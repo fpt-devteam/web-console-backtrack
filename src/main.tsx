@@ -9,6 +9,9 @@ import { routeTree } from './routeTree.gen'
 
 import './styles.css'
 import reportWebVitals from './reportWebVitals.ts'
+import { InternalServerError } from './components/ui/errors/internal-server-error-page.tsx'
+import { Spinner } from './components/ui/spinner.tsx'
+import { NotFoundPage } from './components/ui/errors/not-found-page.tsx'
 
 // Create a new router instance
 
@@ -22,6 +25,9 @@ const router = createRouter({
   scrollRestoration: true,
   defaultStructuralSharing: true,
   defaultPreloadStaleTime: 0,
+  defaultErrorComponent: () => <InternalServerError />,
+  defaultPendingComponent: () => <Spinner size="lg" />,
+  defaultNotFoundComponent: () => <NotFoundPage />,
 })
 
 // Register the router instance for type safety
