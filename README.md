@@ -1,310 +1,321 @@
-Welcome to your new TanStack app! 
+# Backtrack Console
 
-# Getting Started
+Enterprise Management Platform for Backtrack - Built with React, TanStack Router, TanStack Query, and HeroUI.
 
-To run this application:
+## Overview
+
+This is the admin/enterprise console for the Backtrack platform. It provides a comprehensive interface for managing users, analytics, and system operations.
+
+## Tech Stack
+
+- **React 19** - UI library
+- **TypeScript** - Type safety
+- **Vite** - Build tool and dev server
+- **TanStack Router** - File-based routing
+- **TanStack Query** - Data fetching and caching
+- **HeroUI** - UI component library (formerly NextUI)
+- **Firebase** - Authentication
+- **Axios** - HTTP client
+- **React Hot Toast** - Toast notifications
+- **Tailwind CSS 4** - Styling
+- **date-fns** - Date formatting
+
+## Getting Started
+
+### Prerequisites
+
+- Node.js 18+ and npm
+
+### Installation
 
 ```bash
+# Install dependencies
 npm install
-npm run start
 ```
 
-# Building For Production
+### Environment Variables
 
-To build this application for production:
+Create a `.env` file in the root directory with the following variables:
+
+```env
+VITE_API_URL=your_api_url_here
+VITE_FIREBASE_API_KEY=your_firebase_api_key
+VITE_FIREBASE_AUTH_DOMAIN=your_firebase_auth_domain
+VITE_FIREBASE_PROJECT_ID=your_firebase_project_id
+VITE_FIREBASE_STORAGE_BUCKET=your_firebase_storage_bucket
+VITE_FIREBASE_MESSAGING_SENDER_ID=your_firebase_messaging_sender_id
+VITE_FIREBASE_APP_ID=your_firebase_app_id
+```
+
+### Development
 
 ```bash
+# Start the development server (runs on port 3000)
+npm run dev
+```
+
+### Building for Production
+
+```bash
+# Build the application
 npm run build
+
+# Preview the production build
+npm run preview
 ```
 
-## Testing
-
-This project uses [Vitest](https://vitest.dev/) for testing. You can run the tests with:
+### Testing
 
 ```bash
+# Run tests
 npm run test
 ```
 
-## Styling
-
-This project uses [Tailwind CSS](https://tailwindcss.com/) for styling.
-
-
-## Linting & Formatting
-
-
-This project uses [eslint](https://eslint.org/) and [prettier](https://prettier.io/) for linting and formatting. Eslint is configured using [tanstack/eslint-config](https://tanstack.com/config/latest/docs/eslint). The following scripts are available:
+### Linting & Formatting
 
 ```bash
+# Run ESLint
 npm run lint
+
+# Run Prettier
 npm run format
+
+# Run both linting and formatting
 npm run check
 ```
 
+## Project Structure
 
-## Shadcn
-
-Add components using the latest version of [Shadcn](https://ui.shadcn.com/).
-
-```bash
-pnpm dlx shadcn@latest add button
+```
+src/
+├── components/
+│   └── ui/
+│       ├── errors/           # Error page components (404, 403, 500, etc.)
+│       ├── spinner.tsx       # Loading spinner component
+│       └── splash.tsx        # Splash screen component
+├── hooks/
+│   ├── use-dashboard-stats.ts    # TanStack Query hook for dashboard stats
+│   ├── use-activity-logs.ts      # TanStack Query hook for activity logs
+│   └── use-user.ts               # TanStack Query hook for user data
+├── lib/
+│   ├── api-client.ts         # Axios client configuration with auth interceptors
+│   ├── firebase.ts           # Firebase configuration and initialization
+│   ├── toast.ts              # Toast notification wrapper
+│   ├── utils.ts              # Utility functions (cn, getErrorMessage)
+│   └── mock-data.ts          # Mock data for development/demo
+├── routes/
+│   ├── __root.tsx            # Root layout with providers
+│   ├── index.tsx             # Home page
+│   └── dashboard.tsx         # Dashboard with analytics
+├── services/
+│   ├── analytics.service.ts  # Analytics API service
+│   └── user.service.ts       # User API service
+├── types/
+│   ├── api-response.type.ts  # API response types
+│   ├── pagination.type.ts    # Pagination types
+│   ├── user.types.ts         # User-related types
+│   └── analytics.types.ts    # Analytics-related types
+└── main.tsx                  # Application entry point
 ```
 
+## Key Concepts
 
+### Routing
 
-## Routing
-This project uses [TanStack Router](https://tanstack.com/router). The initial setup is a file based router. Which means that the routes are managed as files in `src/routes`.
+This project uses **TanStack Router** with file-based routing. Routes are defined as files in the `src/routes` directory.
 
-### Adding A Route
-
-To add a new route to your application just add another a new file in the `./src/routes` directory.
-
-TanStack will automatically generate the content of the route file for you.
-
-Now that you have two routes you can use a `Link` component to navigate between them.
-
-### Adding Links
-
-To use SPA (Single Page Application) navigation you will need to import the `Link` component from `@tanstack/react-router`.
+To add a new route:
+1. Create a new file in `src/routes` (e.g., `settings.tsx`)
+2. Export a route component using `createFileRoute`
 
 ```tsx
-import { Link } from "@tanstack/react-router";
+import { createFileRoute } from '@tanstack/react-router';
+
+export const Route = createFileRoute('/settings')({
+  component: Settings,
+});
+
+function Settings() {
+  return <div>Settings Page</div>;
+}
 ```
 
-Then anywhere in your JSX you can use it like so:
+### Data Fetching
+
+We use **TanStack Query** for data fetching. The pattern is:
+
+1. **Service Layer** (`src/services/`) - Contains API calls
+2. **Hooks** (`src/hooks/`) - TanStack Query hooks that use services
+3. **Components** - Use hooks to fetch and display data
+
+Example:
 
 ```tsx
-<Link to="/about">About</Link>
+// In component
+import { useDashboardStats } from '@/hooks/use-dashboard-stats';
+
+function Dashboard() {
+  const { data, isLoading, error } = useDashboardStats();
+
+  if (isLoading) return <Spinner />;
+  if (error) return <div>Error: {error.message}</div>;
+
+  return <div>{data.totalUsers}</div>;
+}
 ```
 
-This will create a link that will navigate to the `/about` route.
+### API Client
 
-More information on the `Link` component can be found in the [Link documentation](https://tanstack.com/router/v1/docs/framework/react/api/router/linkComponent).
+The API client (`src/lib/api-client.ts`) provides two instances:
 
-### Using A Layout
+- `privateClient` - Automatically includes Firebase auth token in requests
+- `publicClient` - No authentication required
 
-In the File Based Routing setup the layout is located in `src/routes/__root.tsx`. Anything you add to the root route will appear in all the routes. The route content will appear in the JSX where you use the `<Outlet />` component.
+The private client automatically:
+- Adds the Firebase auth token to requests
+- Refreshes the token if it expires (401 response)
+- Handles token refresh errors
 
-Here is an example layout that includes a header:
+### Mock Data
+
+For development and demo purposes, services can use mock data instead of real API calls. Toggle this in the service file:
 
 ```tsx
-import { Outlet, createRootRoute } from '@tanstack/react-router'
-import { TanStackRouterDevtools } from '@tanstack/react-router-devtools'
-
-import { Link } from "@tanstack/react-router";
-
-export const Route = createRootRoute({
-  component: () => (
-    <>
-      <header>
-        <nav>
-          <Link to="/">Home</Link>
-          <Link to="/about">About</Link>
-        </nav>
-      </header>
-      <Outlet />
-      <TanStackRouterDevtools />
-    </>
-  ),
-})
+// In src/services/analytics.service.ts
+const USE_MOCK_DATA = true; // Set to false to use real API
 ```
 
-The `<TanStackRouterDevtools />` component is not required so you can remove it if you don't want it in your layout.
+### UI Components
 
-More information on layouts can be found in the [Layouts documentation](https://tanstack.com/router/latest/docs/framework/react/guide/routing-concepts#layouts).
+This project uses **HeroUI** (formerly NextUI) for UI components. HeroUI is a modern, React-based UI library built on top of Tailwind CSS.
 
+Common components:
+- `Card`, `CardHeader`, `CardBody` - Card layouts
+- `Button` - Buttons with various styles
+- `Table`, `TableHeader`, `TableBody`, `TableRow`, `TableCell` - Tables
+- `Chip` - Small labels/badges
+- `Spinner` - Loading indicators
+- `Modal`, `Dropdown`, `Input`, etc.
 
-## Data Fetching
-
-There are multiple ways to fetch data in your application. You can use TanStack Query to fetch data from a server. But you can also use the `loader` functionality built into TanStack Router to load the data for a route before it's rendered.
-
-For example:
+Example:
 
 ```tsx
-const peopleRoute = createRoute({
-  getParentRoute: () => rootRoute,
-  path: "/people",
-  loader: async () => {
-    const response = await fetch("https://swapi.dev/api/people");
-    return response.json() as Promise<{
-      results: {
-        name: string;
-      }[];
-    }>;
-  },
-  component: () => {
-    const data = peopleRoute.useLoaderData();
-    return (
-      <ul>
-        {data.results.map((person) => (
-          <li key={person.name}>{person.name}</li>
-        ))}
-      </ul>
-    );
-  },
+import { Card, CardBody, Button } from '@heroui/react';
+
+function MyComponent() {
+  return (
+    <Card>
+      <CardBody>
+        <Button color="primary">Click me</Button>
+      </CardBody>
+    </Card>
+  );
+}
+```
+
+### Toast Notifications
+
+Use the `showToast` utility for notifications:
+
+```tsx
+import { showToast } from '@/lib/toast';
+
+// Success message
+showToast.success('Operation completed!');
+
+// Error message
+showToast.error('Something went wrong');
+
+// From error object
+showToast.fromError(error);
+
+// Loading state
+showToast.loading('Processing...');
+```
+
+### Authentication
+
+Firebase Authentication is configured in `src/lib/firebase.ts`. The auth instance is used by the API client to automatically include auth tokens in requests.
+
+```tsx
+import { auth } from '@/lib/firebase';
+
+// Get current user
+const user = auth.currentUser;
+
+// Listen to auth state
+auth.onAuthStateChanged((user) => {
+  if (user) {
+    // User is signed in
+  } else {
+    // User is signed out
+  }
 });
 ```
 
-Loaders simplify your data fetching logic dramatically. Check out more information in the [Loader documentation](https://tanstack.com/router/latest/docs/framework/react/guide/data-loading#loader-parameters).
+### Error Pages
 
-### React-Query
+Pre-built error pages are available in `src/components/ui/errors/`:
 
-React-Query is an excellent addition or alternative to route loading and integrating it into you application is a breeze.
+- `NotFoundPage` - 404 error
+- `Forbidden` - 403 error
+- `Unauthorized` - 401 error
+- `InternalServerError` - 500 error
 
-First add your dependencies:
+Use them in your routes for consistent error handling.
 
-```bash
-npm install @tanstack/react-query @tanstack/react-query-devtools
-```
+## Development Guidelines
 
-Next we'll need to create a query client and provider. We recommend putting those in `main.tsx`.
+### Adding a New Feature
 
-```tsx
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+1. **Define types** in `src/types/`
+2. **Create service** in `src/services/`
+3. **Create TanStack Query hook** in `src/hooks/`
+4. **Create route/component** that uses the hook
+5. **Use HeroUI components** for UI
 
-// ...
+### Styling
 
-const queryClient = new QueryClient();
+- Use **Tailwind CSS** utility classes
+- Use **HeroUI components** for common UI patterns
+- Use the `cn()` utility from `@/lib/utils` to conditionally combine classes
 
-// ...
+### Code Organization
 
-if (!rootElement.innerHTML) {
-  const root = ReactDOM.createRoot(rootElement);
+- Keep components small and focused
+- Extract reusable logic into custom hooks
+- Use TypeScript for type safety
+- Follow the existing file structure
 
-  root.render(
-    <QueryClientProvider client={queryClient}>
-      <RouterProvider router={router} />
-    </QueryClientProvider>
-  );
-}
-```
+## Demo Dashboard
 
-You can also add TanStack Query Devtools to the root route (optional).
+Visit `/dashboard` to see a demo dashboard that showcases:
+- HeroUI components (Cards, Tables, Chips)
+- TanStack Query integration
+- Mock data fetching
+- Loading states
+- Error handling
+- Toast notifications
 
-```tsx
-import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
+## Deployment
 
-const rootRoute = createRootRoute({
-  component: () => (
-    <>
-      <Outlet />
-      <ReactQueryDevtools buttonPosition="top-right" />
-      <TanStackRouterDevtools />
-    </>
-  ),
-});
-```
-
-Now you can use `useQuery` to fetch your data.
-
-```tsx
-import { useQuery } from "@tanstack/react-query";
-
-import "./App.css";
-
-function App() {
-  const { data } = useQuery({
-    queryKey: ["people"],
-    queryFn: () =>
-      fetch("https://swapi.dev/api/people")
-        .then((res) => res.json())
-        .then((data) => data.results as { name: string }[]),
-    initialData: [],
-  });
-
-  return (
-    <div>
-      <ul>
-        {data.map((person) => (
-          <li key={person.name}>{person.name}</li>
-        ))}
-      </ul>
-    </div>
-  );
-}
-
-export default App;
-```
-
-You can find out everything you need to know on how to use React-Query in the [React-Query documentation](https://tanstack.com/query/latest/docs/framework/react/overview).
-
-## State Management
-
-Another common requirement for React applications is state management. There are many options for state management in React. TanStack Store provides a great starting point for your project.
-
-First you need to add TanStack Store as a dependency:
+The project is configured for deployment on Vercel (see `vercel.json`).
 
 ```bash
-npm install @tanstack/store
+# Build for production
+npm run build
+
+# The build output will be in the dist/ directory
 ```
 
-Now let's create a simple counter in the `src/App.tsx` file as a demonstration.
+## Additional Resources
 
-```tsx
-import { useStore } from "@tanstack/react-store";
-import { Store } from "@tanstack/store";
-import "./App.css";
+- [TanStack Router Docs](https://tanstack.com/router)
+- [TanStack Query Docs](https://tanstack.com/query)
+- [HeroUI Docs](https://heroui.com)
+- [Firebase Docs](https://firebase.google.com/docs)
+- [Tailwind CSS Docs](https://tailwindcss.com)
 
-const countStore = new Store(0);
+## Support
 
-function App() {
-  const count = useStore(countStore);
-  return (
-    <div>
-      <button onClick={() => countStore.setState((n) => n + 1)}>
-        Increment - {count}
-      </button>
-    </div>
-  );
-}
-
-export default App;
-```
-
-One of the many nice features of TanStack Store is the ability to derive state from other state. That derived state will update when the base state updates.
-
-Let's check this out by doubling the count using derived state.
-
-```tsx
-import { useStore } from "@tanstack/react-store";
-import { Store, Derived } from "@tanstack/store";
-import "./App.css";
-
-const countStore = new Store(0);
-
-const doubledStore = new Derived({
-  fn: () => countStore.state * 2,
-  deps: [countStore],
-});
-doubledStore.mount();
-
-function App() {
-  const count = useStore(countStore);
-  const doubledCount = useStore(doubledStore);
-
-  return (
-    <div>
-      <button onClick={() => countStore.setState((n) => n + 1)}>
-        Increment - {count}
-      </button>
-      <div>Doubled - {doubledCount}</div>
-    </div>
-  );
-}
-
-export default App;
-```
-
-We use the `Derived` class to create a new store that is derived from another store. The `Derived` class has a `mount` method that will start the derived store updating.
-
-Once we've created the derived store we can use it in the `App` component just like we would any other store using the `useStore` hook.
-
-You can find out everything you need to know on how to use TanStack Store in the [TanStack Store documentation](https://tanstack.com/store/latest).
-
-# Demo files
-
-Files prefixed with `demo` can be safely deleted. They are there to provide a starting point for you to play around with the features you've installed.
-
-# Learn More
-
-You can learn more about all of the offerings from TanStack in the [TanStack documentation](https://tanstack.com).
+For issues or questions, please contact the development team or create an issue in the repository.
