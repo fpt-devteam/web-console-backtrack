@@ -1,24 +1,19 @@
-import { Outlet, createRootRouteWithContext } from '@tanstack/react-router'
-import { TanStackRouterDevtoolsPanel } from '@tanstack/react-router-devtools'
-import { TanStackDevtools } from '@tanstack/react-devtools'
-import { HeroUIProvider } from '@heroui/react'
-import { Toaster } from 'react-hot-toast'
-
-import Header from '../components/Header'
-
-import StoreDevtools from '../lib/demo-store-devtools'
-
-import TanStackQueryDevtools from '../integrations/tanstack-query/devtools'
-
-import type { QueryClient } from '@tanstack/react-query'
+import { Outlet, createRootRouteWithContext } from '@tanstack/react-router';
+import { TanStackRouterDevtools } from '@tanstack/react-router-devtools';
+import { Toaster } from 'react-hot-toast';
+import type { QueryClient } from '@tanstack/react-query';
 
 interface MyRouterContext {
-  queryClient: QueryClient
+  queryClient: QueryClient;
 }
 
 export const Route = createRootRouteWithContext<MyRouterContext>()({
-  component: () => (
-    <HeroUIProvider>
+  component: RootComponent,
+});
+
+function RootComponent() {
+  return (
+    <>
       <Toaster
         position="top-right"
         toastOptions={{
@@ -43,21 +38,11 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
           },
         }}
       />
-      <Header />
+      
       <Outlet />
-      <TanStackDevtools
-        config={{
-          position: 'bottom-right',
-        }}
-        plugins={[
-          {
-            name: 'Tanstack Router',
-            render: <TanStackRouterDevtoolsPanel />,
-          },
-          StoreDevtools,
-          TanStackQueryDevtools,
-        ]}
-      />
-    </HeroUIProvider>
-  ),
-})
+      
+      {/* Devtools - only in development */}
+      {import.meta.env.DEV && <TanStackRouterDevtools position="bottom-right" />}
+    </>
+  );
+}
