@@ -1,0 +1,47 @@
+[33mcommit 5c217f86b54bcd7a80f448f3d5d60ecddac69f2a[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m, [m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m)[m
+Author: Nhatthang27 <nhatthang270404@gmail.com>
+Date:   Fri Jan 2 23:08:34 2026 +0700
+
+    feat: add error handling pages and UI components
+    
+    - Implemented NotFoundPage and UnauthorizedPage components for better user experience on error routes.
+    - Created a Spinner component for loading states.
+    - Developed a Splash component for initial loading screen with animations.
+    - Added hooks for fetching activity logs and dashboard statistics using React Query.
+    - Introduced analytics and user services for API interactions.
+    - Created mock data for dashboard stats and activity logs for development purposes.
+    - Enhanced the dashboard route with stats cards and activity logs table.
+    - Integrated toast notifications for error handling.
+    - Updated routing structure to include new error handling and dashboard routes.
+
+ .claude/settings.local.json                        |   15 [32m+[m
+ README.md                                          |  435 [32m+[m[31m-[m
+ package-lock.json                                  | 6143 [32m+++++++++++++++++[m[31m---[m
+ package.json                                       |    6 [32m+[m
+ src/components/ui/errors/forbidden-page.tsx        |   36 [32m+[m
+ .../ui/errors/internal-server-error-page.tsx       |   45 [32m+[m
+ src/components/ui/errors/not-found-page.tsx        |   83 [32m+[m
+ src/components/ui/errors/unauthorized-page.tsx     |   36 [32m+[m
+ src/components/ui/spinner.tsx                      |   20 [32m+[m
+ src/components/ui/splash.tsx                       |  167 [32m+[m
+ src/hooks/use-activity-logs.ts                     |    9 [32m+[m
+ src/hooks/use-dashboard-stats.ts                   |    9 [32m+[m
+ src/hooks/use-user.ts                              |   15 [32m+[m
+ src/lib/api-client.ts                              |   55 [32m+[m
+ src/lib/firebase.ts                                |   14 [32m+[m
+ src/lib/mock-data.ts                               |   65 [32m+[m
+ src/lib/toast.ts                                   |   18 [32m+[m
+ src/lib/utils.ts                                   |    9 [32m+[m
+ src/main.tsx                                       |    6 [32m+[m
+ src/routeTree.gen.ts                               |  189 [32m+[m
+ src/routes/__root.tsx                              |   30 [32m+[m[31m-[m
+ src/routes/dashboard.tsx                           |  190 [32m+[m
+ src/routes/demo/form.address.tsx                   |    2 [32m+[m[31m-[m
+ src/routes/demo/form.simple.tsx                    |    2 [32m+[m[31m-[m
+ src/services/analytics.service.ts                  |   36 [32m+[m
+ src/services/user.service.ts                       |   23 [32m+[m
+ src/types/analytics.types.ts                       |   15 [32m+[m
+ src/types/api-response.type.ts                     |    8 [32m+[m
+ src/types/pagination.type.ts                       |   12 [32m+[m
+ src/types/user.types.ts                            |   21 [32m+[m
+ 30 files changed, 6673 insertions(+), 1041 deletions(-)
