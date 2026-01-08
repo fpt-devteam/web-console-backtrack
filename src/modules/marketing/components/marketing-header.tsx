@@ -55,7 +55,7 @@ export function MarketingHeader() {
             >
               Log In
             </Link>
-            <Button asChild size="lg" className="bg-blue-600 hover:bg-blue-700">
+            <Button asChild size="lg" className="bg-blue-500 hover:bg-blue-700">
               <Link to="/apply">Get Started</Link>
             </Button>
           </div>

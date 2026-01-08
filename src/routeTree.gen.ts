@@ -13,6 +13,10 @@ import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as MarketingRouteImport } from './routes/_marketing'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthSigninOrSignupRouteImport } from './routes/auth/signin-or-signup'
+import { Route as AuthSigninRouteImport } from './routes/auth/signin'
+import { Route as AuthRedirectRouteImport } from './routes/auth/redirect'
+import { Route as AuthCreatePasswordRouteImport } from './routes/auth/create-password'
+import { Route as AuthCheckEmailRouteImport } from './routes/auth/check-email'
 import { Route as MarketingUseCasesRouteImport } from './routes/_marketing/use-cases'
 import { Route as MarketingPricingRouteImport } from './routes/_marketing/pricing'
 import { Route as MarketingFeaturesRouteImport } from './routes/_marketing/features'
@@ -37,6 +41,26 @@ const IndexRoute = IndexRouteImport.update({
 const AuthSigninOrSignupRoute = AuthSigninOrSignupRouteImport.update({
   id: '/auth/signin-or-signup',
   path: '/auth/signin-or-signup',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthSigninRoute = AuthSigninRouteImport.update({
+  id: '/auth/signin',
+  path: '/auth/signin',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthRedirectRoute = AuthRedirectRouteImport.update({
+  id: '/auth/redirect',
+  path: '/auth/redirect',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthCreatePasswordRoute = AuthCreatePasswordRouteImport.update({
+  id: '/auth/create-password',
+  path: '/auth/create-password',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthCheckEmailRoute = AuthCheckEmailRouteImport.update({
+  id: '/auth/check-email',
+  path: '/auth/check-email',
   getParentRoute: () => rootRouteImport,
 } as any)
 const MarketingUseCasesRoute = MarketingUseCasesRouteImport.update({
@@ -79,6 +103,10 @@ export interface FileRoutesByFullPath {
   '/features': typeof MarketingFeaturesRoute
   '/pricing': typeof MarketingPricingRoute
   '/use-cases': typeof MarketingUseCasesRoute
+  '/auth/check-email': typeof AuthCheckEmailRoute
+  '/auth/create-password': typeof AuthCreatePasswordRoute
+  '/auth/redirect': typeof AuthRedirectRoute
+  '/auth/signin': typeof AuthSigninRoute
   '/auth/signin-or-signup': typeof AuthSigninOrSignupRoute
 }
 export interface FileRoutesByTo {
@@ -90,6 +118,10 @@ export interface FileRoutesByTo {
   '/features': typeof MarketingFeaturesRoute
   '/pricing': typeof MarketingPricingRoute
   '/use-cases': typeof MarketingUseCasesRoute
+  '/auth/check-email': typeof AuthCheckEmailRoute
+  '/auth/create-password': typeof AuthCreatePasswordRoute
+  '/auth/redirect': typeof AuthRedirectRoute
+  '/auth/signin': typeof AuthSigninRoute
   '/auth/signin-or-signup': typeof AuthSigninOrSignupRoute
 }
 export interface FileRoutesById {
@@ -103,6 +135,10 @@ export interface FileRoutesById {
   '/_marketing/features': typeof MarketingFeaturesRoute
   '/_marketing/pricing': typeof MarketingPricingRoute
   '/_marketing/use-cases': typeof MarketingUseCasesRoute
+  '/auth/check-email': typeof AuthCheckEmailRoute
+  '/auth/create-password': typeof AuthCreatePasswordRoute
+  '/auth/redirect': typeof AuthRedirectRoute
+  '/auth/signin': typeof AuthSigninRoute
   '/auth/signin-or-signup': typeof AuthSigninOrSignupRoute
 }
 export interface FileRouteTypes {
@@ -116,6 +152,10 @@ export interface FileRouteTypes {
     | '/features'
     | '/pricing'
     | '/use-cases'
+    | '/auth/check-email'
+    | '/auth/create-password'
+    | '/auth/redirect'
+    | '/auth/signin'
     | '/auth/signin-or-signup'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -127,6 +167,10 @@ export interface FileRouteTypes {
     | '/features'
     | '/pricing'
     | '/use-cases'
+    | '/auth/check-email'
+    | '/auth/create-password'
+    | '/auth/redirect'
+    | '/auth/signin'
     | '/auth/signin-or-signup'
   id:
     | '__root__'
@@ -139,6 +183,10 @@ export interface FileRouteTypes {
     | '/_marketing/features'
     | '/_marketing/pricing'
     | '/_marketing/use-cases'
+    | '/auth/check-email'
+    | '/auth/create-password'
+    | '/auth/redirect'
+    | '/auth/signin'
     | '/auth/signin-or-signup'
   fileRoutesById: FileRoutesById
 }
@@ -146,6 +194,10 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   MarketingRoute: typeof MarketingRouteWithChildren
   DashboardRoute: typeof DashboardRoute
+  AuthCheckEmailRoute: typeof AuthCheckEmailRoute
+  AuthCreatePasswordRoute: typeof AuthCreatePasswordRoute
+  AuthRedirectRoute: typeof AuthRedirectRoute
+  AuthSigninRoute: typeof AuthSigninRoute
   AuthSigninOrSignupRoute: typeof AuthSigninOrSignupRoute
 }
 
@@ -177,6 +229,34 @@ declare module '@tanstack/react-router' {
       path: '/auth/signin-or-signup'
       fullPath: '/auth/signin-or-signup'
       preLoaderRoute: typeof AuthSigninOrSignupRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/auth/signin': {
+      id: '/auth/signin'
+      path: '/auth/signin'
+      fullPath: '/auth/signin'
+      preLoaderRoute: typeof AuthSigninRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/auth/redirect': {
+      id: '/auth/redirect'
+      path: '/auth/redirect'
+      fullPath: '/auth/redirect'
+      preLoaderRoute: typeof AuthRedirectRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/auth/create-password': {
+      id: '/auth/create-password'
+      path: '/auth/create-password'
+      fullPath: '/auth/create-password'
+      preLoaderRoute: typeof AuthCreatePasswordRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/auth/check-email': {
+      id: '/auth/check-email'
+      path: '/auth/check-email'
+      fullPath: '/auth/check-email'
+      preLoaderRoute: typeof AuthCheckEmailRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_marketing/use-cases': {
@@ -250,6 +330,10 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   MarketingRoute: MarketingRouteWithChildren,
   DashboardRoute: DashboardRoute,
+  AuthCheckEmailRoute: AuthCheckEmailRoute,
+  AuthCreatePasswordRoute: AuthCreatePasswordRoute,
+  AuthRedirectRoute: AuthRedirectRoute,
+  AuthSigninRoute: AuthSigninRoute,
   AuthSigninOrSignupRoute: AuthSigninOrSignupRoute,
 }
 export const routeTree = rootRouteImport
