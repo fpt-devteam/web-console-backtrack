@@ -5,15 +5,15 @@ export function Redirect() {
   
 
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4">
-      <div className="bg-white rounded-xl shadow-lg p-8 w-full max-w-md text-center">
+    <div className="min-h-screen bg-gradient-to-b from-[#E5F4FF] to-white flex items-center justify-center px-4">
+      <div className="bg-white rounded-xl shadow-lg p-8 w-full max-w-xl text-center">
         <div className="flex justify-center mb-6">
           <div className="w-16 h-16 bg-[#E5F4FF] rounded-full flex items-center justify-center">
             <Loader2 className="w-8 h-8 text-blue-500 animate-spin" />
           </div>
         </div>
 
-        <h1 className="text-xl font-semibold text-gray-900 mb-2">
+        <h1 className="text-xl font-semibold  mb-2">
           Redirecting you to your company&apos;s sign-in page…
         </h1>
 

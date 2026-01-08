@@ -8,8 +8,8 @@ export function SignIn() {
   const [showPassword, setShowPassword] = useState(false);
 
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4 py-12">
-      <div className="w-full max-w-lg">
+    <div className="min-h-screen bg-gradient-to-b from-[#E5F4FF] to-white flex items-center justify-center px-4 py-12">
+      <div className="w-full max-w-xl">
         {/* Form Card */}
         <div className="bg-white rounded-xl shadow-lg p-8">
           {/* Lock Icon */}
@@ -20,7 +20,7 @@ export function SignIn() {
           </div>
 
           {/* Title */}
-          <h1 className="text-2xl font-bold text-gray-900 text-center mb-2">
+          <h1 className="text-2xl font-bold   text-center mb-2">
             Sign In to Your Account
           </h1>
 
@@ -33,7 +33,7 @@ export function SignIn() {
           <form className="space-y-4">
             {/* Email Field */}
             <div>
-              <Label htmlFor="email" className="text-sm font-medium text-gray-700">
+              <Label htmlFor="email" className="text-sm font-medium ">
                 Email address
               </Label>
               <div className="relative mt-2 text-gray-600">
@@ -53,7 +53,7 @@ export function SignIn() {
             {/* Password Field */}
             <div>
               <div className="flex items-center justify-between mb-2">
-                <Label htmlFor="password" className="text-sm font-medium text-gray-700">
+                <Label htmlFor="password" className="text-sm font-medium ">
                   Password
                 </Label>
                 <a
@@ -95,7 +95,7 @@ export function SignIn() {
             </Button>
 
             {/* Security Info */}
-            <p className="text-xs font-semibold text-gray-500 text-center mt-5">
+            <p className="text-xs font-semibold text-gray-700 text-center mt-5">
               SECURED BY ENTERPRISE SSO
             </p>
           </form>
