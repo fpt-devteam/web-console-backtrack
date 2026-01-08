@@ -5,8 +5,8 @@ import { Lock } from 'lucide-react';
 
 export function SignInOrSignUp() {
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4 py-12">
-      <div className="w-full max-w-lg">
+    <div className="min-h-screen bg-gradient-to-b from-[#E5F4FF] to-white flex items-center justify-center px-4 py-12">
+        <div className="w-full max-w-xl">
         {/* Form Card */}
         <div className="bg-white rounded-xl shadow-lg p-8">
           {/* Lock Icon */}
@@ -17,7 +17,7 @@ export function SignInOrSignUp() {
           </div>
 
           {/* Title */}
-          <h1 className="text-2xl font-bold text-gray-900 text-center mb-2">
+          <h1 className="text-2xl font-bold   text-center mb-2">
             Sign In or Sign Up
           </h1>
 
@@ -29,7 +29,7 @@ export function SignInOrSignUp() {
           {/* Form */}
           <form className="space-y-4">
             <div>
-              <Label htmlFor="email" className="text-sm font-medium text-gray-700">
+              <Label htmlFor="email" className="text-sm font-medium ">
                 Email address
               </Label>
               <Input
@@ -55,7 +55,7 @@ export function SignInOrSignUp() {
             </Button>
 
             {/* Security Info */}
-            <p className="text-xs font-semibold text-gray-500 text-center mt-5">
+            <p className="text-xs font-semibold text-gray-700 text-center mt-5">
               SECURED BY ENTERPRISE SSO
             </p>
           </form>

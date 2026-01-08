@@ -8,8 +8,8 @@ export function CreatePassword() {
   const [showPassword, setShowPassword] = useState(false);
 
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4 py-12">
-      <div className="w-full max-w-lg">
+    <div className="min-h-screen bg-gradient-to-b from-[#E5F4FF] to-white flex items-center justify-center px-4 py-12">
+      <div className="w-full max-w-xl">
         {/* Form Card */}
         <div className="bg-white rounded-xl shadow-lg p-8">
           {/* Lock Icon */}
@@ -20,7 +20,7 @@ export function CreatePassword() {
           </div>
 
           {/* Title */}
-          <h1 className="text-2xl font-bold text-gray-900 text-center mb-2">
+          <h1 className="text-2xl font-bold  text-center mb-2">
             Create a Password
           </h1>
 
@@ -33,7 +33,7 @@ export function CreatePassword() {
           <form className="space-y-4">
             {/* Email Field */}
             <div>
-              <Label htmlFor="email" className="text-sm font-medium text-gray-700">
+              <Label htmlFor="email" className="text-sm font-medium ">
                 Email address
               </Label>
               <div className="relative mt-2 text-gray-600">
@@ -52,7 +52,7 @@ export function CreatePassword() {
 
             {/* Password Field */}
             <div>
-              <Label htmlFor="password" className="text-sm font-medium text-gray-700 mb-2 block">
+              <Label htmlFor="password" className="text-sm font-medium  mb-2 block">
                 Password
               </Label>
               <div className="relative">
@@ -87,7 +87,7 @@ export function CreatePassword() {
             </Button>
 
             {/* Security Info */}
-            <p className="text-xs font-semibold text-gray-500 text-center mt-5">
+            <p className="text-xs font-semibold text-gray-700 text-center mt-5">
               SECURED BY ENTERPRISE SSO
             </p>
           </form>
@@ -101,6 +101,10 @@ export function CreatePassword() {
               <span className="text-gray-300">|</span>
               <a href="#" className="hover:text-gray-900 transition-colors">
                 Privacy Policy
+              </a>
+              <span className="text-gray-300">|</span>
+              <a href="#" className="hover:text-gray-900 transition-colors">
+                Contact Support
               </a>
             </div>
           </div>

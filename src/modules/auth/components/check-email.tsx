@@ -3,8 +3,8 @@ import { Mail } from 'lucide-react';
 
 export function CheckEmail() {
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4 py-12">
-      <div className="w-full max-w-lg">
+    <div className="min-h-screen bg-gradient-to-b from-[#E5F4FF] to-white flex items-center justify-center px-4 py-12">
+      <div className="w-full max-w-xl">
         {/* Card */}
         <div className="bg-white rounded-xl shadow-lg p-8 text-center">
           {/* Icon */}
@@ -15,14 +15,14 @@ export function CheckEmail() {
           </div>
 
           {/* Title */}
-          <h1 className="text-2xl font-bold text-gray-900 mb-2">
+          <h1 className="text-2xl font-bold  mb-2">
             Check your email
           </h1>
 
           {/* Description */}
           <p className="text-sm text-gray-600 mb-6">
             An activation link has been sent to{' '}
-            <span className="font-medium text-gray-900">
+            <span className="font-medium text-black">
               user***@example.com
             </span>
             . <br />

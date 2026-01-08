@@ -12,6 +12,9 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as MarketingRouteImport } from './routes/_marketing'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as ConsoleWelcomeRouteImport } from './routes/console/welcome'
+import { Route as ConsoleProcessingRouteImport } from './routes/console/processing'
+import { Route as ConsoleCreateOrganizationRouteImport } from './routes/console/create-organization'
 import { Route as AuthSigninOrSignupRouteImport } from './routes/auth/signin-or-signup'
 import { Route as AuthSigninRouteImport } from './routes/auth/signin'
 import { Route as AuthRedirectRouteImport } from './routes/auth/redirect'
@@ -38,6 +41,22 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ConsoleWelcomeRoute = ConsoleWelcomeRouteImport.update({
+  id: '/console/welcome',
+  path: '/console/welcome',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ConsoleProcessingRoute = ConsoleProcessingRouteImport.update({
+  id: '/console/processing',
+  path: '/console/processing',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ConsoleCreateOrganizationRoute =
+  ConsoleCreateOrganizationRouteImport.update({
+    id: '/console/create-organization',
+    path: '/console/create-organization',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const AuthSigninOrSignupRoute = AuthSigninOrSignupRouteImport.update({
   id: '/auth/signin-or-signup',
   path: '/auth/signin-or-signup',
@@ -108,6 +127,9 @@ export interface FileRoutesByFullPath {
   '/auth/redirect': typeof AuthRedirectRoute
   '/auth/signin': typeof AuthSigninRoute
   '/auth/signin-or-signup': typeof AuthSigninOrSignupRoute
+  '/console/create-organization': typeof ConsoleCreateOrganizationRoute
+  '/console/processing': typeof ConsoleProcessingRoute
+  '/console/welcome': typeof ConsoleWelcomeRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -123,6 +145,9 @@ export interface FileRoutesByTo {
   '/auth/redirect': typeof AuthRedirectRoute
   '/auth/signin': typeof AuthSigninRoute
   '/auth/signin-or-signup': typeof AuthSigninOrSignupRoute
+  '/console/create-organization': typeof ConsoleCreateOrganizationRoute
+  '/console/processing': typeof ConsoleProcessingRoute
+  '/console/welcome': typeof ConsoleWelcomeRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -140,6 +165,9 @@ export interface FileRoutesById {
   '/auth/redirect': typeof AuthRedirectRoute
   '/auth/signin': typeof AuthSigninRoute
   '/auth/signin-or-signup': typeof AuthSigninOrSignupRoute
+  '/console/create-organization': typeof ConsoleCreateOrganizationRoute
+  '/console/processing': typeof ConsoleProcessingRoute
+  '/console/welcome': typeof ConsoleWelcomeRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -157,6 +185,9 @@ export interface FileRouteTypes {
     | '/auth/redirect'
     | '/auth/signin'
     | '/auth/signin-or-signup'
+    | '/console/create-organization'
+    | '/console/processing'
+    | '/console/welcome'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -172,6 +203,9 @@ export interface FileRouteTypes {
     | '/auth/redirect'
     | '/auth/signin'
     | '/auth/signin-or-signup'
+    | '/console/create-organization'
+    | '/console/processing'
+    | '/console/welcome'
   id:
     | '__root__'
     | '/'
@@ -188,6 +222,9 @@ export interface FileRouteTypes {
     | '/auth/redirect'
     | '/auth/signin'
     | '/auth/signin-or-signup'
+    | '/console/create-organization'
+    | '/console/processing'
+    | '/console/welcome'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -199,6 +236,9 @@ export interface RootRouteChildren {
   AuthRedirectRoute: typeof AuthRedirectRoute
   AuthSigninRoute: typeof AuthSigninRoute
   AuthSigninOrSignupRoute: typeof AuthSigninOrSignupRoute
+  ConsoleCreateOrganizationRoute: typeof ConsoleCreateOrganizationRoute
+  ConsoleProcessingRoute: typeof ConsoleProcessingRoute
+  ConsoleWelcomeRoute: typeof ConsoleWelcomeRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -222,6 +262,27 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/console/welcome': {
+      id: '/console/welcome'
+      path: '/console/welcome'
+      fullPath: '/console/welcome'
+      preLoaderRoute: typeof ConsoleWelcomeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/console/processing': {
+      id: '/console/processing'
+      path: '/console/processing'
+      fullPath: '/console/processing'
+      preLoaderRoute: typeof ConsoleProcessingRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/console/create-organization': {
+      id: '/console/create-organization'
+      path: '/console/create-organization'
+      fullPath: '/console/create-organization'
+      preLoaderRoute: typeof ConsoleCreateOrganizationRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/auth/signin-or-signup': {
@@ -335,6 +396,9 @@ const rootRouteChildren: RootRouteChildren = {
   AuthRedirectRoute: AuthRedirectRoute,
   AuthSigninRoute: AuthSigninRoute,
   AuthSigninOrSignupRoute: AuthSigninOrSignupRoute,
+  ConsoleCreateOrganizationRoute: ConsoleCreateOrganizationRoute,
+  ConsoleProcessingRoute: ConsoleProcessingRoute,
+  ConsoleWelcomeRoute: ConsoleWelcomeRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
