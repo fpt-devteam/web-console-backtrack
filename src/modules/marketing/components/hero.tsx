@@ -35,7 +35,7 @@ export function Hero() {
               <Button
                 asChild
                 size="lg"
-                className="bg-[#3B82F6] hover:bg-[#2563EB] text-white text-base w-full sm:w-[280px] py-4 rounded-lg font-medium"
+                className="bg-blue-500 hover:bg-[#2563EB] text-white text-base w-full sm:w-[280px] py-4 rounded-lg font-medium"
               >
                 <Link to="/apply">Get started for free</Link>
               </Button>

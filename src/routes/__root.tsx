@@ -1,5 +1,4 @@
 import { Outlet, createRootRouteWithContext } from '@tanstack/react-router';
-import { TanStackRouterDevtools } from '@tanstack/react-router-devtools';
 import { Toaster } from 'react-hot-toast';
 import type { QueryClient } from '@tanstack/react-query';
 
@@ -40,9 +39,6 @@ function RootComponent() {
       />
       
       <Outlet />
-      
-      {/* Devtools - only in development */}
-      {import.meta.env.DEV && <TanStackRouterDevtools position="bottom-right" />}
     </>
   );
 }
