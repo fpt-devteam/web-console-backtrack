@@ -26,6 +26,7 @@ import { Route as MarketingFeaturesRouteImport } from './routes/_marketing/featu
 import { Route as MarketingContactRouteImport } from './routes/_marketing/contact'
 import { Route as MarketingApplyRouteImport } from './routes/_marketing/apply'
 import { Route as MarketingAboutRouteImport } from './routes/_marketing/about'
+import { Route as ConsoleAdminEmployeeRouteImport } from './routes/console/admin/employee'
 
 const DashboardRoute = DashboardRouteImport.update({
   id: '/dashboard',
@@ -112,6 +113,11 @@ const MarketingAboutRoute = MarketingAboutRouteImport.update({
   path: '/about',
   getParentRoute: () => MarketingRoute,
 } as any)
+const ConsoleAdminEmployeeRoute = ConsoleAdminEmployeeRouteImport.update({
+  id: '/console/admin/employee',
+  path: '/console/admin/employee',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -130,6 +136,7 @@ export interface FileRoutesByFullPath {
   '/console/create-organization': typeof ConsoleCreateOrganizationRoute
   '/console/processing': typeof ConsoleProcessingRoute
   '/console/welcome': typeof ConsoleWelcomeRoute
+  '/console/admin/employee': typeof ConsoleAdminEmployeeRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -148,6 +155,7 @@ export interface FileRoutesByTo {
   '/console/create-organization': typeof ConsoleCreateOrganizationRoute
   '/console/processing': typeof ConsoleProcessingRoute
   '/console/welcome': typeof ConsoleWelcomeRoute
+  '/console/admin/employee': typeof ConsoleAdminEmployeeRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -168,6 +176,7 @@ export interface FileRoutesById {
   '/console/create-organization': typeof ConsoleCreateOrganizationRoute
   '/console/processing': typeof ConsoleProcessingRoute
   '/console/welcome': typeof ConsoleWelcomeRoute
+  '/console/admin/employee': typeof ConsoleAdminEmployeeRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -188,6 +197,7 @@ export interface FileRouteTypes {
     | '/console/create-organization'
     | '/console/processing'
     | '/console/welcome'
+    | '/console/admin/employee'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -206,6 +216,7 @@ export interface FileRouteTypes {
     | '/console/create-organization'
     | '/console/processing'
     | '/console/welcome'
+    | '/console/admin/employee'
   id:
     | '__root__'
     | '/'
@@ -225,6 +236,7 @@ export interface FileRouteTypes {
     | '/console/create-organization'
     | '/console/processing'
     | '/console/welcome'
+    | '/console/admin/employee'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -239,6 +251,7 @@ export interface RootRouteChildren {
   ConsoleCreateOrganizationRoute: typeof ConsoleCreateOrganizationRoute
   ConsoleProcessingRoute: typeof ConsoleProcessingRoute
   ConsoleWelcomeRoute: typeof ConsoleWelcomeRoute
+  ConsoleAdminEmployeeRoute: typeof ConsoleAdminEmployeeRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -362,6 +375,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof MarketingAboutRouteImport
       parentRoute: typeof MarketingRoute
     }
+    '/console/admin/employee': {
+      id: '/console/admin/employee'
+      path: '/console/admin/employee'
+      fullPath: '/console/admin/employee'
+      preLoaderRoute: typeof ConsoleAdminEmployeeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -399,6 +419,7 @@ const rootRouteChildren: RootRouteChildren = {
   ConsoleCreateOrganizationRoute: ConsoleCreateOrganizationRoute,
   ConsoleProcessingRoute: ConsoleProcessingRoute,
   ConsoleWelcomeRoute: ConsoleWelcomeRoute,
+  ConsoleAdminEmployeeRoute: ConsoleAdminEmployeeRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
