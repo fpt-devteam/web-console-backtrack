@@ -2,8 +2,46 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Lock } from 'lucide-react';
+import { useState } from 'react';
+import { useRouter } from '@tanstack/react-router';
+import { useCheckEmail } from '@/hooks/use-auth';
+import { showToast } from '@/lib/toast';
 
 export function SignInOrSignUp() {
+  const [email, setEmail] = useState('');
+  const router = useRouter();
+  const checkEmail = useCheckEmail();
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    if (!email.trim()) {
+      showToast.error('Please enter your email address');
+      return;
+    }
+
+    checkEmail.mutate(email, {
+      onSuccess: (result) => {
+        if (result.exists) {
+          // Email exists -> go to signin
+          router.navigate({
+            to: '/auth/signin',
+            state: { email: result.email },
+          });
+        } else {
+          // Email doesn't exist -> go to create password
+          router.navigate({
+            to: '/auth/create-password',
+            state: { email: result.email },
+          });
+        }
+      },
+      onError: (error) => {
+        showToast.error(error.message || 'An error occurred. Please try again.');
+      },
+    });
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-[#E5F4FF] to-white flex items-center justify-center px-4 py-12">
         <div className="w-full max-w-xl">
@@ -27,7 +65,7 @@ export function SignInOrSignUp() {
           </p>
 
           {/* Form */}
-          <form className="space-y-4">
+          <form className="space-y-4" onSubmit={handleSubmit}>
             <div>
               <Label htmlFor="email" className="text-sm font-medium ">
                 Email address
@@ -37,6 +75,9 @@ export function SignInOrSignUp() {
                 type="email"
                 placeholder="name@company.com"
                 className="mt-2"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                disabled={checkEmail.isPending}
                 required
               />
             </div>
@@ -50,8 +91,9 @@ export function SignInOrSignUp() {
             <Button
               type="submit"
               className="w-full bg-blue-500 hover:bg-gray-800 text-white py-5 text-base font-medium"
+              disabled={checkEmail.isPending}
             >
-              Continue →
+              {checkEmail.isPending ? 'Checking...' : 'Continue →'}
             </Button>
 
             {/* Security Info */}

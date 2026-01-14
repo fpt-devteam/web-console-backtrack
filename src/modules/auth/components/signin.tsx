@@ -2,10 +2,57 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Lock, Eye, EyeOff } from 'lucide-react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useRouter, useLocation } from '@tanstack/react-router';
+import { useSignIn } from '@/hooks/use-auth';
+import { showToast } from '@/lib/toast';
 
 export function SignIn() {
   const [showPassword, setShowPassword] = useState(false);
+  const [password, setPassword] = useState('');
+  const [email, setEmail] = useState('');
+  
+  const router = useRouter();
+  const location = useLocation();
+  const signIn = useSignIn();
+
+  // Get email from navigation state
+  useEffect(() => {
+    const stateEmail = (location.state as { email?: string })?.email;
+    
+    if (stateEmail) {
+      setEmail(stateEmail);
+    } else {
+      // If no email provided, redirect back to signin-or-signup
+      showToast.error('Please enter your email first');
+      router.navigate({ to: '/auth/signin-or-signup' });
+    }
+  }, [location.state, router]);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    if (!email || !password) {
+      showToast.error('Please enter your password');
+      return;
+    }
+
+    signIn.mutate(
+      { email, password },
+      {
+        onSuccess: async () => {
+          showToast.success('Welcome back!');
+          // Small delay to ensure state is updated
+          await new Promise(resolve => setTimeout(resolve, 100));
+          // Force navigation
+          window.location.href = '/console/welcome';
+        },
+        onError: (error) => {
+          showToast.error(error.message || 'Failed to sign in. Please try again.');
+        },
+      }
+    );
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-[#E5F4FF] to-white flex items-center justify-center px-4 py-12">
@@ -30,7 +77,7 @@ export function SignIn() {
           </p>
 
           {/* Form */}
-          <form className="space-y-4">
+          <form className="space-y-4" onSubmit={handleSubmit}>
             {/* Email Field */}
             <div>
               <Label htmlFor="email" className="text-sm font-medium ">
@@ -40,7 +87,7 @@ export function SignIn() {
                 <Input
                   id="email"
                   type="email"
-                  value="jane.doe@enterprise.com"
+                  value={email}
                   className="pr-10"
                   readOnly
                 />
@@ -69,6 +116,9 @@ export function SignIn() {
                   type={showPassword ? 'text' : 'password'}
                   placeholder="Enter your password"
                   className="pr-10"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  disabled={signIn.isPending}
                   required
                 />
                 <button
@@ -90,8 +140,9 @@ export function SignIn() {
             <Button
               type="submit"
               className="w-full bg-blue-500 hover:bg-blue-600 text-white py-5 text-base font-medium mt-6"
+              disabled={signIn.isPending}
             >
-              Sign In
+              {signIn.isPending ? 'Signing In...' : 'Sign In'}
             </Button>
 
             {/* Security Info */}

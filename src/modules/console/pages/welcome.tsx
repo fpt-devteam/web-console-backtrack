@@ -1,7 +1,12 @@
 import { Building2, ChevronRight } from 'lucide-react';
-import { Link } from '@tanstack/react-router';
+import { Link, useRouter } from '@tanstack/react-router';
+import { useCurrentUser } from '@/hooks/use-auth';
+import { Spinner } from '@/components/ui/spinner';
 
 export function WelcomePage() {
+  const router = useRouter();
+  const { data: user, isLoading } = useCurrentUser();
+
   // Hardcoded single organization for enterprise admin
   const organization = {
     name: 'Backtrack Inc.',
@@ -11,6 +16,19 @@ export function WelcomePage() {
     iconColor: 'text-blue-600',
   };
 
+  const handleOrganizationClick = () => {
+    // Redirect to admin dashboard
+    router.navigate({ to: '/console/admin/dashboard' });
+  };
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-b from-[#E5F4FF] to-white flex items-center justify-center">
+        <Spinner />
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-[#E5F4FF] to-white flex items-center justify-center px-4 py-12">
       <div className="w-full max-w-2xl">
@@ -19,7 +37,7 @@ export function WelcomePage() {
           {/* Welcome Header */}
           <div className="text-center mb-8">
             <h1 className="text-4xl font-bold mb-3">
-              Welcome back, Sarah
+              Welcome back, {user?.displayName || 'User'}
             </h1>
             <p className="text-base text-gray-600">
               Select an organization to continue or create a new one.
@@ -34,6 +52,7 @@ export function WelcomePage() {
 
             {/* Single Organization Card */}
             <button
+              onClick={handleOrganizationClick}
               className="w-full bg-white border border-gray-200 rounded-lg p-5 hover:border-gray-300 shadow-md hover:shadow-lg transition-all group"
             >
               <div className="flex items-center justify-between">

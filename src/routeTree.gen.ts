@@ -26,7 +26,14 @@ import { Route as MarketingFeaturesRouteImport } from './routes/_marketing/featu
 import { Route as MarketingContactRouteImport } from './routes/_marketing/contact'
 import { Route as MarketingApplyRouteImport } from './routes/_marketing/apply'
 import { Route as MarketingAboutRouteImport } from './routes/_marketing/about'
+import { Route as ConsoleAdminPlanRouteImport } from './routes/console/admin/plan'
+import { Route as ConsoleAdminInviteEmployeeRouteImport } from './routes/console/admin/invite-employee'
 import { Route as ConsoleAdminEmployeeRouteImport } from './routes/console/admin/employee'
+import { Route as ConsoleAdminEditAccountRouteImport } from './routes/console/admin/edit-account'
+import { Route as ConsoleAdminDashboardRouteImport } from './routes/console/admin/dashboard'
+import { Route as ConsoleAdminBranchRouteImport } from './routes/console/admin/branch'
+import { Route as ConsoleAdminEditEmployeeEmployeeIdRouteImport } from './routes/console/admin/edit-employee/$employeeId'
+import { Route as ConsoleAdminEditBranchBranchIdRouteImport } from './routes/console/admin/edit-branch/$branchId'
 
 const DashboardRoute = DashboardRouteImport.update({
   id: '/dashboard',
@@ -113,11 +120,49 @@ const MarketingAboutRoute = MarketingAboutRouteImport.update({
   path: '/about',
   getParentRoute: () => MarketingRoute,
 } as any)
+const ConsoleAdminPlanRoute = ConsoleAdminPlanRouteImport.update({
+  id: '/console/admin/plan',
+  path: '/console/admin/plan',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ConsoleAdminInviteEmployeeRoute =
+  ConsoleAdminInviteEmployeeRouteImport.update({
+    id: '/console/admin/invite-employee',
+    path: '/console/admin/invite-employee',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ConsoleAdminEmployeeRoute = ConsoleAdminEmployeeRouteImport.update({
   id: '/console/admin/employee',
   path: '/console/admin/employee',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ConsoleAdminEditAccountRoute = ConsoleAdminEditAccountRouteImport.update({
+  id: '/console/admin/edit-account',
+  path: '/console/admin/edit-account',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ConsoleAdminDashboardRoute = ConsoleAdminDashboardRouteImport.update({
+  id: '/console/admin/dashboard',
+  path: '/console/admin/dashboard',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ConsoleAdminBranchRoute = ConsoleAdminBranchRouteImport.update({
+  id: '/console/admin/branch',
+  path: '/console/admin/branch',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ConsoleAdminEditEmployeeEmployeeIdRoute =
+  ConsoleAdminEditEmployeeEmployeeIdRouteImport.update({
+    id: '/console/admin/edit-employee/$employeeId',
+    path: '/console/admin/edit-employee/$employeeId',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ConsoleAdminEditBranchBranchIdRoute =
+  ConsoleAdminEditBranchBranchIdRouteImport.update({
+    id: '/console/admin/edit-branch/$branchId',
+    path: '/console/admin/edit-branch/$branchId',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -136,7 +181,14 @@ export interface FileRoutesByFullPath {
   '/console/create-organization': typeof ConsoleCreateOrganizationRoute
   '/console/processing': typeof ConsoleProcessingRoute
   '/console/welcome': typeof ConsoleWelcomeRoute
+  '/console/admin/branch': typeof ConsoleAdminBranchRoute
+  '/console/admin/dashboard': typeof ConsoleAdminDashboardRoute
+  '/console/admin/edit-account': typeof ConsoleAdminEditAccountRoute
   '/console/admin/employee': typeof ConsoleAdminEmployeeRoute
+  '/console/admin/invite-employee': typeof ConsoleAdminInviteEmployeeRoute
+  '/console/admin/plan': typeof ConsoleAdminPlanRoute
+  '/console/admin/edit-branch/$branchId': typeof ConsoleAdminEditBranchBranchIdRoute
+  '/console/admin/edit-employee/$employeeId': typeof ConsoleAdminEditEmployeeEmployeeIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -155,7 +207,14 @@ export interface FileRoutesByTo {
   '/console/create-organization': typeof ConsoleCreateOrganizationRoute
   '/console/processing': typeof ConsoleProcessingRoute
   '/console/welcome': typeof ConsoleWelcomeRoute
+  '/console/admin/branch': typeof ConsoleAdminBranchRoute
+  '/console/admin/dashboard': typeof ConsoleAdminDashboardRoute
+  '/console/admin/edit-account': typeof ConsoleAdminEditAccountRoute
   '/console/admin/employee': typeof ConsoleAdminEmployeeRoute
+  '/console/admin/invite-employee': typeof ConsoleAdminInviteEmployeeRoute
+  '/console/admin/plan': typeof ConsoleAdminPlanRoute
+  '/console/admin/edit-branch/$branchId': typeof ConsoleAdminEditBranchBranchIdRoute
+  '/console/admin/edit-employee/$employeeId': typeof ConsoleAdminEditEmployeeEmployeeIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -176,7 +235,14 @@ export interface FileRoutesById {
   '/console/create-organization': typeof ConsoleCreateOrganizationRoute
   '/console/processing': typeof ConsoleProcessingRoute
   '/console/welcome': typeof ConsoleWelcomeRoute
+  '/console/admin/branch': typeof ConsoleAdminBranchRoute
+  '/console/admin/dashboard': typeof ConsoleAdminDashboardRoute
+  '/console/admin/edit-account': typeof ConsoleAdminEditAccountRoute
   '/console/admin/employee': typeof ConsoleAdminEmployeeRoute
+  '/console/admin/invite-employee': typeof ConsoleAdminInviteEmployeeRoute
+  '/console/admin/plan': typeof ConsoleAdminPlanRoute
+  '/console/admin/edit-branch/$branchId': typeof ConsoleAdminEditBranchBranchIdRoute
+  '/console/admin/edit-employee/$employeeId': typeof ConsoleAdminEditEmployeeEmployeeIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -197,7 +263,14 @@ export interface FileRouteTypes {
     | '/console/create-organization'
     | '/console/processing'
     | '/console/welcome'
+    | '/console/admin/branch'
+    | '/console/admin/dashboard'
+    | '/console/admin/edit-account'
     | '/console/admin/employee'
+    | '/console/admin/invite-employee'
+    | '/console/admin/plan'
+    | '/console/admin/edit-branch/$branchId'
+    | '/console/admin/edit-employee/$employeeId'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -216,7 +289,14 @@ export interface FileRouteTypes {
     | '/console/create-organization'
     | '/console/processing'
     | '/console/welcome'
+    | '/console/admin/branch'
+    | '/console/admin/dashboard'
+    | '/console/admin/edit-account'
     | '/console/admin/employee'
+    | '/console/admin/invite-employee'
+    | '/console/admin/plan'
+    | '/console/admin/edit-branch/$branchId'
+    | '/console/admin/edit-employee/$employeeId'
   id:
     | '__root__'
     | '/'
@@ -236,7 +316,14 @@ export interface FileRouteTypes {
     | '/console/create-organization'
     | '/console/processing'
     | '/console/welcome'
+    | '/console/admin/branch'
+    | '/console/admin/dashboard'
+    | '/console/admin/edit-account'
     | '/console/admin/employee'
+    | '/console/admin/invite-employee'
+    | '/console/admin/plan'
+    | '/console/admin/edit-branch/$branchId'
+    | '/console/admin/edit-employee/$employeeId'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -251,7 +338,14 @@ export interface RootRouteChildren {
   ConsoleCreateOrganizationRoute: typeof ConsoleCreateOrganizationRoute
   ConsoleProcessingRoute: typeof ConsoleProcessingRoute
   ConsoleWelcomeRoute: typeof ConsoleWelcomeRoute
+  ConsoleAdminBranchRoute: typeof ConsoleAdminBranchRoute
+  ConsoleAdminDashboardRoute: typeof ConsoleAdminDashboardRoute
+  ConsoleAdminEditAccountRoute: typeof ConsoleAdminEditAccountRoute
   ConsoleAdminEmployeeRoute: typeof ConsoleAdminEmployeeRoute
+  ConsoleAdminInviteEmployeeRoute: typeof ConsoleAdminInviteEmployeeRoute
+  ConsoleAdminPlanRoute: typeof ConsoleAdminPlanRoute
+  ConsoleAdminEditBranchBranchIdRoute: typeof ConsoleAdminEditBranchBranchIdRoute
+  ConsoleAdminEditEmployeeEmployeeIdRoute: typeof ConsoleAdminEditEmployeeEmployeeIdRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -375,11 +469,60 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof MarketingAboutRouteImport
       parentRoute: typeof MarketingRoute
     }
+    '/console/admin/plan': {
+      id: '/console/admin/plan'
+      path: '/console/admin/plan'
+      fullPath: '/console/admin/plan'
+      preLoaderRoute: typeof ConsoleAdminPlanRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/console/admin/invite-employee': {
+      id: '/console/admin/invite-employee'
+      path: '/console/admin/invite-employee'
+      fullPath: '/console/admin/invite-employee'
+      preLoaderRoute: typeof ConsoleAdminInviteEmployeeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/console/admin/employee': {
       id: '/console/admin/employee'
       path: '/console/admin/employee'
       fullPath: '/console/admin/employee'
       preLoaderRoute: typeof ConsoleAdminEmployeeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/console/admin/edit-account': {
+      id: '/console/admin/edit-account'
+      path: '/console/admin/edit-account'
+      fullPath: '/console/admin/edit-account'
+      preLoaderRoute: typeof ConsoleAdminEditAccountRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/console/admin/dashboard': {
+      id: '/console/admin/dashboard'
+      path: '/console/admin/dashboard'
+      fullPath: '/console/admin/dashboard'
+      preLoaderRoute: typeof ConsoleAdminDashboardRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/console/admin/branch': {
+      id: '/console/admin/branch'
+      path: '/console/admin/branch'
+      fullPath: '/console/admin/branch'
+      preLoaderRoute: typeof ConsoleAdminBranchRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/console/admin/edit-employee/$employeeId': {
+      id: '/console/admin/edit-employee/$employeeId'
+      path: '/console/admin/edit-employee/$employeeId'
+      fullPath: '/console/admin/edit-employee/$employeeId'
+      preLoaderRoute: typeof ConsoleAdminEditEmployeeEmployeeIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/console/admin/edit-branch/$branchId': {
+      id: '/console/admin/edit-branch/$branchId'
+      path: '/console/admin/edit-branch/$branchId'
+      fullPath: '/console/admin/edit-branch/$branchId'
+      preLoaderRoute: typeof ConsoleAdminEditBranchBranchIdRouteImport
       parentRoute: typeof rootRouteImport
     }
   }
@@ -419,7 +562,15 @@ const rootRouteChildren: RootRouteChildren = {
   ConsoleCreateOrganizationRoute: ConsoleCreateOrganizationRoute,
   ConsoleProcessingRoute: ConsoleProcessingRoute,
   ConsoleWelcomeRoute: ConsoleWelcomeRoute,
+  ConsoleAdminBranchRoute: ConsoleAdminBranchRoute,
+  ConsoleAdminDashboardRoute: ConsoleAdminDashboardRoute,
+  ConsoleAdminEditAccountRoute: ConsoleAdminEditAccountRoute,
   ConsoleAdminEmployeeRoute: ConsoleAdminEmployeeRoute,
+  ConsoleAdminInviteEmployeeRoute: ConsoleAdminInviteEmployeeRoute,
+  ConsoleAdminPlanRoute: ConsoleAdminPlanRoute,
+  ConsoleAdminEditBranchBranchIdRoute: ConsoleAdminEditBranchBranchIdRoute,
+  ConsoleAdminEditEmployeeEmployeeIdRoute:
+    ConsoleAdminEditEmployeeEmployeeIdRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
