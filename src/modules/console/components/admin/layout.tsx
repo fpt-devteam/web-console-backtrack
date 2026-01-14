@@ -9,9 +9,13 @@ export function Layout({ children }: LayoutProps) {
   const [sidebarOpen, setSidebarOpen] = useState(true);
 
   return (
-    <div className="flex min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50">
       <Sidebar isOpen={sidebarOpen} onToggle={() => setSidebarOpen(!sidebarOpen)} />
-      <main className="flex-1">
+      <main 
+        className={`transition-all duration-300 ${
+          sidebarOpen ? 'ml-64' : 'ml-20'
+        }`}
+      >
         {children}
       </main>
     </div>

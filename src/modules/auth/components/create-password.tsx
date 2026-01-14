@@ -2,10 +2,65 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Lock, Eye, EyeOff } from 'lucide-react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useRouter, useLocation } from '@tanstack/react-router';
+import { useSignUp } from '@/hooks/use-auth';
+import { showToast } from '@/lib/toast';
+import { saveTempEmail } from '@/mock/storage/auth-storage';
 
 export function CreatePassword() {
   const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [email, setEmail] = useState('');
+  
+  const router = useRouter();
+  const location = useLocation();
+  const signUp = useSignUp();
+
+  // Get email from navigation state
+  useEffect(() => {
+    const stateEmail = (location.state as { email?: string })?.email;
+    if (stateEmail) {
+      setEmail(stateEmail);
+    } else {
+      // If no email provided, redirect back to signin-or-signup
+      showToast.error('Please enter your email first');
+      router.navigate({ to: '/auth/signin-or-signup' });
+    }
+  }, [location.state, router]);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    // Validate passwords match
+    if (password !== confirmPassword) {
+      showToast.error('Passwords do not match');
+      return;
+    }
+
+    // Validate password length
+    if (password.length < 6) {
+      showToast.error('Password must be at least 6 characters long');
+      return;
+    }
+
+    signUp.mutate(
+      { email, password },
+      {
+        onSuccess: () => {
+          // Save email to temp storage for check-email page
+          saveTempEmail(email);
+          showToast.success('Account created successfully!');
+          router.navigate({ to: '/auth/check-email' });
+        },
+        onError: (error) => {
+          showToast.error(error.message || 'Failed to create account. Please try again.');
+        },
+      }
+    );
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-[#E5F4FF] to-white flex items-center justify-center px-4 py-12">
@@ -30,7 +85,7 @@ export function CreatePassword() {
           </p>
 
           {/* Form */}
-          <form className="space-y-4">
+          <form className="space-y-4" onSubmit={handleSubmit}>
             {/* Email Field */}
             <div>
               <Label htmlFor="email" className="text-sm font-medium ">
@@ -40,7 +95,7 @@ export function CreatePassword() {
                 <Input
                   id="email"
                   type="email"
-                  value="alex.morgan@acmecorp.com"
+                  value={email}
                   readOnly
                   className="pr-10"
                 />
@@ -59,8 +114,11 @@ export function CreatePassword() {
                 <Input
                   id="password"
                   type={showPassword ? 'text' : 'password'}
-                  placeholder="Create a strong password"
+                  placeholder="Create a strong password (min 6 chars)"
                   className="pr-10"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  disabled={signUp.isPending}
                   required
                 />
                 <button
@@ -78,12 +136,44 @@ export function CreatePassword() {
               </div>
             </div>
 
+            {/* Confirm Password Field */}
+            <div>
+              <Label htmlFor="confirmPassword" className="text-sm font-medium  mb-2 block">
+                Confirm Password
+              </Label>
+              <div className="relative">
+                <Input
+                  id="confirmPassword"
+                  type={showConfirmPassword ? 'text' : 'password'}
+                  placeholder="Re-enter your password"
+                  className="pr-10"
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  disabled={signUp.isPending}
+                  required
+                />
+                <button
+                  type="button"
+                  className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600"
+                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                  aria-label={showConfirmPassword ? 'Hide password' : 'Show password'}
+                >
+                  {showConfirmPassword ? (
+                    <EyeOff className="h-5 w-5" />
+                  ) : (
+                    <Eye className="h-5 w-5" />
+                  )}
+                </button>
+              </div>
+            </div>
+
             {/* Continue Button */}
             <Button
               type="submit"
               className="w-full bg-blue-500 hover:bg-blue-600 text-white py-5 text-base font-medium mt-6"
+              disabled={signUp.isPending}
             >
-              Continue
+              {signUp.isPending ? 'Creating Account...' : 'Continue'}
             </Button>
 
             {/* Security Info */}

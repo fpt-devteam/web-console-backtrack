@@ -38,12 +38,34 @@ export function Sidebar({ isOpen, onToggle }: SidebarProps) {
   ];
 
   const isActive = (path: string) => {
-    return location.pathname === path;
+    const currentPath = location.pathname;
+    
+    // Exact match
+    if (currentPath === path) return true;
+    
+    // For Employee menu, also highlight when on related employee pages
+    if (path === '/console/admin/employee') {
+      // Check if current path is any employee-related page
+      if (currentPath === '/console/admin/employee' || 
+          currentPath === '/console/admin/invite-employee') {
+        return true;
+      }
+    }
+    
+    // For Plan menu, also highlight when on edit-account page
+    if (path === '/console/admin/plan') {
+      if (currentPath === '/console/admin/plan' || 
+          currentPath === '/console/admin/edit-account') {
+        return true;
+      }
+    }
+    
+    return false;
   };
 
   return (
     <aside 
-      className={`h-screen bg-white border-r border-gray-200 shadow-lg flex flex-col transition-all duration-300 ${
+      className={`fixed left-0 top-0 h-screen bg-white border-r border-gray-200 shadow-lg flex flex-col transition-all duration-300 z-40 ${
         isOpen ? 'w-64' : 'w-20'
       }`}
     >

@@ -2,9 +2,10 @@ import { privateClient } from '@/lib/api-client';
 import type { ApiResponse } from '@/types/api-response.type';
 import type { PagedResponse } from '@/types/pagination.type';
 import type { DashboardStats, ActivityLog } from '@/types/analytics.types';
-import { mockDashboardStats, getMockActivityLogs } from '@/lib/mock-data';
+import { mockDashboardStats, getMockActivityLogs } from '@/mock/data';
+import { USE_MOCK } from '@/mock/config';
 
-const USE_MOCK_DATA = true; // Set to false to use real API
+const USE_MOCK_DATA = USE_MOCK; // Centralized mock flag
 
 export const analyticsService = {
   async getDashboardStats(): Promise<DashboardStats> {
