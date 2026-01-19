@@ -11,7 +11,7 @@ export function BranchPage() {
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState<'All' | 'Active' | 'Pending' | 'Inactive'>('All');
   const [showFilterDropdown, setShowFilterDropdown] = useState(false);
-  const pageSize = 6;
+  const pageSize = 4;
 
   // Filter branches by search term and status
   const filteredBranches = mockBranches.filter(branch => {
@@ -74,7 +74,7 @@ export function BranchPage() {
         <div className="flex items-start justify-between mb-8">
           <div>
             <h1 className="text-3xl font-bold text-gray-900 mb-2">Branch Management</h1>
-            <p className="">Manage your organization's branches and locations.</p>
+            <p className="text-gray-600">Manage your organization's branches and locations.</p>
           </div>
           <button 
             onClick={handleAddBranch}
@@ -93,7 +93,7 @@ export function BranchPage() {
               <input
                 type="text"
                 placeholder="Search by name, code or city"
-                className="w-full pl-10 pr-4 py-1.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
               />
@@ -101,17 +101,17 @@ export function BranchPage() {
             <div className="relative">
               <button 
                 onClick={() => setShowFilterDropdown(!showFilterDropdown)}
-                className="flex items-center gap-2 px-4 py-1.5 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
+                className="flex items-center gap-2 px-4 py-2 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
               >
-                <Filter className="w-5 h-5 " />
+                <Filter className="w-5 h-5 text-gray-600" />
                 <span className="text-gray-700 font-medium">{statusFilter}</span>
-                <ChevronDown className="w-4 h-4 " />
+                <ChevronDown className="w-4 h-4 text-gray-600" />
               </button>
               
               {/* Filter Dropdown */}
               {showFilterDropdown && (
                 <div className="absolute right-0 mt-2 w-48 bg-white border border-gray-200 rounded-lg shadow-lg z-10">
-                  <div className="py-1.5">
+                  <div className="py-2">
                     {(['All', 'Active', 'Pending', 'Inactive'] as const).map((status) => (
                       <button
                         key={status}
@@ -120,7 +120,7 @@ export function BranchPage() {
                           setShowFilterDropdown(false);
                           setCurrentPage(1); // Reset to first page
                         }}
-                        className={`w-full px-4 py-1.5 text-left hover:bg-gray-50 transition-colors ${
+                        className={`w-full px-4 py-2 text-left hover:bg-gray-50 transition-colors ${
                           statusFilter === status ? 'bg-blue-50 text-blue-600 font-semibold' : 'text-gray-700'
                         }`}
                       >
@@ -140,25 +140,25 @@ export function BranchPage() {
             <table className="w-full">
               <thead className="bg-gray-50 border-b border-gray-200">
                 <tr>
-                  <th className="px-6 py-3 text-left text-xs font-semibold  uppercase tracking-wider">
+                  <th className="px-6 py-2 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
                     Branch
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-semibold  uppercase tracking-wider">
+                  <th className="px-6 py-2 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
                     Location
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-semibold  uppercase tracking-wider">
+                  <th className="px-6 py-2 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
                     Manager
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-semibold  uppercase tracking-wider">
+                  <th className="px-6 py-2 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
                     Contact
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-semibold  uppercase tracking-wider">
+                  <th className="px-6 py-2 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
                     Employees
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-semibold  uppercase tracking-wider">
+                  <th className="px-6 py-2 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
                     Status
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-semibold  uppercase tracking-wider">
+                  <th className="px-6 py-2 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
                     Actions
                   </th>
                 </tr>
@@ -178,7 +178,7 @@ export function BranchPage() {
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <span className="">{branch.city}, {branch.state}</span>
+                      <span className="text-gray-600">{branch.city}, {branch.state}</span>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div>
@@ -188,7 +188,7 @@ export function BranchPage() {
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div>
-                        <p className="">{branch.phone}</p>
+                        <p className="text-gray-600">{branch.phone}</p>
                         <p className="text-sm text-gray-500">{branch.email}</p>
                       </div>
                     </td>
@@ -226,21 +226,21 @@ export function BranchPage() {
 
           {/* Pagination */}
           <div className="px-6 py-4 border-t border-gray-200 flex items-center justify-between">
-            <div className="text-sm ">
+            <div className="text-sm text-gray-600">
               Showing {startIndex + 1} to {Math.min(endIndex, filteredBranches.length)} of {filteredBranches.length} results
             </div>
             <div className="flex items-center gap-2">
               <button
                 onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
                 disabled={currentPage === 1}
-                className="px-4 py-1.5 border border-gray-200 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                className="px-4 py-2 border border-gray-200 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
               >
                 Previous
               </button>
               <button
                 onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
                 disabled={currentPage === totalPages}
-                className="px-4 py-1.5 border border-gray-200 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                className="px-4 py-2 border border-gray-200 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
               >
                 Next
               </button>
@@ -248,7 +248,23 @@ export function BranchPage() {
           </div>
         </div>
 
-        
+        {/* Demo Loading Skeleton */}
+        <div className="mt-8 bg-white rounded-xl shadow-sm p-6">
+          <h3 className="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-4">
+            DEMO: LOADING SKELETON
+          </h3>
+          <div className="space-y-3">
+            {[1, 2, 3].map((i) => (
+              <div key={i} className="flex items-center gap-4 animate-pulse">
+                <div className="w-10 h-10 bg-gray-200 rounded-full" />
+                <div className="flex-1 space-y-2">
+                  <div className="h-4 bg-gray-200 rounded w-1/4" />
+                  <div className="h-3 bg-gray-200 rounded w-1/3" />
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
       </div>
     </Layout>
   );

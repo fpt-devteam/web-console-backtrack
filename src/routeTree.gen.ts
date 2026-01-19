@@ -26,6 +26,13 @@ import { Route as MarketingFeaturesRouteImport } from './routes/_marketing/featu
 import { Route as MarketingContactRouteImport } from './routes/_marketing/contact'
 import { Route as MarketingApplyRouteImport } from './routes/_marketing/apply'
 import { Route as MarketingAboutRouteImport } from './routes/_marketing/about'
+import { Route as ConsoleStaffNotificationRouteImport } from './routes/console/staff/notification'
+import { Route as ConsoleStaffInventorySearchRouteImport } from './routes/console/staff/inventory-search'
+import { Route as ConsoleStaffInventoryAddItemRouteImport } from './routes/console/staff/inventory-add-item'
+import { Route as ConsoleStaffInventoryRouteImport } from './routes/console/staff/inventory'
+import { Route as ConsoleStaffFeedRouteImport } from './routes/console/staff/feed'
+import { Route as ConsoleStaffChatRouteImport } from './routes/console/staff/chat'
+import { Route as ConsoleAdminSettingRouteImport } from './routes/console/admin/setting'
 import { Route as ConsoleAdminPlanRouteImport } from './routes/console/admin/plan'
 import { Route as ConsoleAdminInviteEmployeeRouteImport } from './routes/console/admin/invite-employee'
 import { Route as ConsoleAdminEmployeeRouteImport } from './routes/console/admin/employee'
@@ -120,6 +127,44 @@ const MarketingAboutRoute = MarketingAboutRouteImport.update({
   path: '/about',
   getParentRoute: () => MarketingRoute,
 } as any)
+const ConsoleStaffNotificationRoute =
+  ConsoleStaffNotificationRouteImport.update({
+    id: '/console/staff/notification',
+    path: '/console/staff/notification',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ConsoleStaffInventorySearchRoute =
+  ConsoleStaffInventorySearchRouteImport.update({
+    id: '/console/staff/inventory-search',
+    path: '/console/staff/inventory-search',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ConsoleStaffInventoryAddItemRoute =
+  ConsoleStaffInventoryAddItemRouteImport.update({
+    id: '/console/staff/inventory-add-item',
+    path: '/console/staff/inventory-add-item',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ConsoleStaffInventoryRoute = ConsoleStaffInventoryRouteImport.update({
+  id: '/console/staff/inventory',
+  path: '/console/staff/inventory',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ConsoleStaffFeedRoute = ConsoleStaffFeedRouteImport.update({
+  id: '/console/staff/feed',
+  path: '/console/staff/feed',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ConsoleStaffChatRoute = ConsoleStaffChatRouteImport.update({
+  id: '/console/staff/chat',
+  path: '/console/staff/chat',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ConsoleAdminSettingRoute = ConsoleAdminSettingRouteImport.update({
+  id: '/console/admin/setting',
+  path: '/console/admin/setting',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ConsoleAdminPlanRoute = ConsoleAdminPlanRouteImport.update({
   id: '/console/admin/plan',
   path: '/console/admin/plan',
@@ -187,6 +232,13 @@ export interface FileRoutesByFullPath {
   '/console/admin/employee': typeof ConsoleAdminEmployeeRoute
   '/console/admin/invite-employee': typeof ConsoleAdminInviteEmployeeRoute
   '/console/admin/plan': typeof ConsoleAdminPlanRoute
+  '/console/admin/setting': typeof ConsoleAdminSettingRoute
+  '/console/staff/chat': typeof ConsoleStaffChatRoute
+  '/console/staff/feed': typeof ConsoleStaffFeedRoute
+  '/console/staff/inventory': typeof ConsoleStaffInventoryRoute
+  '/console/staff/inventory-add-item': typeof ConsoleStaffInventoryAddItemRoute
+  '/console/staff/inventory-search': typeof ConsoleStaffInventorySearchRoute
+  '/console/staff/notification': typeof ConsoleStaffNotificationRoute
   '/console/admin/edit-branch/$branchId': typeof ConsoleAdminEditBranchBranchIdRoute
   '/console/admin/edit-employee/$employeeId': typeof ConsoleAdminEditEmployeeEmployeeIdRoute
 }
@@ -213,6 +265,13 @@ export interface FileRoutesByTo {
   '/console/admin/employee': typeof ConsoleAdminEmployeeRoute
   '/console/admin/invite-employee': typeof ConsoleAdminInviteEmployeeRoute
   '/console/admin/plan': typeof ConsoleAdminPlanRoute
+  '/console/admin/setting': typeof ConsoleAdminSettingRoute
+  '/console/staff/chat': typeof ConsoleStaffChatRoute
+  '/console/staff/feed': typeof ConsoleStaffFeedRoute
+  '/console/staff/inventory': typeof ConsoleStaffInventoryRoute
+  '/console/staff/inventory-add-item': typeof ConsoleStaffInventoryAddItemRoute
+  '/console/staff/inventory-search': typeof ConsoleStaffInventorySearchRoute
+  '/console/staff/notification': typeof ConsoleStaffNotificationRoute
   '/console/admin/edit-branch/$branchId': typeof ConsoleAdminEditBranchBranchIdRoute
   '/console/admin/edit-employee/$employeeId': typeof ConsoleAdminEditEmployeeEmployeeIdRoute
 }
@@ -241,6 +300,13 @@ export interface FileRoutesById {
   '/console/admin/employee': typeof ConsoleAdminEmployeeRoute
   '/console/admin/invite-employee': typeof ConsoleAdminInviteEmployeeRoute
   '/console/admin/plan': typeof ConsoleAdminPlanRoute
+  '/console/admin/setting': typeof ConsoleAdminSettingRoute
+  '/console/staff/chat': typeof ConsoleStaffChatRoute
+  '/console/staff/feed': typeof ConsoleStaffFeedRoute
+  '/console/staff/inventory': typeof ConsoleStaffInventoryRoute
+  '/console/staff/inventory-add-item': typeof ConsoleStaffInventoryAddItemRoute
+  '/console/staff/inventory-search': typeof ConsoleStaffInventorySearchRoute
+  '/console/staff/notification': typeof ConsoleStaffNotificationRoute
   '/console/admin/edit-branch/$branchId': typeof ConsoleAdminEditBranchBranchIdRoute
   '/console/admin/edit-employee/$employeeId': typeof ConsoleAdminEditEmployeeEmployeeIdRoute
 }
@@ -269,6 +335,13 @@ export interface FileRouteTypes {
     | '/console/admin/employee'
     | '/console/admin/invite-employee'
     | '/console/admin/plan'
+    | '/console/admin/setting'
+    | '/console/staff/chat'
+    | '/console/staff/feed'
+    | '/console/staff/inventory'
+    | '/console/staff/inventory-add-item'
+    | '/console/staff/inventory-search'
+    | '/console/staff/notification'
     | '/console/admin/edit-branch/$branchId'
     | '/console/admin/edit-employee/$employeeId'
   fileRoutesByTo: FileRoutesByTo
@@ -295,6 +368,13 @@ export interface FileRouteTypes {
     | '/console/admin/employee'
     | '/console/admin/invite-employee'
     | '/console/admin/plan'
+    | '/console/admin/setting'
+    | '/console/staff/chat'
+    | '/console/staff/feed'
+    | '/console/staff/inventory'
+    | '/console/staff/inventory-add-item'
+    | '/console/staff/inventory-search'
+    | '/console/staff/notification'
     | '/console/admin/edit-branch/$branchId'
     | '/console/admin/edit-employee/$employeeId'
   id:
@@ -322,6 +402,13 @@ export interface FileRouteTypes {
     | '/console/admin/employee'
     | '/console/admin/invite-employee'
     | '/console/admin/plan'
+    | '/console/admin/setting'
+    | '/console/staff/chat'
+    | '/console/staff/feed'
+    | '/console/staff/inventory'
+    | '/console/staff/inventory-add-item'
+    | '/console/staff/inventory-search'
+    | '/console/staff/notification'
     | '/console/admin/edit-branch/$branchId'
     | '/console/admin/edit-employee/$employeeId'
   fileRoutesById: FileRoutesById
@@ -344,6 +431,13 @@ export interface RootRouteChildren {
   ConsoleAdminEmployeeRoute: typeof ConsoleAdminEmployeeRoute
   ConsoleAdminInviteEmployeeRoute: typeof ConsoleAdminInviteEmployeeRoute
   ConsoleAdminPlanRoute: typeof ConsoleAdminPlanRoute
+  ConsoleAdminSettingRoute: typeof ConsoleAdminSettingRoute
+  ConsoleStaffChatRoute: typeof ConsoleStaffChatRoute
+  ConsoleStaffFeedRoute: typeof ConsoleStaffFeedRoute
+  ConsoleStaffInventoryRoute: typeof ConsoleStaffInventoryRoute
+  ConsoleStaffInventoryAddItemRoute: typeof ConsoleStaffInventoryAddItemRoute
+  ConsoleStaffInventorySearchRoute: typeof ConsoleStaffInventorySearchRoute
+  ConsoleStaffNotificationRoute: typeof ConsoleStaffNotificationRoute
   ConsoleAdminEditBranchBranchIdRoute: typeof ConsoleAdminEditBranchBranchIdRoute
   ConsoleAdminEditEmployeeEmployeeIdRoute: typeof ConsoleAdminEditEmployeeEmployeeIdRoute
 }
@@ -469,6 +563,55 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof MarketingAboutRouteImport
       parentRoute: typeof MarketingRoute
     }
+    '/console/staff/notification': {
+      id: '/console/staff/notification'
+      path: '/console/staff/notification'
+      fullPath: '/console/staff/notification'
+      preLoaderRoute: typeof ConsoleStaffNotificationRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/console/staff/inventory-search': {
+      id: '/console/staff/inventory-search'
+      path: '/console/staff/inventory-search'
+      fullPath: '/console/staff/inventory-search'
+      preLoaderRoute: typeof ConsoleStaffInventorySearchRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/console/staff/inventory-add-item': {
+      id: '/console/staff/inventory-add-item'
+      path: '/console/staff/inventory-add-item'
+      fullPath: '/console/staff/inventory-add-item'
+      preLoaderRoute: typeof ConsoleStaffInventoryAddItemRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/console/staff/inventory': {
+      id: '/console/staff/inventory'
+      path: '/console/staff/inventory'
+      fullPath: '/console/staff/inventory'
+      preLoaderRoute: typeof ConsoleStaffInventoryRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/console/staff/feed': {
+      id: '/console/staff/feed'
+      path: '/console/staff/feed'
+      fullPath: '/console/staff/feed'
+      preLoaderRoute: typeof ConsoleStaffFeedRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/console/staff/chat': {
+      id: '/console/staff/chat'
+      path: '/console/staff/chat'
+      fullPath: '/console/staff/chat'
+      preLoaderRoute: typeof ConsoleStaffChatRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/console/admin/setting': {
+      id: '/console/admin/setting'
+      path: '/console/admin/setting'
+      fullPath: '/console/admin/setting'
+      preLoaderRoute: typeof ConsoleAdminSettingRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/console/admin/plan': {
       id: '/console/admin/plan'
       path: '/console/admin/plan'
@@ -568,6 +711,13 @@ const rootRouteChildren: RootRouteChildren = {
   ConsoleAdminEmployeeRoute: ConsoleAdminEmployeeRoute,
   ConsoleAdminInviteEmployeeRoute: ConsoleAdminInviteEmployeeRoute,
   ConsoleAdminPlanRoute: ConsoleAdminPlanRoute,
+  ConsoleAdminSettingRoute: ConsoleAdminSettingRoute,
+  ConsoleStaffChatRoute: ConsoleStaffChatRoute,
+  ConsoleStaffFeedRoute: ConsoleStaffFeedRoute,
+  ConsoleStaffInventoryRoute: ConsoleStaffInventoryRoute,
+  ConsoleStaffInventoryAddItemRoute: ConsoleStaffInventoryAddItemRoute,
+  ConsoleStaffInventorySearchRoute: ConsoleStaffInventorySearchRoute,
+  ConsoleStaffNotificationRoute: ConsoleStaffNotificationRoute,
   ConsoleAdminEditBranchBranchIdRoute: ConsoleAdminEditBranchBranchIdRoute,
   ConsoleAdminEditEmployeeEmployeeIdRoute:
     ConsoleAdminEditEmployeeEmployeeIdRoute,

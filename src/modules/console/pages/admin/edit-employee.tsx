@@ -67,7 +67,7 @@ export function EditEmployeePage() {
     return (
       <Layout>
         <div className="p-8 bg-gray-50 min-h-screen">
-          <div className="max-w-5xl mx-auto">
+          <div className="max-w-2xl mx-auto">
             <div className="bg-white rounded-xl shadow-sm p-8 text-center">
               <h2 className="text-2xl font-bold text-gray-900 mb-4">Employee Not Found</h2>
               <p className="text-gray-600 mb-6">The employee you're looking for doesn't exist.</p>
@@ -87,7 +87,7 @@ export function EditEmployeePage() {
   return (
     <Layout>
       <div className="p-8 bg-gray-50 min-h-screen">
-        <div className="max-w-6xl mx-auto">
+        <div className="max-w-5xl mx-auto">
           {/* Header */}
           <div className="mb-6">
             <button
@@ -166,18 +166,12 @@ export function EditEmployeePage() {
                     <select
                       value={formData.status}
                       onChange={(e) => setFormData({ ...formData, status: e.target.value as EmployeeStatus })}
-                      disabled={employee?.status === 'Invited'}
-                      className={`w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                        employee?.status === 'Invited' ? 'bg-gray-100 cursor-not-allowed' : ''
-                      }`}
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     >
                       <option value="Active">Active</option>
                       <option value="Invited">Invited</option>
                       <option value="Disabled">Disabled</option>
                     </select>
-                    {employee?.status === 'Invited' && (
-                      <p className="text-sm text-gray-500 mt-1">Status cannot be changed for invited users</p>
-                    )}
                   </div>
                 </div>
               </div>

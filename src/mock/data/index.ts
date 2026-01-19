@@ -10,4 +10,5 @@ export * from './mock-analytics';
 export * from './mock-employees';
 export * from './mock-plan';
 export * from './mock-branches';
+export * from './mock-inventory';
 

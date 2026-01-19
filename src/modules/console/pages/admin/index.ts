@@ -6,4 +6,5 @@ export { EditAccountPage } from './edit-account';
 export { BranchPage } from './branch';
 export { EditBranchPage } from './edit-branch';
 export { EditEmployeePage } from './edit-employee';
+export { SettingPage } from './setting';
 

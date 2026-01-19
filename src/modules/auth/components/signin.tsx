@@ -3,9 +3,10 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Lock, Eye, EyeOff } from 'lucide-react';
 import { useState, useEffect } from 'react';
-import { useRouter, useLocation } from '@tanstack/react-router';
+import { useRouter } from '@tanstack/react-router';
 import { useSignIn } from '@/hooks/use-auth';
 import { showToast } from '@/lib/toast';
+import { getTempEmail } from '@/mock/storage/auth-storage';
 
 export function SignIn() {
   const [showPassword, setShowPassword] = useState(false);
@@ -13,21 +14,19 @@ export function SignIn() {
   const [email, setEmail] = useState('');
   
   const router = useRouter();
-  const location = useLocation();
   const signIn = useSignIn();
 
-  // Get email from navigation state
+  // Get email from sessionStorage (không hiển thị trên URL)
   useEffect(() => {
-    const stateEmail = (location.state as { email?: string })?.email;
-    
-    if (stateEmail) {
-      setEmail(stateEmail);
+    const tempEmail = getTempEmail();
+    if (tempEmail) {
+      setEmail(tempEmail);
     } else {
       // If no email provided, redirect back to signin-or-signup
       showToast.error('Please enter your email first');
       router.navigate({ to: '/auth/signin-or-signup' });
     }
-  }, [location.state, router]);
+  }, [router]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
