@@ -6,6 +6,7 @@ import { useState } from 'react';
 import { useRouter } from '@tanstack/react-router';
 import { useCheckEmail } from '@/hooks/use-auth';
 import { showToast } from '@/lib/toast';
+import { saveTempEmail } from '@/mock/storage/auth-storage';
 
 export function SignInOrSignUp() {
   const [email, setEmail] = useState('');
@@ -22,18 +23,15 @@ export function SignInOrSignUp() {
 
     checkEmail.mutate(email, {
       onSuccess: (result) => {
+        // Save email to sessionStorage (không hiển thị trên URL)
+        saveTempEmail(result.email);
+        
         if (result.exists) {
           // Email exists -> go to signin
-          router.navigate({
-            to: '/auth/signin',
-            state: { email: result.email },
-          });
+          router.navigate({ to: '/auth/signin' });
         } else {
           // Email doesn't exist -> go to create password
-          router.navigate({
-            to: '/auth/create-password',
-            state: { email: result.email },
-          });
+          router.navigate({ to: '/auth/create-password' });
         }
       },
       onError: (error) => {

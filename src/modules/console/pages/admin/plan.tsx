@@ -1,5 +1,6 @@
 import { Layout } from '../../components/admin/layout';
 import { useState, useEffect } from 'react';
+// import { useRouter } from '@tanstack/react-router';
 import { 
   CreditCard, 
   Building2, 
@@ -54,9 +55,9 @@ export function PlanPage() {
           <p className="text-gray-600">Manage your organization's subscription and billing details.</p>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-7 gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Left Column - Subscription & Plans */}
-          <div className="lg:col-span-5 space-y-6">
+          <div className="lg:col-span-2 space-y-6">
             {/* Current Subscription */}
             <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
               <div className="flex items-start justify-between mb-6">
@@ -255,9 +256,9 @@ export function PlanPage() {
           </div>
 
           {/* Right Column - Account Info */}
-          <div className="lg:col-span-2 space-y-6">
+          <div className="space-y-6">
             {/* Payment Method */}
-            <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-5">
+            <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
               <div className="flex items-center justify-between mb-4">
                 <h3 className="text-lg font-bold text-gray-900">Payment Method</h3>
               </div>
@@ -281,7 +282,7 @@ export function PlanPage() {
             </div>
 
             {/* Help Section */}
-            <div className="bg-blue-50 rounded-xl border border-blue-200 p-5">
+            <div className="bg-blue-50 rounded-xl border border-blue-200 p-6">
               <h3 className="text-lg font-bold text-gray-900 mb-2">Need help with plans?</h3>
               <p className="text-sm text-gray-600 mb-4">
                 Our support team can help you pick the right plan for your organization.
