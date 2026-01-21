@@ -39,6 +39,8 @@ import { Route as ConsoleAdminEmployeeRouteImport } from './routes/console/admin
 import { Route as ConsoleAdminEditAccountRouteImport } from './routes/console/admin/edit-account'
 import { Route as ConsoleAdminDashboardRouteImport } from './routes/console/admin/dashboard'
 import { Route as ConsoleAdminBranchRouteImport } from './routes/console/admin/branch'
+import { Route as ConsoleStaffItemItemIdRouteImport } from './routes/console/staff/item/$itemId'
+import { Route as ConsoleStaffItemEditItemIdRouteImport } from './routes/console/staff/item-edit/$itemId'
 import { Route as ConsoleAdminEditEmployeeEmployeeIdRouteImport } from './routes/console/admin/edit-employee/$employeeId'
 import { Route as ConsoleAdminEditBranchBranchIdRouteImport } from './routes/console/admin/edit-branch/$branchId'
 
@@ -196,6 +198,17 @@ const ConsoleAdminBranchRoute = ConsoleAdminBranchRouteImport.update({
   path: '/console/admin/branch',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ConsoleStaffItemItemIdRoute = ConsoleStaffItemItemIdRouteImport.update({
+  id: '/console/staff/item/$itemId',
+  path: '/console/staff/item/$itemId',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ConsoleStaffItemEditItemIdRoute =
+  ConsoleStaffItemEditItemIdRouteImport.update({
+    id: '/console/staff/item-edit/$itemId',
+    path: '/console/staff/item-edit/$itemId',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ConsoleAdminEditEmployeeEmployeeIdRoute =
   ConsoleAdminEditEmployeeEmployeeIdRouteImport.update({
     id: '/console/admin/edit-employee/$employeeId',
@@ -241,6 +254,8 @@ export interface FileRoutesByFullPath {
   '/console/staff/notification': typeof ConsoleStaffNotificationRoute
   '/console/admin/edit-branch/$branchId': typeof ConsoleAdminEditBranchBranchIdRoute
   '/console/admin/edit-employee/$employeeId': typeof ConsoleAdminEditEmployeeEmployeeIdRoute
+  '/console/staff/item-edit/$itemId': typeof ConsoleStaffItemEditItemIdRoute
+  '/console/staff/item/$itemId': typeof ConsoleStaffItemItemIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -274,6 +289,8 @@ export interface FileRoutesByTo {
   '/console/staff/notification': typeof ConsoleStaffNotificationRoute
   '/console/admin/edit-branch/$branchId': typeof ConsoleAdminEditBranchBranchIdRoute
   '/console/admin/edit-employee/$employeeId': typeof ConsoleAdminEditEmployeeEmployeeIdRoute
+  '/console/staff/item-edit/$itemId': typeof ConsoleStaffItemEditItemIdRoute
+  '/console/staff/item/$itemId': typeof ConsoleStaffItemItemIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -309,6 +326,8 @@ export interface FileRoutesById {
   '/console/staff/notification': typeof ConsoleStaffNotificationRoute
   '/console/admin/edit-branch/$branchId': typeof ConsoleAdminEditBranchBranchIdRoute
   '/console/admin/edit-employee/$employeeId': typeof ConsoleAdminEditEmployeeEmployeeIdRoute
+  '/console/staff/item-edit/$itemId': typeof ConsoleStaffItemEditItemIdRoute
+  '/console/staff/item/$itemId': typeof ConsoleStaffItemItemIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -344,6 +363,8 @@ export interface FileRouteTypes {
     | '/console/staff/notification'
     | '/console/admin/edit-branch/$branchId'
     | '/console/admin/edit-employee/$employeeId'
+    | '/console/staff/item-edit/$itemId'
+    | '/console/staff/item/$itemId'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -377,6 +398,8 @@ export interface FileRouteTypes {
     | '/console/staff/notification'
     | '/console/admin/edit-branch/$branchId'
     | '/console/admin/edit-employee/$employeeId'
+    | '/console/staff/item-edit/$itemId'
+    | '/console/staff/item/$itemId'
   id:
     | '__root__'
     | '/'
@@ -411,6 +434,8 @@ export interface FileRouteTypes {
     | '/console/staff/notification'
     | '/console/admin/edit-branch/$branchId'
     | '/console/admin/edit-employee/$employeeId'
+    | '/console/staff/item-edit/$itemId'
+    | '/console/staff/item/$itemId'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -440,6 +465,8 @@ export interface RootRouteChildren {
   ConsoleStaffNotificationRoute: typeof ConsoleStaffNotificationRoute
   ConsoleAdminEditBranchBranchIdRoute: typeof ConsoleAdminEditBranchBranchIdRoute
   ConsoleAdminEditEmployeeEmployeeIdRoute: typeof ConsoleAdminEditEmployeeEmployeeIdRoute
+  ConsoleStaffItemEditItemIdRoute: typeof ConsoleStaffItemEditItemIdRoute
+  ConsoleStaffItemItemIdRoute: typeof ConsoleStaffItemItemIdRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -654,6 +681,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ConsoleAdminBranchRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/console/staff/item/$itemId': {
+      id: '/console/staff/item/$itemId'
+      path: '/console/staff/item/$itemId'
+      fullPath: '/console/staff/item/$itemId'
+      preLoaderRoute: typeof ConsoleStaffItemItemIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/console/staff/item-edit/$itemId': {
+      id: '/console/staff/item-edit/$itemId'
+      path: '/console/staff/item-edit/$itemId'
+      fullPath: '/console/staff/item-edit/$itemId'
+      preLoaderRoute: typeof ConsoleStaffItemEditItemIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/console/admin/edit-employee/$employeeId': {
       id: '/console/admin/edit-employee/$employeeId'
       path: '/console/admin/edit-employee/$employeeId'
@@ -721,6 +762,8 @@ const rootRouteChildren: RootRouteChildren = {
   ConsoleAdminEditBranchBranchIdRoute: ConsoleAdminEditBranchBranchIdRoute,
   ConsoleAdminEditEmployeeEmployeeIdRoute:
     ConsoleAdminEditEmployeeEmployeeIdRoute,
+  ConsoleStaffItemEditItemIdRoute: ConsoleStaffItemEditItemIdRoute,
+  ConsoleStaffItemItemIdRoute: ConsoleStaffItemItemIdRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

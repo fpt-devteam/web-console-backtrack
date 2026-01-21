@@ -91,7 +91,7 @@ export function AddFoundItemPage() {
 
   return (
     <StaffLayout>
-      <div className="p-8 bg-gray-50 ">
+      <div className="p-8">
         <div className="max-w-5xl mx-auto">
           {/* Breadcrumb */}
           <div className="mb-6 flex items-center gap-2 text-sm text-gray-600">

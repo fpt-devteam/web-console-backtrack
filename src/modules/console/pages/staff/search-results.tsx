@@ -118,7 +118,7 @@ export function SearchResultsPage() {
 
   return (
     <StaffLayout>
-      <div className="p-8 bg-gray-50 min-h-screen">
+      <div className="p-8 min-h-screen">
         <div className="max-w-6xl mx-auto">
           {/* Breadcrumb */}
           <div className="mb-6 flex items-center gap-2 text-sm text-gray-600">
@@ -271,9 +271,11 @@ export function SearchResultsPage() {
                       </div>
                     </div>
 
-                    <button className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-all font-medium text-sm">
-                      View Details
-                    </button>
+                    <Link to="/console/staff/item/$itemId" params={{ itemId: item.id }}>
+                      <button className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-all font-medium text-sm">
+                        View Details
+                      </button>
+                    </Link>
                   </div>
                 </div>
               </div>
