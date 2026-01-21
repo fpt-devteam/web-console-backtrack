@@ -1,25 +1,18 @@
-import { StaffLayout } from '../../components/staff/layout'
+import { StaffLayout, InventoryFilters } from '../../components/staff'
 import {
-  Filter as FilterIcon,
-  MoreVertical,
   Calendar,
   Download,
   Plus,
-  X,
   MapPin,
   Package,
 } from 'lucide-react'
 import { useState } from 'react'
 import {
   mockInventoryItems,
-  locations,
-  categories,
-  statuses,
   type ItemStatus,
 } from '@/mock/data/mock-inventory'
 import { Pagination } from '@/components/ui/pagination'
 import { Link, useNavigate } from '@tanstack/react-router'
-import { SearchFilter, Filter } from '@/components/filters'
 
 export function StaffInventoryPage() {
   const navigate = useNavigate()
@@ -29,13 +22,41 @@ export function StaffInventoryPage() {
   const [selectedLocation, setSelectedLocation] = useState('All')
   const [currentPage, setCurrentPage] = useState(1)
   const itemsPerPage = 8
-  const totalItems = 124
 
-  // Active filters
-  const activeFilters = [
-    { label: 'Location: Main Warehouse', value: 'location' },
-    { label: 'Type: Electronics', value: 'category' },
-  ]
+  // Apply filters
+  const filteredItems = mockInventoryItems.filter((item) => {
+    // Status filter
+    if (selectedStatus !== 'All' && item.status !== selectedStatus) {
+      return false
+    }
+    // Category filter
+    if (selectedCategory !== 'All' && item.category !== selectedCategory) {
+      return false
+    }
+    // Location filter
+    if (selectedLocation !== 'All' && item.location !== selectedLocation) {
+      return false
+    }
+    // Search filter
+    if (searchTerm) {
+      const searchLower = searchTerm.toLowerCase()
+      return (
+        item.title.toLowerCase().includes(searchLower) ||
+        item.id.toLowerCase().includes(searchLower) ||
+        item.category.toLowerCase().includes(searchLower) ||
+        item.location.toLowerCase().includes(searchLower)
+      )
+    }
+    return true
+  })
+
+
+  // Pagination
+  const paginatedItems = filteredItems.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
+  )
+  const totalItems = filteredItems.length
 
   const getStatusColor = (status: ItemStatus) => {
     switch (status) {
@@ -69,133 +90,81 @@ export function StaffInventoryPage() {
 
   return (
     <StaffLayout>
-      <div className="p-8 bg-gray-50 min-h-screen">
+      <div className="p-4 sm:p-6 lg:p-8 min-h-screen mx-0 sm:mx-4">
         {/* Header */}
-        <div className="mb-8 flex items-start justify-between">
+        <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4 mb-6">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900">
+            <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">
               Inventory Dashboard
             </h1>
-            <p className="text-gray-600 mt-1">
+            <p className="text-gray-600 mt-1 text-sm sm:text-base">
               Manage lost and found items, storage, and disposal actions.
             </p>
           </div>
-          <div className="flex gap-3">
-            <button className="flex items-center gap-2 px-4 py-1.5 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-all font-medium">
+          <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 w-full sm:w-auto">
+            <button className="flex items-center justify-center gap-2 px-4 py-1.5 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-all font-medium text-sm sm:text-base">
               <Download className="w-4 h-4" />
               Export
             </button>
-            <Link to="/console/staff/inventory-add-item">
-            <button className="flex items-center gap-2 px-4 py-1.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-all font-medium">
+            <Link to="/console/staff/inventory-add-item" className="w-full sm:w-auto">
+            <button className="flex items-center justify-center gap-2 px-4 py-1.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-all font-medium text-sm sm:text-base w-full sm:w-auto">
               <Plus className="w-4 h-4" />
-              Add found item
+              <span className="hidden sm:inline">Add found item</span>
+              <span className="sm:hidden">Add Item</span>
             </button>
             </Link>
           </div>
         </div>
 
         {/* Filters */}
-        <div className="bg-white rounded-xl shadow-sm p-6 mb-6">
-          <div className="flex items-center gap-4 mb-4">
-            {/* Search */}
-            <SearchFilter
-              value={searchTerm}
-              onChange={setSearchTerm}
-              onSearch={() => {
-                if (searchTerm.trim()) {
-                  navigate({
-                    to: '/console/staff/inventory-search',
-                    search: { q: searchTerm.trim() },
-                  })
-                }
-              }}
-                placeholder="Search by ID or name..."
-              />
-
-            {/* Status Filter */}
-            <Filter
-              type="select"
-              value={selectedStatus}
-              onChange={setSelectedStatus}
-              options={statuses.map((s) => ({ value: s, label: s }))}
-              label="Status"
-            />
-
-            {/* Category Filter */}
-            <Filter
-              type="select"
-              value={selectedCategory}
-              onChange={setSelectedCategory}
-              options={categories
-                .filter((c) => c !== 'All')
-                .map((c) => ({ value: c, label: c }))}
-              label="Category"
-            />
-
-            {/* Location Filter */}
-            <Filter
-              type="select"
-              value={selectedLocation}
-              onChange={setSelectedLocation}
-              options={locations
-                .filter((l) => l !== 'All')
-                .map((l) => ({ value: l, label: l }))}
-              label="Location"
-            />
-
-            {/* Date Range */}
-            <button className="p-2 border border-gray-300 rounded-lg hover:bg-gray-50">
-              <Calendar className="w-5 h-5 text-gray-600" />
-            </button>
-
-            {/* Filter Icon */}
-            <button className="p-2 border border-gray-300 rounded-lg hover:bg-gray-50">
-              <FilterIcon className="w-5 h-5 text-gray-600" />
-            </button>
-
-            {/* More Options */}
-            <button className="p-2 border border-gray-300 rounded-lg hover:bg-gray-50">
-              <MoreVertical className="w-5 h-5 text-gray-600" />
-            </button>
-          </div>
-
-          {/* Active Filters */}
-          <div className="flex items-center gap-3">
-            <span className="text-sm font-medium text-gray-700">ACTIVE:</span>
-            {activeFilters.map((filter, index) => (
-              <span
-                key={index}
-                className="inline-flex items-center gap-2 px-3 py-1 bg-blue-50 text-blue-700 rounded-full text-sm"
-              >
-                {filter.label}
-                <button className="hover:text-blue-900">
-                  <X className="w-3 h-3" />
-                </button>
-              </span>
-            ))}
-            <button className="text-sm text-blue-600 hover:text-blue-700 font-medium">
-              Clear all
-            </button>
-          </div>
-        </div>
+        <InventoryFilters
+          searchTerm={searchTerm}
+          onSearchChange={setSearchTerm}
+          selectedStatus={selectedStatus}
+          onStatusChange={setSelectedStatus}
+          selectedCategory={selectedCategory}
+          onCategoryChange={setSelectedCategory}
+          selectedLocation={selectedLocation}
+          onLocationChange={setSelectedLocation}
+          onSearch={() => {
+            if (searchTerm.trim()) {
+              navigate({
+                to: '/console/staff/inventory-search',
+                search: { q: searchTerm.trim() },
+              })
+            }
+          }}
+          searchPlaceholder="Search by ID or name..."
+        />
 
         {/* Item Count */}
-        <div className="flex items-center justify-between mb-4">
-          <div className="flex items-center gap-4">
-            <input
-              type="checkbox"
-              className="w-4 h-4 text-blue-600 rounded border-gray-300 focus:ring-blue-500"
-            />
-            <span className="text-sm text-gray-600">Select all</span>
-          </div>
-          <span className="text-sm text-gray-600">
-            Showing 1-8 of 124 items
+        <div className="flex justify-end mb-4">
+          <span className="text-sm text-gray-600 whitespace-nowrap">
+            Showing {paginatedItems.length > 0 ? (currentPage - 1) * itemsPerPage + 1 : 0}-{Math.min(currentPage * itemsPerPage, totalItems)} of {totalItems} items
           </span>
         </div>
 
         {/* Items Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {mockInventoryItems.map((item) => (
+          {paginatedItems.length === 0 ? (
+            <div className="col-span-full text-center py-12">
+              <p className="text-gray-500 text-lg">No items found</p>
+              {(searchTerm || selectedStatus !== 'All' || selectedCategory !== 'All' || selectedLocation !== 'All') && (
+                <button
+                  onClick={() => {
+                    setSearchTerm('')
+                    setSelectedStatus('All')
+                    setSelectedCategory('All')
+                    setSelectedLocation('All')
+                  }}
+                  className="mt-4 text-blue-600 hover:text-blue-700 font-medium"
+                >
+                  Clear all filters
+                </button>
+              )}
+            </div>
+          ) : (
+            paginatedItems.map((item) => (
             <div
               key={item.id}
               className="bg-white rounded-xl shadow-sm overflow-hidden hover:shadow-md transition-shadow"
@@ -243,22 +212,27 @@ export function StaffInventoryPage() {
                 </div>
 
                 {/* Button */}
-                <button className="w-full py-1.5 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-all font-medium text-sm">
-                  View Details
-                </button>
+                <Link to="/console/staff/item/$itemId" params={{ itemId: item.id }}>
+                  <button className="w-full py-1.5 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-all font-medium text-sm">
+                    View Details
+                  </button>
+                </Link>
               </div>
             </div>
-          ))}
+            ))
+          )}
         </div>
 
         {/* Pagination */}
-        <div className="mt-6">
-          <Pagination
-            currentPage={currentPage}
-            totalPages={Math.ceil(totalItems / itemsPerPage)}
-            onPageChange={setCurrentPage}
-          />
-        </div>
+        {totalItems > itemsPerPage && (
+          <div className="mt-6">
+            <Pagination
+              currentPage={currentPage}
+              totalPages={Math.ceil(totalItems / itemsPerPage)}
+              onPageChange={setCurrentPage}
+            />
+          </div>
+        )}
       </div>
     </StaffLayout>
   )

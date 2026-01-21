@@ -1,16 +1,18 @@
-import { StaffLayout } from '../../components/staff/layout'
-import { Plus, MapPin, Clock, SlidersHorizontal } from 'lucide-react'
+import { StaffLayout, InventoryFilters } from '../../components/staff'
+import { Plus, MapPin, Clock } from 'lucide-react'
 import { useState } from 'react'
 import {
   mockInventoryItems,
   type ItemStatus,
 } from '@/mock/data/mock-inventory'
-import { SearchFilter } from '@/components/filters'
 import { Pagination } from '@/components/ui/pagination'
 import { Link } from '@tanstack/react-router'
 
 export function StaffFeedPage() {
   const [searchTerm, setSearchTerm] = useState('')
+  const [selectedStatus, setSelectedStatus] = useState('All')
+  const [selectedCategory, setSelectedCategory] = useState('All')
+  const [selectedLocation, setSelectedLocation] = useState('All')
   const [currentPage, setCurrentPage] = useState(1)
   const itemsPerPage = 6
 
@@ -56,16 +58,33 @@ export function StaffFeedPage() {
     (item) => item.status === 'New' || item.status === 'Storage'
   )
 
-  // Search filter
-  const filteredItems = searchTerm
-    ? feedItems.filter(
-        (item) =>
-          item.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          item.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          item.category.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          item.location.toLowerCase().includes(searchTerm.toLowerCase())
+  // Apply filters
+  const filteredItems = feedItems.filter((item) => {
+    // Status filter
+    if (selectedStatus !== 'All' && item.status !== selectedStatus) {
+      return false
+    }
+    // Category filter
+    if (selectedCategory !== 'All' && item.category !== selectedCategory) {
+      return false
+    }
+    // Location filter
+    if (selectedLocation !== 'All' && item.location !== selectedLocation) {
+      return false
+    }
+    // Search filter
+    if (searchTerm) {
+      const searchLower = searchTerm.toLowerCase()
+      return (
+        item.title.toLowerCase().includes(searchLower) ||
+        item.id.toLowerCase().includes(searchLower) ||
+        item.category.toLowerCase().includes(searchLower) ||
+        item.location.toLowerCase().includes(searchLower)
       )
-    : feedItems
+    }
+    return true
+  })
+
 
   const paginatedItems = filteredItems.slice(
     (currentPage - 1) * itemsPerPage,
@@ -74,35 +93,36 @@ export function StaffFeedPage() {
 
   return (
     <StaffLayout>
-      <div className="p-8 bg-gray-50 min-h-screen">
+      <div className="p-8 min-h-screen mx-4">
         {/* Header */}
         <div className="mb-8 flex items-start justify-between">
           <div>
             <h1 className="text-3xl font-bold text-gray-900">Item Feed</h1>
           </div>
           <Link to="/console/staff/inventory-add-item">
-            <button className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-all font-medium">
+            <button className="flex items-center gap-2 px-4 py-1.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-all font-medium">
               <Plus className="w-5 h-5" />
               Add found item
             </button>
           </Link>
         </div>
 
-        {/* Search and Filter */}
-        <div className="mb-6 flex items-center gap-4">
-          <SearchFilter
-            value={searchTerm}
-            onChange={setSearchTerm}
-            placeholder="Search items..."
-            className="flex-1"
-          />
-          <button className="p-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">
-            <SlidersHorizontal className="w-5 h-5 text-gray-600" />
-          </button>
+        {/* Filters */}
+        <div className="mb-10">
+        <InventoryFilters
+          searchTerm={searchTerm}
+          onSearchChange={setSearchTerm}
+          selectedStatus={selectedStatus}
+          onStatusChange={setSelectedStatus}
+          selectedCategory={selectedCategory}
+          onCategoryChange={setSelectedCategory}
+          selectedLocation={selectedLocation}
+          onLocationChange={setSelectedLocation}
+          searchPlaceholder="Search items..."
+        />
         </div>
-
         {/* Items Grid - 2 columns */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 my-8">
           {paginatedItems.map((item) => (
             <div
               key={item.id}
@@ -147,9 +167,11 @@ export function StaffFeedPage() {
                 </div>
 
                 {/* Button */}
-                <button className="w-full py-2.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-all font-medium text-sm">
-                  View Details
-                </button>
+                <Link to="/console/staff/item/$itemId" params={{ itemId: item.id }}>
+                  <button className="w-full py-2.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-all font-medium text-sm">
+                    View Details
+                  </button>
+                </Link>
               </div>
             </div>
           ))}

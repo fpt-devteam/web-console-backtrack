@@ -6,9 +6,9 @@ interface LayoutProps {
 
 export function StaffLayout({ children }: LayoutProps) {
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="h-screen overflow-hidden flex flex-col bg-gray-50">
       <StaffNavbar />
-      <main>{children}</main>
+      <main className="flex-1 overflow-hidden overflow-y-auto">{children}</main>
     </div>
   )
 }
