@@ -90,7 +90,7 @@ export function ItemDetailPage() {
                 Delete
               </Button>
               <Link to="/console/staff/item-edit/$itemId" params={{ itemId: item.id }}>
-                <Button className="bg-blue-600 hover:bg-blue-700">Update</Button>
+                <Button className="bg-blue-600 hover:bg-blue-700">Edit</Button>
               </Link>
             </div>
           </div>

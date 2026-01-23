@@ -1,14 +1,19 @@
 import { StaffLayout } from '../../components/staff/layout'
-import { ChevronRight, AlertCircle } from 'lucide-react'
+import { ChevronRight, AlertCircle, User, Package, Info, Building2, Camera } from 'lucide-react'
 import { useState } from 'react'
 import { Link, useNavigate } from '@tanstack/react-router'
 import { Route } from '@/routes/console/staff/item-edit/$itemId'
 import { mockInventoryItems, categories, type ItemStatus } from '@/mock/data/mock-inventory'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
-import { Filter } from '@/components/filters'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
 
 export function EditItemPage() {
   const { itemId } = Route.useParams()
@@ -82,9 +87,25 @@ export function EditItemPage() {
   const statusOptions: ItemStatus[] = ['New', 'Storage', 'Claimed', 'Disposed']
   const filteredCategories = categories.filter((c) => c !== 'All')
 
+  const getStatusColor = (status: ItemStatus | 'In Storage') => {
+    const actualStatus = status === 'In Storage' ? 'Storage' : status
+    switch (actualStatus) {
+      case 'New':
+        return 'bg-blue-500 text-white'
+      case 'Storage':
+        return 'bg-blue-500 text-white'
+      case 'Claimed':
+        return 'bg-green-500 text-white'
+      case 'Disposed':
+        return 'bg-gray-500 text-white'
+      default:
+        return 'bg-gray-500 text-white'
+    }
+  }
+
   return (
     <StaffLayout>
-      <div className="p-8 min-h-screen">
+      <div className="p-6 h-full overflow-y-auto mx-6">
         {/* Breadcrumb */}
         <div className="mb-6 flex items-center gap-2 text-sm text-gray-600">
           <Link
@@ -105,204 +126,238 @@ export function EditItemPage() {
           <span className="text-gray-900 font-medium">Edit</span>
         </div>
 
-        {/* Error Message */}
-        {Object.keys(errors).length > 0 && (
-          <div className="mb-6 bg-red-50 border border-red-200 rounded-lg p-4 flex items-start gap-3">
-            <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
+        {/* Main Card - All Content */}
+        <div className="bg-white rounded-xl shadow-sm">
+          {/* Header */}
+          <div className="p-6 border-b border-gray-200 flex items-start justify-between">
             <div>
-              <p className="text-red-800 font-medium mb-1">
-                There were errors with your submission.
-              </p>
-              <ul className="text-red-700 text-sm space-y-1">
-                {Object.entries(errors).map(([field, message]) => (
-                  <li key={field}>• {message}</li>
-                ))}
-              </ul>
-            </div>
-          </div>
-        )}
-
-        {/* Header */}
-        <div className="mb-6">
-          <h1 className="text-3xl font-bold text-gray-900">Edit Item: {item.title}</h1>
-          <p className="text-gray-600 mt-1">
-            Update item details, manage photos, and change status.
-          </p>
-        </div>
-
-        {/* Form */}
-        <form onSubmit={handleSubmit} className="space-y-6">
-          {/* Photos Section */}
-          <div className="bg-white rounded-xl shadow-sm p-6">
-            <h3 className="text-lg font-bold text-gray-900 mb-4">Photos</h3>
-            
-            {/* Main Photo */}
-            <div className="relative h-96 bg-gradient-to-br from-gray-100 to-gray-200 rounded-lg overflow-hidden mb-4">
-              <img
-                src={images[mainImage]}
-                alt={item.title}
-                className="w-full h-full object-cover"
-              />
-              <div className="absolute bottom-4 left-4 bg-black/60 text-white px-3 py-1 rounded text-sm">
-                Main Photo
-              </div>
-            </div>
-
-            {/* Thumbnails */}
-            <div className="flex items-center gap-3">
-              {images.map((img, idx) => (
-                <button
-                  key={idx}
-                  type="button"
-                  onClick={() => setMainImage(idx)}
-                  className={`relative w-20 h-20 rounded-lg overflow-hidden border-2 transition-all ${
-                    mainImage === idx
-                      ? 'border-blue-600 ring-2 ring-blue-200'
-                      : 'border-gray-300 hover:border-gray-400'
-                  }`}
-                >
-                  <img src={img} alt={`View ${idx + 1}`} className="w-full h-full object-cover" />
-                </button>
-              ))}
-              <button
-                type="button"
-                className="w-20 h-20 rounded-lg border-2 border-dashed border-gray-300 flex items-center justify-center text-gray-400 hover:border-gray-400 hover:text-gray-500 transition-colors"
-              >
-                <span className="text-2xl">+</span>
-              </button>
-            </div>
-            <p className="text-sm text-gray-500 mt-2">Drag thumbnails to reorder</p>
-            <Button type="button" variant="outline" className="mt-3">
-              ADD
-            </Button>
-          </div>
-
-          {/* Form Fields */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            {/* Left Column */}
-            <div className="space-y-6">
-              {/* Category */}
-              <div>
-                <Label htmlFor="category" className="text-sm font-semibold text-gray-900 mb-2 block">
-                  Category
-                </Label>
-                <Filter
-                  type="select"
-                  value={category}
-                  onChange={setCategory}
-                  options={filteredCategories.map((c) => ({ value: c, label: c }))}
-                  showAll={false}
-                  className="w-full"
-                />
-              </div>
-
-              {/* Status */}
-              <div>
-                <Label htmlFor="status" className="text-sm font-semibold text-gray-900 mb-2 block">
-                  Status
-                </Label>
-                <Filter
-                  type="select"
+              <div className="flex items-center gap-3 mb-2">
+                <h1 className="text-3xl font-bold text-gray-900">{item.title}</h1>
+                <Select
                   value={status === 'Storage' ? 'In Storage' : status}
-                  onChange={(val) => setStatus(val === 'In Storage' ? 'Storage' : (val as ItemStatus))}
-                  options={statusOptions.map((s) => ({
-                    value: s === 'Storage' ? 'In Storage' : s,
-                    label: s === 'Storage' ? 'In Storage' : s,
-                  }))}
-                  showAll={false}
-                  className="w-full"
-                />
+                  onValueChange={(val) => setStatus(val === 'In Storage' ? 'Storage' : (val as ItemStatus))}
+                >
+                  <SelectTrigger className={`w-auto !border-0 !shadow-none !bg-transparent ${getStatusColor(status)} !px-3 !py-1 !rounded-md !text-xs !font-bold uppercase !h-auto !min-h-0 cursor-pointer hover:opacity-90 [&>span]:!text-white [&>svg]:hidden`}>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {statusOptions.map((s) => (
+                      <SelectItem key={s} value={s === 'Storage' ? 'In Storage' : s}>
+                        {s === 'Storage' ? 'In Storage' : s}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
-
-              {/* Created By */}
-              <div>
-                <Label className="text-sm font-semibold text-gray-900 mb-2 block">
-                  Created By
-                </Label>
-                <Input
-                  value="Jane Doe (Security)"
-                  disabled
-                  className="bg-gray-50"
-                />
-              </div>
-
-              {/* Stored Location */}
-              <div>
-                <Label htmlFor="storedLocation" className="text-sm font-semibold text-gray-900 mb-2 block">
-                  Stored Location <span className="text-red-500">*</span>
-                </Label>
-                <div className="relative">
-                  <Input
-                    id="storedLocation"
-                    value={storedLocation}
-                    onChange={(e) => {
-                      setStoredLocation(e.target.value)
-                      if (errors.storedLocation) {
-                        setErrors((prev) => {
-                          const newErrors = { ...prev }
-                          delete newErrors.storedLocation
-                          return newErrors
-                        })
-                      }
-                    }}
-                    placeholder="e.g. Storage Room A, Shelf 3"
-                    className={errors.storedLocation ? 'border-red-500 pr-10' : ''}
-                  />
-                  {errors.storedLocation && (
-                    <AlertCircle className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-red-500" />
-                  )}
-                </div>
-                {errors.storedLocation && (
-                  <p className="text-red-500 text-sm mt-1">{errors.storedLocation}</p>
-                )}
-              </div>
+              <p className="text-gray-600">
+                Item #{item.id} • Added on {item.date}
+              </p>
             </div>
-
-            {/* Right Column */}
-            <div className="space-y-6">
-              {/* Description */}
-              <div>
-                <Label htmlFor="description" className="text-sm font-semibold text-gray-900 mb-2 block">
-                  Description
-                </Label>
-                <Textarea
-                  id="description"
-                  value={description}
-                  onChange={(e) => setDescription(e.target.value)}
-                  className="min-h-[150px]"
-                />
-              </div>
-
-              {/* Internal Notes */}
-              <div>
-                <Label htmlFor="internalNotes" className="text-sm font-semibold text-gray-900 mb-2 block">
-                  Internal Notes
-                </Label>
-                <Textarea
-                  id="internalNotes"
-                  value={internalNotes}
-                  onChange={(e) => setInternalNotes(e.target.value)}
-                  className="min-h-[120px]"
-                />
-                <p className="text-xs text-gray-500 mt-1">
-                  Internal notes are visible to staff only.
-                </p>
-              </div>
-            </div>
-          </div>
-
-          {/* Action Buttons */}
-          <div className="flex items-center justify-end gap-3 pt-6 border-t">
-            <Link to="/console/staff/item/$itemId" params={{ itemId }}>
-              <Button type="button" variant="outline">
-                Cancel
+            <div className="flex gap-3">
+              <Link to="/console/staff/item/$itemId" params={{ itemId }}>
+                <Button type="button" variant="outline">
+                  Cancel
+                </Button>
+              </Link>
+              <Button type="submit" form="edit-item-form" className="bg-blue-600 hover:bg-blue-700">
+                Save Changes
               </Button>
-            </Link>
-            <Button type="submit" className="bg-blue-600 hover:bg-blue-700">
-              Save Changes
-            </Button>
+            </div>
           </div>
-        </form>
+
+          {/* Form */}
+          <form id="edit-item-form" onSubmit={handleSubmit}>
+            {/* Images and Details */}
+            <div className="grid grid-cols-1 lg:grid-cols-7">
+              {/* Left Column - Images (3/7) */}
+              <div className="lg:col-span-3 p-6 border-r border-gray-200">
+                {/* Main Image */}
+                <div className="relative h-[350px] bg-gradient-to-br from-gray-100 to-gray-200 rounded-lg overflow-hidden mb-4">
+                  <img
+                    src={images[mainImage]}
+                    alt={item.title}
+                    className="w-full h-full object-cover"
+                  />
+                  <div className="absolute bottom-4 right-4 bg-black/60 text-white px-3 py-1 rounded text-sm">
+                    Main Photo
+                  </div>
+                </div>
+
+                {/* Thumbnails */}
+                <div className="flex gap-3">
+                  {images.map((img, idx) => (
+                    <button
+                      key={idx}
+                      type="button"
+                      onClick={() => setMainImage(idx)}
+                      className={`relative w-20 h-20 rounded-lg overflow-hidden border-2 transition-all ${
+                        mainImage === idx
+                          ? 'border-blue-600 ring-2 ring-blue-200'
+                          : 'border-gray-300 hover:border-gray-400'
+                      }`}
+                    >
+                      <img src={img} alt={`View ${idx + 1}`} className="w-full h-full object-cover" />
+                    </button>
+                  ))}
+                  <button
+                    type="button"
+                    className="w-20 h-20 rounded-lg border-2 border-dashed border-gray-300 flex items-center justify-center text-gray-400 hover:border-gray-400 hover:text-gray-500 transition-colors"
+                  >
+                    <Camera className="w-5 h-5" />
+                  </button>
+                </div>
+              </div>
+
+              {/* Right Column - Form Fields (4/7) */}
+              <div className="lg:col-span-4 py-6 px-8 space-y-6">
+                {/* Error Message */}
+                {Object.keys(errors).length > 0 && (
+                  <div className="bg-red-50 border border-red-200 rounded-lg p-4 flex items-start gap-3">
+                    <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
+                    <div>
+                      <p className="text-red-800 font-medium mb-1">
+                        There were errors with your submission.
+                      </p>
+                      <ul className="text-red-700 text-sm space-y-1">
+                        {Object.entries(errors).map(([field, message]) => (
+                          <li key={field}>• {message}</li>
+                        ))}
+                      </ul>
+                    </div>
+                  </div>
+                )}
+
+                {/* Info Grid - 2 columns */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {/* Category */}
+                  <div>
+                    <div className="text-xs font-semibold uppercase mb-2">
+                      CATEGORY
+                    </div>
+                    <div className="flex items-center gap-2 text-gray-900">
+                      <Package className="w-4 h-4 text-blue-600" />
+                      <Select value={category} onValueChange={setCategory}>
+                        <SelectTrigger className="w-full">
+                          <SelectValue placeholder="Select category" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {filteredCategories.map((cat) => (
+                            <SelectItem key={cat} value={cat}>
+                              {cat}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </div>
+
+                  {/* Created By */}
+                  <div>
+                    <div className="text-xs font-semibold uppercase mb-2">
+                      CREATED BY
+                    </div>
+                    <div className="flex items-center gap-2 text-gray-900">
+                      <User className="w-4 h-4 text-blue-600" />
+                      <span>Jane Doe (Security)</span>
+                    </div>
+                  </div>
+
+                  {/* Status */}
+                  <div>
+                    <div className="text-xs font-semibold uppercase mb-2">
+                      STATUS
+                    </div>
+                    <div className="flex items-center gap-2 text-gray-900">
+                      <Info className="w-4 h-4 text-blue-600" />
+                      <Select
+                        value={status === 'Storage' ? 'In Storage' : status}
+                        onValueChange={(val) => setStatus(val === 'In Storage' ? 'Storage' : (val as ItemStatus))}
+                      >
+                        <SelectTrigger className="w-full">
+                          <SelectValue placeholder="Select status" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {statusOptions.map((s) => (
+                            <SelectItem key={s} value={s === 'Storage' ? 'In Storage' : s}>
+                              {s === 'Storage' ? 'In Storage' : s}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </div>
+
+                  {/* Stored Location */}
+                  <div>
+                    <div className="text-xs font-semibold uppercase mb-2">
+                      STORED LOCATION <span className="text-red-500">*</span>
+                    </div>
+                    <div className="relative">
+                      <div className="flex items-center gap-2">
+                        <Building2 className="w-4 h-4 text-blue-600 flex-shrink-0" />
+                        <div className="relative flex-1">
+                          <Input
+                            id="storedLocation"
+                            value={storedLocation}
+                            onChange={(e) => {
+                              setStoredLocation(e.target.value)
+                              if (errors.storedLocation) {
+                                setErrors((prev) => {
+                                  const newErrors = { ...prev }
+                                  delete newErrors.storedLocation
+                                  return newErrors
+                                })
+                              }
+                            }}
+                            placeholder="e.g. Storage Room A, Shelf 3"
+                            className={errors.storedLocation ? 'border-red-500 pr-10' : ''}
+                          />
+                          {errors.storedLocation && (
+                            <AlertCircle className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-red-500 pointer-events-none" />
+                          )}
+                        </div>
+                      </div>
+                      {errors.storedLocation && (
+                        <p className="text-red-500 text-sm mt-1 ml-6">{errors.storedLocation}</p>
+                      )}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Description */}
+                <div>
+                  <div className="text-xs font-semibold uppercase mb-2">
+                    Description
+                  </div>
+                  <Textarea
+                    id="description"
+                    value={description}
+                    onChange={(e) => setDescription(e.target.value)}
+                    className="min-h-[120px]"
+                    placeholder="Enter item description..."
+                  />
+                </div>
+
+                {/* Internal Notes */}
+                <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+                  <div className="text-xs font-semibold uppercase mb-2">
+                    Internal Notes
+                  </div>
+                  <Textarea
+                    id="internalNotes"
+                    value={internalNotes}
+                    onChange={(e) => setInternalNotes(e.target.value)}
+                    className="min-h-[100px] bg-white"
+                    placeholder="Add internal notes..."
+                  />
+                  <p className="text-xs text-gray-500 mt-2">
+                    Internal notes are visible to staff only.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </form>
+        </div>
       </div>
     </StaffLayout>
   )
