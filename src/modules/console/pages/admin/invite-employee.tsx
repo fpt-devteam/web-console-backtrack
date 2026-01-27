@@ -140,7 +140,7 @@ export function InviteEmployeePage() {
                   placeholder="e.g. Jane Doe"
                   value={formData.fullName}
                   onChange={(e) => handleInputChange('fullName', e.target.value)}
-                  className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 transition-colors ${
+                  className={`w-full px-4 py-1.5 border rounded-lg focus:outline-none focus:ring-2 transition-colors ${
                     errors.fullName
                       ? 'border-red-300 focus:ring-red-500'
                       : 'border-blue-300 focus:ring-blue-500'
@@ -161,7 +161,7 @@ export function InviteEmployeePage() {
                   placeholder="jane@company.com"
                   value={formData.email}
                   onChange={(e) => handleInputChange('email', e.target.value)}
-                  className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 transition-colors ${
+                  className={`w-full px-4 py-1.5 border rounded-lg focus:outline-none focus:ring-2 transition-colors ${
                     errors.email || showError
                       ? 'border-red-300 focus:ring-red-500 bg-red-50'
                       : 'border-gray-300 focus:ring-blue-500'
@@ -190,7 +190,7 @@ export function InviteEmployeePage() {
                     placeholder="+1 (555) 000-0000"
                     value={formData.phoneNumber}
                     onChange={(e) => handleInputChange('phoneNumber', e.target.value)}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors"
+                    className="w-full px-4 py-1.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors"
                   />
                 </div>
 
@@ -202,7 +202,7 @@ export function InviteEmployeePage() {
                   <select
                     value={formData.role}
                     onChange={(e) => handleInputChange('role', e.target.value)}
-                    className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 transition-colors appearance-none ${
+                    className={`w-full px-4 py-1.5 border rounded-lg focus:outline-none focus:ring-2 transition-colors appearance-none ${
                       errors.role
                         ? 'border-red-300 focus:ring-red-500'
                         : 'border-gray-300 focus:ring-blue-500'
@@ -229,7 +229,7 @@ export function InviteEmployeePage() {
                   rows={4}
                   value={formData.internalNotes}
                   onChange={(e) => handleInputChange('internalNotes', e.target.value)}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors resize-none"
+                  className="w-full px-4 py-1.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors resize-none"
                 />
               </div>
 
@@ -238,13 +238,13 @@ export function InviteEmployeePage() {
                 <button
                   type="button"
                   onClick={handleCancel}
-                  className="px-6 py-3 border border-gray-300 rounded-lg font-semibold text-gray-700 hover:bg-gray-50 transition-colors"
+                  className="px-6 py-1.5 border border-gray-300 rounded-lg font-semibold text-gray-700 hover:bg-gray-50 transition-colors"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="px-6 py-3 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 transition-colors"
+                  className="px-6 py-1.5 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 transition-colors"
                 >
                   Send Invite
                 </button>

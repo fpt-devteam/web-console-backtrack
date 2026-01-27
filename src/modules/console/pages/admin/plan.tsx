@@ -121,19 +121,19 @@ export function PlanPage() {
               <div className="flex gap-3">
                 <button
                   onClick={() => handleUpgrade('premium')}
-                  className="px-6 py-2.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-sm transition-colors"
+                  className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-sm transition-colors"
                 >
                   Upgrade Plan
                 </button>
                 <button
                   onClick={handleDownloadInvoice}
-                  className="px-6 py-2.5 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 text-sm transition-colors"
+                  className="px-6 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 text-sm transition-colors"
                 >
                   Download Invoice
                 </button>
                 <button
                   onClick={handleCancelSubscription}
-                  className="px-6 py-2.5 text-red-600 hover:bg-red-50 rounded-lg text-sm transition-colors ml-auto"
+                  className="px-6 py-2 text-red-600 hover:bg-red-50 rounded-lg text-sm transition-colors ml-auto"
                 >
                   Cancel Subscription
                 </button>
@@ -229,21 +229,21 @@ export function PlanPage() {
                       {isCurrentPlan ? (
                         <button
                           disabled
-                          className="w-full py-2.5 bg-gray-100 text-gray-500 rounded-lg text-sm cursor-not-allowed"
+                          className="w-full py-2 bg-gray-100 text-gray-500 rounded-lg text-sm cursor-not-allowed"
                         >
                           Current Plan
                         </button>
                       ) : plan.monthlyPrice < mockCurrentPlan.price ? (
                         <button
                           onClick={() => handleDowngrade(plan.id)}
-                          className="w-full py-2.5 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 text-sm transition-colors"
+                          className="w-full py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 text-sm transition-colors"
                         >
                           Downgrade
                         </button>
                       ) : (
                         <button
                           onClick={() => handleUpgrade(plan.id)}
-                          className="w-full py-2.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-sm transition-colors"
+                          className="w-full py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-sm transition-colors"
                         >
                           Upgrade
                         </button>
