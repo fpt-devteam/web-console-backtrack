@@ -14,7 +14,7 @@ export type UserStatus = 'Active' | 'Inactive';
 export interface SuperAdminUser {
   id: string;
   email: string;
-  displayName: string;
+  name: string;
   role: UserRole;
   status: UserStatus;
   createdAt: Date;
@@ -32,7 +32,7 @@ export const mockSuperAdminUsers: SuperAdminUser[] = [
   {
     id: '1',
     email: 'john.doe@example.com',
-    displayName: 'John Doe',
+    name: 'John Doe',
     role: 'Staff',
     status: 'Active',
     createdAt: new Date('2024-01-15'),
@@ -43,7 +43,7 @@ export const mockSuperAdminUsers: SuperAdminUser[] = [
   {
     id: '2',
     email: 'jane.smith@example.com',
-    displayName: 'Jane Smith',
+    name: 'Jane Smith',
     role: 'Staff',
     status: 'Active',
     createdAt: new Date('2024-01-20'),
@@ -54,7 +54,7 @@ export const mockSuperAdminUsers: SuperAdminUser[] = [
   {
     id: '3',
     email: 'bob.wilson@example.com',
-    displayName: 'Bob Wilson',
+    name: 'Bob Wilson',
     role: 'User',
     status: 'Active',
     createdAt: new Date('2024-02-01'),
@@ -65,7 +65,7 @@ export const mockSuperAdminUsers: SuperAdminUser[] = [
   {
     id: '4',
     email: 'alice.brown@example.com',
-    displayName: 'Alice Brown',
+    name: 'Alice Brown',
     role: 'Staff',
     status: 'Inactive',
     createdAt: new Date('2023-12-10'),
@@ -76,7 +76,7 @@ export const mockSuperAdminUsers: SuperAdminUser[] = [
   {
     id: '5',
     email: 'charlie.davis@example.com',
-    displayName: 'Charlie Davis',
+    name: 'Charlie Davis',
     role: 'User',
     status: 'Active',
     createdAt: new Date('2024-02-15'),
@@ -87,7 +87,7 @@ export const mockSuperAdminUsers: SuperAdminUser[] = [
   {
     id: '6',
     email: 'diana.miller@example.com',
-    displayName: 'Diana Miller',
+    name: 'Diana Miller',
     role: 'User',
     status: 'Inactive',
     createdAt: new Date('2023-11-20'),
@@ -98,7 +98,7 @@ export const mockSuperAdminUsers: SuperAdminUser[] = [
   {
     id: '7',
     email: 'alex.morgan@example.com',
-    displayName: 'Alex Morgan',
+    name: 'Alex Morgan',
     role: 'Staff',
     status: 'Active',
     createdAt: new Date('2023-10-01'),
@@ -110,7 +110,7 @@ export const mockSuperAdminUsers: SuperAdminUser[] = [
   ...Array.from({ length: 43 }, (_, i) => ({
     id: String(i + 8),
     email: `user${i + 8}@example.com`,
-    displayName: `User ${i + 8}`,
+      name: `User ${i + 8}`,
     role: ['Staff', 'User'][i % 2] as UserRole,
     status: ['Active', 'Inactive'][i % 2] as UserStatus,
     createdAt: new Date(2024, 0, 1 + (i % 60)),

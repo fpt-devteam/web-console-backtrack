@@ -25,15 +25,15 @@ export interface IAuthService {
   signUp(credentials: SignupCredentials): Promise<AuthUser>;
 
   /**
+   * Send email verification to current user
+   */
+  sendVerificationEmail(): Promise<void>;
+
+  /**
    * Get the currently authenticated user
    * @returns {AuthUser | null} User if authenticated, null otherwise
    */
   getCurrentUser(): Promise<AuthUser | null>;
-
-  /**
-   * Update user profile
-   */
-  updateUser(userId: string, data: Partial<AuthUser>): Promise<AuthUser>;
 
   /**
    * Sign out the current user
