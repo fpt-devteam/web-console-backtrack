@@ -24,7 +24,7 @@ export function UsersPage() {
   const filteredUsers = mockSuperAdminUsers.filter(user => {
     const matchesSearch = 
       user.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      user.displayName.toLowerCase().includes(searchTerm.toLowerCase());
+      user.name.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesRole = roleFilter === 'All' || user.role === roleFilter;
     const matchesStatus = statusFilter === 'All' || user.status === statusFilter;
     return matchesSearch && matchesRole && matchesStatus;
@@ -38,9 +38,9 @@ export function UsersPage() {
       case 'Oldest':
         return a.createdAt.getTime() - b.createdAt.getTime();
       case 'Name A-Z':
-        return a.displayName.localeCompare(b.displayName);
+        return a.name.localeCompare(b.name);
       case 'Name Z-A':
-        return b.displayName.localeCompare(a.displayName);
+        return b.name.localeCompare(a.name);
       default:
         return 0;
     }
@@ -253,7 +253,7 @@ export function UsersPage() {
                           <div className={`w-10 h-10 rounded-full ${user.avatarColor} flex items-center justify-center text-gray-700 font-semibold text-sm`}>
                             {user.avatarText}
                           </div>
-                          <span className="font-medium text-gray-900">{user.displayName}</span>
+                          <span className="font-medium text-gray-900">{user.name}</span>
                         </div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
@@ -288,7 +288,7 @@ export function UsersPage() {
                             <Edit className="w-4 h-4" />
                           </button>
                           <button
-                            onClick={() => handleDeleteUser(user.id, user.displayName)}
+                            onClick={() => handleDeleteUser(user.id, user.name)}
                             className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
                             title="Delete User"
                           >

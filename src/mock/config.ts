@@ -3,7 +3,7 @@
  */
 
 // Enable or disable mock services
-export const USE_MOCK = true;
+export const USE_MOCK = false;
 
 // Storage key prefix for mock data
 export const MOCK_STORAGE_PREFIX = '__MOCK__';

@@ -6,7 +6,7 @@ import { useState } from 'react';
 import { useRouter } from '@tanstack/react-router';
 import { useCheckEmail } from '@/hooks/use-auth';
 import { showToast } from '@/lib/toast';
-import { saveTempEmail } from '@/mock/storage/auth-storage';
+import { saveTempEmail } from '@/lib/auth-storage';
 
 export function SignInOrSignUp() {
   const [email, setEmail] = useState('');

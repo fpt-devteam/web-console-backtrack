@@ -37,7 +37,7 @@ export function WelcomePage() {
           {/* Welcome Header */}
           <div className="text-center mb-8">
             <h1 className="text-4xl font-bold mb-3">
-              Welcome back, {user?.displayName || 'User'}
+              Welcome back, {user?.name || 'User'}
             </h1>
             <p className="text-base text-gray-600">
               Select an organization to continue or create a new one.

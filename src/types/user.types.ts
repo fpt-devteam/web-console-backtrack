@@ -1,14 +1,13 @@
 export interface UserProfile {
   id: string;
   email?: string | null;
-  displayName?: string | null;
+  name?: string | null;
   globalRole: UserGlobalRoleType;
 }
 
 export const UserGlobalRole = {
-  Customer: 'Customer',
-  PlatformSuperAdmin: 'PlatformSuperAdmin',
-  EnterpriseAdmin: 'EnterpriseAdmin',
+  USER: 'USER',
+  SUPER_ADMIN: 'SUPER_ADMIN',
 } as const;
 
 export type UserGlobalRoleType = typeof UserGlobalRole[keyof typeof UserGlobalRole];
