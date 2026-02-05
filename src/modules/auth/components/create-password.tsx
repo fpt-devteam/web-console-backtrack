@@ -6,7 +6,8 @@ import { useState, useEffect } from 'react';
 import { useRouter } from '@tanstack/react-router';
 import { useSignUp } from '@/hooks/use-auth';
 import { showToast } from '@/lib/toast';
-import { saveTempEmail, getTempEmail } from '@/mock/storage/auth-storage';
+import { getTempEmail, saveTempEmail } from '@/lib/auth-storage';
+import { authService } from '@/services';
 
 export function CreatePassword() {
   const [showPassword, setShowPassword] = useState(false);
@@ -48,14 +49,20 @@ export function CreatePassword() {
     signUp.mutate(
       { email, password },
       {
-        onSuccess: () => {
-          // Save email to temp storage for check-email page
-          saveTempEmail(email);
-          showToast.success('Account created successfully!');
-          router.navigate({ to: '/auth/check-email' });
+        onSuccess: async () => {
+          try {
+            await authService.sendVerificationEmail();
+            saveTempEmail(email);
+            showToast.success('Account created! Check your email to verify.');
+            router.navigate({ to: '/auth/check-email' });
+          } catch (error: any) {
+            saveTempEmail(email);
+            showToast.error('Account created but failed to send verification email.');
+            router.navigate({ to: '/auth/check-email' });
+          }
         },
         onError: (error) => {
-          showToast.error(error.message || 'Failed to create account. Please try again.');
+          showToast.error(error.message || 'Failed to create account.');
         },
       }
     );

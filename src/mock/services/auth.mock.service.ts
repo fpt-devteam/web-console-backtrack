@@ -70,9 +70,12 @@ class MockAuthService implements IAuthService {
     const authUser: AuthUser = {
       id: user.id,
       email: user.email,
-      displayName: user.displayName,
+      emailVerified: user.emailVerified,
+      name: user.name,
       globalRole: user.globalRole,
+      status: user.status,
       createdAt: user.createdAt,
+      updatedAt: user.updatedAt,
     };
 
     // Save to storage
@@ -87,7 +90,7 @@ class MockAuthService implements IAuthService {
   async signUp(credentials: SignupCredentials): Promise<AuthUser> {
     await simulateDelay();
 
-    const { email, password, displayName } = credentials;
+    const { email, password, name } = credentials;
 
     // Validate email format
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -105,13 +108,16 @@ class MockAuthService implements IAuthService {
       throw createAuthError('weak-password', 'Password must be at least 6 characters long.');
     }
 
-    // Create new user with Customer role by default
+    // Create new user with USER role by default
     const newUser: AuthUser = {
       id: `mock-user-${Date.now()}`,
       email: email.toLowerCase(),
-      displayName: displayName || email.split('@')[0],
-      globalRole: UserGlobalRole.Customer,
+      emailVerified: false,
+      name: name || email.split('@')[0],
+      globalRole: UserGlobalRole.USER,
+      status: 'ACTIVE',
       createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
     };
 
     // In a real scenario, this would be saved to a database
@@ -170,6 +176,12 @@ class MockAuthService implements IAuthService {
   async signOut(): Promise<void> {
     await simulateDelay();
     clearMockAuth();
+  }
+
+  async sendVerificationEmail(): Promise<void> {
+    await simulateDelay();
+    // Mock implementation - just simulate sending email
+    console.log('[Mock] Verification email sent');
   }
 }
 

@@ -1,40 +1,133 @@
 import type { IAuthService } from './auth.service.interface';
-import type { AuthUser, LoginCredentials, SignupCredentials, EmailCheckResult } from '@/types/auth.types';
+import type { AuthUser, LoginCredentials, SignupCredentials, EmailCheckResult, AuthError } from '@/types/auth.types';
+import { auth } from '@/lib/firebase';
+import {
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
+  signOut as firebaseSignOut,
+  onAuthStateChanged,
+  fetchSignInMethodsForEmail,
+  sendEmailVerification,
+  type User as FirebaseUser,
+} from 'firebase/auth';
+import { UserGlobalRole } from '@/types/user.types';
 
-/**
- * Real Authentication Service Implementation
- * 
- * TODO: Implement real authentication logic here when ready.
- * 
- * This should integrate with your actual backend API:
- * - Firebase Authentication
- * - Custom API endpoints
- * - OAuth providers
- * etc.
- */
+function createAuthError(error: any): AuthError {
+  const code = error?.code || 'unknown';
+  let message = 'An error occurred. Please try again.';
+
+  switch (code) {
+    case 'auth/email-already-in-use':
+      message = 'An account with this email already exists.';
+      break;
+    case 'auth/invalid-email':
+      message = 'Please enter a valid email address.';
+      break;
+    case 'auth/weak-password':
+      message = 'Password should be at least 6 characters.';
+      break;
+    case 'auth/user-not-found':
+      message = 'No account found with this email address.';
+      break;
+    case 'auth/wrong-password':
+      message = 'Incorrect password. Please try again.';
+      break;
+    case 'auth/too-many-requests':
+      message = 'Too many failed attempts. Please try again later.';
+      break;
+    case 'auth/popup-closed-by-user':
+      message = 'Sign in was cancelled.';
+      break;
+    default:
+      message = error?.message || message;
+  }
+
+  return { code, message };
+}
+
+function firebaseUserToAuthUser(firebaseUser: FirebaseUser): AuthUser {
+  const now = new Date().toISOString();
+  return {
+    id: firebaseUser.uid,
+    email: firebaseUser.email || '',
+    emailVerified: firebaseUser.emailVerified,
+    name: firebaseUser.displayName || firebaseUser.email?.split('@')[0] || 'User',
+    globalRole: UserGlobalRole.USER,
+    status: 'ACTIVE',
+    createdAt: now,
+    updatedAt: now,
+  };
+}
+
 class RealAuthService implements IAuthService {
-  async checkEmailExists(_email: string): Promise<EmailCheckResult> {
-    throw new Error('Real auth service not implemented yet. Set USE_MOCK = true in src/mock/config.ts');
+  async checkEmailExists(email: string): Promise<EmailCheckResult> {
+    try {
+      const trimmedEmail = email.trim().toLowerCase();
+      const signInMethods = await fetchSignInMethodsForEmail(auth, trimmedEmail);
+      return {
+        exists: signInMethods.length > 0,
+        email: trimmedEmail,
+      };
+    } catch (error: any) {
+      return {
+        exists: false,
+        email: email.trim().toLowerCase(),
+      };
+    }
   }
 
-  async signIn(_credentials: LoginCredentials): Promise<AuthUser> {
-    throw new Error('Real auth service not implemented yet. Set USE_MOCK = true in src/mock/config.ts');
+  async signIn(credentials: LoginCredentials): Promise<AuthUser> {
+    try {
+      const userCredential = await signInWithEmailAndPassword(auth, credentials.email, credentials.password);
+      return firebaseUserToAuthUser(userCredential.user);
+    } catch (error: any) {
+      throw createAuthError(error);
+    }
   }
 
-  async signUp(_credentials: SignupCredentials): Promise<AuthUser> {
-    throw new Error('Real auth service not implemented yet. Set USE_MOCK = true in src/mock/config.ts');
+  async signUp(credentials: SignupCredentials): Promise<AuthUser> {
+    try {
+      const userCredential = await createUserWithEmailAndPassword(auth, credentials.email, credentials.password);
+      return firebaseUserToAuthUser(userCredential.user);
+    } catch (error: any) {
+      throw createAuthError(error);
+    }
+  }
+
+  async sendVerificationEmail(): Promise<void> {
+    try {
+      const currentUser = auth.currentUser;
+      if (!currentUser) {
+        throw createAuthError({ code: 'auth/user-not-found', message: 'No user is currently signed in.' });
+      }
+      await sendEmailVerification(currentUser);
+    } catch (error: any) {
+      throw createAuthError(error);
+    }
   }
 
   async getCurrentUser(): Promise<AuthUser | null> {
-    throw new Error('Real auth service not implemented yet. Set USE_MOCK = true in src/mock/config.ts');
-  }
-
-  async updateUser(_userId: string, _data: Partial<AuthUser>): Promise<AuthUser> {
-    throw new Error('Real auth service not implemented yet. Set USE_MOCK = true in src/mock/config.ts');
+    return new Promise((resolve, reject) => {
+      const unsubscribe = onAuthStateChanged(
+        auth,
+        (firebaseUser) => {
+          unsubscribe();
+          resolve(firebaseUser ? firebaseUserToAuthUser(firebaseUser) : null);
+        },
+        (error) => {
+          unsubscribe();
+          reject(createAuthError(error));
+        }
+      );
+    });
   }
 
   async signOut(): Promise<void> {
-    throw new Error('Real auth service not implemented yet. Set USE_MOCK = true in src/mock/config.ts');
+    try {
+      await firebaseSignOut(auth);
+    } catch (error: any) {
+      throw createAuthError(error);
+    }
   }
 }
 
