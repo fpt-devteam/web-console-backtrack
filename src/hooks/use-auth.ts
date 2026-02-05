@@ -86,7 +86,7 @@ export function useSignUp() {
  * const { data: user, isLoading } = useCurrentUser();
  * if (isLoading) return <Spinner />;
  * if (!user) return <Navigate to="/auth/signin" />;
- * return <div>Welcome, {user.displayName}</div>;
+ * return <div>Welcome, {user.name}</div>;
  */
 export function useCurrentUser() {
   return useQuery({
@@ -94,25 +94,6 @@ export function useCurrentUser() {
     queryFn: () => authService.getCurrentUser(),
     staleTime: 1000 * 60 * 5, // 5 minutes
     retry: false,
-  });
-}
-
-/**
- * Update user profile
- * 
- * @example
- * const updateUser = useUpdateUser();
- * updateUser.mutate({ userId: user.id, data: { displayName: 'New Name' } });
- */
-export function useUpdateUser() {
-  const queryClient = useQueryClient();
-
-  return useMutation<AuthUser, AuthError, { userId: string; data: Partial<AuthUser> }>({
-    mutationFn: ({ userId, data }) => authService.updateUser(userId, data),
-    onSuccess: (user) => {
-      // Update the current user cache
-      queryClient.setQueryData(AUTH_KEYS.currentUser, user);
-    },
   });
 }
 

@@ -6,9 +6,12 @@ import type { UserGlobalRoleType } from './user.types';
 export interface AuthUser {
   id: string;
   email: string;
-  displayName: string;
+  emailVerified: boolean;
+  name: string;
   globalRole: UserGlobalRoleType;
-  createdAt?: string;
+  status: 'ACTIVE' | 'SUSPENDED';
+  createdAt: string;
+  updatedAt: string;
 }
 
 /**
@@ -25,7 +28,7 @@ export interface LoginCredentials {
 export interface SignupCredentials {
   email: string;
   password: string;
-  displayName?: string;
+  name?: string;
 }
 
 /**

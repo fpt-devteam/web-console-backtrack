@@ -12,27 +12,25 @@ export interface MockUserWithPassword extends AuthUser {
 export const mockUsers: MockUserWithPassword[] = [
   {
     id: 'mock-user-1',
-    email: 'customer@test.com',
+    email: 'user@test.com',
+    emailVerified: true,
     password: '123456',
-    displayName: 'Customer User',
-    globalRole: UserGlobalRole.Customer,
+    name: 'Regular User',
+    globalRole: UserGlobalRole.USER,
+    status: 'ACTIVE',
     createdAt: new Date('2024-01-15').toISOString(),
+    updatedAt: new Date('2024-01-15').toISOString(),
   },
   {
     id: 'mock-user-2',
-    email: 'admin@test.com',
-    password: '123456',
-    displayName: 'Admin User',
-    globalRole: UserGlobalRole.EnterpriseAdmin,
-    createdAt: new Date('2024-01-10').toISOString(),
-  },
-  {
-    id: 'mock-user-3',
     email: 'superadmin@test.com',
+    emailVerified: true,
     password: '123456',
-    displayName: 'Super Admin',
-    globalRole: UserGlobalRole.PlatformSuperAdmin,
+    name: 'Super Admin',
+    globalRole: UserGlobalRole.SUPER_ADMIN,
+    status: 'ACTIVE',
     createdAt: new Date('2024-01-01').toISOString(),
+    updatedAt: new Date('2024-01-01').toISOString(),
   },
 ];
 

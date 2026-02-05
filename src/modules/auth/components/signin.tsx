@@ -6,7 +6,8 @@ import { useState, useEffect } from 'react';
 import { useRouter } from '@tanstack/react-router';
 import { useSignIn } from '@/hooks/use-auth';
 import { showToast } from '@/lib/toast';
-import { getTempEmail } from '@/mock/storage/auth-storage';
+import { getTempEmail } from '@/lib/auth-storage';
+import { authService } from '@/services';
 
 export function SignIn() {
   const [showPassword, setShowPassword] = useState(false);
@@ -39,15 +40,20 @@ export function SignIn() {
     signIn.mutate(
       { email, password },
       {
-        onSuccess: async () => {
+        onSuccess: async (user) => {
+          // Check if email is verified
+          if (!user.emailVerified) {
+            await authService.signOut();
+            showToast.error('Please verify your email before signing in. Check your inbox.');
+            return;
+          }
+          
           showToast.success('Welcome back!');
-          // Small delay to ensure state is updated
           await new Promise(resolve => setTimeout(resolve, 100));
-          // Force navigation
           window.location.href = '/console/welcome';
         },
         onError: (error) => {
-          showToast.error(error.message || 'Failed to sign in. Please try again.');
+          showToast.error(error.message || 'Failed to sign in.');
         },
       }
     );
