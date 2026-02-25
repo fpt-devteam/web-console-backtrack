@@ -1,10 +1,12 @@
 import { privateClient } from '@/lib/api-client';
 import type { ApiResponse } from '@/types/api-response.type';
+import type { PagedResponse } from '@/types/pagination.type';
 import type {
   CreateOrganizationPayload,
   UpdateOrganizationPayload,
   Organization,
   MyOrganization,
+  OrgMember,
 } from '@/types/organization.types';
 
 export const orgService = {
@@ -20,6 +22,15 @@ export const orgService = {
     return data.data;
   },
 
+  async getMembers(orgId: string, page = 1, pageSize = 20): Promise<PagedResponse<OrgMember>> {
+    const { data } = await privateClient.get<ApiResponse<PagedResponse<OrgMember>>>(
+      `/api/core/orgs/${orgId}/members`,
+      { params: { page, pageSize } }
+    );
+    if (!data.success) throw new Error(data.error?.message ?? 'Failed to fetch members');
+    return data.data;
+  },
+
   async update(orgId: string, payload: UpdateOrganizationPayload): Promise<Organization> {
     const { data } = await privateClient.put<ApiResponse<Organization>>(`/api/core/orgs/${orgId}`, payload);
     if (!data.success) throw new Error(data.error?.message ?? 'Failed to update organization');
@@ -29,6 +40,15 @@ export const orgService = {
   async create(payload: CreateOrganizationPayload): Promise<Organization> {
     const { data } = await privateClient.post<ApiResponse<Organization>>('/api/core/orgs', payload);
     if (!data.success) throw new Error(data.error?.message ?? 'Failed to create organization');
+    return data.data;
+  },
+
+  async updateMemberRole(orgId: string, membershipId: string, role: string): Promise<OrgMember> {
+    const { data } = await privateClient.put<ApiResponse<OrgMember>>(
+      `/api/core/orgs/${orgId}/members/${membershipId}/role`,
+      { role }
+    );
+    if (!data.success) throw new Error(data.error?.message ?? 'Failed to update role');
     return data.data;
   },
 };

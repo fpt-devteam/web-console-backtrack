@@ -29,6 +29,18 @@ export interface UpdateOrganizationPayload {
   taxIdentificationNumber: string;
 }
 
+/** Thành viên org – item từ GET /api/core/orgs/{orgId}/members */
+export interface OrgMember {
+  membershipId: string;
+  userId: string;
+  displayName?: string | null;
+  email?: string | null;
+  avatarUrl?: string | null;
+  role: string;
+  status: string;
+  joinedAt: string;
+}
+
 /** Item trả về từ GET /api/core/orgs/me */
 export interface MyOrganization {
   orgId: string;

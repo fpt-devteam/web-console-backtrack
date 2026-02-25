@@ -7,7 +7,7 @@ import { Spinner } from '@/components/ui/spinner';
 export function WelcomePage() {
   const router = useRouter();
   const { data: user, isLoading: userLoading } = useCurrentUser();
-  const { data: orgs = [], isLoading: orgsLoading } = useMyOrganizations();
+  const { data: orgs = [], isLoading: orgsLoading } = useMyOrganizations({ enabled: !!user });
 
   const handleOrganizationClick = () => {
     router.navigate({ to: '/console/admin/dashboard' });
