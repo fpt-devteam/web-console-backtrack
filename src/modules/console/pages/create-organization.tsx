@@ -4,23 +4,55 @@ import { Label } from '@/components/ui/label';
 import { Check } from 'lucide-react';
 import { useState } from 'react';
 import { useNavigate } from '@tanstack/react-router';
+import { useCreateOrganization } from '@/hooks/use-org';
+
+const INDUSTRY_OPTIONS = [
+  { value: 'airport', label: 'Airport' },
+  { value: 'hotel', label: 'Hotel' },
+  { value: 'university', label: 'University' },
+  { value: 'mall', label: 'Shopping Mall' },
+  { value: 'stadium', label: 'Stadium/Arena' },
+  { value: 'transportation', label: 'Transportation Hub' },
+  { value: 'other', label: 'Other' },
+] as const;
 
 export function CreateOrganizationPage() {
   const navigate = useNavigate();
-  const [subdomain, setSubdomain] = useState('');
-  const [isSubdomainAvailable, setIsSubdomainAvailable] = useState(false);
+  const createOrg = useCreateOrganization();
+  const [form, setForm] = useState({
+    name: '',
+    industryType: '',
+    address: '',
+    slug: '',
+    phone: '',
+    taxIdentificationNumber: '',
+  });
+  const [error, setError] = useState<string | null>(null);
 
-  const handleSubdomainChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value;
-    setSubdomain(value);
-    // Simulate subdomain availability check (hardcoded for UI demo)
-    setIsSubdomainAvailable(value.length > 3);
+  const slugOk = form.slug.length > 3;
+
+  const update = (field: keyof typeof form) => (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+    setForm((prev) => ({ ...prev, [field]: e.target.value }));
+    setError(null);
   };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    // Navigate to processing page
-    navigate({ to: '/console/processing' });
+    setError(null);
+    createOrg.mutate(
+      {
+        name: form.name.trim(),
+        slug: form.slug.trim().toLowerCase().replace(/\s+/g, '-'),
+        address: form.address.trim() || undefined,
+        phone: form.phone.trim(),
+        industryType: form.industryType,
+        taxIdentificationNumber: form.taxIdentificationNumber.trim(),
+      },
+      {
+        onSuccess: () => navigate({ to: '/console/processing' }),
+        onError: (err) => setError(err instanceof Error ? err.message : 'Failed to create organization'),
+      }
+    );
   };
 
   return (
@@ -40,123 +72,99 @@ export function CreateOrganizationPage() {
 
           {/* Form */}
           <form className="space-y-6" onSubmit={handleSubmit}>
-            {/* Company Name & Industry Type Row */}
+            {error && (
+              <p className="text-sm text-red-600 bg-red-50 px-3 py-2 rounded-md">{error}</p>
+            )}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {/* Company Name */}
               <div>
-                <Label htmlFor="companyName" className="text-sm font-semibold  mb-2 block">
-                  Company Name
-                </Label>
+                <Label htmlFor="companyName" className="text-sm font-semibold mb-2 block">Company Name</Label>
                 <Input
                   id="companyName"
-                  type="text"
+                  value={form.name}
+                  onChange={update('name')}
                   placeholder="Acme Inc."
-                  className="w-full"
                   required
                 />
               </div>
-
-              {/* Industry Type */}
               <div>
-                <Label htmlFor="industryType" className="text-sm font-semibold  mb-2 block">
-                  Industry Type
-                </Label>
+                <Label htmlFor="industryType" className="text-sm font-semibold mb-2 block">Industry Type</Label>
                 <select
                   id="industryType"
-                  className="w-full h-10 px-3 border border-gray-300 rounded-md text-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  value={form.industryType}
+                  onChange={update('industryType')}
+                  className="w-full h-10 px-3 border border-gray-300 rounded-md text-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
                   required
                 >
                   <option value="">Select industry</option>
-                  <option value="airport">Airport</option>
-                  <option value="hotel">Hotel</option>
-                  <option value="university">University</option>
-                  <option value="mall">Shopping Mall</option>
-                  <option value="stadium">Stadium/Arena</option>
-                  <option value="transportation">Transportation Hub</option>
-                  <option value="other">Other</option>
+                  {INDUSTRY_OPTIONS.map((o) => (
+                    <option key={o.value} value={o.value}>{o.label}</option>
+                  ))}
                 </select>
               </div>
             </div>
 
-            {/* Company Address */}
             <div>
-              <Label htmlFor="companyAddress" className="text-sm font-semibold  mb-2 block">
+              <Label htmlFor="companyAddress" className="text-sm font-semibold mb-2 block">
                 Company Address <span className="text-gray-400 font-normal">(Optional)</span>
               </Label>
               <Input
                 id="companyAddress"
-                type="text"
+                value={form.address}
+                onChange={update('address')}
                 placeholder="1234 Main St, Suite 100"
-                className="w-full"
               />
             </div>
 
-            {/* Workspace URL */}
             <div>
-              <Label htmlFor="workspaceUrl" className="text-sm font-semibold  mb-2 block">
-                Workspace URL
-              </Label>
+              <Label htmlFor="workspaceUrl" className="text-sm font-semibold mb-2 block">Workspace URL</Label>
               <div className="relative">
                 <Input
                   id="workspaceUrl"
-                  type="text"
+                  value={form.slug}
+                  onChange={update('slug')}
                   placeholder="acme-corp"
-                  value={subdomain}
-                  onChange={handleSubdomainChange}
                   className="w-full pr-32"
                   required
                 />
                 <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
                   <span className="text-sm text-gray-500">.backtrack.com</span>
                 </div>
-                {isSubdomainAvailable && subdomain && (
+                {slugOk && form.slug && (
                   <div className="absolute inset-y-0 right-36 flex items-center pr-2">
                     <Check className="h-5 w-5 text-green-500" />
                   </div>
                 )}
               </div>
               <div className="flex items-center justify-between mt-2">
-                <p className="text-xs text-gray-500">
-                  This will be your team's unique login URL.
-                </p>
-                {isSubdomainAvailable && subdomain && (
-                  <p className="text-xs text-green-600 font-medium">
-                    Subdomain available
-                  </p>
-                )}
+                <p className="text-xs text-gray-500">This will be your team's unique login URL.</p>
+                {slugOk && form.slug && <p className="text-xs text-green-600 font-medium">Subdomain available</p>}
               </div>
             </div>
 
-            {/* Phone Number & Tax ID Row */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {/* Phone Number */}
               <div>
-                <Label htmlFor="phoneNumber" className="text-sm font-semibold  mb-2 block">
-                  Phone Number
-                </Label>
+                <Label htmlFor="phoneNumber" className="text-sm font-semibold mb-2 block">Phone Number</Label>
                 <Input
                   id="phoneNumber"
                   type="tel"
+                  value={form.phone}
+                  onChange={update('phone')}
                   placeholder="+1 (555) 000-0000"
-                  className="w-full"
+                  required
                 />
               </div>
-
-              {/* Tax Identification Number */}
               <div>
-                <Label htmlFor="taxId" className="text-sm font-semibold  mb-2 block">
-                  Tax Identification Number
-                </Label>
+                <Label htmlFor="taxId" className="text-sm font-semibold mb-2 block">Tax Identification Number</Label>
                 <Input
                   id="taxId"
-                  type="text"
+                  value={form.taxIdentificationNumber}
+                  onChange={update('taxIdentificationNumber')}
                   placeholder="XX-XXXXXXX"
-                  className="w-full"
+                  required
                 />
               </div>
             </div>
 
-            {/* Terms Checkbox */}
             <div className="flex items-start gap-3 pt-2">
               <input
                 type="checkbox"
@@ -164,25 +172,20 @@ export function CreateOrganizationPage() {
                 className="mt-1 h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
                 required
               />
-              <label htmlFor="terms" className="text-sm ">
+              <label htmlFor="terms" className="text-sm">
                 I agree to the{' '}
-                <a href="#" className="text-blue-600 hover:text-blue-700 hover:underline">
-                  Terms of Service
-                </a>
+                <a href="#" className="text-blue-600 hover:underline">Terms of Service</a>
                 {' '}and{' '}
-                <a href="#" className="text-blue-600 hover:text-blue-700 hover:underline">
-                  Privacy Policy
-                </a>
-                .
+                <a href="#" className="text-blue-600 hover:underline">Privacy Policy</a>.
               </label>
             </div>
 
-            {/* Submit Button */}
             <Button
               type="submit"
+              disabled={createOrg.isPending}
               className="w-full bg-blue-500 hover:bg-blue-600 text-white py-6 text-base font-medium mt-6"
             >
-              Create Account
+              {createOrg.isPending ? 'Creating…' : 'Create Account'}
             </Button>
           </form>
 
