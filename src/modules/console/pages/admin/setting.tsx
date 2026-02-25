@@ -3,6 +3,7 @@ import { AlertCircle, Phone, X } from 'lucide-react'
 import { useState, useEffect } from 'react'
 import { useRouter } from '@tanstack/react-router'
 import { showToast } from '@/lib/toast'
+import { useCurrentUser } from '@/hooks/use-auth'
 import { useMyOrganizations, useOrganization, useUpdateOrganization } from '@/hooks/use-org'
 import { Spinner } from '@/components/ui/spinner'
 
@@ -34,7 +35,8 @@ interface SettingFormData {
 
 export function SettingPage() {
   const router = useRouter()
-  const { data: myOrgs = [] } = useMyOrganizations()
+  const { data: currentUser } = useCurrentUser()
+  const { data: myOrgs = [] } = useMyOrganizations({ enabled: !!currentUser })
   const orgId = myOrgs[0]?.orgId ?? null
   const { data: org, isLoading: orgLoading, error: orgError } = useOrganization(orgId)
   const updateOrg = useUpdateOrganization()
