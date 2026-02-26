@@ -4,6 +4,7 @@ import { useRouter, useParams } from '@tanstack/react-router';
 import { ArrowLeft } from 'lucide-react';
 import { useCurrentUser } from '@/hooks/use-auth';
 import { useMyOrganizations, useOrgMembers, useUpdateMemberRole } from '@/hooks/use-org';
+import { useCurrentOrgId } from '@/contexts/current-org.context';
 import { showToast } from '@/lib/toast';
 import { Spinner } from '@/components/ui/spinner';
 
@@ -17,8 +18,9 @@ export function EditEmployeePage() {
   const { employeeId: membershipId } = useParams({ from: '/console/admin/edit-employee/$employeeId' });
 
   const { data: user } = useCurrentUser();
+  const { currentOrgId } = useCurrentOrgId();
   const { data: myOrgs = [] } = useMyOrganizations({ enabled: !!user });
-  const orgId = myOrgs[0]?.orgId ?? null;
+  const orgId = currentOrgId ?? myOrgs[0]?.orgId ?? null;
   const { data: membersData, isLoading } = useOrgMembers(orgId, 1, 100);
   const updateRole = useUpdateMemberRole();
 

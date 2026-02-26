@@ -5,6 +5,7 @@ import { Check } from 'lucide-react';
 import { useState } from 'react';
 import { useNavigate } from '@tanstack/react-router';
 import { useCreateOrganization } from '@/hooks/use-org';
+import { useCurrentOrgId } from '@/contexts/current-org.context';
 
 const INDUSTRY_OPTIONS = [
   { value: 'airport', label: 'Airport' },
@@ -18,6 +19,7 @@ const INDUSTRY_OPTIONS = [
 
 export function CreateOrganizationPage() {
   const navigate = useNavigate();
+  const { setCurrentOrgId } = useCurrentOrgId();
   const createOrg = useCreateOrganization();
   const [form, setForm] = useState({
     name: '',
@@ -49,7 +51,10 @@ export function CreateOrganizationPage() {
         taxIdentificationNumber: form.taxIdentificationNumber.trim(),
       },
       {
-        onSuccess: () => navigate({ to: '/console/processing' }),
+        onSuccess: (createdOrg) => {
+          setCurrentOrgId(createdOrg.id);
+          navigate({ to: '/console/processing' });
+        },
         onError: (err) => setError(err instanceof Error ? err.message : 'Failed to create organization'),
       }
     );

@@ -2,14 +2,18 @@ import { Building2, ChevronRight } from 'lucide-react';
 import { Link, useRouter } from '@tanstack/react-router';
 import { useCurrentUser } from '@/hooks/use-auth';
 import { useMyOrganizations } from '@/hooks/use-org';
+import { useCurrentOrgId } from '@/contexts/current-org.context';
 import { Spinner } from '@/components/ui/spinner';
+import type { MyOrganization } from '@/types/organization.types';
 
 export function WelcomePage() {
   const router = useRouter();
+  const { setCurrentOrgId } = useCurrentOrgId();
   const { data: user, isLoading: userLoading } = useCurrentUser();
   const { data: orgs = [], isLoading: orgsLoading } = useMyOrganizations({ enabled: !!user });
 
-  const handleOrganizationClick = () => {
+  const handleOrganizationClick = (org: MyOrganization) => {
+    setCurrentOrgId(org.orgId);
     router.navigate({ to: '/console/admin/dashboard' });
   };
 
@@ -51,7 +55,7 @@ export function WelcomePage() {
                   <button
                     key={org.orgId}
                     type="button"
-                    onClick={handleOrganizationClick}
+                    onClick={() => handleOrganizationClick(org)}
                     className="w-full bg-white border border-gray-200 rounded-lg p-5 hover:border-gray-300 shadow-md hover:shadow-lg transition-all group text-left"
                   >
                     <div className="flex items-center justify-between">

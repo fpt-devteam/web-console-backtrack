@@ -5,6 +5,7 @@ import { useRouter } from '@tanstack/react-router'
 import { showToast } from '@/lib/toast'
 import { useCurrentUser } from '@/hooks/use-auth'
 import { useMyOrganizations, useOrganization, useUpdateOrganization } from '@/hooks/use-org'
+import { useCurrentOrgId } from '@/contexts/current-org.context'
 import { Spinner } from '@/components/ui/spinner'
 
 const INDUSTRY_OPTIONS = [
@@ -36,8 +37,9 @@ interface SettingFormData {
 export function SettingPage() {
   const router = useRouter()
   const { data: currentUser } = useCurrentUser()
+  const { currentOrgId } = useCurrentOrgId()
   const { data: myOrgs = [] } = useMyOrganizations({ enabled: !!currentUser })
-  const orgId = myOrgs[0]?.orgId ?? null
+  const orgId = currentOrgId ?? myOrgs[0]?.orgId ?? null
   const { data: org, isLoading: orgLoading, error: orgError } = useOrganization(orgId)
   const updateOrg = useUpdateOrganization()
 
