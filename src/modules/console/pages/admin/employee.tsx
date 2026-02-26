@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { useRouter } from '@tanstack/react-router';
 import { useCurrentUser } from '@/hooks/use-auth';
 import { useMyOrganizations, useOrgMembers } from '@/hooks/use-org';
+import { useCurrentOrgId } from '@/contexts/current-org.context';
 import { showToast } from '@/lib/toast';
 import { Spinner } from '@/components/ui/spinner';
 import type { OrgMember } from '@/types/organization.types';
@@ -60,8 +61,9 @@ const AVATAR_COLORS = [
 export function EmployeePage() {
   const router = useRouter();
   const { data: user } = useCurrentUser();
+  const { currentOrgId } = useCurrentOrgId();
   const { data: myOrgs = [] } = useMyOrganizations({ enabled: !!user });
-  const orgId = myOrgs[0]?.orgId ?? null;
+  const orgId = currentOrgId ?? myOrgs[0]?.orgId ?? null;
 
   const [currentPage, setCurrentPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState('');
