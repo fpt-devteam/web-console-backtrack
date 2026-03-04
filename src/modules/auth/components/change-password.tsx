@@ -1,4 +1,4 @@
-import { Layout } from '../../components/admin/layout';
+import { Layout } from '@/modules/console/components/admin/layout';
 import { Lock, ArrowLeft, Eye, EyeOff } from 'lucide-react';
 import { useState } from 'react';
 import { useRouter } from '@tanstack/react-router';
@@ -11,7 +11,7 @@ import {
 } from 'firebase/auth';
 import { showToast } from '@/lib/toast';
 
-export function SettingSecurityPage() {
+export function ChangePasswordPage() {
   const router = useRouter();
   const [currentPassword, setCurrentPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
@@ -77,7 +77,7 @@ export function SettingSecurityPage() {
   return (
     <Layout>
       <div className="p-8 bg-gray-50 min-h-screen">
-        <div className="max-w-xl mx-auto">
+        <div className=" mx-10">
           <button
             type="button"
             onClick={() => router.navigate({ to: '/console/admin/setting' })}
