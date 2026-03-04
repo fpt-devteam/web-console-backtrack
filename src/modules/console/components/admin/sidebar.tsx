@@ -59,6 +59,16 @@ export function Sidebar({ isOpen, onToggle }: SidebarProps) {
         return true;
       }
     }
+
+    // For Setting menu, also highlight when on organization, edit, or security
+    if (path === '/console/admin/setting') {
+      if (currentPath === '/console/admin/setting' ||
+          currentPath === '/console/admin/setting/organization' ||
+          currentPath === '/console/admin/setting/organization/edit' ||
+          currentPath === '/console/admin/setting/security') {
+        return true;
+      }
+    }
     
     return false;
   };
