@@ -1,5 +1,5 @@
 import { Layout } from '../../components/admin/layout'
-import { AlertCircle, Phone, X } from 'lucide-react'
+import { AlertCircle, ArrowLeft, Phone, X } from 'lucide-react'
 import { useState, useEffect } from 'react'
 import { useRouter } from '@tanstack/react-router'
 import { showToast } from '@/lib/toast'
@@ -112,7 +112,7 @@ export function SettingPage() {
       {
         onSuccess: () => {
           showToast.success('Organization settings updated successfully!')
-          router.navigate({ to: '/console/admin/dashboard' })
+          router.navigate({ to: '/console/admin/setting/organization' })
         },
         onError: (err) => {
           showToast.error(err instanceof Error ? err.message : 'Failed to update organization')
@@ -122,7 +122,7 @@ export function SettingPage() {
   }
 
   const handleCancel = () => {
-    router.navigate({ to: '/console/admin/dashboard' })
+    router.navigate({ to: '/console/admin/setting/organization' })
   }
 
   if (orgLoading && !org) {
@@ -159,9 +159,17 @@ export function SettingPage() {
   return (
     <Layout>
       <div className="p-8 bg-gray-50 min-h-screen">
-        <div className="max-w-6xl mx-auto">
+        <div className="max-w-5xl mx-auto">
           <div className="mb-8">
-            <h1 className="text-3xl font-bold text-gray-900 mb-2">Organization Settings</h1>
+            <button
+              type="button"
+              onClick={() => router.navigate({ to: '/console/admin/setting/organization' })}
+              className="text-sm text-gray-600 hover:text-gray-900 mb-4 flex items-center gap-2"
+            >
+              <ArrowLeft className="w-4 h-4" />
+              Back to Organization Information
+            </button>
+            <h1 className="text-3xl font-bold text-gray-900 mb-2">Edit Organization Information</h1>
             <p className="text-gray-600">Manage your company profile and contact details</p>
             {org?.status && (
               <p className="text-sm text-gray-500 mt-1">
