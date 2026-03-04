@@ -112,7 +112,7 @@ export function SettingPage() {
       {
         onSuccess: () => {
           showToast.success('Organization settings updated successfully!')
-          router.navigate({ to: '/console/admin/setting/organization' })
+          router.navigate({ to: '/console/admin/setting' })
         },
         onError: (err) => {
           showToast.error(err instanceof Error ? err.message : 'Failed to update organization')
@@ -122,7 +122,7 @@ export function SettingPage() {
   }
 
   const handleCancel = () => {
-    router.navigate({ to: '/console/admin/setting/organization' })
+    router.navigate({ to: '/console/admin/setting' })
   }
 
   if (orgLoading && !org) {
@@ -163,13 +163,13 @@ export function SettingPage() {
           <div className="mb-8">
             <button
               type="button"
-              onClick={() => router.navigate({ to: '/console/admin/setting/organization' })}
+              onClick={() => router.navigate({ to: '/console/admin/setting' })}
               className="text-sm text-gray-600 hover:text-gray-900 mb-4 flex items-center gap-2"
             >
               <ArrowLeft className="w-4 h-4" />
-              Back to Organization Information
+              Back to Settings
             </button>
-            <h1 className="text-3xl font-bold text-gray-900 mb-2">Edit Organization Information</h1>
+            <h1 className="text-3xl font-bold text-gray-900 mb-2">Organization Information</h1>
             <p className="text-gray-600">Manage your company profile and contact details</p>
             {org?.status && (
               <p className="text-sm text-gray-500 mt-1">

@@ -30,7 +30,7 @@ export function SettingsHubPage() {
             </Link>
 
             <Link
-              to="/console/admin/setting/security"
+              to="/console/account/security"
               className="flex items-center justify-between w-full bg-white border border-gray-200 rounded-xl p-6 hover:border-gray-300 shadow-sm hover:shadow-md transition-all text-left group"
             >
               <div className="flex items-center gap-4">
