@@ -31,7 +31,7 @@ export function OrganizationInfoViewPage() {
   const orgId = currentOrgId ?? myOrgs[0]?.orgId ?? null
   const { data: org, isLoading: orgLoading, error: orgError } = useOrganization(orgId)
 
-  if (orgLoading && !org) {
+  if (orgLoading) {
     return (
       <Layout>
         <div className="p-8 bg-gray-50 min-h-screen flex items-center justify-center">
@@ -41,7 +41,7 @@ export function OrganizationInfoViewPage() {
     )
   }
 
-  if (orgError || (!orgLoading && !orgId)) {
+  if (orgError || !orgId || !org) {
     return (
       <Layout>
         <div className="p-8 bg-gray-50 min-h-screen">

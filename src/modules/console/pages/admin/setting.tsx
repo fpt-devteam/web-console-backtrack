@@ -135,7 +135,7 @@ export function SettingPage() {
     )
   }
 
-  if (orgError || (!orgLoading && !orgId)) {
+  if (orgError || (!orgLoading && (!orgId || !org))) {
     return (
       <Layout>
         <div className="p-8 bg-gray-50 min-h-screen">
