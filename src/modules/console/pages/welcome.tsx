@@ -1,25 +1,23 @@
 import { Building2, ChevronRight } from 'lucide-react';
 import { Link, useRouter } from '@tanstack/react-router';
 import { useCurrentUser } from '@/hooks/use-auth';
+import { useMyOrganizations } from '@/hooks/use-org';
+import { useCurrentOrgId } from '@/contexts/current-org.context';
 import { Spinner } from '@/components/ui/spinner';
+import type { MyOrganization } from '@/types/organization.types';
 
 export function WelcomePage() {
   const router = useRouter();
-  const { data: user, isLoading } = useCurrentUser();
+  const { setCurrentOrgId } = useCurrentOrgId();
+  const { data: user, isLoading: userLoading } = useCurrentUser();
+  const { data: orgs = [], isLoading: orgsLoading } = useMyOrganizations({ enabled: !!user });
 
-  // Hardcoded single organization for enterprise admin
-  const organization = {
-    name: 'Backtrack Inc.',
-    domain: 'backtrackinc.portal.com',
-    icon: Building2,
-    color: 'bg-blue-100',
-    iconColor: 'text-blue-600',
-  };
-
-  const handleOrganizationClick = () => {
-    // Redirect to admin dashboard
+  const handleOrganizationClick = (org: MyOrganization) => {
+    setCurrentOrgId(org.orgId);
     router.navigate({ to: '/console/admin/dashboard' });
   };
+
+  const isLoading = userLoading || orgsLoading;
 
   if (isLoading) {
     return (
@@ -32,9 +30,7 @@ export function WelcomePage() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-[#E5F4FF] to-white flex items-center justify-center px-4 py-12">
       <div className="w-full max-w-2xl">
-        {/* Main Card */}
         <div className="bg-white rounded-xl shadow-lg p-12">
-          {/* Welcome Header */}
           <div className="text-center mb-8">
             <h1 className="text-4xl font-bold mb-3">
               Welcome back, {user?.name || 'User'}
@@ -44,39 +40,40 @@ export function WelcomePage() {
             </p>
           </div>
 
-          {/* Organizations Section */}
           <div className="mt-10">
-            <h2 className="text-xs font-semibold  uppercase tracking-wide mb-4">
+            <h2 className="text-xs font-semibold uppercase tracking-wide mb-4">
               YOUR ORGANIZATIONS
             </h2>
 
-            {/* Single Organization Card */}
-            <button
-              onClick={handleOrganizationClick}
-              className="w-full bg-white border border-gray-200 rounded-lg p-5 hover:border-gray-300 shadow-md hover:shadow-lg transition-all group"
-            >
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-4">
-                  {/* Icon */}
-                  <div className={`w-12 h-12 ${organization.color} rounded-lg flex items-center justify-center`}>
-                    <organization.icon className={`w-6 h-6 ${organization.iconColor}`} />
-                  </div>
-                  
-                  {/* Organization Info */}
-                  <div className="text-left">
-                    <h3 className="text-base font-semibold mb-0.5">
-                      {organization.name}
-                    </h3>
-                    <p className="text-sm text-gray-500">
-                      {organization.domain}
-                    </p>
-                  </div>
-                </div>
-
-                {/* Arrow */}
-                <ChevronRight className="w-5 h-5 text-gray-400 group-hover:text-gray-600 transition-colors" />
+            {orgs.length === 0 ? (
+              <p className="text-sm text-gray-500 py-4">
+                You don&apos;t have any organization yet. Create one to get started.
+              </p>
+            ) : (
+              <div className="space-y-3">
+                {orgs.map((org) => (
+                  <button
+                    key={org.orgId}
+                    type="button"
+                    onClick={() => handleOrganizationClick(org)}
+                    className="w-full bg-white border border-gray-200 rounded-lg p-5 hover:border-gray-300 shadow-md hover:shadow-lg transition-all group text-left"
+                  >
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-4">
+                        <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
+                          <Building2 className="w-6 h-6 text-blue-600" />
+                        </div>
+                        <div>
+                          <h3 className="text-base font-semibold mb-0.5">{org.name}</h3>
+                          <p className="text-sm text-gray-500">{org.slug}.backtrack.com</p>
+                        </div>
+                      </div>
+                      <ChevronRight className="w-5 h-5 text-gray-400 group-hover:text-gray-600 shrink-0" />
+                    </div>
+                  </button>
+                ))}
               </div>
-            </button>
+            )}
           </div>
 
           {/* Create New Organization Button */}

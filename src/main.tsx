@@ -12,6 +12,7 @@ import reportWebVitals from './reportWebVitals.ts'
 import { InternalServerError } from './components/ui/errors/internal-server-error-page.tsx'
 import { Spinner } from './components/ui/spinner.tsx'
 import { NotFoundPage } from './components/ui/errors/not-found-page.tsx'
+import { CurrentOrgProvider } from './contexts/current-org.context.tsx'
 
 // Create a new router instance
 
@@ -44,7 +45,9 @@ if (rootElement && !rootElement.innerHTML) {
   root.render(
     <StrictMode>
       <TanStackQueryProvider.Provider {...TanStackQueryProviderContext}>
-        <RouterProvider router={router} />
+        <CurrentOrgProvider>
+          <RouterProvider router={router} />
+        </CurrentOrgProvider>
       </TanStackQueryProvider.Provider>
     </StrictMode>,
   )
