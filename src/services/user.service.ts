@@ -19,5 +19,5 @@ export const userService = {
     const { data } = await privateClient.post<ApiResponse<UserProfile>>('/api/core/users');
     if (!data.success) throw new Error(data.error?.message ?? 'Failed to create user');
     return data.data;
-  }
+  },
 };

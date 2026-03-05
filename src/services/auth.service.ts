@@ -1,12 +1,12 @@
 import type { IAuthService } from './auth.service.interface';
 import type { AuthUser, LoginCredentials, SignupCredentials, EmailCheckResult, AuthError } from '@/types/auth.types';
 import { auth } from '@/lib/firebase';
+import { publicClient } from '@/lib/api-client';
 import {
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
   signOut as firebaseSignOut,
   onAuthStateChanged,
-  fetchSignInMethodsForEmail,
   sendEmailVerification,
   type User as FirebaseUser,
 } from 'firebase/auth';
@@ -59,20 +59,37 @@ function firebaseUserToAuthUser(firebaseUser: FirebaseUser): AuthUser {
   };
 }
 
+/** BE API /auth/check-email response shape */
+interface CheckEmailApiResponse {
+  success: boolean;
+  data?: {
+    status: 'Verified' | 'NotVerified' | 'NotFound';
+    email: string;
+  };
+  error?: { code: string; message: string };
+}
+
 class RealAuthService implements IAuthService {
   async checkEmailExists(email: string): Promise<EmailCheckResult> {
+    const trimmedEmail = email.trim().toLowerCase();
     try {
-      const trimmedEmail = email.trim().toLowerCase();
-      const signInMethods = await fetchSignInMethodsForEmail(auth, trimmedEmail);
-      return {
-        exists: signInMethods.length > 0,
+      const { data } = await publicClient.post<CheckEmailApiResponse>('/auth/check-email', {
         email: trimmedEmail,
+      });
+
+      if (!data.success || !data.data) {
+        return { exists: false, email: trimmedEmail };
+      }
+
+      const status = data.data.status;
+      const exists = status === 'Verified' || status === 'NotVerified';
+      return {
+        exists,
+        email: data.data.email ?? trimmedEmail,
       };
     } catch (error: any) {
-      return {
-        exists: false,
-        email: email.trim().toLowerCase(),
-      };
+      const message = error?.response?.data?.error?.message ?? error?.message ?? 'Unable to check email. Please try again.';
+      throw { code: error?.response?.data?.error?.code ?? 'unknown', message };
     }
   }
 

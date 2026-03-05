@@ -47,10 +47,14 @@ import { Route as ConsoleAdminEmployeeRouteImport } from './routes/console/admin
 import { Route as ConsoleAdminEditAccountRouteImport } from './routes/console/admin/edit-account'
 import { Route as ConsoleAdminDashboardRouteImport } from './routes/console/admin/dashboard'
 import { Route as ConsoleAdminBranchRouteImport } from './routes/console/admin/branch'
+import { Route as ConsoleAccountSecurityRouteImport } from './routes/console/account/security'
+import { Route as ConsoleAdminSettingIndexRouteImport } from './routes/console/admin/setting/index'
 import { Route as ConsoleStaffItemItemIdRouteImport } from './routes/console/staff/item/$itemId'
 import { Route as ConsoleStaffItemEditItemIdRouteImport } from './routes/console/staff/item-edit/$itemId'
+import { Route as ConsoleAdminSettingOrganizationRouteImport } from './routes/console/admin/setting/organization'
 import { Route as ConsoleAdminEditEmployeeEmployeeIdRouteImport } from './routes/console/admin/edit-employee/$employeeId'
 import { Route as ConsoleAdminEditBranchBranchIdRouteImport } from './routes/console/admin/edit-branch/$branchId'
+import { Route as ConsoleAdminSettingOrganizationEditRouteImport } from './routes/console/admin/setting/organization/edit'
 
 const DashboardRoute = DashboardRouteImport.update({
   id: '/dashboard',
@@ -249,6 +253,17 @@ const ConsoleAdminBranchRoute = ConsoleAdminBranchRouteImport.update({
   path: '/console/admin/branch',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ConsoleAccountSecurityRoute = ConsoleAccountSecurityRouteImport.update({
+  id: '/console/account/security',
+  path: '/console/account/security',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ConsoleAdminSettingIndexRoute =
+  ConsoleAdminSettingIndexRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => ConsoleAdminSettingRoute,
+  } as any)
 const ConsoleStaffItemItemIdRoute = ConsoleStaffItemItemIdRouteImport.update({
   id: '/console/staff/item/$itemId',
   path: '/console/staff/item/$itemId',
@@ -259,6 +274,12 @@ const ConsoleStaffItemEditItemIdRoute =
     id: '/console/staff/item-edit/$itemId',
     path: '/console/staff/item-edit/$itemId',
     getParentRoute: () => rootRouteImport,
+  } as any)
+const ConsoleAdminSettingOrganizationRoute =
+  ConsoleAdminSettingOrganizationRouteImport.update({
+    id: '/organization',
+    path: '/organization',
+    getParentRoute: () => ConsoleAdminSettingRoute,
   } as any)
 const ConsoleAdminEditEmployeeEmployeeIdRoute =
   ConsoleAdminEditEmployeeEmployeeIdRouteImport.update({
@@ -271,6 +292,12 @@ const ConsoleAdminEditBranchBranchIdRoute =
     id: '/console/admin/edit-branch/$branchId',
     path: '/console/admin/edit-branch/$branchId',
     getParentRoute: () => rootRouteImport,
+  } as any)
+const ConsoleAdminSettingOrganizationEditRoute =
+  ConsoleAdminSettingOrganizationEditRouteImport.update({
+    id: '/edit',
+    path: '/edit',
+    getParentRoute: () => ConsoleAdminSettingOrganizationRoute,
   } as any)
 
 export interface FileRoutesByFullPath {
@@ -296,13 +323,14 @@ export interface FileRoutesByFullPath {
   '/super-admin/revenue': typeof SuperAdminRevenueRoute
   '/super-admin/service-packages': typeof SuperAdminServicePackagesRoute
   '/super-admin/users': typeof SuperAdminUsersRoute
+  '/console/account/security': typeof ConsoleAccountSecurityRoute
   '/console/admin/branch': typeof ConsoleAdminBranchRoute
   '/console/admin/dashboard': typeof ConsoleAdminDashboardRoute
   '/console/admin/edit-account': typeof ConsoleAdminEditAccountRoute
   '/console/admin/employee': typeof ConsoleAdminEmployeeRoute
   '/console/admin/invite-employee': typeof ConsoleAdminInviteEmployeeRoute
   '/console/admin/plan': typeof ConsoleAdminPlanRoute
-  '/console/admin/setting': typeof ConsoleAdminSettingRoute
+  '/console/admin/setting': typeof ConsoleAdminSettingRouteWithChildren
   '/console/staff/chat': typeof ConsoleStaffChatRoute
   '/console/staff/feed': typeof ConsoleStaffFeedRoute
   '/console/staff/inventory': typeof ConsoleStaffInventoryRoute
@@ -313,8 +341,11 @@ export interface FileRoutesByFullPath {
   '/super-admin/organization/$tenantId': typeof SuperAdminOrganizationTenantIdRoute
   '/console/admin/edit-branch/$branchId': typeof ConsoleAdminEditBranchBranchIdRoute
   '/console/admin/edit-employee/$employeeId': typeof ConsoleAdminEditEmployeeEmployeeIdRoute
+  '/console/admin/setting/organization': typeof ConsoleAdminSettingOrganizationRouteWithChildren
   '/console/staff/item-edit/$itemId': typeof ConsoleStaffItemEditItemIdRoute
   '/console/staff/item/$itemId': typeof ConsoleStaffItemItemIdRoute
+  '/console/admin/setting/': typeof ConsoleAdminSettingIndexRoute
+  '/console/admin/setting/organization/edit': typeof ConsoleAdminSettingOrganizationEditRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -339,13 +370,13 @@ export interface FileRoutesByTo {
   '/super-admin/revenue': typeof SuperAdminRevenueRoute
   '/super-admin/service-packages': typeof SuperAdminServicePackagesRoute
   '/super-admin/users': typeof SuperAdminUsersRoute
+  '/console/account/security': typeof ConsoleAccountSecurityRoute
   '/console/admin/branch': typeof ConsoleAdminBranchRoute
   '/console/admin/dashboard': typeof ConsoleAdminDashboardRoute
   '/console/admin/edit-account': typeof ConsoleAdminEditAccountRoute
   '/console/admin/employee': typeof ConsoleAdminEmployeeRoute
   '/console/admin/invite-employee': typeof ConsoleAdminInviteEmployeeRoute
   '/console/admin/plan': typeof ConsoleAdminPlanRoute
-  '/console/admin/setting': typeof ConsoleAdminSettingRoute
   '/console/staff/chat': typeof ConsoleStaffChatRoute
   '/console/staff/feed': typeof ConsoleStaffFeedRoute
   '/console/staff/inventory': typeof ConsoleStaffInventoryRoute
@@ -356,8 +387,11 @@ export interface FileRoutesByTo {
   '/super-admin/organization/$tenantId': typeof SuperAdminOrganizationTenantIdRoute
   '/console/admin/edit-branch/$branchId': typeof ConsoleAdminEditBranchBranchIdRoute
   '/console/admin/edit-employee/$employeeId': typeof ConsoleAdminEditEmployeeEmployeeIdRoute
+  '/console/admin/setting/organization': typeof ConsoleAdminSettingOrganizationRouteWithChildren
   '/console/staff/item-edit/$itemId': typeof ConsoleStaffItemEditItemIdRoute
   '/console/staff/item/$itemId': typeof ConsoleStaffItemItemIdRoute
+  '/console/admin/setting': typeof ConsoleAdminSettingIndexRoute
+  '/console/admin/setting/organization/edit': typeof ConsoleAdminSettingOrganizationEditRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -384,13 +418,14 @@ export interface FileRoutesById {
   '/super-admin/revenue': typeof SuperAdminRevenueRoute
   '/super-admin/service-packages': typeof SuperAdminServicePackagesRoute
   '/super-admin/users': typeof SuperAdminUsersRoute
+  '/console/account/security': typeof ConsoleAccountSecurityRoute
   '/console/admin/branch': typeof ConsoleAdminBranchRoute
   '/console/admin/dashboard': typeof ConsoleAdminDashboardRoute
   '/console/admin/edit-account': typeof ConsoleAdminEditAccountRoute
   '/console/admin/employee': typeof ConsoleAdminEmployeeRoute
   '/console/admin/invite-employee': typeof ConsoleAdminInviteEmployeeRoute
   '/console/admin/plan': typeof ConsoleAdminPlanRoute
-  '/console/admin/setting': typeof ConsoleAdminSettingRoute
+  '/console/admin/setting': typeof ConsoleAdminSettingRouteWithChildren
   '/console/staff/chat': typeof ConsoleStaffChatRoute
   '/console/staff/feed': typeof ConsoleStaffFeedRoute
   '/console/staff/inventory': typeof ConsoleStaffInventoryRoute
@@ -401,8 +436,11 @@ export interface FileRoutesById {
   '/super-admin/organization/$tenantId': typeof SuperAdminOrganizationTenantIdRoute
   '/console/admin/edit-branch/$branchId': typeof ConsoleAdminEditBranchBranchIdRoute
   '/console/admin/edit-employee/$employeeId': typeof ConsoleAdminEditEmployeeEmployeeIdRoute
+  '/console/admin/setting/organization': typeof ConsoleAdminSettingOrganizationRouteWithChildren
   '/console/staff/item-edit/$itemId': typeof ConsoleStaffItemEditItemIdRoute
   '/console/staff/item/$itemId': typeof ConsoleStaffItemItemIdRoute
+  '/console/admin/setting/': typeof ConsoleAdminSettingIndexRoute
+  '/console/admin/setting/organization/edit': typeof ConsoleAdminSettingOrganizationEditRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -429,6 +467,7 @@ export interface FileRouteTypes {
     | '/super-admin/revenue'
     | '/super-admin/service-packages'
     | '/super-admin/users'
+    | '/console/account/security'
     | '/console/admin/branch'
     | '/console/admin/dashboard'
     | '/console/admin/edit-account'
@@ -446,8 +485,11 @@ export interface FileRouteTypes {
     | '/super-admin/organization/$tenantId'
     | '/console/admin/edit-branch/$branchId'
     | '/console/admin/edit-employee/$employeeId'
+    | '/console/admin/setting/organization'
     | '/console/staff/item-edit/$itemId'
     | '/console/staff/item/$itemId'
+    | '/console/admin/setting/'
+    | '/console/admin/setting/organization/edit'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -472,13 +514,13 @@ export interface FileRouteTypes {
     | '/super-admin/revenue'
     | '/super-admin/service-packages'
     | '/super-admin/users'
+    | '/console/account/security'
     | '/console/admin/branch'
     | '/console/admin/dashboard'
     | '/console/admin/edit-account'
     | '/console/admin/employee'
     | '/console/admin/invite-employee'
     | '/console/admin/plan'
-    | '/console/admin/setting'
     | '/console/staff/chat'
     | '/console/staff/feed'
     | '/console/staff/inventory'
@@ -489,8 +531,11 @@ export interface FileRouteTypes {
     | '/super-admin/organization/$tenantId'
     | '/console/admin/edit-branch/$branchId'
     | '/console/admin/edit-employee/$employeeId'
+    | '/console/admin/setting/organization'
     | '/console/staff/item-edit/$itemId'
     | '/console/staff/item/$itemId'
+    | '/console/admin/setting'
+    | '/console/admin/setting/organization/edit'
   id:
     | '__root__'
     | '/'
@@ -516,6 +561,7 @@ export interface FileRouteTypes {
     | '/super-admin/revenue'
     | '/super-admin/service-packages'
     | '/super-admin/users'
+    | '/console/account/security'
     | '/console/admin/branch'
     | '/console/admin/dashboard'
     | '/console/admin/edit-account'
@@ -533,8 +579,11 @@ export interface FileRouteTypes {
     | '/super-admin/organization/$tenantId'
     | '/console/admin/edit-branch/$branchId'
     | '/console/admin/edit-employee/$employeeId'
+    | '/console/admin/setting/organization'
     | '/console/staff/item-edit/$itemId'
     | '/console/staff/item/$itemId'
+    | '/console/admin/setting/'
+    | '/console/admin/setting/organization/edit'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -555,13 +604,14 @@ export interface RootRouteChildren {
   SuperAdminRevenueRoute: typeof SuperAdminRevenueRoute
   SuperAdminServicePackagesRoute: typeof SuperAdminServicePackagesRoute
   SuperAdminUsersRoute: typeof SuperAdminUsersRoute
+  ConsoleAccountSecurityRoute: typeof ConsoleAccountSecurityRoute
   ConsoleAdminBranchRoute: typeof ConsoleAdminBranchRoute
   ConsoleAdminDashboardRoute: typeof ConsoleAdminDashboardRoute
   ConsoleAdminEditAccountRoute: typeof ConsoleAdminEditAccountRoute
   ConsoleAdminEmployeeRoute: typeof ConsoleAdminEmployeeRoute
   ConsoleAdminInviteEmployeeRoute: typeof ConsoleAdminInviteEmployeeRoute
   ConsoleAdminPlanRoute: typeof ConsoleAdminPlanRoute
-  ConsoleAdminSettingRoute: typeof ConsoleAdminSettingRoute
+  ConsoleAdminSettingRoute: typeof ConsoleAdminSettingRouteWithChildren
   ConsoleStaffChatRoute: typeof ConsoleStaffChatRoute
   ConsoleStaffFeedRoute: typeof ConsoleStaffFeedRoute
   ConsoleStaffInventoryRoute: typeof ConsoleStaffInventoryRoute
@@ -843,6 +893,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ConsoleAdminBranchRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/console/account/security': {
+      id: '/console/account/security'
+      path: '/console/account/security'
+      fullPath: '/console/account/security'
+      preLoaderRoute: typeof ConsoleAccountSecurityRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/console/admin/setting/': {
+      id: '/console/admin/setting/'
+      path: '/'
+      fullPath: '/console/admin/setting/'
+      preLoaderRoute: typeof ConsoleAdminSettingIndexRouteImport
+      parentRoute: typeof ConsoleAdminSettingRoute
+    }
     '/console/staff/item/$itemId': {
       id: '/console/staff/item/$itemId'
       path: '/console/staff/item/$itemId'
@@ -857,6 +921,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ConsoleStaffItemEditItemIdRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/console/admin/setting/organization': {
+      id: '/console/admin/setting/organization'
+      path: '/organization'
+      fullPath: '/console/admin/setting/organization'
+      preLoaderRoute: typeof ConsoleAdminSettingOrganizationRouteImport
+      parentRoute: typeof ConsoleAdminSettingRoute
+    }
     '/console/admin/edit-employee/$employeeId': {
       id: '/console/admin/edit-employee/$employeeId'
       path: '/console/admin/edit-employee/$employeeId'
@@ -870,6 +941,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/console/admin/edit-branch/$branchId'
       preLoaderRoute: typeof ConsoleAdminEditBranchBranchIdRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/console/admin/setting/organization/edit': {
+      id: '/console/admin/setting/organization/edit'
+      path: '/edit'
+      fullPath: '/console/admin/setting/organization/edit'
+      preLoaderRoute: typeof ConsoleAdminSettingOrganizationEditRouteImport
+      parentRoute: typeof ConsoleAdminSettingOrganizationRoute
     }
   }
 }
@@ -910,6 +988,35 @@ const SuperAdminOrganizationRouteWithChildren =
     SuperAdminOrganizationRouteChildren,
   )
 
+interface ConsoleAdminSettingOrganizationRouteChildren {
+  ConsoleAdminSettingOrganizationEditRoute: typeof ConsoleAdminSettingOrganizationEditRoute
+}
+
+const ConsoleAdminSettingOrganizationRouteChildren: ConsoleAdminSettingOrganizationRouteChildren =
+  {
+    ConsoleAdminSettingOrganizationEditRoute:
+      ConsoleAdminSettingOrganizationEditRoute,
+  }
+
+const ConsoleAdminSettingOrganizationRouteWithChildren =
+  ConsoleAdminSettingOrganizationRoute._addFileChildren(
+    ConsoleAdminSettingOrganizationRouteChildren,
+  )
+
+interface ConsoleAdminSettingRouteChildren {
+  ConsoleAdminSettingOrganizationRoute: typeof ConsoleAdminSettingOrganizationRouteWithChildren
+  ConsoleAdminSettingIndexRoute: typeof ConsoleAdminSettingIndexRoute
+}
+
+const ConsoleAdminSettingRouteChildren: ConsoleAdminSettingRouteChildren = {
+  ConsoleAdminSettingOrganizationRoute:
+    ConsoleAdminSettingOrganizationRouteWithChildren,
+  ConsoleAdminSettingIndexRoute: ConsoleAdminSettingIndexRoute,
+}
+
+const ConsoleAdminSettingRouteWithChildren =
+  ConsoleAdminSettingRoute._addFileChildren(ConsoleAdminSettingRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   MarketingRoute: MarketingRouteWithChildren,
@@ -928,13 +1035,14 @@ const rootRouteChildren: RootRouteChildren = {
   SuperAdminRevenueRoute: SuperAdminRevenueRoute,
   SuperAdminServicePackagesRoute: SuperAdminServicePackagesRoute,
   SuperAdminUsersRoute: SuperAdminUsersRoute,
+  ConsoleAccountSecurityRoute: ConsoleAccountSecurityRoute,
   ConsoleAdminBranchRoute: ConsoleAdminBranchRoute,
   ConsoleAdminDashboardRoute: ConsoleAdminDashboardRoute,
   ConsoleAdminEditAccountRoute: ConsoleAdminEditAccountRoute,
   ConsoleAdminEmployeeRoute: ConsoleAdminEmployeeRoute,
   ConsoleAdminInviteEmployeeRoute: ConsoleAdminInviteEmployeeRoute,
   ConsoleAdminPlanRoute: ConsoleAdminPlanRoute,
-  ConsoleAdminSettingRoute: ConsoleAdminSettingRoute,
+  ConsoleAdminSettingRoute: ConsoleAdminSettingRouteWithChildren,
   ConsoleStaffChatRoute: ConsoleStaffChatRoute,
   ConsoleStaffFeedRoute: ConsoleStaffFeedRoute,
   ConsoleStaffInventoryRoute: ConsoleStaffInventoryRoute,
