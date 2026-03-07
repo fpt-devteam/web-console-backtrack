@@ -4,6 +4,8 @@ import { useState } from 'react'
 import { Link, useParams } from '@tanstack/react-router'
 import { mockInventoryItems, type ItemStatus } from '@/mock/data/mock-inventory'
 import { Button } from '@/components/ui/button'
+import { Spinner } from '@/components/ui/spinner'
+import { usePost } from '@/hooks/use-post'
 
 export function ItemDetailPage() {
   const { itemId } = useParams({ from: '/console/staff/item/$itemId' })
@@ -11,6 +13,132 @@ export function ItemDetailPage() {
 
   // Find item by ID
   const item = mockInventoryItems.find((i) => i.id === itemId)
+  const looksLikeGuid = /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/.test(
+    itemId
+  )
+  const { data: post, isLoading: postLoading } = usePost(looksLikeGuid ? itemId : null)
+
+  if (!item && looksLikeGuid && postLoading) {
+    return (
+      <StaffLayout>
+        <div className="p-8 min-h-screen flex items-center justify-center">
+          <Spinner size="lg" />
+        </div>
+      </StaffLayout>
+    )
+  }
+
+  if (!item && looksLikeGuid && post) {
+    const images = post.imageUrls?.length ? post.imageUrls : []
+    const mainImg = images[mainImage] ?? images[0]
+    return (
+      <StaffLayout>
+        <div className="p-6 h-full overflow-y-auto mx-6">
+          <div className="mb-6 flex items-center gap-2 text-sm text-gray-600">
+            <Link to="/console/staff/feed" className="hover:text-gray-900 transition-colors">
+              Feed
+            </Link>
+            <ChevronRight className="w-4 h-4" />
+            <span className="text-gray-900 font-medium">Post #{post.id}</span>
+          </div>
+
+          <div className="bg-white rounded-xl shadow-sm">
+            <div className="p-6 border-b border-gray-200 flex items-start justify-between">
+              <div>
+                <div className="flex items-center gap-3 mb-2">
+                  <h1 className="text-3xl font-bold text-gray-900">{post.itemName}</h1>
+                  <span className="px-3 py-1 rounded-md text-xs font-bold uppercase bg-gray-100 text-gray-700">
+                    {post.postType}
+                  </span>
+                </div>
+                <p className="text-gray-600">Post #{post.id}</p>
+              </div>
+              <div className="flex gap-3">
+                <Button variant="outline" className="text-red-600 border-red-300 hover:bg-red-50" disabled>
+                  <Trash2 className="w-4 h-4 mr-2" />
+                  Delete
+                </Button>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 lg:grid-cols-7">
+              <div className="lg:col-span-3 p-6 border-r border-gray-200">
+                <div className="relative h-[350px] bg-gradient-to-br from-gray-100 to-gray-200 rounded-lg overflow-hidden mb-4 flex items-center justify-center">
+                  {mainImg ? (
+                    <img src={mainImg} alt={post.itemName} className="w-full h-full object-cover" />
+                  ) : (
+                    <div className="text-gray-400">No image</div>
+                  )}
+                </div>
+
+                {images.length > 1 && (
+                  <div className="flex gap-3">
+                    {images.map((img, idx) => (
+                      <button
+                        key={idx}
+                        onClick={() => setMainImage(idx)}
+                        className={`relative w-20 h-20 rounded-lg overflow-hidden border-2 transition-all ${
+                          mainImage === idx
+                            ? 'border-blue-600 ring-2 ring-blue-200'
+                            : 'border-gray-300 hover:border-gray-400'
+                        }`}
+                      >
+                        <img src={img} alt={`View ${idx + 1}`} className="w-full h-full object-cover" />
+                      </button>
+                    ))}
+                    <button className="w-20 h-20 rounded-lg border-2 border-dashed border-gray-300 flex items-center justify-center text-gray-400">
+                      <Camera className="w-5 h-5" />
+                    </button>
+                  </div>
+                )}
+              </div>
+
+              <div className="lg:col-span-4 py-6 px-8 space-y-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div>
+                    <div className="text-xs font-semibold uppercase mb-2">CREATED BY</div>
+                    <div className="flex items-center gap-2 text-gray-900">
+                      <User className="w-4 h-4 text-blue-600" />
+                      <span>{post.author?.displayName ?? post.author?.id ?? '-'}</span>
+                    </div>
+                  </div>
+
+                  <div>
+                    <div className="text-xs font-semibold uppercase mb-2">STATUS</div>
+                    <div className="flex items-center gap-2 text-gray-900">
+                      <Info className="w-4 h-4 text-blue-600" />
+                      <span>{post.postType}</span>
+                    </div>
+                  </div>
+
+                  <div>
+                    <div className="text-xs font-semibold uppercase mb-2">LOCATION</div>
+                    <div className="flex items-center gap-2 text-gray-900">
+                      <Building2 className="w-4 h-4 text-blue-600" />
+                      <span>{post.displayAddress ?? 'Unknown location'}</span>
+                    </div>
+                  </div>
+
+                  <div>
+                    <div className="text-xs font-semibold uppercase mb-2">EVENT TIME</div>
+                    <div className="flex items-center gap-2 text-gray-900">
+                      <Package className="w-4 h-4 text-blue-600" />
+                      <span>{new Date(post.eventTime).toLocaleString()}</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div>
+                  <div className="text-xs font-semibold uppercase mb-2">Description</div>
+                  <p className="text-gray-700 leading-relaxed">{post.description}</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </StaffLayout>
+    )
+  }
 
   if (!item) {
     return (
