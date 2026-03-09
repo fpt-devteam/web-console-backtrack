@@ -6,6 +6,7 @@ import { useState } from 'react';
 import { useNavigate } from '@tanstack/react-router';
 import { useCreateOrganization } from '@/hooks/use-org';
 import { useCurrentOrgId } from '@/contexts/current-org.context';
+import { PlaceSearchInput } from '@/components/place-search-input';
 
 const INDUSTRY_OPTIONS = [
   { value: 'airport', label: 'Airport' },
@@ -29,6 +30,10 @@ export function CreateOrganizationPage() {
     phone: '',
     taxIdentificationNumber: '',
   });
+  /** Lat/lon from Nominatim when user selects a place; null if only typing. */
+  const [location, setLocation] = useState<{ latitude: number; longitude: number } | null>(null);
+  /** place_id from Nominatim (externalPlaceId for BE) when selected from dropdown. */
+  const [externalPlaceId, setExternalPlaceId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   const slugOk = form.slug.length > 3;
@@ -41,11 +46,15 @@ export function CreateOrganizationPage() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
+    const displayAddress = form.address.trim() || form.name.trim() || '—';
+    const coords = location ?? { latitude: 0, longitude: 0 };
     createOrg.mutate(
       {
         name: form.name.trim(),
         slug: form.slug.trim().toLowerCase().replace(/\s+/g, '-'),
-        address: form.address.trim() || undefined,
+        displayAddress,
+        location: coords,
+        externalPlaceId: externalPlaceId ?? undefined,
         phone: form.phone.trim(),
         industryType: form.industryType,
         taxIdentificationNumber: form.taxIdentificationNumber.trim(),
@@ -82,7 +91,7 @@ export function CreateOrganizationPage() {
             )}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
-                <Label htmlFor="companyName" className="text-sm font-semibold mb-2 block">Company Name</Label>
+                <Label htmlFor="companyName" className="text-sm font-semibold mb-2 block">Company Name <span className="text-red-500">*</span></Label>
                 <Input
                   id="companyName"
                   value={form.name}
@@ -92,7 +101,7 @@ export function CreateOrganizationPage() {
                 />
               </div>
               <div>
-                <Label htmlFor="industryType" className="text-sm font-semibold mb-2 block">Industry Type</Label>
+                <Label htmlFor="industryType" className="text-sm font-semibold mb-2 block">Industry Type <span className="text-red-500">*</span></Label>
                 <select
                   id="industryType"
                   value={form.industryType}
@@ -110,18 +119,31 @@ export function CreateOrganizationPage() {
 
             <div>
               <Label htmlFor="companyAddress" className="text-sm font-semibold mb-2 block">
-                Company Address <span className="text-gray-400 font-normal">(Optional)</span>
+                Company Address <span className="text-red-500">*</span>
               </Label>
-              <Input
+              <PlaceSearchInput
                 id="companyAddress"
                 value={form.address}
-                onChange={update('address')}
-                placeholder="1234 Main St, Suite 100"
+                onChange={(value) => {
+                  setForm((prev) => ({ ...prev, address: value }));
+                  setError(null);
+                }}
+                onSelect={(place) => {
+                  setForm((prev) => ({ ...prev, address: place.displayAddress }));
+                  setLocation({ latitude: place.latitude, longitude: place.longitude });
+                  setExternalPlaceId(place.placeId ?? null);
+                }}
+                placeholder="Type address or place name, then select a result for coordinates (OpenStreetMap)"
               />
+              {location && (
+                <p className="text-xs text-green-600 mt-1">
+                  Selected coordinates: {location.latitude.toFixed(5)}, {location.longitude.toFixed(5)}
+                </p>
+              )}
             </div>
 
             <div>
-              <Label htmlFor="workspaceUrl" className="text-sm font-semibold mb-2 block">Workspace URL</Label>
+              <Label htmlFor="workspaceUrl" className="text-sm font-semibold mb-2 block">Workspace URL <span className="text-red-500">*</span></Label>
               <div className="relative">
                 <Input
                   id="workspaceUrl"
@@ -148,7 +170,7 @@ export function CreateOrganizationPage() {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
-                <Label htmlFor="phoneNumber" className="text-sm font-semibold mb-2 block">Phone Number</Label>
+                <Label htmlFor="phoneNumber" className="text-sm font-semibold mb-2 block">Phone Number <span className="text-red-500">*</span></Label>
                 <Input
                   id="phoneNumber"
                   type="tel"
@@ -159,7 +181,7 @@ export function CreateOrganizationPage() {
                 />
               </div>
               <div>
-                <Label htmlFor="taxId" className="text-sm font-semibold mb-2 block">Tax Identification Number</Label>
+                <Label htmlFor="taxId" className="text-sm font-semibold mb-2 block">Tax Identification Number <span className="text-red-500">*</span></Label>
                 <Input
                   id="taxId"
                   value={form.taxIdentificationNumber}

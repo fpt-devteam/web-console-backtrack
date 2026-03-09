@@ -10,7 +10,18 @@ export const POST_KEYS = {
 export function usePosts(params: GetPostsParams) {
   return useQuery({
     queryKey: POST_KEYS.list(params),
-    queryFn: () => postService.getPosts(params),
+    queryFn: async () => {
+      const searchTerm = params.searchTerm?.trim()
+      if (searchTerm) {
+        return postService.searchSemantic({
+          searchText: searchTerm,
+          page: params.page ?? 1,
+          pageSize: params.pageSize ?? 20,
+          postType: params.postType ?? 'All',
+        })
+      }
+      return postService.getPosts(params)
+    },
   })
 }
 
@@ -28,6 +39,17 @@ export function useCreatePost() {
     mutationFn: (payload: CreatePostPayload) => postService.create(payload),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['posts'] })
+    },
+  })
+}
+
+export function useDeletePost() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: (postId: string) => postService.delete(postId),
+    onSuccess: (_, postId) => {
+      queryClient.invalidateQueries({ queryKey: ['posts'] })
+      queryClient.removeQueries({ queryKey: POST_KEYS.byId(postId) })
     },
   })
 }

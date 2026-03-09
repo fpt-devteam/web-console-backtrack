@@ -24,6 +24,21 @@ export interface Post {
   createdAt: string
 }
 
+/** Item trả về từ BE: GET /api/core/posts/search/semantic (không có author, có similarityScore) */
+export interface PostSemanticSearchItem {
+  id: string
+  postType: string
+  itemName: string
+  description: string
+  imageUrls: string[]
+  location?: PostLocation | null
+  externalPlaceId?: string | null
+  displayAddress?: string | null
+  eventTime: string
+  createdAt: string
+  similarityScore: number
+}
+
 export type PostTypeFilter = 'All' | 'Lost' | 'Found'
 
 /** Payload cho POST /api/core/posts (AuthorId do BE lấy từ token) */
