@@ -32,13 +32,38 @@ export const orgService = {
   },
 
   async update(orgId: string, payload: UpdateOrganizationPayload): Promise<Organization> {
-    const { data } = await privateClient.put<ApiResponse<Organization>>(`/api/core/orgs/${orgId}`, payload);
+    const body = {
+      name: payload.name,
+      slug: payload.slug,
+      displayAddress: payload.displayAddress ?? undefined,
+      location: payload.location
+        ? { latitude: payload.location.latitude, longitude: payload.location.longitude }
+        : undefined,
+      externalPlaceId: payload.externalPlaceId ?? undefined,
+      phone: payload.phone,
+      industryType: payload.industryType,
+      taxIdentificationNumber: payload.taxIdentificationNumber,
+    };
+    const { data } = await privateClient.put<ApiResponse<Organization>>(`/api/core/orgs/${orgId}`, body);
     if (!data.success) throw new Error(data.error?.message ?? 'Failed to update organization');
     return data.data;
   },
 
   async create(payload: CreateOrganizationPayload): Promise<Organization> {
-    const { data } = await privateClient.post<ApiResponse<Organization>>('/api/core/orgs', payload);
+    const body = {
+      name: payload.name,
+      slug: payload.slug,
+      displayAddress: payload.displayAddress,
+      location: {
+        latitude: payload.location.latitude,
+        longitude: payload.location.longitude,
+      },
+      externalPlaceId: payload.externalPlaceId ?? undefined,
+      phone: payload.phone,
+      industryType: payload.industryType,
+      taxIdentificationNumber: payload.taxIdentificationNumber,
+    };
+    const { data } = await privateClient.post<ApiResponse<Organization>>('/api/core/orgs', body);
     if (!data.success) throw new Error(data.error?.message ?? 'Failed to create organization');
     return data.data;
   },

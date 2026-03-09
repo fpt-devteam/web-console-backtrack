@@ -1,5 +1,15 @@
 import { LayoutGrid, Users, CreditCard, Building2, Settings, ChevronLeft, ChevronRight } from 'lucide-react';
 import { Link, useLocation } from '@tanstack/react-router';
+import { useCurrentOrgId } from '@/contexts/current-org.context';
+import { useOrganization } from '@/hooks/use-org';
+import { useCurrentUser } from '@/hooks/use-auth';
+
+function getInitials(name: string | null | undefined): string {
+  if (!name?.trim()) return 'U';
+  const parts = name.trim().split(/\s+/);
+  if (parts.length >= 2) return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+  return name.slice(0, 2).toUpperCase();
+}
 
 interface SidebarProps {
   isOpen: boolean;
@@ -8,7 +18,12 @@ interface SidebarProps {
 
 export function Sidebar({ isOpen, onToggle }: SidebarProps) {
   const location = useLocation();
-  
+  const { currentOrgId } = useCurrentOrgId();
+  const { data: org } = useOrganization(currentOrgId);
+  const { data: user } = useCurrentUser();
+  const userInitials = getInitials(user?.name);
+  const userDisplayName = user?.name || user?.email || 'User';
+
   const menuItems = [
     {
       name: 'Dashboard',
@@ -78,33 +93,27 @@ export function Sidebar({ isOpen, onToggle }: SidebarProps) {
         isOpen ? 'w-64' : 'w-20'
       }`}
     >
-      {/* Header/Logo & Toggle */}
+      {/* Header: Org + Toggle */}
       <div className="flex items-center gap-3 px-4 py-6 border-b border-gray-200 relative">
-        {/* Avatar/Logo */}
-        <div className="flex items-center gap-3 flex-1">
+        <div className="flex items-center gap-3 flex-1 min-w-0">
           <div className="w-10 h-10 bg-blue-500 rounded-full flex items-center justify-center flex-shrink-0">
             <Building2 className="w-6 h-6 text-white" />
           </div>
-          <h1 
-            className={`font-bold text-xl tracking-wide transition-all duration-300 whitespace-nowrap overflow-hidden ${
-              isOpen ? 'w-auto opacity-100' : 'w-0 opacity-0'
-            }`}
-          >
-            Admin
-          </h1>
+          <div className={`min-w-0 transition-all duration-300 ${isOpen ? 'opacity-100' : 'w-0 opacity-0 overflow-hidden'}`}>
+            <h1 className="font-bold text-xl tracking-wide whitespace-nowrap truncate" title={org?.name}>
+              {org?.name ?? 'Admin'}
+            </h1>
+            {org && isOpen && (
+              <p className="text-xs text-gray-500 truncate" title={org.slug}>{org.slug}</p>
+            )}
+          </div>
         </div>
-        
-        {/* Toggle Button */}
         <button
           onClick={onToggle}
           className="absolute -right-3 top-1/2 -translate-y-1/2 bg-white border border-gray-200 rounded-full shadow-md p-1 hover:bg-gray-100 transition-all z-10"
           aria-label="Toggle sidebar"
         >
-          {isOpen ? (
-            <ChevronLeft className="w-5 h-5 text-gray-600" />
-          ) : (
-            <ChevronRight className="w-5 h-5 text-gray-600" />
-          )}
+          {isOpen ? <ChevronLeft className="w-5 h-5 text-gray-600" /> : <ChevronRight className="w-5 h-5 text-gray-600" />}
         </button>
       </div>
 
@@ -140,8 +149,28 @@ export function Sidebar({ isOpen, onToggle }: SidebarProps) {
         </ul>
       </nav>
 
+      {/* User info */}
+      <div
+        className={`border-t border-gray-200 px-4 py-3 flex items-center gap-3 min-w-0 transition-all duration-300 ${
+          isOpen ? 'opacity-100' : 'opacity-0 overflow-hidden justify-center'
+        }`}
+      >
+        <div
+          className="w-9 h-9 rounded-full bg-gradient-to-br from-blue-400 to-indigo-500 flex items-center justify-center text-white font-semibold text-sm flex-shrink-0"
+          title={userDisplayName}
+        >
+          {userInitials}
+        </div>
+        {isOpen && (
+          <div className="min-w-0 flex-1">
+            <p className="text-sm font-medium text-gray-900 truncate" title={userDisplayName}>{userDisplayName}</p>
+            <p className="text-xs text-gray-500 truncate">Admin</p>
+          </div>
+        )}
+      </div>
+
       {/* Footer */}
-      <div 
+      <div
         className={`px-6 py-4 border-t border-gray-200 text-xs text-gray-400 transition-all duration-300 whitespace-nowrap overflow-hidden ${
           isOpen ? 'w-auto opacity-100' : 'w-0 opacity-0'
         }`}

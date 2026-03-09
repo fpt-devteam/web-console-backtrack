@@ -130,7 +130,7 @@ export function OrganizationInfoViewPage() {
                   Address <span className="text-gray-400 font-normal">(Optional)</span>
                 </label>
                 <div className="w-full px-4 py-2 border border-gray-200 rounded-lg bg-gray-50 text-gray-900 min-h-[100px] whitespace-pre-wrap">
-                  {org.address?.trim() || '—'}
+                  {org.displayAddress?.trim() || '—'}
                 </div>
               </div>
 

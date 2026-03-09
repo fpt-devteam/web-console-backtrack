@@ -1,17 +1,25 @@
+/** BE CreateOrganizationCommand: Location + DisplayAddress required (không còn address) */
 export interface CreateOrganizationPayload {
   name: string;
   slug: string;
-  address?: string | null;
+  /** Địa chỉ hiển thị (bắt buộc trên BE) */
+  displayAddress: string;
+  /** Tọa độ (bắt buộc trên BE); không có map thì gửi 0,0 */
+  location: { latitude: number; longitude: number };
+  externalPlaceId?: string | null;
   phone: string;
   industryType: string;
   taxIdentificationNumber: string;
 }
 
+/** BE OrganizationResult / GET /api/core/orgs/{id} */
 export interface Organization {
   id: string;
   name: string;
   slug: string;
-  address?: string | null;
+  displayAddress?: string | null;
+  location?: { latitude: number; longitude: number } | null;
+  externalPlaceId?: string | null;
   phone: string;
   industryType: string;
   taxIdentificationNumber: string;
@@ -19,11 +27,13 @@ export interface Organization {
   createdAt: string;
 }
 
-/** Payload cho PUT /api/core/orgs/{orgId} (TaxId gửi nguyên từ GET, không đổi) */
+/** Payload for PUT /api/core/orgs/{orgId} – matches UpdateOrganizationCommand */
 export interface UpdateOrganizationPayload {
   name: string;
   slug: string;
-  address?: string | null;
+  displayAddress?: string | null;
+  location?: { latitude: number; longitude: number } | null;
+  externalPlaceId?: string | null;
   phone: string;
   industryType: string;
   taxIdentificationNumber: string;
@@ -41,12 +51,14 @@ export interface OrgMember {
   joinedAt: string;
 }
 
-/** Item trả về từ GET /api/core/orgs/me */
+/** Item from GET /api/core/orgs/me (MyOrganizationResult) */
 export interface MyOrganization {
   orgId: string;
   name: string;
   slug: string;
-  address?: string | null;
+  displayAddress: string;
+  location: { latitude: number; longitude: number };
+  externalPlaceId?: string | null;
   phone: string;
   industryType: string;
   taxIdentificationNumber: string;

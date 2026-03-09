@@ -1,15 +1,17 @@
 import { StaffLayout } from '../../components/staff/layout'
 import { ChevronRight, Trash2, User, Package, Info, Building2, Camera } from 'lucide-react'
 import { useState } from 'react'
-import { Link, useParams } from '@tanstack/react-router'
+import { Link, useParams, useNavigate } from '@tanstack/react-router'
 import { mockInventoryItems, type ItemStatus } from '@/mock/data/mock-inventory'
 import { Button } from '@/components/ui/button'
 import { Spinner } from '@/components/ui/spinner'
-import { usePost } from '@/hooks/use-post'
+import { usePost, useDeletePost } from '@/hooks/use-post'
 
 export function ItemDetailPage() {
   const { itemId } = useParams({ from: '/console/staff/item/$itemId' })
+  const navigate = useNavigate()
   const [mainImage, setMainImage] = useState(0)
+  const deletePost = useDeletePost()
 
   // Find item by ID
   const item = mockInventoryItems.find((i) => i.id === itemId)
@@ -54,9 +56,21 @@ export function ItemDetailPage() {
                 <p className="text-gray-600">Post #{post.id}</p>
               </div>
               <div className="flex gap-3">
-                <Button variant="outline" className="text-red-600 border-red-300 hover:bg-red-50" disabled>
+                <Button
+                  variant="outline"
+                  className="text-red-600 border-red-300 hover:bg-red-50"
+                  disabled={deletePost.isPending}
+                  onClick={() => {
+                    if (window.confirm('Are you sure you want to delete this post? This cannot be undone.')) {
+                      deletePost.mutate(post.id, {
+                        onSuccess: () => navigate({ to: '/console/staff/feed' }),
+                        onError: (err) => alert(err instanceof Error ? err.message : 'Failed to delete post'),
+                      })
+                    }
+                  }}
+                >
                   <Trash2 className="w-4 h-4 mr-2" />
-                  Delete
+                  {deletePost.isPending ? 'Deleting...' : 'Delete'}
                 </Button>
               </div>
             </div>

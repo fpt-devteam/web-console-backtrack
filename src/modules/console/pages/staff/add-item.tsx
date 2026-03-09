@@ -248,12 +248,11 @@ export function AddFoundItemPage() {
               />
             </div>
 
-            {/* Địa điểm mặc định = tổ chức hiện tại (không gửi lên BE) */}
             <div className="rounded-lg bg-gray-50 border border-gray-200 px-4 py-3">
               <p className="text-sm font-medium text-gray-700">Địa điểm ghi nhận</p>
               <p className="text-sm text-gray-600 mt-0.5">
                 {org
-                  ? [org.name, org.address].filter(Boolean).join(' – ') || '—'
+                  ? [org.name, org.displayAddress].filter(Boolean).join(' – ') || '—'
                   : '—'}
               </p>
             </div>
