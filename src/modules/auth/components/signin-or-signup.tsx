@@ -2,16 +2,29 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Lock } from 'lucide-react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from '@tanstack/react-router';
 import { useCheckEmail } from '@/hooks/use-auth';
 import { showToast } from '@/lib/toast';
-import { saveTempEmail } from '@/lib/auth-storage';
+import { saveTempEmail, saveInvitationCode } from '@/lib/auth-storage';
 
 export function SignInOrSignUp() {
   const [email, setEmail] = useState('');
   const router = useRouter();
   const checkEmail = useCheckEmail();
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const code = params.get('code');
+    const emailParam = params.get('email');
+
+    if (code) {
+      saveInvitationCode(code);
+    }
+    if (emailParam) {
+      setEmail(emailParam);
+    }
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -23,14 +36,11 @@ export function SignInOrSignUp() {
 
     checkEmail.mutate(email, {
       onSuccess: (result) => {
-        // Save email to sessionStorage (không hiển thị trên URL)
         saveTempEmail(result.email);
         
         if (result.exists) {
-          // Email exists -> go to signin
           router.navigate({ to: '/auth/signin' });
         } else {
-          // Email doesn't exist -> go to create password
           router.navigate({ to: '/auth/create-password' });
         }
       },

@@ -30,6 +30,27 @@ export interface GetPendingInvitationsResult {
   invitations: PendingInvitationItem[];
 }
 
+export interface CheckInvitationPayload {
+  token: string;
+  email: string;
+}
+
+export interface CheckInvitationResult {
+  isTokenValid: boolean;
+  organizationName?: string;
+  role?: string;
+}
+
+export interface JoinByInvitationPayload {
+  token: string;
+}
+
+export interface JoinByInvitationResult {
+  organizationId: string;
+  membershipId: string;
+  role: string;
+}
+
 export const invitationService = {
   async create(payload: CreateInvitationPayload): Promise<CreateInvitationResult> {
     const { data } = await privateClient.post<ApiResponse<CreateInvitationResult>>('/api/core/invitations', {
@@ -48,6 +69,26 @@ export const invitationService = {
       { params: { organizationId } }
     );
     if (!data.success) throw new Error(data.error?.message ?? 'Failed to fetch pending invitations');
+    return data.data;
+  },
+
+  /** POST /api/core/invitations/check */
+  async check(payload: CheckInvitationPayload): Promise<CheckInvitationResult> {
+    const { data } = await privateClient.post<ApiResponse<CheckInvitationResult>>(
+      '/api/core/invitations/check',
+      payload,
+    );
+    if (!data.success) throw new Error(data.error?.message ?? 'Failed to check invitation');
+    return data.data;
+  },
+
+  /** POST /api/core/invitations/join */
+  async join(payload: JoinByInvitationPayload): Promise<JoinByInvitationResult> {
+    const { data } = await privateClient.post<ApiResponse<JoinByInvitationResult>>(
+      '/api/core/invitations/join',
+      payload,
+    );
+    if (!data.success) throw new Error(data.error?.message ?? 'Failed to join organization');
     return data.data;
   },
 };
