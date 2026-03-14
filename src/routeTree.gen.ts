@@ -22,6 +22,7 @@ import { Route as SuperAdminAddTenantRouteImport } from './routes/super-admin/ad
 import { Route as ConsoleWelcomeRouteImport } from './routes/console/welcome'
 import { Route as ConsoleStaffRouteImport } from './routes/console/staff'
 import { Route as ConsoleProcessingRouteImport } from './routes/console/processing'
+import { Route as ConsoleJoinInvitationRouteImport } from './routes/console/join-invitation'
 import { Route as ConsoleCreateOrganizationRouteImport } from './routes/console/create-organization'
 import { Route as ConsoleAdminRouteImport } from './routes/console/admin'
 import { Route as AuthSigninOrSignupRouteImport } from './routes/auth/signin-or-signup'
@@ -122,6 +123,11 @@ const ConsoleStaffRoute = ConsoleStaffRouteImport.update({
 const ConsoleProcessingRoute = ConsoleProcessingRouteImport.update({
   id: '/console/processing',
   path: '/console/processing',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ConsoleJoinInvitationRoute = ConsoleJoinInvitationRouteImport.update({
+  id: '/console/join-invitation',
+  path: '/console/join-invitation',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ConsoleCreateOrganizationRoute =
@@ -335,6 +341,7 @@ export interface FileRoutesByFullPath {
   '/auth/signin-or-signup': typeof AuthSigninOrSignupRoute
   '/console/admin': typeof ConsoleAdminRouteWithChildren
   '/console/create-organization': typeof ConsoleCreateOrganizationRoute
+  '/console/join-invitation': typeof ConsoleJoinInvitationRoute
   '/console/processing': typeof ConsoleProcessingRoute
   '/console/staff': typeof ConsoleStaffRouteWithChildren
   '/console/welcome': typeof ConsoleWelcomeRoute
@@ -385,6 +392,7 @@ export interface FileRoutesByTo {
   '/auth/signin-or-signup': typeof AuthSigninOrSignupRoute
   '/console/admin': typeof ConsoleAdminRouteWithChildren
   '/console/create-organization': typeof ConsoleCreateOrganizationRoute
+  '/console/join-invitation': typeof ConsoleJoinInvitationRoute
   '/console/processing': typeof ConsoleProcessingRoute
   '/console/staff': typeof ConsoleStaffRouteWithChildren
   '/console/welcome': typeof ConsoleWelcomeRoute
@@ -436,6 +444,7 @@ export interface FileRoutesById {
   '/auth/signin-or-signup': typeof AuthSigninOrSignupRoute
   '/console/admin': typeof ConsoleAdminRouteWithChildren
   '/console/create-organization': typeof ConsoleCreateOrganizationRoute
+  '/console/join-invitation': typeof ConsoleJoinInvitationRoute
   '/console/processing': typeof ConsoleProcessingRoute
   '/console/staff': typeof ConsoleStaffRouteWithChildren
   '/console/welcome': typeof ConsoleWelcomeRoute
@@ -488,6 +497,7 @@ export interface FileRouteTypes {
     | '/auth/signin-or-signup'
     | '/console/admin'
     | '/console/create-organization'
+    | '/console/join-invitation'
     | '/console/processing'
     | '/console/staff'
     | '/console/welcome'
@@ -538,6 +548,7 @@ export interface FileRouteTypes {
     | '/auth/signin-or-signup'
     | '/console/admin'
     | '/console/create-organization'
+    | '/console/join-invitation'
     | '/console/processing'
     | '/console/staff'
     | '/console/welcome'
@@ -588,6 +599,7 @@ export interface FileRouteTypes {
     | '/auth/signin-or-signup'
     | '/console/admin'
     | '/console/create-organization'
+    | '/console/join-invitation'
     | '/console/processing'
     | '/console/staff'
     | '/console/welcome'
@@ -634,6 +646,7 @@ export interface RootRouteChildren {
   AuthSigninOrSignupRoute: typeof AuthSigninOrSignupRoute
   ConsoleAdminRoute: typeof ConsoleAdminRouteWithChildren
   ConsoleCreateOrganizationRoute: typeof ConsoleCreateOrganizationRoute
+  ConsoleJoinInvitationRoute: typeof ConsoleJoinInvitationRoute
   ConsoleProcessingRoute: typeof ConsoleProcessingRoute
   ConsoleStaffRoute: typeof ConsoleStaffRouteWithChildren
   ConsoleWelcomeRoute: typeof ConsoleWelcomeRoute
@@ -731,6 +744,13 @@ declare module '@tanstack/react-router' {
       path: '/console/processing'
       fullPath: '/console/processing'
       preLoaderRoute: typeof ConsoleProcessingRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/console/join-invitation': {
+      id: '/console/join-invitation'
+      path: '/console/join-invitation'
+      fullPath: '/console/join-invitation'
+      preLoaderRoute: typeof ConsoleJoinInvitationRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/console/create-organization': {
@@ -1144,6 +1164,7 @@ const rootRouteChildren: RootRouteChildren = {
   AuthSigninOrSignupRoute: AuthSigninOrSignupRoute,
   ConsoleAdminRoute: ConsoleAdminRouteWithChildren,
   ConsoleCreateOrganizationRoute: ConsoleCreateOrganizationRoute,
+  ConsoleJoinInvitationRoute: ConsoleJoinInvitationRoute,
   ConsoleProcessingRoute: ConsoleProcessingRoute,
   ConsoleStaffRoute: ConsoleStaffRouteWithChildren,
   ConsoleWelcomeRoute: ConsoleWelcomeRoute,
