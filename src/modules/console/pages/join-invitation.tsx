@@ -1,10 +1,12 @@
 import { Loader2, Check, XCircle } from 'lucide-react'
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter } from '@tanstack/react-router'
 import { Button } from '@/components/ui/button'
 import { useCurrentOrgId } from '@/contexts/current-org.context'
-import { getInvitationCode, clearInvitationCode, getTempEmail } from '@/lib/auth-storage'
+import { getInvitationCode, clearInvitationCode } from '@/lib/auth-storage'
 import { invitationService } from '@/services/invitation.service'
+import { auth } from '@/lib/firebase'
+import { onAuthStateChanged } from 'firebase/auth'
 
 type PageState =
   | { status: 'joining' }
@@ -16,48 +18,41 @@ export function JoinInvitationPage() {
   const { setCurrentOrgId } = useCurrentOrgId()
   const [state, setState] = useState<PageState>({ status: 'joining' })
 
-  const autoJoin = useCallback(async () => {
-    const code = getInvitationCode()
-    const email = getTempEmail()
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, async (user) => {
+      if (!user) return
 
-    if (!code || !email) {
-      clearInvitationCode()
-      setState({ status: 'error', message: 'No invitation found. The link may be invalid or expired.' })
-      return
-    }
+      const code = getInvitationCode()
 
-    try {
-      const checkResult = await invitationService.check({ token: code, email })
-
-      if (!checkResult.isTokenValid) {
+      if (!code) {
         clearInvitationCode()
-        setState({ status: 'error', message: 'This invitation is no longer valid. It may have expired or already been used.' })
+        setState({ status: 'error', message: 'No invitation found. The link may be invalid or expired.' })
         return
       }
 
-      const joinResult = await invitationService.join({ token: code })
-      clearInvitationCode()
-      setState({ status: 'success' })
+      try {
+        const joinResult = await invitationService.join({ token: code })
+        clearInvitationCode()
+        setState({ status: 'success' })
 
-      setCurrentOrgId(joinResult.organizationId)
-      setTimeout(() => {
-        const destination = joinResult.role === 'OrgAdmin'
-          ? '/console/admin/dashboard'
-          : '/console/staff/inventory'
-        window.location.href = destination
-      }, 1500)
-    } catch (err) {
-      clearInvitationCode()
-      setState({
-        status: 'error',
-        message: err instanceof Error ? err.message : 'Failed to join organization.',
-      })
-    }
+        setCurrentOrgId(joinResult.organizationId)
+        setTimeout(() => {
+          const destination = joinResult.role === 'OrgAdmin'
+            ? '/console/admin/dashboard'
+            : '/console/staff/inventory'
+          window.location.href = destination
+        }, 1500)
+      } catch (err) {
+        clearInvitationCode()
+        setState({
+          status: 'error',
+          message: err instanceof Error ? err.message : 'Failed to join organization.',
+        })
+      }
+    })
+
+    return () => unsubscribe()
   }, [setCurrentOrgId])
-
-  useEffect(() => {
-    autoJoin()
-  }, [autoJoin])
 
   const handleGoToWelcome = () => {
     clearInvitationCode()

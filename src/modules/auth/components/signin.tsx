@@ -8,6 +8,7 @@ import { useSignIn } from '@/hooks/use-auth';
 import { showToast } from '@/lib/toast';
 import { getTempEmail, getInvitationCode } from '@/lib/auth-storage';
 import { authService } from '@/services';
+import { userService } from '@/services/user.service';
 
 export function SignIn() {
   const [showPassword, setShowPassword] = useState(false);
@@ -46,9 +47,9 @@ export function SignIn() {
             showToast.error('Please verify your email before signing in. Check your inbox.');
             return;
           }
-          
+
+          await userService.upsertUser();
           showToast.success('Welcome back!');
-          await new Promise(resolve => setTimeout(resolve, 100));
 
           const invitationCode = getInvitationCode();
           if (invitationCode) {
