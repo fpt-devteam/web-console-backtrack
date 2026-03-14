@@ -1,25 +1,26 @@
 import { StaffLayout } from '../../components/staff'
-import { Calendar, Download, Plus, MapPin, Search } from 'lucide-react'
+import { Calendar, Download, Plus, Search, Archive } from 'lucide-react'
 import { useMemo, useState } from 'react'
 import { Pagination } from '@/components/ui/pagination'
 import { Link, useNavigate } from '@tanstack/react-router'
-import { usePosts } from '@/hooks/use-post'
-import type { PostTypeFilter } from '@/types/post.types'
+import { useInventoryItems } from '@/hooks/use-inventory'
+import { useCurrentOrgId } from '@/contexts/current-org.context'
 import { Spinner } from '@/components/ui/spinner'
 
 const pageSize = 8
 
 export function StaffInventoryPage() {
   const navigate = useNavigate()
+  const { currentOrgId } = useCurrentOrgId()
   const [searchTerm, setSearchTerm] = useState('')
-  const [postType, setPostType] = useState<PostTypeFilter>('All')
+  const [statusFilter, setStatusFilter] = useState<string>('All')
   const [currentPage, setCurrentPage] = useState(1)
 
-  const { data, isLoading, isError } = usePosts({
+  const { data, isLoading, isError } = useInventoryItems(currentOrgId, {
     page: currentPage,
     pageSize,
-    postType,
-    searchTerm,
+    status: statusFilter !== 'All' ? statusFilter : undefined,
+    searchTerm: searchTerm.trim() || undefined,
   })
 
   const items = data?.items ?? []
@@ -37,14 +38,25 @@ export function StaffInventoryPage() {
     }
   }, [])
 
-  const typeBadgeClass = (t: string) => {
-    switch (t) {
-      case 'Found':
-        return 'bg-green-600 text-white'
-      case 'Lost':
-        return 'bg-amber-500 text-white'
+  const statusBadgeClass = (s: string) => {
+    switch (s) {
+      case 'InStorage':
+        return 'bg-indigo-500 text-white'
+      case 'Returned':
+        return 'bg-green-500 text-white'
+      case 'Disposed':
+        return 'bg-gray-500 text-white'
       default:
         return 'bg-gray-600 text-white'
+    }
+  }
+
+  const statusLabel = (s: string) => {
+    switch (s) {
+      case 'InStorage': return 'In Storage'
+      case 'Returned': return 'Returned'
+      case 'Disposed': return 'Disposed'
+      default: return s
     }
   }
 
@@ -75,7 +87,6 @@ export function StaffInventoryPage() {
           </div>
         </div>
 
-        {/* Filters: chỉ search + postType (có API) */}
         <div className="mb-6 flex flex-col gap-3 lg:flex-row lg:items-center">
           <div className="flex-1 relative">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
@@ -98,16 +109,17 @@ export function StaffInventoryPage() {
             />
           </div>
           <select
-            value={postType}
+            value={statusFilter}
             onChange={(e) => {
-              setPostType(e.target.value as PostTypeFilter)
+              setStatusFilter(e.target.value)
               setCurrentPage(1)
             }}
             className="px-4 py-2 border border-gray-200 rounded-lg bg-white text-gray-700 font-medium"
           >
             <option value="All">All</option>
-            <option value="Lost">Lost</option>
-            <option value="Found">Found</option>
+            <option value="InStorage">In Storage</option>
+            <option value="Returned">Returned</option>
+            <option value="Disposed">Disposed</option>
           </select>
           {searchTerm.trim() && (
             <button
@@ -119,7 +131,7 @@ export function StaffInventoryPage() {
               }}
               className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium"
             >
-              Search in new page
+              Semantic search
             </button>
           )}
         </div>
@@ -134,7 +146,7 @@ export function StaffInventoryPage() {
 
         {isError && (
           <div className="text-center py-12">
-            <p className="text-gray-500 text-lg">Failed to load posts.</p>
+            <p className="text-gray-500 text-lg">Failed to load inventory items.</p>
           </div>
         )}
 
@@ -146,13 +158,13 @@ export function StaffInventoryPage() {
           ) : items.length === 0 ? (
             <div className="col-span-full text-center py-12">
               <p className="text-gray-500 text-lg">
-                No posts found{searchTerm.trim() ? ` matching "${searchTerm.trim()}"` : ''}
+                No items found{searchTerm.trim() ? ` matching "${searchTerm.trim()}"` : ''}
               </p>
-              {(searchTerm || postType !== 'All') && (
+              {(searchTerm || statusFilter !== 'All') && (
                 <button
                   onClick={() => {
                     setSearchTerm('')
-                    setPostType('All')
+                    setStatusFilter('All')
                     setCurrentPage(1)
                   }}
                   className="mt-4 text-blue-600 hover:text-blue-700 font-medium"
@@ -162,16 +174,16 @@ export function StaffInventoryPage() {
               )}
             </div>
           ) : (
-            items.map((post) => (
+            items.map((item) => (
               <div
-                key={post.id}
+                key={item.id}
                 className="bg-white rounded-xl shadow-sm overflow-hidden hover:shadow-md transition-shadow"
               >
                 <div className="relative h-48 bg-gradient-to-br from-gray-100 to-gray-200">
-                  {post.imageUrls?.[0] ? (
+                  {item.imageUrls?.[0] ? (
                     <img
-                      src={post.imageUrls[0]}
-                      alt={post.itemName}
+                      src={item.imageUrls[0]}
+                      alt={item.itemName}
                       className="w-full h-full object-cover"
                     />
                   ) : (
@@ -180,25 +192,27 @@ export function StaffInventoryPage() {
                     </div>
                   )}
                   <span
-                    className={`absolute top-3 right-3 px-3 py-1 rounded-full text-xs font-semibold ${typeBadgeClass(post.postType)}`}
+                    className={`absolute top-3 right-3 px-3 py-1 rounded-full text-xs font-semibold ${statusBadgeClass(item.status)}`}
                   >
-                    {post.postType}
+                    {statusLabel(item.status)}
                   </span>
                 </div>
                 <div className="p-4">
-                  <h3 className="font-semibold text-gray-900 mb-3">{post.itemName}</h3>
-                  <p className="text-sm text-gray-600 mb-3 line-clamp-2">{post.description}</p>
+                  <h3 className="font-semibold text-gray-900 mb-3">{item.itemName}</h3>
+                  <p className="text-sm text-gray-600 mb-3 line-clamp-2">{item.description}</p>
                   <div className="space-y-2 text-sm text-gray-600 mb-4">
-                    <div className="flex items-center gap-2">
-                      <MapPin className="w-4 h-4 flex-shrink-0" />
-                      <span>{post.displayAddress || 'Unknown location'}</span>
-                    </div>
+                    {item.storageLocation && (
+                      <div className="flex items-center gap-2">
+                        <Archive className="w-4 h-4 flex-shrink-0" />
+                        <span>{item.storageLocation}</span>
+                      </div>
+                    )}
                     <div className="flex items-center gap-2">
                       <Calendar className="w-4 h-4 flex-shrink-0" />
-                      <span>Posted {formatPosted(post.createdAt)}</span>
+                      <span>Added {formatPosted(item.createdAt)}</span>
                     </div>
                   </div>
-                  <Link to="/console/staff/item/$itemId" params={{ itemId: post.id }}>
+                  <Link to="/console/staff/item/$itemId" params={{ itemId: item.id }}>
                     <button className="w-full py-1.5 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-all font-medium text-sm">
                       View Details
                     </button>

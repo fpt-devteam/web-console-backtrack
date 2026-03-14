@@ -1,154 +1,48 @@
 import { StaffLayout } from '../../components/staff/layout'
-import { ChevronRight, Trash2, User, Package, Info, Building2, Camera } from 'lucide-react'
+import { ChevronRight, Trash2, Info, Building2, Camera, Tag, Calendar } from 'lucide-react'
 import { useState } from 'react'
 import { Link, useParams, useNavigate } from '@tanstack/react-router'
-import { mockInventoryItems, type ItemStatus } from '@/mock/data/mock-inventory'
 import { Button } from '@/components/ui/button'
 import { Spinner } from '@/components/ui/spinner'
-import { usePost, useDeletePost } from '@/hooks/use-post'
+import { useInventoryItem, useDeleteInventoryItem } from '@/hooks/use-inventory'
+import { useCurrentOrgId } from '@/contexts/current-org.context'
 
 export function ItemDetailPage() {
   const { itemId } = useParams({ from: '/console/staff/item/$itemId' })
   const navigate = useNavigate()
+  const { currentOrgId } = useCurrentOrgId()
   const [mainImage, setMainImage] = useState(0)
-  const deletePost = useDeletePost()
+  const deleteItem = useDeleteInventoryItem(currentOrgId)
 
-  // Find item by ID
-  const item = mockInventoryItems.find((i) => i.id === itemId)
-  const looksLikeGuid = /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/.test(
-    itemId
-  )
-  const { data: post, isLoading: postLoading } = usePost(looksLikeGuid ? itemId : null)
+  const { data: item, isLoading } = useInventoryItem(currentOrgId, itemId)
 
-  if (!item && looksLikeGuid && postLoading) {
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case 'InStorage':
+        return 'bg-indigo-500 text-white'
+      case 'Returned':
+        return 'bg-green-500 text-white'
+      case 'Disposed':
+        return 'bg-gray-500 text-white'
+      default:
+        return 'bg-gray-500 text-white'
+    }
+  }
+
+  const statusLabel = (s: string) => {
+    switch (s) {
+      case 'InStorage': return 'In Storage'
+      case 'Returned': return 'Returned'
+      case 'Disposed': return 'Disposed'
+      default: return s
+    }
+  }
+
+  if (isLoading) {
     return (
       <StaffLayout>
         <div className="p-8 min-h-screen flex items-center justify-center">
           <Spinner size="lg" />
-        </div>
-      </StaffLayout>
-    )
-  }
-
-  if (!item && looksLikeGuid && post) {
-    const images = post.imageUrls?.length ? post.imageUrls : []
-    const mainImg = images[mainImage] ?? images[0]
-    return (
-      <StaffLayout>
-        <div className="p-6 h-full overflow-y-auto mx-6">
-          <div className="mb-6 flex items-center gap-2 text-sm text-gray-600">
-            <Link to="/console/staff/feed" className="hover:text-gray-900 transition-colors">
-              Feed
-            </Link>
-            <ChevronRight className="w-4 h-4" />
-            <span className="text-gray-900 font-medium">Post #{post.id}</span>
-          </div>
-
-          <div className="bg-white rounded-xl shadow-sm">
-            <div className="p-6 border-b border-gray-200 flex items-start justify-between">
-              <div>
-                <div className="flex items-center gap-3 mb-2">
-                  <h1 className="text-3xl font-bold text-gray-900">{post.itemName}</h1>
-                  <span className="px-3 py-1 rounded-md text-xs font-bold uppercase bg-gray-100 text-gray-700">
-                    {post.postType}
-                  </span>
-                </div>
-                <p className="text-gray-600">Post #{post.id}</p>
-              </div>
-              <div className="flex gap-3">
-                <Button
-                  variant="outline"
-                  className="text-red-600 border-red-300 hover:bg-red-50"
-                  disabled={deletePost.isPending}
-                  onClick={() => {
-                    if (window.confirm('Are you sure you want to delete this post? This cannot be undone.')) {
-                      deletePost.mutate(post.id, {
-                        onSuccess: () => navigate({ to: '/console/staff/feed' }),
-                        onError: (err) => alert(err instanceof Error ? err.message : 'Failed to delete post'),
-                      })
-                    }
-                  }}
-                >
-                  <Trash2 className="w-4 h-4 mr-2" />
-                  {deletePost.isPending ? 'Deleting...' : 'Delete'}
-                </Button>
-              </div>
-            </div>
-
-            <div className="grid grid-cols-1 lg:grid-cols-7">
-              <div className="lg:col-span-3 p-6 border-r border-gray-200">
-                <div className="relative h-[350px] bg-gradient-to-br from-gray-100 to-gray-200 rounded-lg overflow-hidden mb-4 flex items-center justify-center">
-                  {mainImg ? (
-                    <img src={mainImg} alt={post.itemName} className="w-full h-full object-cover" />
-                  ) : (
-                    <div className="text-gray-400">No image</div>
-                  )}
-                </div>
-
-                {images.length > 1 && (
-                  <div className="flex gap-3">
-                    {images.map((img, idx) => (
-                      <button
-                        key={idx}
-                        onClick={() => setMainImage(idx)}
-                        className={`relative w-20 h-20 rounded-lg overflow-hidden border-2 transition-all ${
-                          mainImage === idx
-                            ? 'border-blue-600 ring-2 ring-blue-200'
-                            : 'border-gray-300 hover:border-gray-400'
-                        }`}
-                      >
-                        <img src={img} alt={`View ${idx + 1}`} className="w-full h-full object-cover" />
-                      </button>
-                    ))}
-                    <button className="w-20 h-20 rounded-lg border-2 border-dashed border-gray-300 flex items-center justify-center text-gray-400">
-                      <Camera className="w-5 h-5" />
-                    </button>
-                  </div>
-                )}
-              </div>
-
-              <div className="lg:col-span-4 py-6 px-8 space-y-6">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div>
-                    <div className="text-xs font-semibold uppercase mb-2">CREATED BY</div>
-                    <div className="flex items-center gap-2 text-gray-900">
-                      <User className="w-4 h-4 text-blue-600" />
-                      <span>{post.author?.displayName ?? post.author?.id ?? '-'}</span>
-                    </div>
-                  </div>
-
-                  <div>
-                    <div className="text-xs font-semibold uppercase mb-2">STATUS</div>
-                    <div className="flex items-center gap-2 text-gray-900">
-                      <Info className="w-4 h-4 text-blue-600" />
-                      <span>{post.postType}</span>
-                    </div>
-                  </div>
-
-                  <div>
-                    <div className="text-xs font-semibold uppercase mb-2">LOCATION</div>
-                    <div className="flex items-center gap-2 text-gray-900">
-                      <Building2 className="w-4 h-4 text-blue-600" />
-                      <span>{post.displayAddress ?? 'Unknown location'}</span>
-                    </div>
-                  </div>
-
-                  <div>
-                    <div className="text-xs font-semibold uppercase mb-2">EVENT TIME</div>
-                    <div className="flex items-center gap-2 text-gray-900">
-                      <Package className="w-4 h-4 text-blue-600" />
-                      <span>{new Date(post.eventTime).toLocaleString()}</span>
-                    </div>
-                  </div>
-                </div>
-
-                <div>
-                  <div className="text-xs font-semibold uppercase mb-2">Description</div>
-                  <p className="text-gray-700 leading-relaxed">{post.description}</p>
-                </div>
-              </div>
-            </div>
-          </div>
         </div>
       </StaffLayout>
     )
@@ -170,66 +64,49 @@ export function ItemDetailPage() {
     )
   }
 
-  const getStatusColor = (status: ItemStatus) => {
-    switch (status) {
-      case 'New':
-        return 'bg-blue-500 text-white'
-      case 'Storage':
-        return 'bg-blue-500 text-white'
-      case 'Claimed':
-        return 'bg-green-500 text-white'
-      case 'Disposed':
-        return 'bg-gray-500 text-white'
-      default:
-        return 'bg-gray-500 text-white'
-    }
-  }
-
-  // Mock additional images (duplicate for demo)
-  const images = [item.image, item.image, item.image]
-
-  // Mock description
-  const description = `Standard ${item.title.toLowerCase()}, size M. Shows some signs of wear around the collar. Contains a pair of black sunglasses in the left breast pocket. No other contents found.`
-
-  // Mock internal notes
-  const internalNote = `Customer called on Oct 25th inquiring about a similar item. Asked to hold until Friday for pickup. Reference Ticket #9582.`
+  const images = item.imageUrls?.length ? item.imageUrls : []
+  const mainImg = images[mainImage] ?? images[0]
 
   return (
     <StaffLayout>
       <div className="p-6 h-full overflow-y-auto mx-6">
-        {/* Breadcrumb */}
         <div className="mb-6 flex items-center gap-2 text-sm text-gray-600">
-          <Link
-            to="/console/staff/inventory"
-            className="hover:text-gray-900 transition-colors"
-          >
+          <Link to="/console/staff/inventory" className="hover:text-gray-900 transition-colors">
             Inventory
           </Link>
           <ChevronRight className="w-4 h-4" />
-          <span className="text-gray-900 font-medium">Item #{item.id}</span>
+          <span className="text-gray-900 font-medium">{item.itemName}</span>
         </div>
 
-        {/* Main Card - All Content */}
         <div className="bg-white rounded-xl shadow-sm">
-          {/* Header */}
           <div className="p-6 border-b border-gray-200 flex items-start justify-between">
             <div>
               <div className="flex items-center gap-3 mb-2">
-                <h1 className="text-3xl font-bold text-gray-900">{item.title}</h1>
-                <span
-                  className={`px-3 py-1 rounded-md text-xs font-bold uppercase ${getStatusColor(item.status)}`}
-                >
-                  {item.status === 'Storage' ? 'In Storage' : item.status}
+                <h1 className="text-3xl font-bold text-gray-900">{item.itemName}</h1>
+                <span className={`px-3 py-1 rounded-md text-xs font-bold uppercase ${getStatusColor(item.status)}`}>
+                  {statusLabel(item.status)}
                 </span>
               </div>
               <p className="text-gray-600">
-                Item #{item.id} • Added on {item.date}
+                Added {new Date(item.createdAt).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })}
               </p>
             </div>
             <div className="flex gap-3">
-              <Button variant="outline" className="text-red-600 border-red-300 hover:bg-red-50">
+              <Button
+                variant="outline"
+                className="text-red-600 border-red-300 hover:bg-red-50"
+                disabled={deleteItem.isPending}
+                onClick={() => {
+                  if (window.confirm('Are you sure you want to delete this item? This cannot be undone.')) {
+                    deleteItem.mutate(item.id, {
+                      onSuccess: () => navigate({ to: '/console/staff/inventory' }),
+                      onError: (err) => alert(err instanceof Error ? err.message : 'Failed to delete item'),
+                    })
+                  }
+                }}
+              >
                 <Trash2 className="w-4 h-4 mr-2" />
-                Delete
+                {deleteItem.isPending ? 'Deleting...' : 'Delete'}
               </Button>
               <Link to="/console/staff/item-edit/$itemId" params={{ itemId: item.id }}>
                 <Button className="bg-blue-600 hover:bg-blue-700">Edit</Button>
@@ -237,105 +114,78 @@ export function ItemDetailPage() {
             </div>
           </div>
 
-          {/* Images and Details */}
           <div className="grid grid-cols-1 lg:grid-cols-7">
-            {/* Left Column - Images (3/7) */}
             <div className="lg:col-span-3 p-6 border-r border-gray-200">
-              {/* Main Image */}
-              <div className="relative h-[350px] bg-gradient-to-br from-gray-100 to-gray-200 rounded-lg overflow-hidden mb-4">
-                <img
-                  src={images[mainImage]}
-                  alt={item.title}
-                  className="w-full h-full object-cover"
-                />
-                <div className="absolute bottom-4 right-4 bg-black/60 text-white px-3 py-1 rounded text-sm">
-                  Main Photo
-                </div>
+              <div className="relative h-[350px] bg-gradient-to-br from-gray-100 to-gray-200 rounded-lg overflow-hidden mb-4 flex items-center justify-center">
+                {mainImg ? (
+                  <img src={mainImg} alt={item.itemName} className="w-full h-full object-cover" />
+                ) : (
+                  <div className="text-gray-400">No image</div>
+                )}
               </div>
 
-              {/* Thumbnails */}
-              <div className="flex gap-3">
-                {images.map((img, idx) => (
-                  <button
-                    key={idx}
-                    onClick={() => setMainImage(idx)}
-                    className={`relative w-20 h-20 rounded-lg overflow-hidden border-2 transition-all ${
-                      mainImage === idx
-                        ? 'border-blue-600 ring-2 ring-blue-200'
-                        : 'border-gray-300 hover:border-gray-400'
-                    }`}
-                  >
-                    <img src={img} alt={`View ${idx + 1}`} className="w-full h-full object-cover" />
+              {images.length > 1 && (
+                <div className="flex gap-3">
+                  {images.map((img, idx) => (
+                    <button
+                      key={idx}
+                      onClick={() => setMainImage(idx)}
+                      className={`relative w-20 h-20 rounded-lg overflow-hidden border-2 transition-all ${
+                        mainImage === idx
+                          ? 'border-blue-600 ring-2 ring-blue-200'
+                          : 'border-gray-300 hover:border-gray-400'
+                      }`}
+                    >
+                      <img src={img} alt={`View ${idx + 1}`} className="w-full h-full object-cover" />
+                    </button>
+                  ))}
+                  <button className="w-20 h-20 rounded-lg border-2 border-dashed border-gray-300 flex items-center justify-center text-gray-400">
+                    <Camera className="w-5 h-5" />
                   </button>
-                ))}
-                <button className="w-20 h-20 rounded-lg border-2 border-dashed border-gray-300 flex items-center justify-center text-gray-400 hover:border-gray-400 hover: transition-colors">
-                  <Camera className="w-5 h-5" />
-                </button>
-              </div>
+                </div>
+              )}
             </div>
 
-            {/* Right Column - Details (4/7) */}
             <div className="lg:col-span-4 py-6 px-8 space-y-6">
-              {/* Info Grid - 2 columns */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {/* Category */}
                 <div>
-                  <div className="text-xs font-semibold  uppercase mb-2">
-                    CATEGORY
-                  </div>
-                  <div className="flex items-center gap-2 text-gray-900">
-                    <Package className="w-4 h-4 text-blue-600" />
-                    <span>{item.category}</span>
-                  </div>
-                </div>
-
-                {/* Created By */}
-                <div>
-                  <div className="text-xs font-semibold  uppercase mb-2">
-                    CREATED BY
-                  </div>
-                  <div className="flex items-center gap-2 text-gray-900">
-                    <User className="w-4 h-4 text-blue-600" />
-                    <span>Jane Doe (Security)</span>
-                  </div>
-                </div>
-
-                {/* Status */}
-                <div>
-                  <div className="text-xs font-semibold  uppercase mb-2">
-                    STATUS
-                  </div>
+                  <div className="text-xs font-semibold uppercase mb-2">STATUS</div>
                   <div className="flex items-center gap-2 text-gray-900">
                     <Info className="w-4 h-4 text-blue-600" />
-                    <span>{item.status === 'Storage' ? 'In Storage' : item.status}</span>
+                    <span>{statusLabel(item.status)}</span>
                   </div>
                 </div>
 
-                {/* Stored Location */}
                 <div>
-                  <div className="text-xs font-semibold  uppercase mb-2">
-                    STORED LOCATION
-                  </div>
+                  <div className="text-xs font-semibold uppercase mb-2">STORED LOCATION</div>
                   <div className="flex items-center gap-2 text-gray-900">
                     <Building2 className="w-4 h-4 text-blue-600" />
-                    <span>{item.bin || 'Storage Room A, Shelf 3'}</span>
+                    <span>{item.storageLocation || '—'}</span>
                   </div>
                 </div>
-              </div>
 
-              {/* Description */}
-              <div>
-                <div className="text-xs font-semibold  uppercase mb-2">
-                  Description
+                <div>
+                  <div className="text-xs font-semibold uppercase mb-2">LOGGED AT</div>
+                  <div className="flex items-center gap-2 text-gray-900">
+                    <Calendar className="w-4 h-4 text-blue-600" />
+                    <span>{new Date(item.loggedAt).toLocaleString()}</span>
+                  </div>
                 </div>
-                <p className="text-gray-700 leading-relaxed">{description}</p>
+
+                {item.distinctiveMarks && (
+                  <div>
+                    <div className="text-xs font-semibold uppercase mb-2">DISTINCTIVE MARKS</div>
+                    <div className="flex items-center gap-2 text-gray-900">
+                      <Tag className="w-4 h-4 text-blue-600" />
+                      <span>{item.distinctiveMarks}</span>
+                    </div>
+                  </div>
+                )}
               </div>
 
-              {/* Internal Notes */}
-              <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
-                <p className="text-gray-700">
-                  <span className="font-semibold">Note:</span> {internalNote}
-                </p>
+              <div>
+                <div className="text-xs font-semibold uppercase mb-2">Description</div>
+                <p className="text-gray-700 leading-relaxed">{item.description}</p>
               </div>
             </div>
           </div>
