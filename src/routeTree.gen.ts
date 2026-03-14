@@ -9,6 +9,7 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as SuperAdminRouteImport } from './routes/super-admin'
 import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as MarketingRouteImport } from './routes/_marketing'
 import { Route as IndexRouteImport } from './routes/index'
@@ -19,8 +20,11 @@ import { Route as SuperAdminOrganizationRouteImport } from './routes/super-admin
 import { Route as SuperAdminDashboardRouteImport } from './routes/super-admin/dashboard'
 import { Route as SuperAdminAddTenantRouteImport } from './routes/super-admin/add-tenant'
 import { Route as ConsoleWelcomeRouteImport } from './routes/console/welcome'
+import { Route as ConsoleStaffRouteImport } from './routes/console/staff'
 import { Route as ConsoleProcessingRouteImport } from './routes/console/processing'
+import { Route as ConsoleJoinInvitationRouteImport } from './routes/console/join-invitation'
 import { Route as ConsoleCreateOrganizationRouteImport } from './routes/console/create-organization'
+import { Route as ConsoleAdminRouteImport } from './routes/console/admin'
 import { Route as AuthSigninOrSignupRouteImport } from './routes/auth/signin-or-signup'
 import { Route as AuthSigninRouteImport } from './routes/auth/signin'
 import { Route as AuthRedirectRouteImport } from './routes/auth/redirect'
@@ -56,6 +60,11 @@ import { Route as ConsoleAdminEditEmployeeEmployeeIdRouteImport } from './routes
 import { Route as ConsoleAdminEditBranchBranchIdRouteImport } from './routes/console/admin/edit-branch/$branchId'
 import { Route as ConsoleAdminSettingOrganizationEditRouteImport } from './routes/console/admin/setting/organization/edit'
 
+const SuperAdminRoute = SuperAdminRouteImport.update({
+  id: '/super-admin',
+  path: '/super-admin',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const DashboardRoute = DashboardRouteImport.update({
   id: '/dashboard',
   path: '/dashboard',
@@ -71,44 +80,54 @@ const IndexRoute = IndexRouteImport.update({
   getParentRoute: () => rootRouteImport,
 } as any)
 const SuperAdminUsersRoute = SuperAdminUsersRouteImport.update({
-  id: '/super-admin/users',
-  path: '/super-admin/users',
-  getParentRoute: () => rootRouteImport,
+  id: '/users',
+  path: '/users',
+  getParentRoute: () => SuperAdminRoute,
 } as any)
 const SuperAdminServicePackagesRoute =
   SuperAdminServicePackagesRouteImport.update({
-    id: '/super-admin/service-packages',
-    path: '/super-admin/service-packages',
-    getParentRoute: () => rootRouteImport,
+    id: '/service-packages',
+    path: '/service-packages',
+    getParentRoute: () => SuperAdminRoute,
   } as any)
 const SuperAdminRevenueRoute = SuperAdminRevenueRouteImport.update({
-  id: '/super-admin/revenue',
-  path: '/super-admin/revenue',
-  getParentRoute: () => rootRouteImport,
+  id: '/revenue',
+  path: '/revenue',
+  getParentRoute: () => SuperAdminRoute,
 } as any)
 const SuperAdminOrganizationRoute = SuperAdminOrganizationRouteImport.update({
-  id: '/super-admin/organization',
-  path: '/super-admin/organization',
-  getParentRoute: () => rootRouteImport,
+  id: '/organization',
+  path: '/organization',
+  getParentRoute: () => SuperAdminRoute,
 } as any)
 const SuperAdminDashboardRoute = SuperAdminDashboardRouteImport.update({
-  id: '/super-admin/dashboard',
-  path: '/super-admin/dashboard',
-  getParentRoute: () => rootRouteImport,
+  id: '/dashboard',
+  path: '/dashboard',
+  getParentRoute: () => SuperAdminRoute,
 } as any)
 const SuperAdminAddTenantRoute = SuperAdminAddTenantRouteImport.update({
-  id: '/super-admin/add-tenant',
-  path: '/super-admin/add-tenant',
-  getParentRoute: () => rootRouteImport,
+  id: '/add-tenant',
+  path: '/add-tenant',
+  getParentRoute: () => SuperAdminRoute,
 } as any)
 const ConsoleWelcomeRoute = ConsoleWelcomeRouteImport.update({
   id: '/console/welcome',
   path: '/console/welcome',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ConsoleStaffRoute = ConsoleStaffRouteImport.update({
+  id: '/console/staff',
+  path: '/console/staff',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ConsoleProcessingRoute = ConsoleProcessingRouteImport.update({
   id: '/console/processing',
   path: '/console/processing',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ConsoleJoinInvitationRoute = ConsoleJoinInvitationRouteImport.update({
+  id: '/console/join-invitation',
+  path: '/console/join-invitation',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ConsoleCreateOrganizationRoute =
@@ -117,6 +136,11 @@ const ConsoleCreateOrganizationRoute =
     path: '/console/create-organization',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ConsoleAdminRoute = ConsoleAdminRouteImport.update({
+  id: '/console/admin',
+  path: '/console/admin',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthSigninOrSignupRoute = AuthSigninOrSignupRouteImport.update({
   id: '/auth/signin-or-signup',
   path: '/auth/signin-or-signup',
@@ -180,78 +204,78 @@ const SuperAdminOrganizationTenantIdRoute =
   } as any)
 const SuperAdminEditTenantTenantIdRoute =
   SuperAdminEditTenantTenantIdRouteImport.update({
-    id: '/super-admin/edit-tenant/$tenantId',
-    path: '/super-admin/edit-tenant/$tenantId',
-    getParentRoute: () => rootRouteImport,
+    id: '/edit-tenant/$tenantId',
+    path: '/edit-tenant/$tenantId',
+    getParentRoute: () => SuperAdminRoute,
   } as any)
 const ConsoleStaffNotificationRoute =
   ConsoleStaffNotificationRouteImport.update({
-    id: '/console/staff/notification',
-    path: '/console/staff/notification',
-    getParentRoute: () => rootRouteImport,
+    id: '/notification',
+    path: '/notification',
+    getParentRoute: () => ConsoleStaffRoute,
   } as any)
 const ConsoleStaffInventorySearchRoute =
   ConsoleStaffInventorySearchRouteImport.update({
-    id: '/console/staff/inventory-search',
-    path: '/console/staff/inventory-search',
-    getParentRoute: () => rootRouteImport,
+    id: '/inventory-search',
+    path: '/inventory-search',
+    getParentRoute: () => ConsoleStaffRoute,
   } as any)
 const ConsoleStaffInventoryAddItemRoute =
   ConsoleStaffInventoryAddItemRouteImport.update({
-    id: '/console/staff/inventory-add-item',
-    path: '/console/staff/inventory-add-item',
-    getParentRoute: () => rootRouteImport,
+    id: '/inventory-add-item',
+    path: '/inventory-add-item',
+    getParentRoute: () => ConsoleStaffRoute,
   } as any)
 const ConsoleStaffInventoryRoute = ConsoleStaffInventoryRouteImport.update({
-  id: '/console/staff/inventory',
-  path: '/console/staff/inventory',
-  getParentRoute: () => rootRouteImport,
+  id: '/inventory',
+  path: '/inventory',
+  getParentRoute: () => ConsoleStaffRoute,
 } as any)
 const ConsoleStaffFeedRoute = ConsoleStaffFeedRouteImport.update({
-  id: '/console/staff/feed',
-  path: '/console/staff/feed',
-  getParentRoute: () => rootRouteImport,
+  id: '/feed',
+  path: '/feed',
+  getParentRoute: () => ConsoleStaffRoute,
 } as any)
 const ConsoleStaffChatRoute = ConsoleStaffChatRouteImport.update({
-  id: '/console/staff/chat',
-  path: '/console/staff/chat',
-  getParentRoute: () => rootRouteImport,
+  id: '/chat',
+  path: '/chat',
+  getParentRoute: () => ConsoleStaffRoute,
 } as any)
 const ConsoleAdminSettingRoute = ConsoleAdminSettingRouteImport.update({
-  id: '/console/admin/setting',
-  path: '/console/admin/setting',
-  getParentRoute: () => rootRouteImport,
+  id: '/setting',
+  path: '/setting',
+  getParentRoute: () => ConsoleAdminRoute,
 } as any)
 const ConsoleAdminPlanRoute = ConsoleAdminPlanRouteImport.update({
-  id: '/console/admin/plan',
-  path: '/console/admin/plan',
-  getParentRoute: () => rootRouteImport,
+  id: '/plan',
+  path: '/plan',
+  getParentRoute: () => ConsoleAdminRoute,
 } as any)
 const ConsoleAdminInviteEmployeeRoute =
   ConsoleAdminInviteEmployeeRouteImport.update({
-    id: '/console/admin/invite-employee',
-    path: '/console/admin/invite-employee',
-    getParentRoute: () => rootRouteImport,
+    id: '/invite-employee',
+    path: '/invite-employee',
+    getParentRoute: () => ConsoleAdminRoute,
   } as any)
 const ConsoleAdminEmployeeRoute = ConsoleAdminEmployeeRouteImport.update({
-  id: '/console/admin/employee',
-  path: '/console/admin/employee',
-  getParentRoute: () => rootRouteImport,
+  id: '/employee',
+  path: '/employee',
+  getParentRoute: () => ConsoleAdminRoute,
 } as any)
 const ConsoleAdminEditAccountRoute = ConsoleAdminEditAccountRouteImport.update({
-  id: '/console/admin/edit-account',
-  path: '/console/admin/edit-account',
-  getParentRoute: () => rootRouteImport,
+  id: '/edit-account',
+  path: '/edit-account',
+  getParentRoute: () => ConsoleAdminRoute,
 } as any)
 const ConsoleAdminDashboardRoute = ConsoleAdminDashboardRouteImport.update({
-  id: '/console/admin/dashboard',
-  path: '/console/admin/dashboard',
-  getParentRoute: () => rootRouteImport,
+  id: '/dashboard',
+  path: '/dashboard',
+  getParentRoute: () => ConsoleAdminRoute,
 } as any)
 const ConsoleAdminBranchRoute = ConsoleAdminBranchRouteImport.update({
-  id: '/console/admin/branch',
-  path: '/console/admin/branch',
-  getParentRoute: () => rootRouteImport,
+  id: '/branch',
+  path: '/branch',
+  getParentRoute: () => ConsoleAdminRoute,
 } as any)
 const ConsoleAccountSecurityRoute = ConsoleAccountSecurityRouteImport.update({
   id: '/console/account/security',
@@ -265,15 +289,15 @@ const ConsoleAdminSettingIndexRoute =
     getParentRoute: () => ConsoleAdminSettingRoute,
   } as any)
 const ConsoleStaffItemItemIdRoute = ConsoleStaffItemItemIdRouteImport.update({
-  id: '/console/staff/item/$itemId',
-  path: '/console/staff/item/$itemId',
-  getParentRoute: () => rootRouteImport,
+  id: '/item/$itemId',
+  path: '/item/$itemId',
+  getParentRoute: () => ConsoleStaffRoute,
 } as any)
 const ConsoleStaffItemEditItemIdRoute =
   ConsoleStaffItemEditItemIdRouteImport.update({
-    id: '/console/staff/item-edit/$itemId',
-    path: '/console/staff/item-edit/$itemId',
-    getParentRoute: () => rootRouteImport,
+    id: '/item-edit/$itemId',
+    path: '/item-edit/$itemId',
+    getParentRoute: () => ConsoleStaffRoute,
   } as any)
 const ConsoleAdminSettingOrganizationRoute =
   ConsoleAdminSettingOrganizationRouteImport.update({
@@ -283,15 +307,15 @@ const ConsoleAdminSettingOrganizationRoute =
   } as any)
 const ConsoleAdminEditEmployeeEmployeeIdRoute =
   ConsoleAdminEditEmployeeEmployeeIdRouteImport.update({
-    id: '/console/admin/edit-employee/$employeeId',
-    path: '/console/admin/edit-employee/$employeeId',
-    getParentRoute: () => rootRouteImport,
+    id: '/edit-employee/$employeeId',
+    path: '/edit-employee/$employeeId',
+    getParentRoute: () => ConsoleAdminRoute,
   } as any)
 const ConsoleAdminEditBranchBranchIdRoute =
   ConsoleAdminEditBranchBranchIdRouteImport.update({
-    id: '/console/admin/edit-branch/$branchId',
-    path: '/console/admin/edit-branch/$branchId',
-    getParentRoute: () => rootRouteImport,
+    id: '/edit-branch/$branchId',
+    path: '/edit-branch/$branchId',
+    getParentRoute: () => ConsoleAdminRoute,
   } as any)
 const ConsoleAdminSettingOrganizationEditRoute =
   ConsoleAdminSettingOrganizationEditRouteImport.update({
@@ -303,6 +327,7 @@ const ConsoleAdminSettingOrganizationEditRoute =
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/dashboard': typeof DashboardRoute
+  '/super-admin': typeof SuperAdminRouteWithChildren
   '/about': typeof MarketingAboutRoute
   '/apply': typeof MarketingApplyRoute
   '/contact': typeof MarketingContactRoute
@@ -314,8 +339,11 @@ export interface FileRoutesByFullPath {
   '/auth/redirect': typeof AuthRedirectRoute
   '/auth/signin': typeof AuthSigninRoute
   '/auth/signin-or-signup': typeof AuthSigninOrSignupRoute
+  '/console/admin': typeof ConsoleAdminRouteWithChildren
   '/console/create-organization': typeof ConsoleCreateOrganizationRoute
+  '/console/join-invitation': typeof ConsoleJoinInvitationRoute
   '/console/processing': typeof ConsoleProcessingRoute
+  '/console/staff': typeof ConsoleStaffRouteWithChildren
   '/console/welcome': typeof ConsoleWelcomeRoute
   '/super-admin/add-tenant': typeof SuperAdminAddTenantRoute
   '/super-admin/dashboard': typeof SuperAdminDashboardRoute
@@ -350,6 +378,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/dashboard': typeof DashboardRoute
+  '/super-admin': typeof SuperAdminRouteWithChildren
   '/about': typeof MarketingAboutRoute
   '/apply': typeof MarketingApplyRoute
   '/contact': typeof MarketingContactRoute
@@ -361,8 +390,11 @@ export interface FileRoutesByTo {
   '/auth/redirect': typeof AuthRedirectRoute
   '/auth/signin': typeof AuthSigninRoute
   '/auth/signin-or-signup': typeof AuthSigninOrSignupRoute
+  '/console/admin': typeof ConsoleAdminRouteWithChildren
   '/console/create-organization': typeof ConsoleCreateOrganizationRoute
+  '/console/join-invitation': typeof ConsoleJoinInvitationRoute
   '/console/processing': typeof ConsoleProcessingRoute
+  '/console/staff': typeof ConsoleStaffRouteWithChildren
   '/console/welcome': typeof ConsoleWelcomeRoute
   '/super-admin/add-tenant': typeof SuperAdminAddTenantRoute
   '/super-admin/dashboard': typeof SuperAdminDashboardRoute
@@ -398,6 +430,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/_marketing': typeof MarketingRouteWithChildren
   '/dashboard': typeof DashboardRoute
+  '/super-admin': typeof SuperAdminRouteWithChildren
   '/_marketing/about': typeof MarketingAboutRoute
   '/_marketing/apply': typeof MarketingApplyRoute
   '/_marketing/contact': typeof MarketingContactRoute
@@ -409,8 +442,11 @@ export interface FileRoutesById {
   '/auth/redirect': typeof AuthRedirectRoute
   '/auth/signin': typeof AuthSigninRoute
   '/auth/signin-or-signup': typeof AuthSigninOrSignupRoute
+  '/console/admin': typeof ConsoleAdminRouteWithChildren
   '/console/create-organization': typeof ConsoleCreateOrganizationRoute
+  '/console/join-invitation': typeof ConsoleJoinInvitationRoute
   '/console/processing': typeof ConsoleProcessingRoute
+  '/console/staff': typeof ConsoleStaffRouteWithChildren
   '/console/welcome': typeof ConsoleWelcomeRoute
   '/super-admin/add-tenant': typeof SuperAdminAddTenantRoute
   '/super-admin/dashboard': typeof SuperAdminDashboardRoute
@@ -447,6 +483,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/dashboard'
+    | '/super-admin'
     | '/about'
     | '/apply'
     | '/contact'
@@ -458,8 +495,11 @@ export interface FileRouteTypes {
     | '/auth/redirect'
     | '/auth/signin'
     | '/auth/signin-or-signup'
+    | '/console/admin'
     | '/console/create-organization'
+    | '/console/join-invitation'
     | '/console/processing'
+    | '/console/staff'
     | '/console/welcome'
     | '/super-admin/add-tenant'
     | '/super-admin/dashboard'
@@ -494,6 +534,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/dashboard'
+    | '/super-admin'
     | '/about'
     | '/apply'
     | '/contact'
@@ -505,8 +546,11 @@ export interface FileRouteTypes {
     | '/auth/redirect'
     | '/auth/signin'
     | '/auth/signin-or-signup'
+    | '/console/admin'
     | '/console/create-organization'
+    | '/console/join-invitation'
     | '/console/processing'
+    | '/console/staff'
     | '/console/welcome'
     | '/super-admin/add-tenant'
     | '/super-admin/dashboard'
@@ -541,6 +585,7 @@ export interface FileRouteTypes {
     | '/'
     | '/_marketing'
     | '/dashboard'
+    | '/super-admin'
     | '/_marketing/about'
     | '/_marketing/apply'
     | '/_marketing/contact'
@@ -552,8 +597,11 @@ export interface FileRouteTypes {
     | '/auth/redirect'
     | '/auth/signin'
     | '/auth/signin-or-signup'
+    | '/console/admin'
     | '/console/create-organization'
+    | '/console/join-invitation'
     | '/console/processing'
+    | '/console/staff'
     | '/console/welcome'
     | '/super-admin/add-tenant'
     | '/super-admin/dashboard'
@@ -590,43 +638,30 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   MarketingRoute: typeof MarketingRouteWithChildren
   DashboardRoute: typeof DashboardRoute
+  SuperAdminRoute: typeof SuperAdminRouteWithChildren
   AuthCheckEmailRoute: typeof AuthCheckEmailRoute
   AuthCreatePasswordRoute: typeof AuthCreatePasswordRoute
   AuthRedirectRoute: typeof AuthRedirectRoute
   AuthSigninRoute: typeof AuthSigninRoute
   AuthSigninOrSignupRoute: typeof AuthSigninOrSignupRoute
+  ConsoleAdminRoute: typeof ConsoleAdminRouteWithChildren
   ConsoleCreateOrganizationRoute: typeof ConsoleCreateOrganizationRoute
+  ConsoleJoinInvitationRoute: typeof ConsoleJoinInvitationRoute
   ConsoleProcessingRoute: typeof ConsoleProcessingRoute
+  ConsoleStaffRoute: typeof ConsoleStaffRouteWithChildren
   ConsoleWelcomeRoute: typeof ConsoleWelcomeRoute
-  SuperAdminAddTenantRoute: typeof SuperAdminAddTenantRoute
-  SuperAdminDashboardRoute: typeof SuperAdminDashboardRoute
-  SuperAdminOrganizationRoute: typeof SuperAdminOrganizationRouteWithChildren
-  SuperAdminRevenueRoute: typeof SuperAdminRevenueRoute
-  SuperAdminServicePackagesRoute: typeof SuperAdminServicePackagesRoute
-  SuperAdminUsersRoute: typeof SuperAdminUsersRoute
   ConsoleAccountSecurityRoute: typeof ConsoleAccountSecurityRoute
-  ConsoleAdminBranchRoute: typeof ConsoleAdminBranchRoute
-  ConsoleAdminDashboardRoute: typeof ConsoleAdminDashboardRoute
-  ConsoleAdminEditAccountRoute: typeof ConsoleAdminEditAccountRoute
-  ConsoleAdminEmployeeRoute: typeof ConsoleAdminEmployeeRoute
-  ConsoleAdminInviteEmployeeRoute: typeof ConsoleAdminInviteEmployeeRoute
-  ConsoleAdminPlanRoute: typeof ConsoleAdminPlanRoute
-  ConsoleAdminSettingRoute: typeof ConsoleAdminSettingRouteWithChildren
-  ConsoleStaffChatRoute: typeof ConsoleStaffChatRoute
-  ConsoleStaffFeedRoute: typeof ConsoleStaffFeedRoute
-  ConsoleStaffInventoryRoute: typeof ConsoleStaffInventoryRoute
-  ConsoleStaffInventoryAddItemRoute: typeof ConsoleStaffInventoryAddItemRoute
-  ConsoleStaffInventorySearchRoute: typeof ConsoleStaffInventorySearchRoute
-  ConsoleStaffNotificationRoute: typeof ConsoleStaffNotificationRoute
-  SuperAdminEditTenantTenantIdRoute: typeof SuperAdminEditTenantTenantIdRoute
-  ConsoleAdminEditBranchBranchIdRoute: typeof ConsoleAdminEditBranchBranchIdRoute
-  ConsoleAdminEditEmployeeEmployeeIdRoute: typeof ConsoleAdminEditEmployeeEmployeeIdRoute
-  ConsoleStaffItemEditItemIdRoute: typeof ConsoleStaffItemEditItemIdRoute
-  ConsoleStaffItemItemIdRoute: typeof ConsoleStaffItemItemIdRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/super-admin': {
+      id: '/super-admin'
+      path: '/super-admin'
+      fullPath: '/super-admin'
+      preLoaderRoute: typeof SuperAdminRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/dashboard': {
       id: '/dashboard'
       path: '/dashboard'
@@ -650,51 +685,58 @@ declare module '@tanstack/react-router' {
     }
     '/super-admin/users': {
       id: '/super-admin/users'
-      path: '/super-admin/users'
+      path: '/users'
       fullPath: '/super-admin/users'
       preLoaderRoute: typeof SuperAdminUsersRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof SuperAdminRoute
     }
     '/super-admin/service-packages': {
       id: '/super-admin/service-packages'
-      path: '/super-admin/service-packages'
+      path: '/service-packages'
       fullPath: '/super-admin/service-packages'
       preLoaderRoute: typeof SuperAdminServicePackagesRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof SuperAdminRoute
     }
     '/super-admin/revenue': {
       id: '/super-admin/revenue'
-      path: '/super-admin/revenue'
+      path: '/revenue'
       fullPath: '/super-admin/revenue'
       preLoaderRoute: typeof SuperAdminRevenueRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof SuperAdminRoute
     }
     '/super-admin/organization': {
       id: '/super-admin/organization'
-      path: '/super-admin/organization'
+      path: '/organization'
       fullPath: '/super-admin/organization'
       preLoaderRoute: typeof SuperAdminOrganizationRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof SuperAdminRoute
     }
     '/super-admin/dashboard': {
       id: '/super-admin/dashboard'
-      path: '/super-admin/dashboard'
+      path: '/dashboard'
       fullPath: '/super-admin/dashboard'
       preLoaderRoute: typeof SuperAdminDashboardRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof SuperAdminRoute
     }
     '/super-admin/add-tenant': {
       id: '/super-admin/add-tenant'
-      path: '/super-admin/add-tenant'
+      path: '/add-tenant'
       fullPath: '/super-admin/add-tenant'
       preLoaderRoute: typeof SuperAdminAddTenantRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof SuperAdminRoute
     }
     '/console/welcome': {
       id: '/console/welcome'
       path: '/console/welcome'
       fullPath: '/console/welcome'
       preLoaderRoute: typeof ConsoleWelcomeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/console/staff': {
+      id: '/console/staff'
+      path: '/console/staff'
+      fullPath: '/console/staff'
+      preLoaderRoute: typeof ConsoleStaffRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/console/processing': {
@@ -704,11 +746,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ConsoleProcessingRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/console/join-invitation': {
+      id: '/console/join-invitation'
+      path: '/console/join-invitation'
+      fullPath: '/console/join-invitation'
+      preLoaderRoute: typeof ConsoleJoinInvitationRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/console/create-organization': {
       id: '/console/create-organization'
       path: '/console/create-organization'
       fullPath: '/console/create-organization'
       preLoaderRoute: typeof ConsoleCreateOrganizationRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/console/admin': {
+      id: '/console/admin'
+      path: '/console/admin'
+      fullPath: '/console/admin'
+      preLoaderRoute: typeof ConsoleAdminRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/auth/signin-or-signup': {
@@ -797,101 +853,101 @@ declare module '@tanstack/react-router' {
     }
     '/super-admin/edit-tenant/$tenantId': {
       id: '/super-admin/edit-tenant/$tenantId'
-      path: '/super-admin/edit-tenant/$tenantId'
+      path: '/edit-tenant/$tenantId'
       fullPath: '/super-admin/edit-tenant/$tenantId'
       preLoaderRoute: typeof SuperAdminEditTenantTenantIdRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof SuperAdminRoute
     }
     '/console/staff/notification': {
       id: '/console/staff/notification'
-      path: '/console/staff/notification'
+      path: '/notification'
       fullPath: '/console/staff/notification'
       preLoaderRoute: typeof ConsoleStaffNotificationRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof ConsoleStaffRoute
     }
     '/console/staff/inventory-search': {
       id: '/console/staff/inventory-search'
-      path: '/console/staff/inventory-search'
+      path: '/inventory-search'
       fullPath: '/console/staff/inventory-search'
       preLoaderRoute: typeof ConsoleStaffInventorySearchRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof ConsoleStaffRoute
     }
     '/console/staff/inventory-add-item': {
       id: '/console/staff/inventory-add-item'
-      path: '/console/staff/inventory-add-item'
+      path: '/inventory-add-item'
       fullPath: '/console/staff/inventory-add-item'
       preLoaderRoute: typeof ConsoleStaffInventoryAddItemRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof ConsoleStaffRoute
     }
     '/console/staff/inventory': {
       id: '/console/staff/inventory'
-      path: '/console/staff/inventory'
+      path: '/inventory'
       fullPath: '/console/staff/inventory'
       preLoaderRoute: typeof ConsoleStaffInventoryRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof ConsoleStaffRoute
     }
     '/console/staff/feed': {
       id: '/console/staff/feed'
-      path: '/console/staff/feed'
+      path: '/feed'
       fullPath: '/console/staff/feed'
       preLoaderRoute: typeof ConsoleStaffFeedRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof ConsoleStaffRoute
     }
     '/console/staff/chat': {
       id: '/console/staff/chat'
-      path: '/console/staff/chat'
+      path: '/chat'
       fullPath: '/console/staff/chat'
       preLoaderRoute: typeof ConsoleStaffChatRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof ConsoleStaffRoute
     }
     '/console/admin/setting': {
       id: '/console/admin/setting'
-      path: '/console/admin/setting'
+      path: '/setting'
       fullPath: '/console/admin/setting'
       preLoaderRoute: typeof ConsoleAdminSettingRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof ConsoleAdminRoute
     }
     '/console/admin/plan': {
       id: '/console/admin/plan'
-      path: '/console/admin/plan'
+      path: '/plan'
       fullPath: '/console/admin/plan'
       preLoaderRoute: typeof ConsoleAdminPlanRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof ConsoleAdminRoute
     }
     '/console/admin/invite-employee': {
       id: '/console/admin/invite-employee'
-      path: '/console/admin/invite-employee'
+      path: '/invite-employee'
       fullPath: '/console/admin/invite-employee'
       preLoaderRoute: typeof ConsoleAdminInviteEmployeeRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof ConsoleAdminRoute
     }
     '/console/admin/employee': {
       id: '/console/admin/employee'
-      path: '/console/admin/employee'
+      path: '/employee'
       fullPath: '/console/admin/employee'
       preLoaderRoute: typeof ConsoleAdminEmployeeRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof ConsoleAdminRoute
     }
     '/console/admin/edit-account': {
       id: '/console/admin/edit-account'
-      path: '/console/admin/edit-account'
+      path: '/edit-account'
       fullPath: '/console/admin/edit-account'
       preLoaderRoute: typeof ConsoleAdminEditAccountRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof ConsoleAdminRoute
     }
     '/console/admin/dashboard': {
       id: '/console/admin/dashboard'
-      path: '/console/admin/dashboard'
+      path: '/dashboard'
       fullPath: '/console/admin/dashboard'
       preLoaderRoute: typeof ConsoleAdminDashboardRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof ConsoleAdminRoute
     }
     '/console/admin/branch': {
       id: '/console/admin/branch'
-      path: '/console/admin/branch'
+      path: '/branch'
       fullPath: '/console/admin/branch'
       preLoaderRoute: typeof ConsoleAdminBranchRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof ConsoleAdminRoute
     }
     '/console/account/security': {
       id: '/console/account/security'
@@ -909,17 +965,17 @@ declare module '@tanstack/react-router' {
     }
     '/console/staff/item/$itemId': {
       id: '/console/staff/item/$itemId'
-      path: '/console/staff/item/$itemId'
+      path: '/item/$itemId'
       fullPath: '/console/staff/item/$itemId'
       preLoaderRoute: typeof ConsoleStaffItemItemIdRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof ConsoleStaffRoute
     }
     '/console/staff/item-edit/$itemId': {
       id: '/console/staff/item-edit/$itemId'
-      path: '/console/staff/item-edit/$itemId'
+      path: '/item-edit/$itemId'
       fullPath: '/console/staff/item-edit/$itemId'
       preLoaderRoute: typeof ConsoleStaffItemEditItemIdRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof ConsoleStaffRoute
     }
     '/console/admin/setting/organization': {
       id: '/console/admin/setting/organization'
@@ -930,17 +986,17 @@ declare module '@tanstack/react-router' {
     }
     '/console/admin/edit-employee/$employeeId': {
       id: '/console/admin/edit-employee/$employeeId'
-      path: '/console/admin/edit-employee/$employeeId'
+      path: '/edit-employee/$employeeId'
       fullPath: '/console/admin/edit-employee/$employeeId'
       preLoaderRoute: typeof ConsoleAdminEditEmployeeEmployeeIdRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof ConsoleAdminRoute
     }
     '/console/admin/edit-branch/$branchId': {
       id: '/console/admin/edit-branch/$branchId'
-      path: '/console/admin/edit-branch/$branchId'
+      path: '/edit-branch/$branchId'
       fullPath: '/console/admin/edit-branch/$branchId'
       preLoaderRoute: typeof ConsoleAdminEditBranchBranchIdRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof ConsoleAdminRoute
     }
     '/console/admin/setting/organization/edit': {
       id: '/console/admin/setting/organization/edit'
@@ -988,6 +1044,30 @@ const SuperAdminOrganizationRouteWithChildren =
     SuperAdminOrganizationRouteChildren,
   )
 
+interface SuperAdminRouteChildren {
+  SuperAdminAddTenantRoute: typeof SuperAdminAddTenantRoute
+  SuperAdminDashboardRoute: typeof SuperAdminDashboardRoute
+  SuperAdminOrganizationRoute: typeof SuperAdminOrganizationRouteWithChildren
+  SuperAdminRevenueRoute: typeof SuperAdminRevenueRoute
+  SuperAdminServicePackagesRoute: typeof SuperAdminServicePackagesRoute
+  SuperAdminUsersRoute: typeof SuperAdminUsersRoute
+  SuperAdminEditTenantTenantIdRoute: typeof SuperAdminEditTenantTenantIdRoute
+}
+
+const SuperAdminRouteChildren: SuperAdminRouteChildren = {
+  SuperAdminAddTenantRoute: SuperAdminAddTenantRoute,
+  SuperAdminDashboardRoute: SuperAdminDashboardRoute,
+  SuperAdminOrganizationRoute: SuperAdminOrganizationRouteWithChildren,
+  SuperAdminRevenueRoute: SuperAdminRevenueRoute,
+  SuperAdminServicePackagesRoute: SuperAdminServicePackagesRoute,
+  SuperAdminUsersRoute: SuperAdminUsersRoute,
+  SuperAdminEditTenantTenantIdRoute: SuperAdminEditTenantTenantIdRoute,
+}
+
+const SuperAdminRouteWithChildren = SuperAdminRoute._addFileChildren(
+  SuperAdminRouteChildren,
+)
+
 interface ConsoleAdminSettingOrganizationRouteChildren {
   ConsoleAdminSettingOrganizationEditRoute: typeof ConsoleAdminSettingOrganizationEditRoute
 }
@@ -1017,25 +1097,19 @@ const ConsoleAdminSettingRouteChildren: ConsoleAdminSettingRouteChildren = {
 const ConsoleAdminSettingRouteWithChildren =
   ConsoleAdminSettingRoute._addFileChildren(ConsoleAdminSettingRouteChildren)
 
-const rootRouteChildren: RootRouteChildren = {
-  IndexRoute: IndexRoute,
-  MarketingRoute: MarketingRouteWithChildren,
-  DashboardRoute: DashboardRoute,
-  AuthCheckEmailRoute: AuthCheckEmailRoute,
-  AuthCreatePasswordRoute: AuthCreatePasswordRoute,
-  AuthRedirectRoute: AuthRedirectRoute,
-  AuthSigninRoute: AuthSigninRoute,
-  AuthSigninOrSignupRoute: AuthSigninOrSignupRoute,
-  ConsoleCreateOrganizationRoute: ConsoleCreateOrganizationRoute,
-  ConsoleProcessingRoute: ConsoleProcessingRoute,
-  ConsoleWelcomeRoute: ConsoleWelcomeRoute,
-  SuperAdminAddTenantRoute: SuperAdminAddTenantRoute,
-  SuperAdminDashboardRoute: SuperAdminDashboardRoute,
-  SuperAdminOrganizationRoute: SuperAdminOrganizationRouteWithChildren,
-  SuperAdminRevenueRoute: SuperAdminRevenueRoute,
-  SuperAdminServicePackagesRoute: SuperAdminServicePackagesRoute,
-  SuperAdminUsersRoute: SuperAdminUsersRoute,
-  ConsoleAccountSecurityRoute: ConsoleAccountSecurityRoute,
+interface ConsoleAdminRouteChildren {
+  ConsoleAdminBranchRoute: typeof ConsoleAdminBranchRoute
+  ConsoleAdminDashboardRoute: typeof ConsoleAdminDashboardRoute
+  ConsoleAdminEditAccountRoute: typeof ConsoleAdminEditAccountRoute
+  ConsoleAdminEmployeeRoute: typeof ConsoleAdminEmployeeRoute
+  ConsoleAdminInviteEmployeeRoute: typeof ConsoleAdminInviteEmployeeRoute
+  ConsoleAdminPlanRoute: typeof ConsoleAdminPlanRoute
+  ConsoleAdminSettingRoute: typeof ConsoleAdminSettingRouteWithChildren
+  ConsoleAdminEditBranchBranchIdRoute: typeof ConsoleAdminEditBranchBranchIdRoute
+  ConsoleAdminEditEmployeeEmployeeIdRoute: typeof ConsoleAdminEditEmployeeEmployeeIdRoute
+}
+
+const ConsoleAdminRouteChildren: ConsoleAdminRouteChildren = {
   ConsoleAdminBranchRoute: ConsoleAdminBranchRoute,
   ConsoleAdminDashboardRoute: ConsoleAdminDashboardRoute,
   ConsoleAdminEditAccountRoute: ConsoleAdminEditAccountRoute,
@@ -1043,18 +1117,58 @@ const rootRouteChildren: RootRouteChildren = {
   ConsoleAdminInviteEmployeeRoute: ConsoleAdminInviteEmployeeRoute,
   ConsoleAdminPlanRoute: ConsoleAdminPlanRoute,
   ConsoleAdminSettingRoute: ConsoleAdminSettingRouteWithChildren,
+  ConsoleAdminEditBranchBranchIdRoute: ConsoleAdminEditBranchBranchIdRoute,
+  ConsoleAdminEditEmployeeEmployeeIdRoute:
+    ConsoleAdminEditEmployeeEmployeeIdRoute,
+}
+
+const ConsoleAdminRouteWithChildren = ConsoleAdminRoute._addFileChildren(
+  ConsoleAdminRouteChildren,
+)
+
+interface ConsoleStaffRouteChildren {
+  ConsoleStaffChatRoute: typeof ConsoleStaffChatRoute
+  ConsoleStaffFeedRoute: typeof ConsoleStaffFeedRoute
+  ConsoleStaffInventoryRoute: typeof ConsoleStaffInventoryRoute
+  ConsoleStaffInventoryAddItemRoute: typeof ConsoleStaffInventoryAddItemRoute
+  ConsoleStaffInventorySearchRoute: typeof ConsoleStaffInventorySearchRoute
+  ConsoleStaffNotificationRoute: typeof ConsoleStaffNotificationRoute
+  ConsoleStaffItemEditItemIdRoute: typeof ConsoleStaffItemEditItemIdRoute
+  ConsoleStaffItemItemIdRoute: typeof ConsoleStaffItemItemIdRoute
+}
+
+const ConsoleStaffRouteChildren: ConsoleStaffRouteChildren = {
   ConsoleStaffChatRoute: ConsoleStaffChatRoute,
   ConsoleStaffFeedRoute: ConsoleStaffFeedRoute,
   ConsoleStaffInventoryRoute: ConsoleStaffInventoryRoute,
   ConsoleStaffInventoryAddItemRoute: ConsoleStaffInventoryAddItemRoute,
   ConsoleStaffInventorySearchRoute: ConsoleStaffInventorySearchRoute,
   ConsoleStaffNotificationRoute: ConsoleStaffNotificationRoute,
-  SuperAdminEditTenantTenantIdRoute: SuperAdminEditTenantTenantIdRoute,
-  ConsoleAdminEditBranchBranchIdRoute: ConsoleAdminEditBranchBranchIdRoute,
-  ConsoleAdminEditEmployeeEmployeeIdRoute:
-    ConsoleAdminEditEmployeeEmployeeIdRoute,
   ConsoleStaffItemEditItemIdRoute: ConsoleStaffItemEditItemIdRoute,
   ConsoleStaffItemItemIdRoute: ConsoleStaffItemItemIdRoute,
+}
+
+const ConsoleStaffRouteWithChildren = ConsoleStaffRoute._addFileChildren(
+  ConsoleStaffRouteChildren,
+)
+
+const rootRouteChildren: RootRouteChildren = {
+  IndexRoute: IndexRoute,
+  MarketingRoute: MarketingRouteWithChildren,
+  DashboardRoute: DashboardRoute,
+  SuperAdminRoute: SuperAdminRouteWithChildren,
+  AuthCheckEmailRoute: AuthCheckEmailRoute,
+  AuthCreatePasswordRoute: AuthCreatePasswordRoute,
+  AuthRedirectRoute: AuthRedirectRoute,
+  AuthSigninRoute: AuthSigninRoute,
+  AuthSigninOrSignupRoute: AuthSigninOrSignupRoute,
+  ConsoleAdminRoute: ConsoleAdminRouteWithChildren,
+  ConsoleCreateOrganizationRoute: ConsoleCreateOrganizationRoute,
+  ConsoleJoinInvitationRoute: ConsoleJoinInvitationRoute,
+  ConsoleProcessingRoute: ConsoleProcessingRoute,
+  ConsoleStaffRoute: ConsoleStaffRouteWithChildren,
+  ConsoleWelcomeRoute: ConsoleWelcomeRoute,
+  ConsoleAccountSecurityRoute: ConsoleAccountSecurityRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

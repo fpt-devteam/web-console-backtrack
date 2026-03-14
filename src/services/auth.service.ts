@@ -11,6 +11,7 @@ import {
   type User as FirebaseUser,
 } from 'firebase/auth';
 import { UserGlobalRole } from '@/types/user.types';
+import { userService } from './user.service';
 
 function createAuthError(error: any): AuthError {
   const code = error?.code || 'unknown';
@@ -127,9 +128,22 @@ class RealAuthService implements IAuthService {
     return new Promise((resolve, reject) => {
       const unsubscribe = onAuthStateChanged(
         auth,
-        (firebaseUser) => {
+        async (firebaseUser) => {
           unsubscribe();
-          resolve(firebaseUser ? firebaseUserToAuthUser(firebaseUser) : null);
+          if (!firebaseUser) {
+            resolve(null);
+            return;
+          }
+
+          const baseUser = firebaseUserToAuthUser(firebaseUser);
+
+          try {
+            const profile = await userService.getMe();
+            resolve({ ...baseUser, globalRole: profile.globalRole });
+          } catch {
+            // Fallback: if BE is unreachable or token invalid, keep USER.
+            resolve(baseUser);
+          }
         },
         (error) => {
           unsubscribe();

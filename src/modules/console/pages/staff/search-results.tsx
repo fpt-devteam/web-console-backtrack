@@ -1,120 +1,63 @@
 import { StaffLayout } from '../../components/staff/layout'
-import {
-  Calendar,
-  MapPin,
-  Package,
-  ChevronRight,
-} from 'lucide-react'
-import { useState } from 'react'
-import {
-  mockInventoryItems,
-  locations,
-  categories,
-  type ItemStatus,
-} from '@/mock/data/mock-inventory'
+import { MapPin, Clock, ChevronRight } from 'lucide-react'
+import { useMemo } from 'react'
 import { Link, useNavigate, useSearch } from '@tanstack/react-router'
 import { Pagination } from '@/components/ui/pagination'
-import { SearchFilter, Filter } from '@/components/filters'
+import { usePosts } from '@/hooks/use-post'
+import type { PostTypeFilter } from '@/types/post.types'
+import type { Post } from '@/types/post.types'
+import { Spinner } from '@/components/ui/spinner'
 
 export interface SearchResultsSearch {
   q?: string
-  category?: string
-  location?: string
-  date?: string
+  postType?: PostTypeFilter
   page?: number
 }
+
+const pageSize = 10
 
 export function SearchResultsPage() {
   const navigate = useNavigate()
   const searchParams = useSearch({ strict: false }) as SearchResultsSearch
-  const [searchTerm, setSearchTerm] = useState(searchParams?.q || '')
-  const [selectedCategory, setSelectedCategory] = useState(searchParams?.category || 'All')
-  const [selectedLocation, setSelectedLocation] = useState(searchParams?.location || 'All')
-  const [selectedDate, setSelectedDate] = useState(searchParams?.date || 'Last 30 Days')
-  const [currentPage, setCurrentPage] = useState(searchParams?.page || 1)
-  const itemsPerPage = 10
-  const totalItems = 42
+  const searchTerm = searchParams?.q ?? ''
+  const postType = (searchParams?.postType as PostTypeFilter) ?? 'All'
+  const currentPage = searchParams?.page ?? 1
 
-  // Mock search results with match percentages
-  const searchResults = [
-    {
-      ...mockInventoryItems[0],
-      matchPercentage: 92,
-      matchDescription: 'High visual similarity detected',
-      foundLocation: 'Found in Main Lobby, near Elevator B',
-      storageLocation: 'Lobby Storage Box #4',
-    },
-    {
-      ...mockInventoryItems[1],
-      matchPercentage: 78,
-      matchDescription: 'Color matches, shape varies',
-      foundLocation: 'Found in East Wing, Corridor 2',
-      storageLocation: 'Lost & Found Central',
-    },
-    {
-      ...mockInventoryItems[2],
-      matchPercentage: 45,
-      matchDescription: 'Keywords match, visual mismatch',
-      foundLocation: 'Found in Gym Locker Room',
-      storageLocation: 'Front Desk',
-    },
-  ]
+  const { data, isLoading, isError } = usePosts({
+    searchTerm,
+    postType,
+    page: currentPage,
+    pageSize,
+  })
 
-  const getStatusColor = (status: ItemStatus) => {
-    switch (status) {
-      case 'New':
-        return 'bg-blue-500 text-white'
-      case 'Storage':
-        return 'bg-yellow-500 text-white'
-      case 'Claimed':
-        return 'bg-green-500 text-white'
-      case 'Disposed':
-        return 'bg-gray-500 text-white'
+  const items = data?.items ?? []
+  const totalCount = data?.totalCount ?? 0
+  const totalPages = Math.max(1, Math.ceil(totalCount / pageSize))
+
+  const formatPosted = useMemo(() => {
+    return (iso: string) => {
+      try {
+        const d = new Date(iso)
+        return d.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })
+      } catch {
+        return iso
+      }
+    }
+  }, [])
+
+  const typeBadgeClass = (t: string) => {
+    switch (t) {
+      case 'Found':
+        return 'bg-green-600 text-white'
+      case 'Lost':
+        return 'bg-amber-500 text-white'
       default:
-        return 'bg-gray-500 text-white'
+        return 'bg-gray-600 text-white'
     }
   }
 
-  const getCategoryColor = (category: string) => {
-    switch (category) {
-      case 'Electronics':
-        return 'text-blue-600 bg-blue-50'
-      case 'Clothing':
-        return 'text-purple-600 bg-purple-50'
-      case 'Personal Items':
-        return 'text-green-600 bg-green-50'
-      case 'Food & Drink':
-        return 'text-yellow-600 bg-yellow-50'
-      default:
-        return 'text-gray-600 bg-gray-50'
-    }
-  }
-
-  const handleSearch = () => {
-    navigate({
-      to: '/console/staff/inventory-search',
-      search: {
-        q: searchTerm,
-        category: selectedCategory !== 'All' ? selectedCategory : undefined,
-        location: selectedLocation !== 'All' ? selectedLocation : undefined,
-        date: selectedDate,
-      },
-    })
-  }
-
-  const clearSearch = () => {
-    setSearchTerm('')
-    navigate({
-      to: '/console/staff/inventory-search',
-      search: {
-        q: '',
-      },
-    })
-  }
-
-  const filteredCategories = categories.filter((cat) => cat !== 'All')
-  const filteredLocations = locations.filter((loc) => loc !== 'All')
-  const dateOptions = ['Last 7 Days', 'Last 30 Days', 'Last 90 Days', 'All Time']
+  const postWithScore = (p: Post): p is Post & { similarityScore?: number } =>
+    'similarityScore' in p && typeof (p as Post & { similarityScore?: number }).similarityScore === 'number'
 
   return (
     <StaffLayout>
@@ -122,177 +65,129 @@ export function SearchResultsPage() {
         <div className="max-w-6xl mx-auto">
           {/* Breadcrumb */}
           <div className="mb-6 flex items-center gap-2 text-sm text-gray-600">
-            <Link
-              to="/console/staff/inventory"
-              className="hover:text-gray-900 transition-colors"
-            >
+            <Link to="/console/staff/inventory" className="hover:text-gray-900 transition-colors">
               Dashboard
             </Link>
             <ChevronRight className="w-4 h-4" />
-            <Link
-              to="/console/staff/inventory"
-              className="hover:text-gray-900 transition-colors"
-            >
+            <Link to="/console/staff/inventory" className="hover:text-gray-900 transition-colors">
               Inventory
             </Link>
             <ChevronRight className="w-4 h-4" />
             <span className="text-gray-900 font-medium">Search Results</span>
           </div>
 
-          {/* Header */}
           <div className="mb-6">
             <h1 className="text-3xl font-bold text-gray-900">Search Results</h1>
+            {searchTerm && (
+              <p className="text-gray-600 mt-1">
+                Kết quả tìm kiếm theo &quot;{searchTerm}&quot; (semantic search)
+              </p>
+            )}
           </div>
 
-          {/* Search and Filters */}
-          <div className="bg-white rounded-xl shadow-sm p-6 mb-6">
-            {/* Search Bar */}
-            <div className="flex items-center gap-4 mb-4">
-              <SearchFilter
-                value={searchTerm}
-                onChange={setSearchTerm}
-                onSearch={handleSearch}
-                onClear={clearSearch}
-                placeholder="Search by ID or name..."
-                showClearButton={true}
-              />
+          {isError && (
+            <div className="text-center py-12">
+              <p className="text-gray-500 text-lg">Không tải được kết quả tìm kiếm.</p>
             </div>
+          )}
 
-            {/* Filters */}
-            <div className="flex items-center gap-4 flex-wrap">
-              <Filter
-                type="select"
-                value={selectedCategory}
-                onChange={setSelectedCategory}
-                options={filteredCategories.map((c) => ({ value: c, label: c }))}
-                label="Category"
-              />
-
-              <Filter
-                type="select"
-                value={selectedLocation}
-                onChange={setSelectedLocation}
-                options={filteredLocations.map((l) => ({ value: l, label: l }))}
-                label="Location"
-              />
-
-              <Filter
-                type="select"
-                value={selectedDate}
-                onChange={setSelectedDate}
-                options={dateOptions.map((d) => ({ value: d, label: d }))}
-                label="Date"
-              />
-
-              <button className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-all font-medium">
-                Advanced Filters
-              </button>
-
-              <div className="ml-auto">
-                <select className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
-                  <option>Sort by: Relevance (Score)</option>
-                  <option>Sort by: Date (Newest)</option>
-                  <option>Sort by: Date (Oldest)</option>
-                  <option>Sort by: Match % (High to Low)</option>
-                </select>
+          {!isError && (
+            <>
+              <div className="mb-4 text-sm text-gray-600">
+                {totalCount > 0
+                  ? `Showing ${(currentPage - 1) * pageSize + 1}-${Math.min(currentPage * pageSize, totalCount)} of ${totalCount} results`
+                  : searchTerm
+                    ? 'No posts match your search.'
+                    : 'Enter a search term to find posts.'}
               </div>
-            </div>
 
-            {/* Results Count */}
-            <div className="mt-4 text-sm text-gray-600">
-              Showing {Math.min((currentPage - 1) * itemsPerPage + 1, totalItems)}-
-              {Math.min(currentPage * itemsPerPage, totalItems)} of {totalItems} results
-            </div>
-          </div>
-
-          {/* Search Results List */}
-          <div className="space-y-4 mb-6">
-            {searchResults.map((item: any) => (
-              <div
-                key={item.id}
-                className="bg-white rounded-xl shadow-sm p-6 hover:shadow-md transition-shadow"
-              >
-                <div className="flex gap-6">
-                  {/* Image */}
-                  <div className="w-32 h-32 rounded-lg overflow-hidden flex-shrink-0">
-                    <img
-                      src={item.image}
-                      alt={item.title}
-                      className="w-full h-full object-cover"
-                    />
-                  </div>
-
-                  {/* Content */}
-                  <div className="flex-1">
-                    <div className="flex items-start justify-between mb-2">
-                      <div>
-                        <div className="flex items-center gap-2 mb-2">
-                          <span
-                            className={`inline-block px-2 py-1 rounded text-xs font-medium ${getCategoryColor(item.category)}`}
-                          >
-                            {item.category.toUpperCase()}
-                          </span>
-                          <span
-                            className={`px-3 py-1 rounded-full text-xs font-semibold ${getStatusColor(item.status)}`}
-                          >
-                            {item.status}
-                          </span>
-                        </div>
-                        <h3 className="text-xl font-semibold text-gray-900 mb-1">
-                          {item.title}
-                        </h3>
-                      </div>
-                      <div className="text-right">
-                        <div className="text-2xl font-bold text-blue-600">
-                          {item.matchPercentage}%
-                        </div>
-                        <div className="text-xs text-gray-500">Match</div>
-                      </div>
-                    </div>
-
-                    <p className="text-sm text-gray-600 mb-3">
-                      {item.matchDescription}
-                    </p>
-
-                    <div className="space-y-2 text-sm text-gray-600 mb-4">
-                      <div className="flex items-center gap-2">
-                        <MapPin className="w-4 h-4" />
-                        <span>{item.foundLocation || item.location}</span>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <Calendar className="w-4 h-4" />
-                        <span>
-                          {item.date}, {item.time}
-                        </span>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <Package className="w-4 h-4" />
-                        <span>{item.storageLocation || item.bin || `Item #${item.id}`}</span>
-                      </div>
-                    </div>
-
-                    <Link to="/console/staff/item/$itemId" params={{ itemId: item.id }}>
-                      <button className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-all font-medium text-sm">
-                        View Details
-                      </button>
-                    </Link>
-                  </div>
+              {isLoading ? (
+                <div className="py-12">
+                  <Spinner className="mx-auto" />
                 </div>
-              </div>
-            ))}
-          </div>
+              ) : (
+                <div className="space-y-4 mb-6">
+                  {items.map((post) => (
+                    <div
+                      key={post.id}
+                      className="bg-white rounded-xl shadow-sm p-6 hover:shadow-md transition-shadow flex gap-6"
+                    >
+                      <div className="w-32 h-32 rounded-lg overflow-hidden flex-shrink-0 bg-gray-100">
+                        {post.imageUrls?.[0] ? (
+                          <img
+                            src={post.imageUrls[0]}
+                            alt={post.itemName}
+                            className="w-full h-full object-cover"
+                          />
+                        ) : (
+                          <div className="w-full h-full flex items-center justify-center text-gray-400 text-sm">
+                            No image
+                          </div>
+                        )}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-start justify-between gap-4 mb-2">
+                          <div className="flex items-center gap-2 flex-wrap">
+                            <span
+                              className={`inline-block px-2 py-1 rounded text-xs font-medium ${typeBadgeClass(post.postType)}`}
+                            >
+                              {post.postType}
+                            </span>
+                          </div>
+                          {postWithScore(post) && post.similarityScore != null && (
+                            <div className="text-right flex-shrink-0">
+                              <div className="text-xl font-bold text-blue-600">
+                                {Math.round(post.similarityScore * 100)}%
+                              </div>
+                              <div className="text-xs text-gray-500">Match</div>
+                            </div>
+                          )}
+                        </div>
+                        <h3 className="text-xl font-semibold text-gray-900 mb-1">{post.itemName}</h3>
+                        <p className="text-sm text-gray-600 mb-3 line-clamp-2">{post.description}</p>
+                        <div className="space-y-2 text-sm text-gray-600 mb-4">
+                          <div className="flex items-center gap-2">
+                            <MapPin className="w-4 h-4 flex-shrink-0" />
+                            <span>{post.displayAddress || 'Unknown location'}</span>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <Clock className="w-4 h-4 flex-shrink-0" />
+                            <span>Posted {formatPosted(post.createdAt)}</span>
+                          </div>
+                        </div>
+                        <Link to="/console/staff/item/$itemId" params={{ itemId: post.id }}>
+                          <button className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-all font-medium text-sm">
+                            View Details
+                          </button>
+                        </Link>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
 
-          {/* Pagination */}
-          <div className="mt-6">
-            <Pagination
-              currentPage={currentPage}
-              totalPages={Math.ceil(totalItems / itemsPerPage)}
-              onPageChange={setCurrentPage}
-            />
-          </div>
+              {totalPages > 1 && (
+                <div className="mt-6">
+                  <Pagination
+                    currentPage={currentPage}
+                    totalPages={totalPages}
+                    onPageChange={(page) => {
+                      navigate({
+                        to: '/console/staff/inventory-search',
+                        search: {
+                          q: searchTerm || undefined,
+                          postType: postType !== 'All' ? postType : undefined,
+                          page: page > 1 ? page : undefined,
+                        },
+                      })
+                    }}
+                  />
+                </div>
+              )}
+            </>
+          )}
         </div>
       </div>
     </StaffLayout>
   )
 }
-

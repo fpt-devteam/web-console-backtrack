@@ -4,7 +4,6 @@ import {
   Users, 
   DollarSign, 
   Package, 
-  Settings, 
   Shield, 
   FileText,
   ChevronLeft,
@@ -60,11 +59,6 @@ export function Sidebar({ isOpen, onToggle }: SidebarProps) {
       name: 'Service Package Management',
       icon: Package,
       path: '/super-admin/service-packages',
-    },
-    {
-      name: 'Setting',
-      icon: Settings,
-      path: '/super-admin/setting',
     },
   ];
 
