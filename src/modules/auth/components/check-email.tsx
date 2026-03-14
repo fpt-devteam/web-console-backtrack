@@ -2,7 +2,7 @@ import { Button } from '@/components/ui/button';
 import { Mail } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useRouter } from '@tanstack/react-router';
-import { getTempEmail, clearTempEmail } from '@/lib/auth-storage';
+import { getTempEmail } from '@/lib/auth-storage';
 import { showToast } from '@/lib/toast';
 import { authService } from '@/services';
 
@@ -56,11 +56,8 @@ export function CheckEmail() {
   };
 
   const handleContinue = async () => {
-    // Sign out before going to login
-    // await authService.signOut();
-    clearTempEmail();
     showToast.success('Please sign in with your verified account.');
-    router.navigate({ to: '/auth/signin-or-signup' });
+    router.navigate({ to: '/auth/signin' });
   };
 
   // Mask email for privacy
