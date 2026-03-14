@@ -5,24 +5,22 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select'
-import { Link } from '@tanstack/react-router'
-import { categories, locations } from '@/mock/data/mock-inventory'
+import { Link, useNavigate } from '@tanstack/react-router'
+import { useCreatePost } from '@/hooks/use-post'
+import { useCurrentOrgId } from '@/contexts/current-org.context'
+import { useOrganization } from '@/hooks/use-org'
 
 export function AddFoundItemPage() {
+  const navigate = useNavigate()
+  const { currentOrgId } = useCurrentOrgId()
+  const { data: org } = useOrganization(currentOrgId)
+  const createPost = useCreatePost()
   const [photos, setPhotos] = useState<string[]>([])
-  const [category, setCategory] = useState<string>('')
   const [itemName, setItemName] = useState<string>('')
   const [description, setDescription] = useState<string>('')
+  const [distinctiveMarks, setDistinctiveMarks] = useState<string>('')
   const [dateTime, setDateTime] = useState<string>('')
-  const [whereFound, setWhereFound] = useState<string>('')
-  const [location, setLocation] = useState<string>('')
+  const [submitError, setSubmitError] = useState<string | null>(null)
 
   const handlePhotoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files
@@ -62,32 +60,50 @@ export function AddFoundItemPage() {
     setPhotos(photos.filter((_, i) => i !== index))
   }
 
-  const handleSubmit = () => {
-    // Handle form submission
-    console.log({
-      photos,
-      category,
-      itemName,
-      description,
-      dateTime,
-      whereFound,
-      location,
+  const buildPayload = () => ({
+      postType: 'Found' as const,
+      itemName: itemName.trim(),
+      description: description.trim() || itemName.trim(),
+      distinctiveMarks: distinctiveMarks.trim() || undefined,
+      imageUrls: photos,
+      eventTime: dateTime ? new Date(dateTime).toISOString() : new Date().toISOString(),
+    })
+
+  const handleSubmit = (addAnother: boolean) => {
+    setSubmitError(null)
+    if (!itemName.trim()) {
+      setSubmitError('Item name is required.')
+      return
+    }
+    if (!description.trim()) {
+      setSubmitError('Description is required.')
+      return
+    }
+    if (!dateTime) {
+      setSubmitError('Date & time found is required.')
+      return
+    }
+    createPost.mutate(buildPayload(), {
+      onSuccess: () => {
+        if (addAnother) {
+          setItemName('')
+          setDescription('')
+          setDistinctiveMarks('')
+          setDateTime('')
+        } else {
+          navigate({ to: '/console/staff/feed' })
+        }
+      },
+      onError: (err) => {
+        setSubmitError(err instanceof Error ? err.message : 'Failed to create item.')
+      },
     })
   }
 
   const handleSaveAndAddAnother = () => {
-    handleSubmit()
-    // Reset form except photos
-    setCategory('')
-    setItemName('')
-    setDescription('')
-    setDateTime('')
-    setWhereFound('')
-    setLocation('')
+    handleSubmit(true)
   }
 
-  const filteredCategories = categories.filter((cat) => cat !== 'All')
-  const filteredLocations = locations.filter((loc) => loc !== 'All')
 
   return (
     <StaffLayout>
@@ -113,7 +129,18 @@ export function AddFoundItemPage() {
 
         {/* Form Container */}
         <div className="max-w-5xl mx-auto bg-white rounded-xl shadow-lg p-8">
-          <form className="space-y-8">
+          {submitError && (
+            <div className="mb-4 p-3 rounded-md bg-red-50 text-red-700 text-sm">
+              {submitError}
+            </div>
+          )}
+          <form
+            className="space-y-8"
+            onSubmit={(e) => {
+              e.preventDefault()
+              handleSubmit(false)
+            }}
+          >
             {/* Photos Section */}
             <div>
               <div className="flex items-center justify-between mb-4">
@@ -162,29 +189,10 @@ export function AddFoundItemPage() {
             <div className="space-y-6">
               <h2 className="text-base font-semibold text-gray-900">Item Details</h2>
 
-              {/* Category */}
-              <div>
-                <Label htmlFor="category" className="text-sm font-medium text-gray-700">
-                  Category <span className="text-red-500">*</span>
-                </Label>
-                <Select value={category} onValueChange={setCategory}>
-                  <SelectTrigger id="category" className="w-full mt-1">
-                    <SelectValue placeholder="Select category" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {filteredCategories.map((cat) => (
-                      <SelectItem key={cat} value={cat}>
-                        {cat}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-
-              {/* Item Name */}
+              {/* Item Name (BE required) */}
               <div>
                 <Label htmlFor="itemName" className="text-sm font-medium text-gray-700">
-                  Item Name <span className="text-red-500">*</span>
+                  Item name <span className="text-red-500">*</span>
                 </Label>
                 <Input
                   id="itemName"
@@ -196,10 +204,10 @@ export function AddFoundItemPage() {
                 />
               </div>
 
-              {/* Description */}
+              {/* Description (BE required) */}
               <div>
                 <Label htmlFor="description" className="text-sm font-medium text-gray-700">
-                  Description
+                  Description <span className="text-red-500">*</span>
                 </Label>
                 <Textarea
                   id="description"
@@ -209,12 +217,27 @@ export function AddFoundItemPage() {
                   className="mt-1 min-h-[120px]"
                 />
               </div>
+
+              {/* Distinctive marks (BE optional) */}
+              <div>
+                <Label htmlFor="distinctiveMarks" className="text-sm font-medium text-gray-700">
+                  Distinctive marks
+                </Label>
+                <Input
+                  id="distinctiveMarks"
+                  type="text"
+                  placeholder="e.g. color, brand, serial number"
+                  value={distinctiveMarks}
+                  onChange={(e) => setDistinctiveMarks(e.target.value)}
+                  className="mt-1"
+                />
+              </div>
             </div>
 
-            {/* Date & Time Found */}
+            {/* Date & time found (BE required: eventTime) */}
             <div>
               <Label htmlFor="dateTime" className="text-sm font-medium text-gray-700">
-                Date & Time Found
+                Date & time found <span className="text-red-500">*</span>
               </Label>
               <Input
                 id="dateTime"
@@ -225,38 +248,13 @@ export function AddFoundItemPage() {
               />
             </div>
 
-            {/* Where was it found? */}
-            <div>
-              <Label htmlFor="whereFound" className="text-sm font-medium text-gray-700">
-                Where was it found?
-              </Label>
-              <Input
-                id="whereFound"
-                type="text"
-                placeholder="Enter location description"
-                value={whereFound}
-                onChange={(e) => setWhereFound(e.target.value)}
-                className="mt-1"
-              />
-            </div>
-
-            {/* Select Location */}
-            <div>
-              <Label htmlFor="location" className="text-sm font-medium text-gray-700">
-                Select Location
-              </Label>
-              <Select value={location} onValueChange={setLocation}>
-                <SelectTrigger id="location" className="w-full mt-1">
-                  <SelectValue placeholder="Select location" />
-                </SelectTrigger>
-                <SelectContent>
-                  {filteredLocations.map((loc) => (
-                    <SelectItem key={loc} value={loc}>
-                      {loc}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+            <div className="rounded-lg bg-gray-50 border border-gray-200 px-4 py-3">
+              <p className="text-sm font-medium text-gray-700">Địa điểm ghi nhận</p>
+              <p className="text-sm text-gray-600 mt-0.5">
+                {org
+                  ? [org.name, org.displayAddress].filter(Boolean).join(' – ') || '—'
+                  : '—'}
+              </p>
             </div>
 
             {/* Action Buttons */}
@@ -270,15 +268,16 @@ export function AddFoundItemPage() {
                 type="button"
                 variant="secondary"
                 onClick={handleSaveAndAddAnother}
+                disabled={createPost.isPending}
               >
                 Save & add another
               </Button>
               <Button
-                type="button"
-                onClick={handleSubmit}
+                type="submit"
                 className="bg-blue-600 hover:bg-blue-700"
+                disabled={createPost.isPending}
               >
-                Save item
+                {createPost.isPending ? 'Saving...' : 'Save item'}
               </Button>
             </div>
           </form>

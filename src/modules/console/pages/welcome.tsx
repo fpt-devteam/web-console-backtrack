@@ -14,7 +14,10 @@ export function WelcomePage() {
 
   const handleOrganizationClick = (org: MyOrganization) => {
     setCurrentOrgId(org.orgId);
-    router.navigate({ to: '/console/admin/dashboard' });
+    const destination = org.myRole === 'OrgAdmin'
+      ? '/console/admin/dashboard'
+      : '/console/staff/inventory';
+    router.navigate({ to: destination });
   };
 
   const isLoading = userLoading || orgsLoading;

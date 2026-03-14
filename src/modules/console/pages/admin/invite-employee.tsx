@@ -2,12 +2,13 @@ import { Layout } from '../../components/admin/layout';
 import { AlertCircle, X } from 'lucide-react';
 import { useState } from 'react';
 import { useRouter } from '@tanstack/react-router';
-import { useMutation } from '@tanstack/react-query';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useCurrentUser } from '@/hooks/use-auth';
 import { useMyOrganizations, useOrgMembers } from '@/hooks/use-org';
 import { useCurrentOrgId } from '@/contexts/current-org.context';
 import { invitationService } from '@/services/invitation.service';
 import { showToast } from '@/lib/toast';
+import { INVITATION_KEYS } from '@/hooks/use-invitation';
 
 const ROLE_OPTIONS = [
   { value: 'OrgAdmin', label: 'Admin' },
@@ -26,9 +27,13 @@ export function InviteEmployeePage() {
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [showError, setShowError] = useState(false);
 
+  const queryClient = useQueryClient();
   const createInvitation = useMutation({
     mutationFn: (payload: { orgId: string; email: string; role: string }) =>
       invitationService.create(payload),
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({ queryKey: INVITATION_KEYS.pending(variables.orgId) });
+    },
   });
 
   const members = membersData?.items ?? [];
@@ -68,7 +73,7 @@ export function InviteEmployeePage() {
       {
         onSuccess: () => {
           showToast.success(`Invitation sent to ${formData.email}`);
-          router.navigate({ to: '/console/admin/employee', search: { status: 'Invited' } });
+          router.navigate({ to: '/console/admin/employee', search: { tab: 'invitation' } });
         },
         onError: (err) => {
           showToast.error(err instanceof Error ? err.message : 'Failed to send invitation');
