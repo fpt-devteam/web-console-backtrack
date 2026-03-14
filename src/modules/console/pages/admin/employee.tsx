@@ -67,6 +67,8 @@ export function EmployeePage() {
 
   const [activeTab, setActiveTab] = useState<'employee' | 'invitation'>('employee');
   const [currentPage, setCurrentPage] = useState(1);
+  const [invitationPage, setInvitationPage] = useState(1);
+  const [invitationSearchTerm, setInvitationSearchTerm] = useState('');
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('All');
   const [showFilterDropdown, setShowFilterDropdown] = useState(false);
@@ -103,6 +105,32 @@ export function EmployeePage() {
         );
 
   const totalPages = Math.max(1, Math.ceil(totalCount / PAGE_SIZE));
+  const invitationFiltered =
+    !invitationSearchTerm.trim()
+      ? pendingInvitations
+      : pendingInvitations.filter(
+          (inv) =>
+            (inv.email ?? '')
+              .toLowerCase()
+              .includes(invitationSearchTerm.toLowerCase()) 
+            
+        );
+  const invitationTotalCount = invitationFiltered.length;
+  const invitationTotalPages = Math.max(1, Math.ceil(invitationTotalCount / PAGE_SIZE));
+  const invitationPaged = invitationFiltered.slice(
+    (invitationPage - 1) * PAGE_SIZE,
+    invitationPage * PAGE_SIZE
+  );
+
+  useEffect(() => {
+    if (invitationTotalPages > 0 && invitationPage > invitationTotalPages) {
+      setInvitationPage(1);
+    }
+  }, [invitationPage, invitationTotalPages]);
+
+  useEffect(() => {
+    setInvitationPage(1);
+  }, [invitationSearchTerm]);
 
   const handleEditEmployee = (membershipId: string) => {
     router.navigate({
@@ -316,7 +344,7 @@ export function EmployeePage() {
             </table>
           </div>
 
-          {!isLoading && totalCount > 0 && (
+          {!isLoading && totalCount > 0 && totalCount > PAGE_SIZE && (
             <div className="px-6 py-4 border-t border-gray-200 flex items-center justify-between">
               <div className="text-sm text-gray-600">
                 Showing {(currentPage - 1) * PAGE_SIZE + 1} to{' '}
@@ -345,71 +373,120 @@ export function EmployeePage() {
         )}
 
         {activeTab === 'invitation' && (
-          <div className="bg-white rounded-xl shadow-sm overflow-hidden">
-            {pendingLoading ? (
-              <div className="py-12 flex justify-center">
-                <Spinner className="mx-auto" />
-              </div>
-            ) : pendingInvitations.length === 0 ? (
-              <div className="py-12 text-center text-gray-500">
-                <p>No pending invitations.</p>
-                <button
-                  type="button"
-                  onClick={() => router.navigate({ to: '/console/admin/invite-employee' })}
-                  className="mt-3 text-blue-600 hover:text-blue-700 font-medium"
-                >
-                  Send an invitation
-                </button>
-              </div>
-            ) : (
-              <div className="overflow-x-auto">
-                <table className="w-full">
-                  <thead className="bg-gray-50 border-b border-gray-200">
-                    <tr>
-                      <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                        Email
-                      </th>
-                      <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                        Role
-                      </th>
-                      <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                        Status
-                      </th>
-                      <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                        Expires
-                      </th>
-                      <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                        Sent
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-gray-200">
-                    {pendingInvitations.map((inv) => (
-                      <tr key={inv.id} className="hover:bg-gray-50">
-                        <td className="px-6 py-4 whitespace-nowrap text-gray-900 font-medium">
-                          {inv.email}
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-gray-600">
-                          {ROLE_LABEL[inv.role] ?? inv.role}
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <span className="px-3 py-1 rounded-full text-xs font-semibold bg-amber-100 text-amber-800">
-                            {inv.status}
-                          </span>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-gray-600">
-                          {formatJoinedAt(inv.expiredTime)}
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-gray-600">
-                          {formatJoinedAt(inv.createdAt)}
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
+          <>
+            {!pendingLoading && pendingInvitations.length > 0 && (
+              <div className="bg-white rounded-xl shadow-sm p-4 mb-6">
+                <div className="relative">
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                  <input
+                    type="text"
+                    placeholder="Search by email"
+                    className="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    value={invitationSearchTerm}
+                    onChange={(e) => setInvitationSearchTerm(e.target.value)}
+                  />
+                </div>
               </div>
             )}
-          </div>
+            <div className="bg-white rounded-xl shadow-sm overflow-hidden">
+              {pendingLoading ? (
+                <div className="py-12 flex justify-center">
+                  <Spinner className="mx-auto" />
+                </div>
+              ) : pendingInvitations.length === 0 ? (
+                <div className="py-12 text-center text-gray-500">
+                  <p>No pending invitations.</p>
+                  <button
+                    type="button"
+                    onClick={() => router.navigate({ to: '/console/admin/invite-employee' })}
+                    className="mt-3 text-blue-600 hover:text-blue-700 font-medium"
+                  >
+                    Send an invitation
+                  </button>
+                </div>
+              ) : invitationFiltered.length === 0 ? (
+                <div className="py-12 text-center text-gray-500">
+                  <p>No invitations match your search.</p>
+                </div>
+              ) : (
+                <>
+                  <div className="overflow-x-auto">
+                  <table className="w-full">
+                    <thead className="bg-gray-50 border-b border-gray-200">
+                      <tr>
+                        <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                          Email
+                        </th>
+                        <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                          Role
+                        </th>
+                        <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                          Status
+                        </th>
+                        <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                          Expires
+                        </th>
+                        <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                          Sent
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-gray-200">
+                      {invitationPaged.map((inv) => (
+                        <tr key={inv.id} className="hover:bg-gray-50">
+                          <td className="px-6 py-4 whitespace-nowrap text-gray-900 font-medium">
+                            {inv.email}
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap text-gray-600">
+                            {ROLE_LABEL[inv.role] ?? inv.role}
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap">
+                            <span className="px-3 py-1 rounded-full text-xs font-semibold bg-amber-100 text-amber-800">
+                              {inv.status}
+                            </span>
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap text-gray-600">
+                            {formatJoinedAt(inv.expiredTime)}
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap text-gray-600">
+                            {formatJoinedAt(inv.createdAt)}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+                {invitationTotalCount > PAGE_SIZE && (
+                  <div className="px-6 py-4 border-t border-gray-200 flex items-center justify-between">
+                    <div className="text-sm text-gray-600">
+                      Showing {(invitationPage - 1) * PAGE_SIZE + 1} to{' '}
+                      {Math.min(invitationPage * PAGE_SIZE, invitationTotalCount)} of{' '}
+                      {invitationTotalCount} results
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <button
+                        onClick={() => setInvitationPage((p) => Math.max(1, p - 1))}
+                        disabled={invitationPage === 1}
+                        className="px-4 py-2 border border-gray-200 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                      >
+                        Previous
+                      </button>
+                      <button
+                        onClick={() =>
+                          setInvitationPage((p) => Math.min(invitationTotalPages, p + 1))
+                        }
+                        disabled={invitationPage >= invitationTotalPages}
+                        className="px-4 py-2 border border-gray-200 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                      >
+                        Next
+                      </button>
+                    </div>
+                  </div>
+                )}
+                </>
+              )}
+            </div>
+          </>
         )}
       </div>
     </Layout>
