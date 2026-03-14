@@ -6,7 +6,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { Link, useNavigate } from '@tanstack/react-router'
-import { useCreatePost } from '@/hooks/use-post'
+import { useCreateInventoryItem } from '@/hooks/use-inventory'
 import { useCurrentOrgId } from '@/contexts/current-org.context'
 import { useOrganization } from '@/hooks/use-org'
 
@@ -14,12 +14,12 @@ export function AddFoundItemPage() {
   const navigate = useNavigate()
   const { currentOrgId } = useCurrentOrgId()
   const { data: org } = useOrganization(currentOrgId)
-  const createPost = useCreatePost()
+  const createItem = useCreateInventoryItem(currentOrgId)
   const [photos, setPhotos] = useState<string[]>([])
   const [itemName, setItemName] = useState<string>('')
   const [description, setDescription] = useState<string>('')
   const [distinctiveMarks, setDistinctiveMarks] = useState<string>('')
-  const [dateTime, setDateTime] = useState<string>('')
+  const [storageLocation, setStorageLocation] = useState<string>('')
   const [submitError, setSubmitError] = useState<string | null>(null)
 
   const handlePhotoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -61,12 +61,11 @@ export function AddFoundItemPage() {
   }
 
   const buildPayload = () => ({
-      postType: 'Found' as const,
       itemName: itemName.trim(),
-      description: description.trim() || itemName.trim(),
+      description: description.trim(),
       distinctiveMarks: distinctiveMarks.trim() || undefined,
-      imageUrls: photos,
-      eventTime: dateTime ? new Date(dateTime).toISOString() : new Date().toISOString(),
+      imageUrls: photos.length > 0 ? photos : undefined,
+      storageLocation: storageLocation.trim() || undefined,
     })
 
   const handleSubmit = (addAnother: boolean) => {
@@ -79,19 +78,16 @@ export function AddFoundItemPage() {
       setSubmitError('Description is required.')
       return
     }
-    if (!dateTime) {
-      setSubmitError('Date & time found is required.')
-      return
-    }
-    createPost.mutate(buildPayload(), {
+    createItem.mutate(buildPayload(), {
       onSuccess: () => {
         if (addAnother) {
           setItemName('')
           setDescription('')
           setDistinctiveMarks('')
-          setDateTime('')
+          setStorageLocation('')
+          setPhotos([])
         } else {
-          navigate({ to: '/console/staff/feed' })
+          navigate({ to: '/console/staff/inventory' })
         }
       },
       onError: (err) => {
@@ -234,22 +230,23 @@ export function AddFoundItemPage() {
               </div>
             </div>
 
-            {/* Date & time found (BE required: eventTime) */}
+            {/* Storage Location (optional) */}
             <div>
-              <Label htmlFor="dateTime" className="text-sm font-medium text-gray-700">
-                Date & time found <span className="text-red-500">*</span>
+              <Label htmlFor="storageLocation" className="text-sm font-medium text-gray-700">
+                Storage location
               </Label>
               <Input
-                id="dateTime"
-                type="datetime-local"
-                value={dateTime}
-                onChange={(e) => setDateTime(e.target.value)}
+                id="storageLocation"
+                type="text"
+                placeholder="e.g. Shelf A, Room 101, Front desk drawer"
+                value={storageLocation}
+                onChange={(e) => setStorageLocation(e.target.value)}
                 className="mt-1"
               />
             </div>
 
             <div className="rounded-lg bg-gray-50 border border-gray-200 px-4 py-3">
-              <p className="text-sm font-medium text-gray-700">Địa điểm ghi nhận</p>
+              <p className="text-sm font-medium text-gray-700">Organization</p>
               <p className="text-sm text-gray-600 mt-0.5">
                 {org
                   ? [org.name, org.displayAddress].filter(Boolean).join(' – ') || '—'
@@ -268,16 +265,16 @@ export function AddFoundItemPage() {
                 type="button"
                 variant="secondary"
                 onClick={handleSaveAndAddAnother}
-                disabled={createPost.isPending}
+                disabled={createItem.isPending}
               >
                 Save & add another
               </Button>
               <Button
                 type="submit"
                 className="bg-blue-600 hover:bg-blue-700"
-                disabled={createPost.isPending}
+                disabled={createItem.isPending}
               >
-                {createPost.isPending ? 'Saving...' : 'Save item'}
+                {createItem.isPending ? 'Saving...' : 'Save item'}
               </Button>
             </div>
           </form>
