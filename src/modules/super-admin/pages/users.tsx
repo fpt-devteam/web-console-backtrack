@@ -2,6 +2,7 @@ import { Layout } from '../components/layout';
 import { Plus, Edit, Trash2 } from 'lucide-react';
 import { useState } from 'react';
 import { formatDistanceToNow } from 'date-fns';
+import { useDebouncedValue, SEARCH_DEBOUNCE_MS } from '@/hooks/use-debounce';
 import { mockSuperAdminUsers, type UserRole, type UserStatus } from '@/mock/data/mock-super-admin-users';
 import { TableFiltersBar } from '@/components/filters/table-filters-bar';
 import { Pagination } from '@/components/ui/pagination';
@@ -15,6 +16,7 @@ import { Pagination } from '@/components/ui/pagination';
 export function UsersPage() {
   const [currentPage, setCurrentPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState('');
+  const debouncedSearchTerm = useDebouncedValue(searchTerm.trim(), SEARCH_DEBOUNCE_MS);
   const [roleFilter, setRoleFilter] = useState<UserRole | 'All'>('All');
   const [statusFilter, setStatusFilter] = useState<UserStatus | 'All'>('All');
   const [sortFilter, setSortFilter] = useState<'Newest' | 'Oldest' | 'Name A-Z' | 'Name Z-A'>('Newest');
@@ -23,8 +25,8 @@ export function UsersPage() {
   // Filter users by search term, role, and status
   const filteredUsers = mockSuperAdminUsers.filter(user => {
     const matchesSearch = 
-      user.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      user.name.toLowerCase().includes(searchTerm.toLowerCase());
+      user.email.toLowerCase().includes(debouncedSearchTerm.toLowerCase()) ||
+      user.name.toLowerCase().includes(debouncedSearchTerm.toLowerCase());
     const matchesRole = roleFilter === 'All' || user.role === roleFilter;
     const matchesStatus = statusFilter === 'All' || user.status === statusFilter;
     return matchesSearch && matchesRole && matchesStatus;

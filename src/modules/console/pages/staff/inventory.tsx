@@ -1,9 +1,10 @@
 import { StaffLayout } from '../../components/staff'
 import { Calendar, Download, Plus, Search, Archive } from 'lucide-react'
-import { useMemo, useState } from 'react'
+import { useMemo, useState, useEffect } from 'react'
 import { Pagination } from '@/components/ui/pagination'
 import { Link, useNavigate } from '@tanstack/react-router'
 import { useInventoryItems } from '@/hooks/use-inventory'
+import { useDebouncedValue, SEARCH_DEBOUNCE_MS } from '@/hooks/use-debounce'
 import { useCurrentOrgId } from '@/contexts/current-org.context'
 import { Spinner } from '@/components/ui/spinner'
 
@@ -13,14 +14,19 @@ export function StaffInventoryPage() {
   const navigate = useNavigate()
   const { currentOrgId } = useCurrentOrgId()
   const [searchTerm, setSearchTerm] = useState('')
+  const debouncedSearchTerm = useDebouncedValue(searchTerm.trim(), SEARCH_DEBOUNCE_MS)
   const [statusFilter, setStatusFilter] = useState<string>('All')
   const [currentPage, setCurrentPage] = useState(1)
+
+  useEffect(() => {
+    setCurrentPage(1)
+  }, [debouncedSearchTerm])
 
   const { data, isLoading, isError } = useInventoryItems(currentOrgId, {
     page: currentPage,
     pageSize,
     status: statusFilter !== 'All' ? statusFilter : undefined,
-    searchTerm: searchTerm.trim() || undefined,
+    searchTerm: debouncedSearchTerm || undefined,
   })
 
   const items = data?.items ?? []

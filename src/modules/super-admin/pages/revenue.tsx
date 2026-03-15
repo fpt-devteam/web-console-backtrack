@@ -1,5 +1,6 @@
 import { Layout } from '../components/layout';
 import { useState, useMemo } from 'react';
+import { useDebouncedValue, SEARCH_DEBOUNCE_MS } from '@/hooks/use-debounce';
 import {
   DollarSign,
   TrendingUp,
@@ -49,6 +50,7 @@ import {
 export function RevenuePage() {
   const [currentPage, setCurrentPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState('');
+  const debouncedSearchTerm = useDebouncedValue(searchTerm.trim(), SEARCH_DEBOUNCE_MS);
   const [revenueTypeFilter, setRevenueTypeFilter] = useState<RevenueType | 'All'>('All');
   const [statusFilter, setStatusFilter] = useState<RevenueStatus | 'All'>('All');
   const [paymentMethodFilter, setPaymentMethodFilter] = useState<PaymentMethod | 'All'>('All');
@@ -64,11 +66,11 @@ export function RevenuePage() {
       const matchesRevenueType =
         revenueTypeFilter === 'All' || transaction.revenueType === revenueTypeFilter;
       const matchesSearch =
-        transaction.tenantName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        transaction.userName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        transaction.invoiceNumber?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        transaction.qrCodeName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        transaction.description.toLowerCase().includes(searchTerm.toLowerCase());
+        transaction.tenantName?.toLowerCase().includes(debouncedSearchTerm.toLowerCase()) ||
+        transaction.userName?.toLowerCase().includes(debouncedSearchTerm.toLowerCase()) ||
+        transaction.invoiceNumber?.toLowerCase().includes(debouncedSearchTerm.toLowerCase()) ||
+        transaction.qrCodeName?.toLowerCase().includes(debouncedSearchTerm.toLowerCase()) ||
+        transaction.description.toLowerCase().includes(debouncedSearchTerm.toLowerCase());
       const matchesStatus = statusFilter === 'All' || transaction.status === statusFilter;
       const matchesPaymentMethod =
         paymentMethodFilter === 'All' || transaction.paymentMethod === paymentMethodFilter;
@@ -76,7 +78,7 @@ export function RevenuePage() {
         matchesRevenueType && matchesSearch && matchesStatus && matchesPaymentMethod
       );
     });
-  }, [revenueTypeFilter, searchTerm, statusFilter, paymentMethodFilter]);
+  }, [revenueTypeFilter, debouncedSearchTerm, statusFilter, paymentMethodFilter]);
 
   /**
    * Sorts transactions by date (newest first)

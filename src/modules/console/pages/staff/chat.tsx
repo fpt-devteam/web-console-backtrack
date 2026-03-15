@@ -1,6 +1,7 @@
 import { StaffLayout } from '../../components/staff/layout'
 import { Search, Smile, Paperclip, Image as ImageIcon, CheckCircle2 } from 'lucide-react'
 import { useState } from 'react'
+import { useDebouncedValue, SEARCH_DEBOUNCE_MS } from '@/hooks/use-debounce'
 
 interface Chat {
   id: string
@@ -103,14 +104,15 @@ export function StaffChatPage() {
   const [selectedChat, setSelectedChat] = useState<string>('1')
   const [filter, setFilter] = useState<'all' | 'unread' | 'resolved'>('all')
   const [searchTerm, setSearchTerm] = useState('')
+  const debouncedSearchTerm = useDebouncedValue(searchTerm.trim(), SEARCH_DEBOUNCE_MS)
   const [message, setMessage] = useState('')
 
   const activeChat = mockChats.find((chat) => chat.id === selectedChat)
   const filteredChats = mockChats.filter((chat) => {
     if (filter === 'unread' && !chat.unreadCount) return false
     if (filter === 'resolved') return false // Add resolved logic later
-    if (searchTerm) {
-      const searchLower = searchTerm.toLowerCase()
+    if (debouncedSearchTerm) {
+      const searchLower = debouncedSearchTerm.toLowerCase()
       return (
         chat.name.toLowerCase().includes(searchLower) ||
         chat.caseTitle.toLowerCase().includes(searchLower) ||
