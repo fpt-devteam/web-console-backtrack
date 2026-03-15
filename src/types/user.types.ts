@@ -1,7 +1,12 @@
 export interface UserProfile {
   id: string;
   email?: string | null;
+  displayName?: string | null;
   name?: string | null;
+  avatarUrl?: string | null;
+  phone?: string | null;
+  showEmail?: boolean;
+  showPhone?: boolean;
   globalRole: UserGlobalRoleType;
 }
 

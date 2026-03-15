@@ -3,7 +3,7 @@ import { Search, Filter, Plus, ChevronDown, Edit, Trash2 } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { useRouter } from '@tanstack/react-router';
 import { useCurrentUser } from '@/hooks/use-auth';
-import { useMyOrganizations, useOrgMembers } from '@/hooks/use-org';
+import { useMyOrganizations, useOrgMembers, useRemoveMember } from '@/hooks/use-org';
 import { useCurrentOrgId } from '@/contexts/current-org.context';
 import { usePendingInvitations } from '@/hooks/use-invitation';
 import { showToast } from '@/lib/toast';
@@ -26,14 +26,6 @@ function formatJoinedAt(iso: string) {
 }
 
 function getAvatarInitials(m: OrgMember) {
-  if (m.displayName) {
-    return m.displayName
-      .split(' ')
-      .map((n) => n[0])
-      .join('')
-      .toUpperCase()
-      .slice(0, 2);
-  }
   return m.email?.slice(0, 2).toUpperCase() ?? '?';
 }
 
@@ -74,6 +66,7 @@ export function EmployeePage() {
   const [showFilterDropdown, setShowFilterDropdown] = useState(false);
 
   const { data: membersData, isLoading } = useOrgMembers(orgId, currentPage, PAGE_SIZE);
+  const removeMember = useRemoveMember();
   const { data: pendingData, isLoading: pendingLoading } = usePendingInvitations(orgId);
   const pendingInvitations = pendingData?.invitations ?? [];
 
@@ -94,15 +87,7 @@ export function EmployeePage() {
   const searchFiltered =
     !searchTerm.trim()
       ? filteredItems
-      : filteredItems.filter(
-          (m) =>
-            (m.displayName ?? '')
-              .toLowerCase()
-              .includes(searchTerm.toLowerCase()) ||
-            (m.email ?? '')
-              .toLowerCase()
-              .includes(searchTerm.toLowerCase())
-        );
+      : filteredItems.filter((m) => (m.email ?? '').toLowerCase().includes(searchTerm.toLowerCase()));
 
   const totalPages = Math.max(1, Math.ceil(totalCount / PAGE_SIZE));
   const invitationFiltered =
@@ -139,10 +124,16 @@ export function EmployeePage() {
     });
   };
 
-  const handleDeleteEmployee = (name: string) => {
-    if (window.confirm(`Are you sure you want to remove ${name}?`)) {
-      showToast.error('Remove member is not implemented yet.');
-    }
+  const handleDeleteEmployee = (member: OrgMember) => {
+    if (!orgId) return;
+    if (!window.confirm(`Are you sure you want to remove ${member.email || 'this member'}?`)) return;
+    removeMember.mutate(
+      { orgId, membershipId: member.membershipId },
+      {
+        onSuccess: () => showToast.success('Member removed'),
+        onError: (err) => showToast.error(err instanceof Error ? err.message : 'Failed to remove member'),
+      }
+    );
   };
 
   if (!orgId && !isLoading) {
@@ -210,7 +201,7 @@ export function EmployeePage() {
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
               <input
                 type="text"
-                placeholder="Search by name or email"
+                placeholder="Search by email"
                 className="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
@@ -256,9 +247,6 @@ export function EmployeePage() {
               <thead className="bg-gray-50 border-b border-gray-200">
                 <tr>
                   <th className="px-6 py-2 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                    Name
-                  </th>
-                  <th className="px-6 py-2 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
                     Email
                   </th>
                   <th className="px-6 py-2 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
@@ -278,7 +266,7 @@ export function EmployeePage() {
               <tbody className="divide-y divide-gray-200">
                 {isLoading ? (
                   <tr>
-                    <td colSpan={6} className="px-6 py-12 text-center text-gray-500">
+                    <td colSpan={5} className="px-6 py-12 text-center text-gray-500">
                       <Spinner className="mx-auto" />
                     </td>
                   </tr>
@@ -294,13 +282,8 @@ export function EmployeePage() {
                           >
                             {getAvatarInitials(member)}
                           </div>
-                          <span className="font-medium text-gray-900">
-                            {member.displayName || member.email || '-'}
-                          </span>
+                          <span className="font-medium text-gray-900">{member.email || '-'}</span>
                         </div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-gray-600">
-                        {member.email || '-'}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-gray-700">
                         {ROLE_LABEL[member.role] ?? member.role}
@@ -327,10 +310,9 @@ export function EmployeePage() {
                             <Edit className="w-4 h-4" />
                           </button>
                           <button
-                            onClick={() =>
-                              handleDeleteEmployee(member.displayName || member.email || 'this member')
-                            }
-                            className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                            onClick={() => handleDeleteEmployee(member)}
+                            disabled={removeMember.isPending}
+                            className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors disabled:opacity-50"
                             title="Remove"
                           >
                             <Trash2 className="w-4 h-4" />

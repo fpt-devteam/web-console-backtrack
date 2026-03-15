@@ -1,6 +1,6 @@
 import { createFileRoute } from '@tanstack/react-router'
-import { ChangePasswordPage } from '@/modules/auth/components/change-password'
+import { SecurityPage } from '@/modules/console/pages/admin/security-page'
 
 export const Route = createFileRoute('/console/account/security')({
-  component: () => <ChangePasswordPage />,
+  component: () => <SecurityPage />,
 })
