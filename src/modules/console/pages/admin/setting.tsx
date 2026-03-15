@@ -1,5 +1,5 @@
 import { Layout } from '../../components/admin/layout'
-import { AlertCircle, ArrowLeft, Phone, X } from 'lucide-react'
+import { AlertCircle, Phone, X } from 'lucide-react'
 import { useState, useEffect } from 'react'
 import { useRouter } from '@tanstack/react-router'
 import { showToast } from '@/lib/toast'
@@ -176,19 +176,22 @@ export function SettingPage() {
       <div className="p-8 bg-gray-50 min-h-screen">
         <div className="max-w-5xl mx-auto">
           <div className="mb-8">
-            <button
-              type="button"
-              onClick={() => router.navigate({ to: '/console/admin/setting' })}
-              className="text-sm text-gray-600 hover:text-gray-900 mb-4 flex items-center gap-2"
-            >
-              <ArrowLeft className="w-4 h-4" />
-              Back to Settings
-            </button>
             <h1 className="text-3xl font-bold text-gray-900 mb-2">Organization Information</h1>
             <p className="text-gray-600">Manage your company profile and contact details</p>
             {org?.status && (
-              <p className="text-sm text-gray-500 mt-1">
-                Status: <span className="font-medium capitalize">{org.status.toLowerCase()}</span>
+              <p className="text-sm text-gray-500 mt-1 flex items-center gap-2">
+                Status:{' '}
+                <span
+                  className={`inline-flex px-2.5 py-0.5 rounded-full text-xs font-semibold capitalize ${
+                    org.status.toLowerCase() === 'active'
+                      ? 'bg-green-100 text-green-800'
+                      : org.status.toLowerCase() === 'suspended'
+                        ? 'bg-red-100 text-red-800'
+                        : 'bg-gray-100 text-gray-700'
+                  }`}
+                >
+                  {org.status.toLowerCase()}
+                </span>
               </p>
             )}
           </div>

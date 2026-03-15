@@ -1,7 +1,9 @@
-import { createFileRoute } from '@tanstack/react-router'
-import { SettingsHubPage } from '@/modules/console/pages/admin/settings-hub'
+import { createFileRoute, redirect } from '@tanstack/react-router'
 
 export const Route = createFileRoute('/console/admin/setting/')({
-  component: () => <SettingsHubPage />,
+  beforeLoad: () => {
+    throw redirect({ to: '/console/admin/setting/organization' })
+  },
+  component: () => null,
 })
 

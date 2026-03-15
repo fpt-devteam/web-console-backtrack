@@ -70,3 +70,14 @@ export function useUpdateMemberRole() {
     },
   });
 }
+
+export function useRemoveMember() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ orgId, membershipId }: { orgId: string; membershipId: string }) =>
+      orgService.removeMember(orgId, membershipId),
+    onSuccess: (_, { orgId }) => {
+      queryClient.invalidateQueries({ queryKey: ['orgs', orgId] });
+    },
+  });
+}
