@@ -6,6 +6,7 @@ import { useCurrentUser } from '@/hooks/use-auth';
 import { useMyOrganizations, useOrgMembers, useRemoveMember } from '@/hooks/use-org';
 import { useCurrentOrgId } from '@/contexts/current-org.context';
 import { usePendingInvitations } from '@/hooks/use-invitation';
+import { useDebouncedValue, SEARCH_DEBOUNCE_MS } from '@/hooks/use-debounce';
 import { showToast } from '@/lib/toast';
 import { Spinner } from '@/components/ui/spinner';
 import type { OrgMember } from '@/types/organization.types';
@@ -65,6 +66,9 @@ export function EmployeePage() {
   const [statusFilter, setStatusFilter] = useState<string>('All');
   const [showFilterDropdown, setShowFilterDropdown] = useState(false);
 
+  const debouncedSearchTerm = useDebouncedValue(searchTerm.trim(), SEARCH_DEBOUNCE_MS);
+  const debouncedInvitationSearchTerm = useDebouncedValue(invitationSearchTerm.trim(), SEARCH_DEBOUNCE_MS);
+
   const { data: membersData, isLoading } = useOrgMembers(orgId, currentPage, PAGE_SIZE);
   const removeMember = useRemoveMember();
   const { data: pendingData, isLoading: pendingLoading } = usePendingInvitations(orgId);
@@ -85,20 +89,19 @@ export function EmployeePage() {
       ? items
       : items.filter((m) => m.status === statusFilter);
   const searchFiltered =
-    !searchTerm.trim()
+    !debouncedSearchTerm
       ? filteredItems
-      : filteredItems.filter((m) => (m.email ?? '').toLowerCase().includes(searchTerm.toLowerCase()));
+      : filteredItems.filter((m) => (m.email ?? '').toLowerCase().includes(debouncedSearchTerm.toLowerCase()));
 
   const totalPages = Math.max(1, Math.ceil(totalCount / PAGE_SIZE));
   const invitationFiltered =
-    !invitationSearchTerm.trim()
+    !debouncedInvitationSearchTerm
       ? pendingInvitations
       : pendingInvitations.filter(
           (inv) =>
             (inv.email ?? '')
               .toLowerCase()
-              .includes(invitationSearchTerm.toLowerCase()) 
-            
+              .includes(debouncedInvitationSearchTerm.toLowerCase())
         );
   const invitationTotalCount = invitationFiltered.length;
   const invitationTotalPages = Math.max(1, Math.ceil(invitationTotalCount / PAGE_SIZE));
@@ -115,7 +118,7 @@ export function EmployeePage() {
 
   useEffect(() => {
     setInvitationPage(1);
-  }, [invitationSearchTerm]);
+  }, [debouncedInvitationSearchTerm]);
 
   const handleEditEmployee = (membershipId: string) => {
     router.navigate({

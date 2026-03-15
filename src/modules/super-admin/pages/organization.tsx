@@ -3,6 +3,7 @@ import { Plus, Edit, Trash2, Eye } from 'lucide-react';
 import { useState } from 'react';
 import { formatDistanceToNow } from 'date-fns';
 import { useRouter } from '@tanstack/react-router';
+import { useDebouncedValue, SEARCH_DEBOUNCE_MS } from '@/hooks/use-debounce';
 import { mockTenants, type TenantStatus } from '@/mock/data/mock-tenants';
 import { TableFiltersBar } from '@/components/filters/table-filters-bar';
 import { Pagination } from '@/components/ui/pagination';
@@ -17,6 +18,7 @@ export function OrganizationPage() {
   const router = useRouter();
   const [currentPage, setCurrentPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState('');
+  const debouncedSearchTerm = useDebouncedValue(searchTerm.trim(), SEARCH_DEBOUNCE_MS);
   const [statusFilter, setStatusFilter] = useState<TenantStatus | 'All'>('All');
   const [sortFilter, setSortFilter] = useState<'Newest' | 'Oldest' | 'Name A-Z' | 'Name Z-A'>('Newest');
   const pageSize = 5;
@@ -24,9 +26,9 @@ export function OrganizationPage() {
   // Filter tenants by search term and status
   const filteredTenants = mockTenants.filter(tenant => {
     const matchesSearch = 
-      tenant.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      tenant.subdomain.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      tenant.adminEmail.toLowerCase().includes(searchTerm.toLowerCase());
+      tenant.name.toLowerCase().includes(debouncedSearchTerm.toLowerCase()) ||
+      tenant.subdomain.toLowerCase().includes(debouncedSearchTerm.toLowerCase()) ||
+      tenant.adminEmail.toLowerCase().includes(debouncedSearchTerm.toLowerCase());
     const matchesStatus = statusFilter === 'All' || tenant.status === statusFilter;
     return matchesSearch && matchesStatus;
   });

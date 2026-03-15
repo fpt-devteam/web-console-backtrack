@@ -1,22 +1,28 @@
 import { StaffLayout } from '../../components/staff'
 import { Plus, MapPin, Clock, Search } from 'lucide-react'
-import { useMemo, useState } from 'react'
+import { useMemo, useState, useEffect } from 'react'
 import { Link } from '@tanstack/react-router'
 import { Spinner } from '@/components/ui/spinner'
 import { usePosts } from '@/hooks/use-post'
+import { useDebouncedValue, SEARCH_DEBOUNCE_MS } from '@/hooks/use-debounce'
 import type { PostTypeFilter } from '@/types/post.types'
 
 export function StaffFeedPage() {
   const [searchTerm, setSearchTerm] = useState('')
+  const debouncedSearchTerm = useDebouncedValue(searchTerm.trim(), SEARCH_DEBOUNCE_MS)
   const [postType, setPostType] = useState<PostTypeFilter>('All')
   const [currentPage, setCurrentPage] = useState(1)
   const pageSize = 6
+
+  useEffect(() => {
+    setCurrentPage(1)
+  }, [debouncedSearchTerm])
 
   const { data, isLoading, isError } = usePosts({
     page: currentPage,
     pageSize,
     postType,
-    searchTerm,
+    searchTerm: debouncedSearchTerm || undefined,
   })
 
   const items = data?.items ?? []
