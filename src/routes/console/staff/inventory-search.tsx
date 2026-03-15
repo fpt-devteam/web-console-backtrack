@@ -6,7 +6,6 @@ export const Route = createFileRoute('/console/staff/inventory-search')({
   validateSearch: (search: Record<string, unknown>): SearchResultsSearch => {
     return {
       q: (search.q as string) || undefined,
-      postType: (search.postType as SearchResultsSearch['postType']) || undefined,
       page: search.page ? Number(search.page) : undefined,
     }
   },
