@@ -50,7 +50,8 @@ export async function requireOrgMember(queryClient: QueryClient) {
   const activeOrg = (currentOrgId ? myOrgs.find((o) => o.orgId === currentOrgId) : null) ?? myOrgs[0];
 
   if (!activeOrg) {
-    throw new Error('NO_ACTIVE_ORG');
+    // User has no org membership — send them to create/join one
+    throw redirect({ to: '/console/create-organization' });
   }
 
   return activeOrg;
@@ -69,8 +70,8 @@ export async function requireOrgAdmin(queryClient: QueryClient) {
 export async function requireOrgStaff(queryClient: QueryClient) {
   const activeOrg = await requireOrgMember(queryClient);
 
-  if (activeOrg.myRole !== 'OrgStaff') {
-    // Admin (hoặc role khác) không được vào portal staff
+  // Both OrgStaff and OrgAdmin can access the staff portal
+  if (activeOrg.myRole !== 'OrgStaff' && activeOrg.myRole !== 'OrgAdmin') {
     throw new Error('FORBIDDEN_ORG_STAFF');
   }
 
