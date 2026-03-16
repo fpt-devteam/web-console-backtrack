@@ -1,8 +1,20 @@
 import { Button, Card, CardBody, CardHeader } from '@heroui/react';
 import { Home, ShieldAlert } from 'lucide-react';
 import { Link } from '@tanstack/react-router';
+import type { ErrorComponentProps } from '@tanstack/react-router';
 
-export function Forbidden() {
+const MESSAGES: Record<string, string> = {
+  FORBIDDEN_ORG_ADMIN: 'You need OrgAdmin privileges to access this page.',
+  FORBIDDEN_ORG_STAFF: 'You need OrgStaff membership to access this page.',
+  FORBIDDEN_SUPER_ADMIN: 'Super-admin access is required.',
+};
+
+export function Forbidden({ error }: ErrorComponentProps) {
+  const message =
+    error instanceof Error
+      ? (MESSAGES[error.message] ?? 'You do not have permission to access this page.')
+      : 'You do not have permission to access this page.';
+
   return (
     <div className="flex min-h-screen items-center justify-center bg-gray-100 dark:bg-gray-950">
       <Card className="w-full max-w-md">
@@ -13,13 +25,13 @@ export function Forbidden() {
               403 - Forbidden
             </h1>
             <p className="mt-2 text-base text-gray-500 dark:text-gray-400">
-              You do not have permission to access this page.
+              {message}
             </p>
           </div>
         </CardHeader>
         <CardBody className="items-center gap-4">
           <p className="text-center text-sm text-gray-500 dark:text-gray-400">
-            Access is denied. Please contact an administrator if you believe this is an error.
+            Contact an administrator if you believe this is an error.
           </p>
           <Button
             as={Link}
