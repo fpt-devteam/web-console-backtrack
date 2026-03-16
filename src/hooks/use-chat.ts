@@ -1,0 +1,103 @@
+import {
+  useQuery,
+  useMutation,
+  useInfiniteQuery,
+  useQueryClient,
+} from '@tanstack/react-query';
+import { chatService } from '@/services/chat.service';
+
+// ── Query key factory ───────────────────────────────────
+
+export const chatKeys = {
+  all: ['chat'] as const,
+  queue: () => [...chatKeys.all, 'queue'] as const,
+  assigned: () => [...chatKeys.all, 'assigned'] as const,
+  conversation: (id: string) => [...chatKeys.all, 'conversation', id] as const,
+  messages: (conversationId: string) => [...chatKeys.all, 'messages', conversationId] as const,
+};
+
+// ── Queue / assigned lists ──────────────────────────────
+
+/**
+ * Fetch all conversations currently in the org queue (not yet assigned).
+ * Refetches every 15 seconds to catch new tickets.
+ */
+export function useChatQueue(orgId?: string) {
+  return useQuery({
+    queryKey: [...chatKeys.queue(), { orgId }],
+    queryFn: () => chatService.listQueue(orgId),
+    staleTime: 1000 * 15,
+    refetchInterval: 1000 * 15,
+  });
+}
+
+/**
+ * Fetch conversations currently assigned to the authenticated staff member.
+ */
+export function useChatAssigned() {
+  return useQuery({
+    queryKey: chatKeys.assigned(),
+    queryFn: () => chatService.listAssigned(),
+    staleTime: 1000 * 30,
+  });
+}
+
+// ── Single conversation ─────────────────────────────────
+
+export function useConversation(conversationId: string | null) {
+  return useQuery({
+    queryKey: chatKeys.conversation(conversationId ?? ''),
+    queryFn: () => chatService.getConversation(conversationId!),
+    enabled: !!conversationId,
+    staleTime: 1000 * 60 * 5,
+  });
+}
+
+// ── Messages (infinite scroll) ──────────────────────────
+
+/**
+ * Paginated message history using cursor-based infinite scroll.
+ * Pages are ordered from newest (first page) to oldest (later pages).
+ */
+export function useChatMessages(conversationId: string | null) {
+  return useInfiniteQuery({
+    queryKey: chatKeys.messages(conversationId ?? ''),
+    queryFn: ({ pageParam }) =>
+      chatService.getMessages(conversationId!, {
+        cursor: pageParam as string | undefined,
+        limit: 30,
+      }),
+    enabled: !!conversationId,
+    initialPageParam: undefined as string | undefined,
+    getNextPageParam: (lastPage) => lastPage.nextCursor ?? undefined,
+  });
+}
+
+// ── Assignment mutations ────────────────────────────────
+
+/** Staff member takes a conversation from the queue */
+export function useAssignConversation() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (conversationId: string) => chatService.assignSelf(conversationId),
+    onSuccess: () => {
+      // Refresh both lists after assignment
+      queryClient.invalidateQueries({ queryKey: chatKeys.queue() });
+      queryClient.invalidateQueries({ queryKey: chatKeys.assigned() });
+    },
+  });
+}
+
+/** Staff member returns a conversation back to the queue */
+export function useReturnToQueue() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (conversationId: string) => chatService.returnToQueue(conversationId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: chatKeys.queue() });
+      queryClient.invalidateQueries({ queryKey: chatKeys.assigned() });
+    },
+  });
+}

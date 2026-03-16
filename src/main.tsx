@@ -13,6 +13,7 @@ import { InternalServerError } from './components/ui/errors/internal-server-erro
 import { Spinner } from './components/ui/spinner.tsx'
 import { NotFoundPage } from './components/ui/errors/not-found-page.tsx'
 import { CurrentOrgProvider } from './contexts/current-org.context.tsx'
+import { ChatProvider } from './contexts/chat.context.tsx'
 
 // Create a new router instance
 
@@ -46,7 +47,9 @@ if (rootElement && !rootElement.innerHTML) {
     <StrictMode>
       <TanStackQueryProvider.Provider {...TanStackQueryProviderContext}>
         <CurrentOrgProvider>
-          <RouterProvider router={router} />
+          <ChatProvider>
+            <RouterProvider router={router} />
+          </ChatProvider>
         </CurrentOrgProvider>
       </TanStackQueryProvider.Provider>
     </StrictMode>,
