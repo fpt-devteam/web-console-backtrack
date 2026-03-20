@@ -1,11 +1,12 @@
 import { Layout } from '../components/layout';
-import { Plus, Edit, Trash2 } from 'lucide-react';
+import { Eye, Trash2 } from 'lucide-react';
 import { useState } from 'react';
 import { formatDistanceToNow } from 'date-fns';
 import { useDebouncedValue, SEARCH_DEBOUNCE_MS } from '@/hooks/use-debounce';
 import { mockSuperAdminUsers, type UserRole, type UserStatus } from '@/mock/data/mock-super-admin-users';
 import { TableFiltersBar } from '@/components/filters/table-filters-bar';
 import { Pagination } from '@/components/ui/pagination';
+import { useRouter } from '@tanstack/react-router';
 
 /**
  * User Management Page
@@ -14,6 +15,7 @@ import { Pagination } from '@/components/ui/pagination';
  * and pagination functionality.
  */
 export function UsersPage() {
+  const router = useRouter();
   const [currentPage, setCurrentPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState('');
   const debouncedSearchTerm = useDebouncedValue(searchTerm.trim(), SEARCH_DEBOUNCE_MS);
@@ -81,23 +83,6 @@ export function UsersPage() {
   };
 
   /**
-   * Gets role color based on user role
-   * 
-   * @param role - User role
-   * @returns Badge color class
-   */
-  const getRoleColor = (role: UserRole) => {
-    switch (role) {
-      case 'Staff':
-        return 'bg-blue-100 text-blue-700';
-      case 'User':
-        return 'bg-gray-100 text-gray-700';
-      default:
-        return 'bg-gray-100 text-gray-700';
-    }
-  };
-
-  /**
    * Formats date to readable string
    * 
    * @param date - Date to format
@@ -123,14 +108,8 @@ export function UsersPage() {
     return distance.replace('about ', '').replace(' ago', ' ago');
   };
 
-  const handleAddUser = () => {
-    // TODO: Navigate to add user page
-    console.log('Add user clicked');
-  };
-
-  const handleEditUser = (userId: string) => {
-    // TODO: Navigate to edit user page
-    console.log('Edit user:', userId);
+  const handleViewUser = (userId: string) => {
+    router.navigate({ to: '/super-admin/users/$userId', params: { userId } });
   };
 
   const handleDeleteUser = (userId: string, userName: string) => {
@@ -162,27 +141,20 @@ export function UsersPage() {
     <Layout>
       <div className="p-8 bg-gray-50 min-h-screen">
         {/* Breadcrumbs */}
-        <div className="mb-6">
+        <div className="mb-4">
           <nav className="text-sm text-gray-500">
             <span className="hover:text-gray-700 cursor-pointer">User Management</span>
           </nav>
         </div>
 
         {/* Header */}
-        <div className="flex items-start justify-between mb-8">
+        <div className="flex items-start justify-between mb-4">
           <div>
             <h1 className="text-3xl font-bold text-gray-900 mb-2">Users</h1>
             <p className="text-gray-600">
               Manage and monitor all user accounts, roles, and permissions.
             </p>
           </div>
-          <button
-            onClick={handleAddUser}
-            className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-1.5 rounded-lg font-semibold flex items-center gap-2 transition-colors"
-          >
-            <Plus className="w-5 h-5" />
-            Add User
-          </button>
         </div>
 
         {/* Search and Filter Bar */}
@@ -220,27 +192,24 @@ export function UsersPage() {
         <div className="bg-white rounded-xl shadow-sm overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full">
-              <thead className="bg-gray-50 border-b border-gray-200">
+              <thead className="bg-blue-50 border-b-1 ">
                 <tr>
-                  <th className="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-bold uppercase tracking-wider ">
                     User
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-bold uppercase tracking-wider ">
                     Email
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider">
-                    Role
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-bold uppercase tracking-wider ">
                     Status
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-bold uppercase tracking-wider ">
                     Created Date
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-bold uppercase tracking-wider ">
                     Last Login
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-bold uppercase tracking-wider ">
                     Action
                   </th>
                 </tr>
@@ -262,11 +231,6 @@ export function UsersPage() {
                         <span className="text-gray-600">{user.email}</span>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
-                        <span className={`px-3 py-1 rounded-full text-xs font-semibold ${getRoleColor(user.role)}`}>
-                          {user.role}
-                        </span>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
                         <div className="flex items-center gap-2">
                           <span className={`w-2 h-2 rounded-full ${statusStyle.dot}`}></span>
                           <span className={`text-sm font-medium ${statusStyle.text}`}>
@@ -283,11 +247,11 @@ export function UsersPage() {
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="flex items-center gap-2">
                           <button
-                            onClick={() => handleEditUser(user.id)}
-                            className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
-                            title="Edit User"
+                            onClick={() => handleViewUser(user.id)}
+                            className="p-2 text-gray-400 hover:text-green-600 hover:bg-green-50 rounded-lg transition-colors"
+                            title="View User Details"
                           >
-                            <Edit className="w-4 h-4" />
+                            <Eye className="w-4 h-4" />
                           </button>
                           <button
                             onClick={() => handleDeleteUser(user.id, user.name)}

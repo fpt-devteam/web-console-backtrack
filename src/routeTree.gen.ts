@@ -18,7 +18,6 @@ import { Route as SuperAdminServicePackagesRouteImport } from './routes/super-ad
 import { Route as SuperAdminRevenueRouteImport } from './routes/super-admin/revenue'
 import { Route as SuperAdminOrganizationRouteImport } from './routes/super-admin/organization'
 import { Route as SuperAdminDashboardRouteImport } from './routes/super-admin/dashboard'
-import { Route as SuperAdminAddTenantRouteImport } from './routes/super-admin/add-tenant'
 import { Route as ConsoleWelcomeRouteImport } from './routes/console/welcome'
 import { Route as ConsoleStaffRouteImport } from './routes/console/staff'
 import { Route as ConsoleProcessingRouteImport } from './routes/console/processing'
@@ -36,8 +35,8 @@ import { Route as MarketingFeaturesRouteImport } from './routes/_marketing/featu
 import { Route as MarketingContactRouteImport } from './routes/_marketing/contact'
 import { Route as MarketingApplyRouteImport } from './routes/_marketing/apply'
 import { Route as MarketingAboutRouteImport } from './routes/_marketing/about'
+import { Route as SuperAdminUsersUserIdRouteImport } from './routes/super-admin/users/$userId'
 import { Route as SuperAdminOrganizationTenantIdRouteImport } from './routes/super-admin/organization/$tenantId'
-import { Route as SuperAdminEditTenantTenantIdRouteImport } from './routes/super-admin/edit-tenant/$tenantId'
 import { Route as ConsoleStaffNotificationRouteImport } from './routes/console/staff/notification'
 import { Route as ConsoleStaffInventorySearchRouteImport } from './routes/console/staff/inventory-search'
 import { Route as ConsoleStaffInventoryAddItemRouteImport } from './routes/console/staff/inventory-add-item'
@@ -104,11 +103,6 @@ const SuperAdminOrganizationRoute = SuperAdminOrganizationRouteImport.update({
 const SuperAdminDashboardRoute = SuperAdminDashboardRouteImport.update({
   id: '/dashboard',
   path: '/dashboard',
-  getParentRoute: () => SuperAdminRoute,
-} as any)
-const SuperAdminAddTenantRoute = SuperAdminAddTenantRouteImport.update({
-  id: '/add-tenant',
-  path: '/add-tenant',
   getParentRoute: () => SuperAdminRoute,
 } as any)
 const ConsoleWelcomeRoute = ConsoleWelcomeRouteImport.update({
@@ -197,17 +191,16 @@ const MarketingAboutRoute = MarketingAboutRouteImport.update({
   path: '/about',
   getParentRoute: () => MarketingRoute,
 } as any)
+const SuperAdminUsersUserIdRoute = SuperAdminUsersUserIdRouteImport.update({
+  id: '/$userId',
+  path: '/$userId',
+  getParentRoute: () => SuperAdminUsersRoute,
+} as any)
 const SuperAdminOrganizationTenantIdRoute =
   SuperAdminOrganizationTenantIdRouteImport.update({
     id: '/$tenantId',
     path: '/$tenantId',
     getParentRoute: () => SuperAdminOrganizationRoute,
-  } as any)
-const SuperAdminEditTenantTenantIdRoute =
-  SuperAdminEditTenantTenantIdRouteImport.update({
-    id: '/edit-tenant/$tenantId',
-    path: '/edit-tenant/$tenantId',
-    getParentRoute: () => SuperAdminRoute,
   } as any)
 const ConsoleStaffNotificationRoute =
   ConsoleStaffNotificationRouteImport.update({
@@ -352,12 +345,11 @@ export interface FileRoutesByFullPath {
   '/console/processing': typeof ConsoleProcessingRoute
   '/console/staff': typeof ConsoleStaffRouteWithChildren
   '/console/welcome': typeof ConsoleWelcomeRoute
-  '/super-admin/add-tenant': typeof SuperAdminAddTenantRoute
   '/super-admin/dashboard': typeof SuperAdminDashboardRoute
   '/super-admin/organization': typeof SuperAdminOrganizationRouteWithChildren
   '/super-admin/revenue': typeof SuperAdminRevenueRoute
   '/super-admin/service-packages': typeof SuperAdminServicePackagesRoute
-  '/super-admin/users': typeof SuperAdminUsersRoute
+  '/super-admin/users': typeof SuperAdminUsersRouteWithChildren
   '/console/account/security': typeof ConsoleAccountSecurityRoute
   '/console/admin/branch': typeof ConsoleAdminBranchRoute
   '/console/admin/dashboard': typeof ConsoleAdminDashboardRoute
@@ -372,8 +364,8 @@ export interface FileRoutesByFullPath {
   '/console/staff/inventory-add-item': typeof ConsoleStaffInventoryAddItemRoute
   '/console/staff/inventory-search': typeof ConsoleStaffInventorySearchRoute
   '/console/staff/notification': typeof ConsoleStaffNotificationRoute
-  '/super-admin/edit-tenant/$tenantId': typeof SuperAdminEditTenantTenantIdRoute
   '/super-admin/organization/$tenantId': typeof SuperAdminOrganizationTenantIdRoute
+  '/super-admin/users/$userId': typeof SuperAdminUsersUserIdRoute
   '/console/admin/edit-branch/$branchId': typeof ConsoleAdminEditBranchBranchIdRoute
   '/console/admin/edit-employee/$employeeId': typeof ConsoleAdminEditEmployeeEmployeeIdRoute
   '/console/admin/setting/organization': typeof ConsoleAdminSettingOrganizationRouteWithChildren
@@ -404,12 +396,11 @@ export interface FileRoutesByTo {
   '/console/processing': typeof ConsoleProcessingRoute
   '/console/staff': typeof ConsoleStaffRouteWithChildren
   '/console/welcome': typeof ConsoleWelcomeRoute
-  '/super-admin/add-tenant': typeof SuperAdminAddTenantRoute
   '/super-admin/dashboard': typeof SuperAdminDashboardRoute
   '/super-admin/organization': typeof SuperAdminOrganizationRouteWithChildren
   '/super-admin/revenue': typeof SuperAdminRevenueRoute
   '/super-admin/service-packages': typeof SuperAdminServicePackagesRoute
-  '/super-admin/users': typeof SuperAdminUsersRoute
+  '/super-admin/users': typeof SuperAdminUsersRouteWithChildren
   '/console/account/security': typeof ConsoleAccountSecurityRoute
   '/console/admin/branch': typeof ConsoleAdminBranchRoute
   '/console/admin/dashboard': typeof ConsoleAdminDashboardRoute
@@ -423,8 +414,8 @@ export interface FileRoutesByTo {
   '/console/staff/inventory-add-item': typeof ConsoleStaffInventoryAddItemRoute
   '/console/staff/inventory-search': typeof ConsoleStaffInventorySearchRoute
   '/console/staff/notification': typeof ConsoleStaffNotificationRoute
-  '/super-admin/edit-tenant/$tenantId': typeof SuperAdminEditTenantTenantIdRoute
   '/super-admin/organization/$tenantId': typeof SuperAdminOrganizationTenantIdRoute
+  '/super-admin/users/$userId': typeof SuperAdminUsersUserIdRoute
   '/console/admin/edit-branch/$branchId': typeof ConsoleAdminEditBranchBranchIdRoute
   '/console/admin/edit-employee/$employeeId': typeof ConsoleAdminEditEmployeeEmployeeIdRoute
   '/console/staff/item-edit/$itemId': typeof ConsoleStaffItemEditItemIdRoute
@@ -456,12 +447,11 @@ export interface FileRoutesById {
   '/console/processing': typeof ConsoleProcessingRoute
   '/console/staff': typeof ConsoleStaffRouteWithChildren
   '/console/welcome': typeof ConsoleWelcomeRoute
-  '/super-admin/add-tenant': typeof SuperAdminAddTenantRoute
   '/super-admin/dashboard': typeof SuperAdminDashboardRoute
   '/super-admin/organization': typeof SuperAdminOrganizationRouteWithChildren
   '/super-admin/revenue': typeof SuperAdminRevenueRoute
   '/super-admin/service-packages': typeof SuperAdminServicePackagesRoute
-  '/super-admin/users': typeof SuperAdminUsersRoute
+  '/super-admin/users': typeof SuperAdminUsersRouteWithChildren
   '/console/account/security': typeof ConsoleAccountSecurityRoute
   '/console/admin/branch': typeof ConsoleAdminBranchRoute
   '/console/admin/dashboard': typeof ConsoleAdminDashboardRoute
@@ -476,8 +466,8 @@ export interface FileRoutesById {
   '/console/staff/inventory-add-item': typeof ConsoleStaffInventoryAddItemRoute
   '/console/staff/inventory-search': typeof ConsoleStaffInventorySearchRoute
   '/console/staff/notification': typeof ConsoleStaffNotificationRoute
-  '/super-admin/edit-tenant/$tenantId': typeof SuperAdminEditTenantTenantIdRoute
   '/super-admin/organization/$tenantId': typeof SuperAdminOrganizationTenantIdRoute
+  '/super-admin/users/$userId': typeof SuperAdminUsersUserIdRoute
   '/console/admin/edit-branch/$branchId': typeof ConsoleAdminEditBranchBranchIdRoute
   '/console/admin/edit-employee/$employeeId': typeof ConsoleAdminEditEmployeeEmployeeIdRoute
   '/console/admin/setting/organization': typeof ConsoleAdminSettingOrganizationRouteWithChildren
@@ -510,7 +500,6 @@ export interface FileRouteTypes {
     | '/console/processing'
     | '/console/staff'
     | '/console/welcome'
-    | '/super-admin/add-tenant'
     | '/super-admin/dashboard'
     | '/super-admin/organization'
     | '/super-admin/revenue'
@@ -530,8 +519,8 @@ export interface FileRouteTypes {
     | '/console/staff/inventory-add-item'
     | '/console/staff/inventory-search'
     | '/console/staff/notification'
-    | '/super-admin/edit-tenant/$tenantId'
     | '/super-admin/organization/$tenantId'
+    | '/super-admin/users/$userId'
     | '/console/admin/edit-branch/$branchId'
     | '/console/admin/edit-employee/$employeeId'
     | '/console/admin/setting/organization'
@@ -562,7 +551,6 @@ export interface FileRouteTypes {
     | '/console/processing'
     | '/console/staff'
     | '/console/welcome'
-    | '/super-admin/add-tenant'
     | '/super-admin/dashboard'
     | '/super-admin/organization'
     | '/super-admin/revenue'
@@ -581,8 +569,8 @@ export interface FileRouteTypes {
     | '/console/staff/inventory-add-item'
     | '/console/staff/inventory-search'
     | '/console/staff/notification'
-    | '/super-admin/edit-tenant/$tenantId'
     | '/super-admin/organization/$tenantId'
+    | '/super-admin/users/$userId'
     | '/console/admin/edit-branch/$branchId'
     | '/console/admin/edit-employee/$employeeId'
     | '/console/staff/item-edit/$itemId'
@@ -613,7 +601,6 @@ export interface FileRouteTypes {
     | '/console/processing'
     | '/console/staff'
     | '/console/welcome'
-    | '/super-admin/add-tenant'
     | '/super-admin/dashboard'
     | '/super-admin/organization'
     | '/super-admin/revenue'
@@ -633,8 +620,8 @@ export interface FileRouteTypes {
     | '/console/staff/inventory-add-item'
     | '/console/staff/inventory-search'
     | '/console/staff/notification'
-    | '/super-admin/edit-tenant/$tenantId'
     | '/super-admin/organization/$tenantId'
+    | '/super-admin/users/$userId'
     | '/console/admin/edit-branch/$branchId'
     | '/console/admin/edit-employee/$employeeId'
     | '/console/admin/setting/organization'
@@ -727,13 +714,6 @@ declare module '@tanstack/react-router' {
       path: '/dashboard'
       fullPath: '/super-admin/dashboard'
       preLoaderRoute: typeof SuperAdminDashboardRouteImport
-      parentRoute: typeof SuperAdminRoute
-    }
-    '/super-admin/add-tenant': {
-      id: '/super-admin/add-tenant'
-      path: '/add-tenant'
-      fullPath: '/super-admin/add-tenant'
-      preLoaderRoute: typeof SuperAdminAddTenantRouteImport
       parentRoute: typeof SuperAdminRoute
     }
     '/console/welcome': {
@@ -855,19 +835,19 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof MarketingAboutRouteImport
       parentRoute: typeof MarketingRoute
     }
+    '/super-admin/users/$userId': {
+      id: '/super-admin/users/$userId'
+      path: '/$userId'
+      fullPath: '/super-admin/users/$userId'
+      preLoaderRoute: typeof SuperAdminUsersUserIdRouteImport
+      parentRoute: typeof SuperAdminUsersRoute
+    }
     '/super-admin/organization/$tenantId': {
       id: '/super-admin/organization/$tenantId'
       path: '/$tenantId'
       fullPath: '/super-admin/organization/$tenantId'
       preLoaderRoute: typeof SuperAdminOrganizationTenantIdRouteImport
       parentRoute: typeof SuperAdminOrganizationRoute
-    }
-    '/super-admin/edit-tenant/$tenantId': {
-      id: '/super-admin/edit-tenant/$tenantId'
-      path: '/edit-tenant/$tenantId'
-      fullPath: '/super-admin/edit-tenant/$tenantId'
-      preLoaderRoute: typeof SuperAdminEditTenantTenantIdRouteImport
-      parentRoute: typeof SuperAdminRoute
     }
     '/console/staff/notification': {
       id: '/console/staff/notification'
@@ -1062,24 +1042,32 @@ const SuperAdminOrganizationRouteWithChildren =
     SuperAdminOrganizationRouteChildren,
   )
 
+interface SuperAdminUsersRouteChildren {
+  SuperAdminUsersUserIdRoute: typeof SuperAdminUsersUserIdRoute
+}
+
+const SuperAdminUsersRouteChildren: SuperAdminUsersRouteChildren = {
+  SuperAdminUsersUserIdRoute: SuperAdminUsersUserIdRoute,
+}
+
+const SuperAdminUsersRouteWithChildren = SuperAdminUsersRoute._addFileChildren(
+  SuperAdminUsersRouteChildren,
+)
+
 interface SuperAdminRouteChildren {
-  SuperAdminAddTenantRoute: typeof SuperAdminAddTenantRoute
   SuperAdminDashboardRoute: typeof SuperAdminDashboardRoute
   SuperAdminOrganizationRoute: typeof SuperAdminOrganizationRouteWithChildren
   SuperAdminRevenueRoute: typeof SuperAdminRevenueRoute
   SuperAdminServicePackagesRoute: typeof SuperAdminServicePackagesRoute
-  SuperAdminUsersRoute: typeof SuperAdminUsersRoute
-  SuperAdminEditTenantTenantIdRoute: typeof SuperAdminEditTenantTenantIdRoute
+  SuperAdminUsersRoute: typeof SuperAdminUsersRouteWithChildren
 }
 
 const SuperAdminRouteChildren: SuperAdminRouteChildren = {
-  SuperAdminAddTenantRoute: SuperAdminAddTenantRoute,
   SuperAdminDashboardRoute: SuperAdminDashboardRoute,
   SuperAdminOrganizationRoute: SuperAdminOrganizationRouteWithChildren,
   SuperAdminRevenueRoute: SuperAdminRevenueRoute,
   SuperAdminServicePackagesRoute: SuperAdminServicePackagesRoute,
-  SuperAdminUsersRoute: SuperAdminUsersRoute,
-  SuperAdminEditTenantTenantIdRoute: SuperAdminEditTenantTenantIdRoute,
+  SuperAdminUsersRoute: SuperAdminUsersRouteWithChildren,
 }
 
 const SuperAdminRouteWithChildren = SuperAdminRoute._addFileChildren(

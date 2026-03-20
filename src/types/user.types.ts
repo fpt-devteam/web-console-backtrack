@@ -11,8 +11,14 @@ export interface UserProfile {
 }
 
 export const UserGlobalRole = {
-  USER: 'USER',
-  SUPER_ADMIN: 'SUPER_ADMIN',
+  // Keep FE values aligned with BE enum names (see Backtrack.Core.Domain.Constants.UserRole)
+  // BE returns: "Customer" | "PlatformSuperAdmin"
+  USER: 'Customer',
+  SUPER_ADMIN: 'PlatformSuperAdmin',
+
+  // Aliases (useful if other parts of FE use "Customer"/"PlatformSuperAdmin" naming)
+  Customer: 'Customer',
+  PlatformSuperAdmin: 'PlatformSuperAdmin',
 } as const;
 
 export type UserGlobalRoleType = typeof UserGlobalRole[keyof typeof UserGlobalRole];
