@@ -52,7 +52,7 @@ export function Pagination({
           className="p-2 rounded-lg hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
           aria-label="Previous page"
         >
-          <ChevronLeft className="w-5 h-5 text-gray-600" />
+          <ChevronLeft className="w-5 h-5 text-black" />
         </button>
 
         {/* Page numbers */}
@@ -61,7 +61,7 @@ export function Pagination({
             return (
               <span
                 key={`ellipsis-${index}`}
-                className="px-3 py-2 text-gray-500"
+                className="px-3 py-2 text-black"
               >
                 ...
               </span>
@@ -78,7 +78,7 @@ export function Pagination({
               className={`min-w-[40px] px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
                 isActive
                   ? 'bg-blue-600 text-white'
-                  : 'text-gray-700 hover:bg-gray-100'
+                  : 'text-black hover:bg-gray-100'
               }`}
             >
               {pageNum}
@@ -93,7 +93,7 @@ export function Pagination({
           className="p-2 rounded-lg hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
           aria-label="Next page"
         >
-          <ChevronRight className="w-5 h-5 text-gray-600" />
+          <ChevronRight className="w-5 h-5 text-black" />
         </button>
       </div>
     </div>

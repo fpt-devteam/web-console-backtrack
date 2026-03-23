@@ -11,8 +11,6 @@ import {
 import {
   mockDashboardStats,
   mockItemStatusData,
-  mockRecentActivity,
-  mockStoragePlan,
 } from '@/mock/data/mock-admin-dashboard'
 import {
   BarChart,
@@ -26,16 +24,12 @@ import {
 export function AdminDashboardPage() {
   const stats = mockDashboardStats
   const itemStatus = mockItemStatusData
-  const activities = mockRecentActivity
-  const storage = mockStoragePlan
 
   // Prepare data for bar chart
   const chartData = [
     { name: 'Found', value: itemStatus.found, fill: '#007CF7' }, // blue-500
     { name: 'Returned', value: itemStatus.returned, fill: '#46D24F' }, // green-500
   ]
-
-  const storagePercent = (storage.used / storage.total) * 100
 
   return (
     <Layout>
@@ -127,8 +121,7 @@ export function AdminDashboardPage() {
 
         {/* Main Content Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Left Column - Item Status & Recent Activity */}
-          <div className="lg:col-span-2 space-y-6">
+          <div className="lg:col-span-2">
             {/* Item Status Distribution */}
             <div className="bg-white rounded-xl shadow-sm p-6">
               <div className="flex items-center justify-between mb-6">
@@ -164,53 +157,8 @@ export function AdminDashboardPage() {
                 </ResponsiveContainer>
               </div>
             </div>
-
-            {/* Recent Activity */}
-            <div className="bg-white rounded-xl shadow-sm p-6">
-              <div className="flex items-center justify-between mb-6">
-                <h2 className="text-lg font-bold text-gray-900">
-                  Recent Activity
-                </h2>
-                <button className="text-sm text-blue-600 hover:text-blue-700 font-medium">
-                  View all
-                </button>
-              </div>
-
-              <div className="space-y-4">
-                {activities.map((activity) => (
-                  <div
-                    key={activity.id}
-                    className="flex items-start gap-4 p-3 rounded-lg hover:bg-gray-50 transition-colors"
-                  >
-                    <div
-                      className={`w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 ${
-                        activity.type === 'found'
-                          ? 'bg-blue-100'
-                          : activity.type === 'staff'
-                            ? 'bg-purple-100'
-                            : 'bg-green-100'
-                      }`}
-                    >
-                      <span className="text-lg">{activity.icon}</span>
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm font-semibold text-gray-900">
-                        {activity.title}
-                      </p>
-                      <p className="text-sm text-gray-500 mt-0.5">
-                        {activity.description}
-                      </p>
-                    </div>
-                    <span className="text-xs text-gray-400 flex-shrink-0">
-                      {activity.time}
-                    </span>
-                  </div>
-                ))}
-              </div>
-            </div>
           </div>
 
-          {/* Right Column - Quick Actions & Storage */}
           <div className="space-y-6">
             {/* Quick Actions */}
             <div className="bg-white rounded-xl shadow-sm p-6">
@@ -262,37 +210,6 @@ export function AdminDashboardPage() {
                   </div>
                 </button>
               </div>
-            </div>
-
-            {/* Storage Plan */}
-            <div className="bg-black rounded-xl shadow-lg p-6 text-white">
-              <div className="flex items-center justify-between ">
-                <h3 className="text-lg font-bold">Storage Plan</h3>
-                <span className="px-3 py-1 bg-green-500 text-white text-xs font-semibold rounded-full">
-                  {storage.status === 'active' ? 'Active' : 'Inactive'}
-                </span>
-              </div>
-
-              <p className="text-sm text-gray-300 mb-4">{storage.name}</p>
-
-              <div className="mb-6">
-                <div className="flex items-center justify-between text-sm mb-2">
-                  <span className="text-gray-300">Storage Used</span>
-                  <span className="font-semibold">
-                    {storage.used} / {storage.total} items
-                  </span>
-                </div>
-                <div className="h-2 bg-gray-700 rounded-full overflow-hidden">
-                  <div
-                    className="h-full bg-blue-500 rounded-full transition-all duration-500"
-                    style={{ width: `${storagePercent}%` }}
-                  />
-                </div>
-              </div>
-
-              <button className="w-full bg-white text-gray-900 py-2 rounded-lg font-semibold hover:bg-gray-100 transition-colors">
-                Upgrade Plan
-              </button>
             </div>
           </div>
         </div>

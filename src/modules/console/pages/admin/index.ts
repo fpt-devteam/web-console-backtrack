@@ -7,4 +7,5 @@ export { BranchPage } from './branch';
 export { EditBranchPage } from './edit-branch';
 export { EditEmployeePage } from './edit-employee';
 export { SettingPage } from './setting';
-
+export { AdminInventoryMonitorPage } from './inventory-monitor';
+export { AdminInventoryItemDetailPage } from './inventory-item-detail';

@@ -1,4 +1,4 @@
-import { LayoutGrid, Users, CreditCard, Building2, Settings, ChevronLeft, ChevronRight, ChevronDown, ChevronUp, ArrowLeftRight } from 'lucide-react';
+import { LayoutGrid, Users, CreditCard, Building2, Settings, ChevronLeft, ChevronRight, ChevronDown, ChevronUp, ArrowLeftRight, Package } from 'lucide-react';
 import { Link, useLocation } from '@tanstack/react-router';
 import { useState, useEffect } from 'react';
 import { useCurrentOrgId } from '@/contexts/current-org.context';
@@ -42,6 +42,7 @@ export function Sidebar({ isOpen, onToggle }: SidebarProps) {
     { name: 'Employee', icon: Users, path: '/console/admin/employee' },
     { name: 'Plan', icon: CreditCard, path: '/console/admin/plan' },
     { name: 'Branch', icon: Building2, path: '/console/admin/branch' },
+    { name: 'Inventory', icon: Package, path: '/console/admin/inventory' },
     {
       name: 'Setting',
       icon: Settings,
@@ -71,6 +72,12 @@ export function Sidebar({ isOpen, onToggle }: SidebarProps) {
     if (path === '/console/admin/plan') {
       if (currentPath === '/console/admin/plan' || 
           currentPath === '/console/admin/edit-account') {
+        return true;
+      }
+    }
+
+    if (path === '/console/admin/inventory') {
+      if (currentPath === '/console/admin/inventory' || currentPath.startsWith('/console/admin/inventory/')) {
         return true;
       }
     }
