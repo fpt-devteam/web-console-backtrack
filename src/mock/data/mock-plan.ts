@@ -124,3 +124,47 @@ export const mockPaymentMethod: PaymentMethod = {
   expiresYear: 2025,
 };
 
+export interface OrgBillingHistoryRow {
+  id: string;
+  invoiceDate: string;
+  description: string;
+  amount: number;
+  currency: 'USD';
+  status: 'Paid' | 'Pending' | 'Failed';
+}
+
+export const mockOrgBillingHistory: OrgBillingHistoryRow[] = [
+  {
+    id: 'INV-2024-089',
+    invoiceDate: 'Jan 14, 2024',
+    description: 'Standard Plan — Monthly subscription',
+    amount: 49,
+    currency: 'USD',
+    status: 'Paid',
+  },
+  {
+    id: 'INV-2024-062',
+    invoiceDate: 'Dec 14, 2023',
+    description: 'Standard Plan — Monthly subscription',
+    amount: 49,
+    currency: 'USD',
+    status: 'Paid',
+  },
+  {
+    id: 'INV-2024-041',
+    invoiceDate: 'Nov 14, 2023',
+    description: 'Standard Plan — Monthly subscription',
+    amount: 49,
+    currency: 'USD',
+    status: 'Paid',
+  },
+  {
+    id: 'INV-2024-028',
+    invoiceDate: 'Oct 14, 2023',
+    description: 'Proration — plan change',
+    amount: 12.5,
+    currency: 'USD',
+    status: 'Paid',
+  },
+];
+

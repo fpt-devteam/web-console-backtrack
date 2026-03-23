@@ -12,6 +12,7 @@ import {
   mockCurrentPlan,
   mockAvailablePlans,
   mockPaymentMethod,
+  mockOrgBillingHistory,
   type PaymentMethod,
 } from '@/mock/data';
 import { showToast } from '@/lib/toast';
@@ -48,18 +49,19 @@ export function PlanPage() {
 
   return (
     <Layout>
-      <div className="p-8 max-w-7xl mx-auto">
+      <div className="p-4 sm:p-8 w-full">
         {/* Header */}
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-gray-900 mb-2">Plan Management</h1>
           <p className="text-gray-600">Manage your organization's subscription and billing details.</p>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Left Column - Subscription & Plans */}
-          <div className="lg:col-span-2 space-y-6">
+        <div className="space-y-8">
+          {/* Current plan + Payment method (same row height on large screens) */}
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-stretch">
             {/* Current Subscription */}
-            <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+            <div className="lg:col-span-2 h-full min-h-0">
+              <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 h-full">
               <div className="flex items-start justify-between mb-6">
                 <div>
                   <div className="flex items-center gap-3 mb-2">
@@ -138,9 +140,36 @@ export function PlanPage() {
                   Cancel Subscription
                 </button>
               </div>
+              </div>
             </div>
 
-            {/* Available Plans */}
+            {/* Payment Method — khung cùng chiều cao cột; nội dung xếp bình thường */}
+            <div className="lg:col-span-1 h-full min-h-0">
+              <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 h-full">
+                <h3 className="text-lg font-bold text-gray-900 mb-4">Payment Method</h3>
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="w-12 h-8 bg-gradient-to-br from-blue-600 to-blue-800 rounded flex items-center justify-center shrink-0">
+                    <CreditCard className="w-6 h-6 text-white" />
+                  </div>
+                  <div className="min-w-0">
+                    <p className="text-gray-900 font-medium">
+                      {paymentMethod.type.charAt(0).toUpperCase() + paymentMethod.type.slice(1)} ending in{' '}
+                      {paymentMethod.last4}
+                    </p>
+                    <p className="text-sm text-gray-500">
+                      Expires {paymentMethod.expiresMonth}/{paymentMethod.expiresYear}
+                    </p>
+                  </div>
+                </div>
+                <button type="button" className="text-blue-600 hover:text-blue-700 text-sm font-medium">
+                  + Add Payment Method
+                </button>
+              </div>
+            </div>
+          </div>
+
+          {/* Available Plans — full width */}
+          <div className="w-full">
             <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
               <div className="flex items-center justify-between mb-6">
                 <h2 className="text-xl font-bold text-gray-900">Available Plans</h2>
@@ -171,7 +200,7 @@ export function PlanPage() {
               </div>
 
               {/* Plan Cards */}
-              <div className="grid grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 {mockAvailablePlans.map((plan) => {
                   const isCurrentPlan = plan.name === mockCurrentPlan.name;
                   const price = billingCycle === 'monthly' ? plan.monthlyPrice : plan.yearlyPrice;
@@ -255,42 +284,49 @@ export function PlanPage() {
             </div>
           </div>
 
-          {/* Right Column - Account Info */}
-          <div className="space-y-6">
-            {/* Payment Method */}
-            <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="text-lg font-bold text-gray-900">Payment Method</h3>
+          {/* Billing History — full width */}
+          <div className="w-full bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+              <div className="px-6 pt-6 pb-2">
+                <h2 className="text-lg font-semibold text-gray-900">Billing History</h2>
               </div>
-              <div className="flex items-center gap-3 mb-4">
-                <div className="w-12 h-8 bg-gradient-to-br from-blue-600 to-blue-800 rounded flex items-center justify-center">
-                  <CreditCard className="w-6 h-6 text-white" />
-                </div>
-                <div className="flex-1">
-                  <p className="text-gray-900 font-medium">
-                    {paymentMethod.type.charAt(0).toUpperCase() + paymentMethod.type.slice(1)} ending in{' '}
-                    {paymentMethod.last4}
-                  </p>
-                  <p className="text-sm text-gray-500">
-                    Expires {paymentMethod.expiresMonth}/{paymentMethod.expiresYear}
-                  </p>
-                </div>
+              <div className="overflow-x-auto px-6 pb-6">
+                <table className="min-w-[640px] w-full text-sm">
+                    <thead>
+                      <tr className="bg-blue-50 text-left text-blue-900 uppercase text-xs font-bold tracking-wider border-b-1">
+                        <th className="px-4 py-3 font-medium">Invoice</th>
+                        <th className="px-4 py-3 font-medium">Date</th>
+                        <th className="px-4 py-3 font-medium">Description</th>
+                        <th className="px-4 py-3 font-medium">Amount</th>
+                        <th className="px-4 py-3 font-medium">Status</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {mockOrgBillingHistory.map((row) => (
+                        <tr key={row.id} className="border-t border-gray-100 hover:bg-gray-50/80">
+                          <td className="px-4 py-3 text-gray-900 font-medium">{row.id}</td>
+                          <td className="px-4 py-3 text-gray-700">{row.invoiceDate}</td>
+                          <td className="px-4 py-3 text-gray-700">{row.description}</td>
+                          <td className="px-4 py-3 text-gray-900">
+                            ${row.amount.toFixed(2)} {row.currency}
+                          </td>
+                          <td className="px-4 py-3">
+                            <span
+                              className={`inline-flex px-2.5 py-0.5 rounded-full text-xs font-semibold ${
+                                row.status === 'Paid'
+                                  ? 'bg-green-100 text-green-800'
+                                  : row.status === 'Pending'
+                                    ? 'bg-amber-100 text-amber-800'
+                                    : 'bg-red-100 text-red-800'
+                              }`}
+                            >
+                              {row.status}
+                            </span>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
               </div>
-              <button className="text-blue-600 hover:text-blue-700 text-sm font-medium">
-                + Add Payment Method
-              </button>
-            </div>
-
-            {/* Help Section */}
-            <div className="bg-blue-50 rounded-xl border border-blue-200 p-6">
-              <h3 className="text-lg font-bold text-gray-900 mb-2">Need help with plans?</h3>
-              <p className="text-sm text-gray-600 mb-4">
-                Our support team can help you pick the right plan for your organization.
-              </p>
-              <button className="text-blue-600 hover:text-blue-700 text-sm font-medium">
-                Contact Support →
-              </button>
-            </div>
           </div>
         </div>
       </div>
