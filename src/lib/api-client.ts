@@ -3,6 +3,17 @@ import { auth } from './firebase';
 
 const API_URL = import.meta.env.VITE_API_URL;
 
+/**
+ * Reactive bridge: React context cannot be read inside an Axios interceptor
+ * (module-level singleton). Instead, the CurrentOrgContext calls setActiveOrgId()
+ * whenever the active org changes, and the interceptor reads this variable.
+ */
+let _activeOrgId: string | null = null;
+
+export function setActiveOrgId(orgId: string | null): void {
+  _activeOrgId = orgId;
+}
+
 export const privateClient = axios.create({
   baseURL: API_URL,
   headers: {
@@ -16,6 +27,10 @@ privateClient.interceptors.request.use(
     if (user) {
       const token = await user.getIdToken();
       config.headers.Authorization = `Bearer ${token}`;
+    }
+    // Inject active org so the API Gateway can scope requests correctly
+    if (_activeOrgId) {
+      config.headers['X-Org-Id'] = _activeOrgId;
     }
     return config;
   },
