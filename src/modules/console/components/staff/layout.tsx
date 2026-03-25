@@ -1,14 +1,23 @@
-import { StaffNavbar } from './navbar'
+import { useState } from 'react'
+import { StaffSidebar } from './sidebar'
 
 interface LayoutProps {
   children: React.ReactNode
 }
 
 export function StaffLayout({ children }: LayoutProps) {
+  const [sidebarOpen, setSidebarOpen] = useState(true)
+
   return (
-    <div className="h-screen overflow-hidden flex flex-col bg-gray-50">
-      <StaffNavbar />
-      <main className="flex-1 overflow-hidden overflow-y-auto">{children}</main>
+    <div className="min-h-screen bg-gray-50">
+      <StaffSidebar isOpen={sidebarOpen} onToggle={() => setSidebarOpen(!sidebarOpen)} />
+      <main
+        className={`transition-all duration-300 overflow-y-auto ${
+          sidebarOpen ? 'ml-64' : 'ml-20'
+        }`}
+      >
+        {children}
+      </main>
     </div>
   )
 }

@@ -111,6 +111,9 @@ export function ItemDetailPage() {
               <Link to="/console/staff/item-edit/$itemId" params={{ itemId: item.id }}>
                 <Button className="bg-blue-600 hover:bg-blue-700">Edit</Button>
               </Link>
+              <Link to="/console/staff/item-handover/$itemId" params={{ itemId: item.id }}>
+                <Button className="bg-blue-600 hover:bg-blue-700">Handover</Button>
+              </Link>
             </div>
           </div>
 

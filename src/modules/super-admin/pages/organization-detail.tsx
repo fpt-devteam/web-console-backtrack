@@ -1,8 +1,25 @@
 import { Layout } from '../components/layout';
 import { useRouter, useParams } from '@tanstack/react-router';
 import { mockTenants } from '@/mock/data/mock-tenants';
-import { CheckCircle2, Calendar, Share2, Settings, ArrowLeft } from 'lucide-react';
+import { CheckCircle2, Calendar, ArrowLeft, Phone } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+
+const INDUSTRY_OPTIONS: Record<string, string> = {
+  technology: 'Technology & Software',
+  healthcare: 'Healthcare',
+  finance: 'Finance & Banking',
+  retail: 'Retail & E-commerce',
+  education: 'Education',
+  manufacturing: 'Manufacturing',
+  hospitality: 'Hospitality & Tourism',
+  airport: 'Airport',
+  hotel: 'Hotel',
+  university: 'University',
+  mall: 'Shopping Mall',
+  stadium: 'Stadium/Arena',
+  transportation: 'Transportation Hub',
+  other: 'Other',
+};
 
 /**
  * Organization Detail Page
@@ -23,28 +40,14 @@ export function OrganizationDetailPage() {
   
   // Find tenant by ID
   const tenant = mockTenants.find(t => t.id === tenantId);
+  const industryLabel = tenant?.industryType ? (INDUSTRY_OPTIONS[tenant.industryType] ?? tenant.industryType) : null;
+  const taxId = tenant?.taxIdentificationNumber ?? tenant?.taxId;
 
   /**
    * Handles navigation back to organization list
    */
   const handleBack = () => {
     router.navigate({ to: '/super-admin/organization' });
-  };
-
-  /**
-   * Handles share public profile action
-   */
-  const handleShareProfile = () => {
-    // TODO: Implement share functionality
-    console.log('Share profile:', tenantId);
-  };
-
-  /**
-   * Handles manage plan action
-   */
-  const handleManagePlan = () => {
-    // TODO: Implement plan management
-    console.log('Manage plan:', tenantId);
   };
 
   /**
@@ -183,7 +186,7 @@ export function OrganizationDetailPage() {
 
   return (
     <Layout>
-      <div className="p-8 bg-gray-50 min-h-screen">
+      <div className="p-8  bg-gray-50 min-h-screen">
         {/* Breadcrumbs */}
         <div className="mb-6">
           <nav className="text-sm text-gray-500">
@@ -207,10 +210,12 @@ export function OrganizationDetailPage() {
         </div>
 
         {/* Organization Header */}
-        <div className="bg-white rounded-xl shadow-sm p-6 mb-6">
-          <div className="flex items-start justify-between">
-            <div className="flex-1">
-              <div className="flex items-center gap-3 mb-3">
+        
+
+        {/* Organization Information (Org Admin card style) */}
+        <div className="bg-white rounded-xl shadow-sm p-8 mb-6">
+          <div className="space-y-6">
+          <div className="flex items-center gap-3 mb-4">
                 <h1 className="text-3xl font-bold text-gray-900">{tenant.name}</h1>
                 <span
                   className={`px-3 py-1 rounded-full text-sm font-medium border ${getStatusBadgeClass(
@@ -220,31 +225,63 @@ export function OrganizationDetailPage() {
                   {tenant.status}
                 </span>
               </div>
-              <div className="space-y-1">
-                <p className="text-gray-600">{tenant.subdomain}</p>
-                {tenant.taxId && (
-                  <p className="text-gray-600">Tax Identification Number: {tenant.taxId}</p>
-                )}
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Organization Name</label>
+                <div className="w-full px-4 py-2 border border-gray-200 rounded-lg bg-gray-50 text-gray-900">
+                  {tenant.name || '—'}
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Industry Type</label>
+                <div className="w-full px-4 py-2 border border-gray-200 rounded-lg bg-gray-50 text-gray-900">
+                  {industryLabel || '—'}
+                </div>
               </div>
             </div>
-            <div className="flex items-center gap-3">
-              <Button
-                onClick={handleShareProfile}
-                variant="outline"
-                className="flex items-center gap-2"
-              >
-                <Share2 className="w-4 h-4" />
-                Share Public Profile
-              </Button>
-              <Button
-                onClick={handleManagePlan}
-                variant="default"
-                className="flex items-center gap-2"
-              >
-                <Settings className="w-4 h-4" />
-                Manage Plan
-              </Button>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Workspace URL (slug)</label>
+              <div className="flex items-center gap-2">
+                <div className="flex-1 px-4 py-2 border border-gray-200 rounded-lg bg-gray-50 text-gray-900">
+                  {tenant.slug || '—'}
+                </div>
+                <span className="text-sm text-gray-500">.backtrack.com</span>
+              </div>
             </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Phone Number</label>
+              <div className="relative">
+                <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500">
+                  <Phone className="w-4 h-4" />
+                </span>
+                <div className="w-full pl-12 pr-4 py-2 border border-gray-200 rounded-lg bg-gray-50 text-gray-900">
+                  {tenant.phone || '—'}
+                </div>
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Address <span className="text-gray-400 font-normal">(Optional)</span>
+              </label>
+              <div className="w-full px-4 py-2 border border-gray-200 rounded-lg bg-gray-50 text-gray-900 min-h-[100px] whitespace-pre-wrap">
+                {tenant.displayAddress?.trim() || '—'}
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Tax Identification Number
+              </label>
+              <div className="w-full px-4 py-2 border border-gray-300 rounded-lg bg-gray-50 text-gray-500">
+                {taxId ?? '—'}
+              </div>
+            </div>
+
           </div>
         </div>
 
@@ -275,9 +312,31 @@ export function OrganizationDetailPage() {
                     Renewal: {formatDate(tenant.subscriptionPlan.renewalDate)}
                   </span>
                 </div>
+
+                {(tenant.subscriptionPlan.billingCycle || tenant.subscriptionPlan.price || tenant.subscriptionPlan.quotasSummary) && (
+                  <div className="pt-2 border-t border-gray-200">
+                    <div className="flex flex-wrap gap-x-6 gap-y-2 text-sm text-gray-600">
+                      {tenant.subscriptionPlan.billingCycle && (
+                        <div>Billing: <span className="font-medium text-gray-900">{tenant.subscriptionPlan.billingCycle}</span></div>
+                      )}
+                      {tenant.subscriptionPlan.price && (
+                        <div>
+                          Price: <span className="font-medium text-gray-900">${tenant.subscriptionPlan.price.amount.toFixed(2)}</span>/{tenant.subscriptionPlan.price.period}
+                        </div>
+                      )}
+                      {tenant.subscriptionPlan.quotasSummary && (
+                        <div>
+                          Limits: <span className="font-medium text-gray-900">{tenant.subscriptionPlan.quotasSummary.activeUsersLimit} users</span> / <span className="font-medium text-gray-900">{tenant.subscriptionPlan.quotasSummary.storageLimitGB}GB</span>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                )}
+
                 <p className="text-sm text-gray-600 pt-2 border-t border-gray-200">
                   {tenant.subscriptionPlan.description}
                 </p>
+
               </div>
             </div>
           )}
@@ -285,59 +344,81 @@ export function OrganizationDetailPage() {
           {/* Usage Overview Card */}
           {tenant.usageOverview && (
             <div className="bg-white rounded-xl shadow-sm p-6">
-              <h2 className="text-lg font-semibold text-gray-900 mb-4">Usage Overview</h2>
-              <div className="space-y-6">
-                {/* Active Users */}
+              {tenant.subscriptionPlan?.includedFeatures?.length ? (
+              <div className="flex items-start justify-between mb-4 gap-3">
                 <div>
-                  <div className="flex items-center justify-between mb-2">
-                    <span className="text-sm font-medium text-gray-700">Active Users</span>
-                    <span className="text-sm text-gray-600">
-                      {tenant.usageOverview.activeUsers.current} / {tenant.usageOverview.activeUsers.limit}
-                    </span>
-                  </div>
-                  <div className="w-full bg-gray-200 rounded-full h-2.5">
-                    <div
-                      className="bg-blue-600 h-2.5 rounded-full transition-all"
-                      style={{
-                        width: `${calculateProgress(
-                          tenant.usageOverview.activeUsers.current,
-                          tenant.usageOverview.activeUsers.limit
-                        )}%`,
-                      }}
-                    ></div>
-                  </div>
+                  <h2 className="text-lg font-semibold text-gray-900">Plan Features</h2>
+                  <p className="text-sm text-gray-500 mt-1">This subscription includes: {tenant.subscriptionPlan.includedFeatures.join(', ')}.</p>
                 </div>
+              </div>
+              ) : null}
+              
 
-                {/* Storage Used */}
-                <div>
-                  <div className="flex items-center justify-between mb-2">
-                    <span className="text-sm font-medium text-gray-700">Storage Used</span>
-                    <span className="text-sm text-gray-600">
-                      {formatStorage(tenant.usageOverview.storageUsed.current)} /{' '}
-                      {formatStorage(tenant.usageOverview.storageUsed.limit)}
-                    </span>
-                  </div>
-                  <div className="w-full bg-gray-200 rounded-full h-2.5">
-                    <div
-                      className="bg-purple-600 h-2.5 rounded-full transition-all"
-                      style={{
-                        width: `${calculateProgress(
-                          tenant.usageOverview.storageUsed.current,
-                          tenant.usageOverview.storageUsed.limit
-                        )}%`,
-                      }}
-                    ></div>
-                  </div>
-                </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                
 
                 {/* System Status */}
-                <div className="flex items-center gap-2 pt-2 border-t border-gray-200">
-                  <span className="text-sm font-medium text-gray-700">System Status:</span>
-                  <div className="flex items-center gap-2">
-                    <span className={`w-2 h-2 rounded-full ${statusStyle.dot}`}></span>
-                    <span className={`text-sm font-medium ${statusStyle.text}`}>
+                <div className="md:col-span-2 rounded-lg border border-gray-200 p-4">
+                  <div className="flex items-center justify-between gap-3">
+                    <div className="flex items-center gap-2">
+                      <span className={`w-2 h-2 rounded-full ${statusStyle.dot}`} />
+                      <span className="text-sm font-medium text-gray-900">System Status</span>
+                    </div>
+                    <span
+                      className={`inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-medium bg-gray-50 border border-gray-200 ${statusStyle.text}`}
+                    >
                       {tenant.usageOverview.systemStatus}
                     </span>
+                  </div>
+
+                  {/* Organization limits details */}
+                  <div className="mt-5 pt-5 border-t border-gray-200">
+                    <div className="flex items-start justify-between gap-3">
+                      <p className="text-sm font-medium text-gray-900">Org Usage Limits</p>
+                      <p className="text-xs text-gray-500">Staff + storage capacity</p>
+                    </div>
+
+                    <div className="mt-4 space-y-4">
+                      <div>
+                        <div className="flex items-center justify-between gap-3 mb-2">
+                          <span className="text-sm font-medium text-gray-900">Active Users</span>
+                          <span className="text-sm font-semibold text-gray-900">
+                            {tenant.usageOverview.activeUsers.current} / {tenant.usageOverview.activeUsers.limit}
+                          </span>
+                        </div>
+                        <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
+                          <div
+                            className="h-full bg-blue-600 rounded-full transition-all"
+                            style={{
+                              width: `${calculateProgress(
+                                tenant.usageOverview.activeUsers.current,
+                                tenant.usageOverview.activeUsers.limit
+                              )}%`,
+                            }}
+                          />
+                        </div>
+                      </div>
+
+                      <div>
+                        <div className="flex items-center justify-between gap-3 mb-2">
+                          <span className="text-sm font-medium text-gray-900">Storage Used</span>
+                          <span className="text-sm font-semibold text-gray-900">
+                            {formatStorage(tenant.usageOverview.storageUsed.current)} / {formatStorage(tenant.usageOverview.storageUsed.limit)}
+                          </span>
+                        </div>
+                        <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
+                          <div
+                            className="h-full bg-purple-600 rounded-full transition-all"
+                            style={{
+                              width: `${calculateProgress(
+                                tenant.usageOverview.storageUsed.current,
+                                tenant.usageOverview.storageUsed.limit
+                              )}%`,
+                            }}
+                          />
+                        </div>
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -345,30 +426,69 @@ export function OrganizationDetailPage() {
           )}
         </div>
 
-        {/* Enabled Modules Card */}
-        {tenant.enabledModules && tenant.enabledModules.length > 0 && (
+        
+
+        {tenant.billingHistory && tenant.billingHistory.length > 0 && (
           <div className="mt-6 bg-white rounded-xl shadow-sm p-6">
-            <h2 className="text-lg font-semibold text-gray-900 mb-4">Enabled Modules</h2>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-              {tenant.enabledModules.map((module) => (
-                <div
-                  key={module.id}
-                  className="border border-gray-200 rounded-lg p-4 hover:border-blue-300 hover:shadow-sm transition-all"
-                >
-                  <div className="flex items-center gap-3">
-                    <span className="text-2xl">{module.icon}</span>
-                    <div>
-                      <p className="font-medium text-gray-900">{module.name}</p>
-                      <p className="text-xs text-gray-500">
-                        {module.enabled ? 'Enabled' : 'Disabled'}
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              ))}
+            <h2 className="text-lg font-semibold text-gray-900 mb-4">Billing History</h2>
+            <div className="overflow-x-auto">
+              <table className="min-w-[600px] w-full text-sm">
+                <thead>
+                  <tr className="bg-blue-50 text-left  text-blue-900 uppercase text-xs font-bold tracking-wider ">
+                    <th className="font-medium py-2 ps-2">Invoice</th>
+                    <th className="font-medium py-2 ps-2">Date</th>
+                    <th className="font-medium py-2 ps-2">Amount</th>
+                    <th className="font-medium py-2">Status</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {tenant.billingHistory.slice(0, 6).map((inv) => (
+                    <tr key={inv.id} className="border-t">
+                      <td className="py-3 pr-4 text-gray-700">{inv.id}</td>
+                      <td className="py-3 pr-4 text-gray-700">{formatDate(inv.invoiceDate)}</td>
+                      <td className="py-3 pr-4 text-gray-700">${inv.amount.toFixed(2)} {inv.currency}</td>
+                      <td className="py-3 text-gray-700">{inv.status}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             </div>
           </div>
         )}
+
+        {tenant.members && tenant.members.length > 0 && (
+          <div className="mt-6 bg-white rounded-xl shadow-sm p-6">
+            <h2 className="text-lg font-semibold text-gray-900 mb-4">Members</h2>
+            <div className="overflow-x-auto">
+              <table className="min-w-[750px] w-full text-sm">
+                <thead>
+                  <tr className="bg-blue-50 text-left text-blue-900 uppercase text-xs font-bold tracking-wider ">
+                    <th className="font-medium py-2 ps-2">Name</th>
+                    <th className="font-medium py-2 ps-2">Email</th>
+                    <th className="font-medium py-2 ps-2">Role</th>
+                    <th className="font-medium py-2 ps-2">Status</th>
+                    <th className="font-medium py-2">Last Active</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {tenant.members.slice(0, 6).map((m) => (
+                    <tr key={m.id} className="border-t">
+                      <td className="py-3 pr-4 text-gray-700">{m.name}</td>
+                      <td className="py-3 pr-4 text-gray-700">{m.email}</td>
+                      <td className="py-3 pr-4 text-gray-700">{m.role}</td>
+                      <td className="py-3 pr-4 text-gray-700">{m.status}</td>
+                      <td className="py-3 text-gray-700">
+                        {formatDate(m.lastActiveAt)}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        )}
+
+        
       </div>
     </Layout>
   );

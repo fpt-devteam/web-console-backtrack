@@ -69,11 +69,28 @@ export const orgService = {
   },
 
   async updateMemberRole(orgId: string, membershipId: string, role: string): Promise<OrgMember> {
-    const { data } = await privateClient.put<ApiResponse<OrgMember>>(
-      `/api/core/orgs/${orgId}/members/${membershipId}/role`,
-      { role }
-    );
-    if (!data.success) throw new Error(data.error?.message ?? 'Failed to update role');
-    return data.data;
+    try {
+      const { data } = await privateClient.put<ApiResponse<OrgMember>>(
+        `/api/core/orgs/${orgId}/members/${membershipId}/role`,
+        { role }
+      );
+      if (!data.success) throw new Error(data.error?.message ?? 'Failed to update role');
+      return data.data;
+    } catch (err: unknown) {
+      const ax = err as { response?: { status?: number; data?: ApiResponse<unknown> } };
+      const body = ax.response?.data;
+      const backendMessage = body?.error?.message;
+      if (backendMessage) throw new Error(backendMessage);
+      if (ax.response?.status === 400) {
+        throw new Error(
+          'The organization must have at least one admin. You cannot change the last admin to Staff.'
+        );
+      }
+      throw err;
+    }
+  },
+
+  async removeMember(orgId: string, membershipId: string): Promise<void> {
+    await privateClient.delete(`/api/core/orgs/${orgId}/members/${membershipId}`);
   },
 };

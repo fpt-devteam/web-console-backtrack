@@ -5,13 +5,7 @@ import {
   AlertCircle,
   CheckCircle2,
   Activity,
-  Bell,
-  UserPlus,
-  Settings,
-  FileText,
-  Download,
   TrendingUp,
-  X,
   ChevronDown,
 } from 'lucide-react';
 import {
@@ -288,69 +282,6 @@ export function DashboardPage() {
           </div>
         </div>
 
-        {/* Action Required and Quick Actions - Same Row */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-          {/* Action Required Alert */}
-          <div className="bg-white rounded-xl shadow-sm p-6 border-2 border-red-200">
-            <div className="flex items-start gap-4">
-              <div className="p-3 bg-red-100 rounded-lg flex-shrink-0">
-                <Bell className="w-6 h-6 text-red-600" />
-              </div>
-              <div className="flex-1">
-                <h3 className="text-lg font-bold text-gray-900 mb-2">
-                  Action Required: 5 Pending Approvals
-                </h3>
-                <p className="text-gray-600 mb-4">
-                  There are 5 new organization requests that have been pending for more than 24 hours. 
-                  Please review them as soon as possible.
-                </p>
-                <div className="flex items-center gap-3">
-                  <button className="bg-red-600 hover:bg-red-700 text-white px-4 py-1.5 rounded-lg font-medium transition-colors">
-                    Review Requests
-                  </button>
-                  <button className="text-gray-600 hover:text-gray-700 px-4 py-1.5 rounded-lg font-medium transition-colors flex items-center gap-2">
-                    <X className="w-4 h-4" />
-                    Dismiss
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Quick Actions */}
-          <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-200">
-            <h2 className="text-lg font-bold text-gray-900 mb-4">Quick Actions</h2>
-            <div className="grid grid-cols-2 gap-4">
-              <button className="flex flex-col items-center gap-2 p-4 border border-gray-200 rounded-lg hover:bg-gray-50 hover:border-blue-300 transition-all group">
-                <div className="p-3 bg-blue-100 rounded-lg group-hover:bg-blue-200 transition-colors">
-                  <UserPlus className="w-6 h-6 text-blue-600" />
-                </div>
-                <span className="text-sm font-medium text-gray-700">Invite Admin</span>
-              </button>
-              
-              <button className="flex flex-col items-center gap-2 p-4 border border-gray-200 rounded-lg hover:bg-gray-50 hover:border-blue-300 transition-all group">
-                <div className="p-3 bg-gray-100 rounded-lg group-hover:bg-gray-200 transition-colors">
-                  <Settings className="w-6 h-6 text-gray-600" />
-                </div>
-                <span className="text-sm font-medium text-gray-700">System Config</span>
-              </button>
-              
-              <button className="flex flex-col items-center gap-2 p-4 border border-gray-200 rounded-lg hover:bg-gray-50 hover:border-blue-300 transition-all group">
-                <div className="p-3 bg-gray-100 rounded-lg group-hover:bg-gray-200 transition-colors">
-                  <FileText className="w-6 h-6 text-gray-600" />
-                </div>
-                <span className="text-sm font-medium text-gray-700">Audit Logs</span>
-              </button>
-              
-              <button className="flex flex-col items-center gap-2 p-4 border border-gray-200 rounded-lg hover:bg-gray-50 hover:border-blue-300 transition-all group">
-                <div className="p-3 bg-gray-100 rounded-lg group-hover:bg-gray-200 transition-colors">
-                  <Download className="w-6 h-6 text-gray-600" />
-                </div>
-                <span className="text-sm font-medium text-gray-700">Export Data</span>
-              </button>
-            </div>
-          </div>
-        </div>
       </div>
     </Layout>
   );

@@ -20,6 +20,16 @@ export function AddFoundItemPage() {
   const [description, setDescription] = useState<string>('')
   const [distinctiveMarks, setDistinctiveMarks] = useState<string>('')
   const [storageLocation, setStorageLocation] = useState<string>('')
+  // UI-only contact/identity fields (not sent to API yet)
+  const [finderFullName, setFinderFullName] = useState<string>('')
+  const [finderEmail, setFinderEmail] = useState<string>('')
+  const [finderNationalId, setFinderNationalId] = useState<string>('')
+  const [finderInternalId, setFinderInternalId] = useState<string>('')
+  const [finderPhone, setFinderPhone] = useState<string>('')
+
+  const [recipientFullName, setRecipientFullName] = useState<string>('')
+  const [recipientEmail, setRecipientEmail] = useState<string>('')
+  
   const [submitError, setSubmitError] = useState<string | null>(null)
 
   const handlePhotoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -86,6 +96,14 @@ export function AddFoundItemPage() {
           setDistinctiveMarks('')
           setStorageLocation('')
           setPhotos([])
+          setFinderFullName('')
+          setFinderEmail('')
+          setFinderNationalId('')
+          setFinderInternalId('')
+          setFinderPhone('')
+          setRecipientFullName('')
+          setRecipientEmail('')
+        
         } else {
           navigate({ to: '/console/staff/inventory' })
         }
@@ -181,9 +199,9 @@ export function AddFoundItemPage() {
               </div>
             </div>
 
-            {/* Item Details Section */}
-            <div className="space-y-6">
-              <h2 className="text-base font-semibold text-gray-900">Item Details</h2>
+            {/* Product information block */}
+            <div className="space-y-6 rounded-lg border border-gray-200 p-4">
+              <h2 className="text-base font-semibold text-gray-900">Product information</h2>
 
               {/* Item Name (BE required) */}
               <div>
@@ -228,21 +246,141 @@ export function AddFoundItemPage() {
                   className="mt-1"
                 />
               </div>
+
+              {/* Storage Location (optional) */}
+              <div>
+                <Label htmlFor="storageLocation" className="text-sm font-medium text-gray-700">
+                  Storage location
+                </Label>
+                <Input
+                  id="storageLocation"
+                  type="text"
+                  placeholder="e.g. Shelf A, Room 101, Front desk drawer"
+                  value={storageLocation}
+                  onChange={(e) => setStorageLocation(e.target.value)}
+                  className="mt-1"
+                />
+              </div>
             </div>
 
-            {/* Storage Location (optional) */}
-            <div>
-              <Label htmlFor="storageLocation" className="text-sm font-medium text-gray-700">
-                Storage location
-              </Label>
-              <Input
-                id="storageLocation"
-                type="text"
-                placeholder="e.g. Shelf A, Room 101, Front desk drawer"
-                value={storageLocation}
-                onChange={(e) => setStorageLocation(e.target.value)}
-                className="mt-1"
-              />
+            {/* People information block */}
+            <div className="space-y-8 rounded-lg border border-gray-200 p-4">
+              {/* Finder information (UI only) */}
+              <div className="space-y-4">
+                <div>
+                  <h3 className="text-base font-semibold text-gray-900">Finder information</h3>
+                  <p className="text-sm text-gray-600">
+                    Contact and ID details of the person who found or handed in the item.
+                  </p>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <Label htmlFor="finderFullName" className="text-sm font-medium text-gray-700">
+                      Full name
+                    </Label>
+                    <Input
+                      id="finderFullName"
+                      type="text"
+                      placeholder="e.g. Alex Tran"
+                      value={finderFullName}
+                      onChange={(e) => setFinderFullName(e.target.value)}
+                      className="mt-1"
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="finderEmail" className="text-sm font-medium text-gray-700">
+                      Email (optional)
+                    </Label>
+                    <Input
+                      id="finderEmail"
+                      type="email"
+                      placeholder="name@example.com"
+                      value={finderEmail}
+                      onChange={(e) => setFinderEmail(e.target.value)}
+                      className="mt-1"
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="finderNationalId" className="text-sm font-medium text-gray-700">
+                      National ID / citizen ID (number)
+                    </Label>
+                    <Input
+                      id="finderNationalId"
+                      type="text"
+                      placeholder="e.g. 079185******123"
+                      value={finderNationalId}
+                      onChange={(e) => setFinderNationalId(e.target.value)}
+                      className="mt-1"
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="finderInternalId" className="text-sm font-medium text-gray-700">
+                      Student / staff ID (internal)
+                    </Label>
+                    <Input
+                      id="finderInternalId"
+                      type="text"
+                      placeholder="e.g. STU-22123456"
+                      value={finderInternalId}
+                      onChange={(e) => setFinderInternalId(e.target.value)}
+                      className="mt-1"
+                    />
+                  </div>
+                </div>
+                <div>
+                  <Label htmlFor="finderPhone" className="text-sm font-medium text-gray-700">
+                    Phone number
+                  </Label>
+                  <Input
+                    id="finderPhone"
+                    type="tel"
+                    placeholder="e.g. +1 903 000 6782"
+                    value={finderPhone}
+                    onChange={(e) => setFinderPhone(e.target.value)}
+                    className="mt-1"
+                  />
+                </div>
+              </div>
+
+              <div className="border-t border-gray-200" />
+
+              {/* Receiving staff information (UI only) */}
+              <div className="space-y-4">
+                <div>
+                  <h3 className="text-base font-semibold text-gray-900">Receiving staff information</h3>
+                  <p className="text-sm text-gray-600">
+                    Contact and ID details of the staff member who receives the item.
+                  </p>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <Label htmlFor="recipientFullName" className="text-sm font-medium text-gray-700">
+                      Full name
+                    </Label>
+                    <Input
+                      id="recipientFullName"
+                      type="text"
+                      placeholder="e.g. Morgan Lee"
+                      value={recipientFullName}
+                      onChange={(e) => setRecipientFullName(e.target.value)}
+                      className="mt-1"
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="recipientEmail" className="text-sm font-medium text-gray-700">
+                      Email (optional)
+                    </Label>
+                    <Input
+                      id="recipientEmail"
+                      type="email"
+                      placeholder="name@example.com"
+                      value={recipientEmail}
+                      onChange={(e) => setRecipientEmail(e.target.value)}
+                      className="mt-1"
+                    />
+                  </div>
+                </div>
+              </div>
             </div>
 
             <div className="rounded-lg bg-gray-50 border border-gray-200 px-4 py-3">

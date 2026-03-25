@@ -9,11 +9,33 @@ import { showToast } from '@/lib/toast';
 import { getTempEmail, getInvitationCode } from '@/lib/auth-storage';
 import { authService } from '@/services';
 import { userService } from '@/services/user.service';
+import { UserGlobalRole } from '@/types/user.types';
+
+function toFriendlySignInErrorMessage(message: unknown): string {
+  const raw = typeof message === 'string' ? message.trim() : '';
+  if (!raw) return 'Unable to sign in. Please try again.';
+
+  const lower = raw.toLowerCase();
+
+  // Hide technical/system style messages.
+  if (lower.includes('firebase') || lower.includes('auth/') || lower.includes('stack') || lower.includes('exception')) {
+    return 'Unable to sign in. Please check your email and password and try again.';
+  }
+
+  // Normalize some common raw messages that could leak through.
+  if (lower.includes('network') || lower.includes('timeout') || lower.includes('failed to fetch')) {
+    return 'Network error. Please check your connection and try again.';
+  }
+
+  // Keep existing user-friendly messages from our auth service mapping.
+  return raw;
+}
 
 export function SignIn() {
   const [showPassword, setShowPassword] = useState(false);
   const [password, setPassword] = useState('');
   const [email, setEmail] = useState('');
+  const [formError, setFormError] = useState<string | null>(null);
   
   const router = useRouter();
   const signIn = useSignIn();
@@ -25,16 +47,17 @@ export function SignIn() {
       setEmail(tempEmail);
     } else {
       // If no email provided, redirect back to signin-or-signup
-      showToast.error('Please enter your email first');
+      setFormError('Please enter your email first');
       router.navigate({ to: '/auth/signin-or-signup' });
     }
   }, [router]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setFormError(null);
 
     if (!email || !password) {
-      showToast.error('Please enter your password');
+      setFormError('Please enter your password');
       return;
     }
 
@@ -44,14 +67,21 @@ export function SignIn() {
         onSuccess: async (user) => {
           if (!user.emailVerified) {
             await authService.signOut();
-            showToast.error('Please verify your email before signing in. Check your inbox.');
+            setFormError('Please verify your email before signing in. Check your inbox.');
             return;
           }
 
-          await userService.upsertUser();
+          const upsertedProfile = await userService.upsertUser();
           showToast.success('Welcome back!');
 
           const invitationCode = getInvitationCode();
+
+          // Super admin goes straight to super-admin dashboard.
+          if (upsertedProfile.globalRole === UserGlobalRole.SUPER_ADMIN) {
+            window.location.href = '/super-admin/dashboard';
+            return;
+          }
+
           if (invitationCode) {
             window.location.href = '/console/join-invitation';
           } else {
@@ -59,7 +89,7 @@ export function SignIn() {
           }
         },
         onError: (error) => {
-          showToast.error(error.message || 'Failed to sign in.');
+          setFormError(toFriendlySignInErrorMessage((error as any)?.message));
         },
       }
     );
@@ -128,7 +158,10 @@ export function SignIn() {
                   placeholder="Enter your password"
                   className="pr-10"
                   value={password}
-                  onChange={(e) => setPassword(e.target.value)}
+                  onChange={(e) => {
+                    setPassword(e.target.value);
+                    if (formError) setFormError(null);
+                  }}
                   disabled={signIn.isPending}
                   required
                 />
@@ -145,6 +178,11 @@ export function SignIn() {
                   )}
                 </button>
               </div>
+              {formError && (
+                <p className="mt-2 text-sm text-red-600" role="alert" aria-live="polite">
+                  {formError}
+                </p>
+              )}
             </div>
 
             {/* Sign In Button */}

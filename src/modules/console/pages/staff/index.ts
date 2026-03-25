@@ -6,4 +6,5 @@ export { AddFoundItemPage } from './add-item'
 export { SearchResultsPage, type SearchResultsSearch } from './search-results'
 export { ItemDetailPage } from './item-detail'
 export { EditItemPage } from './edit-item'
+export { HandoverItemPage } from './handover-item'
 
