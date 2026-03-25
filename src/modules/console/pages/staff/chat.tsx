@@ -1,277 +1,413 @@
+import { useEffect, useRef, useState } from 'react'
 import { StaffLayout } from '../../components/staff/layout'
-import { Search, Smile, Paperclip, Image as ImageIcon, CheckCircle2 } from 'lucide-react'
-import { useState } from 'react'
-import { useDebouncedValue, SEARCH_DEBOUNCE_MS } from '@/hooks/use-debounce'
+import {
+  Search,
+  Smile,
+  Paperclip,
+  Image as ImageIcon,
+  CheckCircle2,
+  Loader2,
+  RefreshCw,
+} from 'lucide-react'
+import { useChatContext } from '@/contexts/chat.context'
+import {
+  useChatAssigned,
+  useChatQueue,
+  useChatMessages,
+  useAssignConversation,
+} from '@/hooks/use-chat'
+import {
+  useIncomingMessages,
+  useSendMessage,
+  useTypingIndicator,
+  useMarkSeen,
+} from '@/hooks/use-chat-socket'
+import { MessageType, type IConversation } from '@/types/chat.types'
+import { useCurrentOrgId } from '@/contexts/current-org.context'
+import { auth } from '@/lib/firebase'
 
-interface Chat {
-  id: string
-  name: string
-  avatar: string
-  status: 'online' | 'offline' | 'date'
-  statusText: string
-  caseTitle: string
-  caseNumber: string
-  lastMessage: string
-  timestamp: string
-  unreadCount?: number
+// ── Helpers ─────────────────────────────────────────────
+
+function avatarUrl(name: string) {
+  return `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=6366f1&color=fff`
 }
 
-interface Message {
-  id: string
-  sender: 'customer' | 'staff'
-  text: string
-  timestamp: string
+function formatTime(iso: string | null | undefined): string {
+  if (!iso) return ''
+  const d = new Date(iso)
+  return d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
 }
 
-interface ChatWithMessages extends Chat {
-  messages: Message[]
+// ── Typing indicator ─────────────────────────────────────
+
+function TypingIndicator({ conversationId }: { conversationId: string }) {
+  const { typingUsers } = useChatContext()
+  const active = Object.values(typingUsers).filter(
+    (t) => t.conversationId === conversationId
+  )
+  if (!active.length) return null
+  const names = active.map((t) => t.displayName ?? 'Someone')
+  return (
+    <div className="px-7 pb-2 text-xs text-gray-400 italic">
+      {names.join(', ')} {names.length === 1 ? 'is' : 'are'} typing…
+    </div>
+  )
 }
 
-const mockChats: ChatWithMessages[] = [
-  {
-    id: '1',
-    name: 'Alice Smith',
-    avatar: 'https://ui-avatars.com/api/?name=Alice+Smith&background=6366f1&color=fff',
-    status: 'online',
-    statusText: 'Online',
-    caseTitle: 'Lost Wallet',
-    caseNumber: '#4421',
-    lastMessage: 'It is a brown leather wallet.',
-    timestamp: '10:42 AM',
-    messages: [
-      {
-        id: 'm1',
-        sender: 'customer',
-        text: "Hi, I think I left my wallet in the lobby near the coffee machine. Can you check?",
-        timestamp: '10:30 AM',
-      },
-      {
-        id: 'm2',
-        sender: 'staff',
-        text: "Hello Alice. I'm checking with the security team now. Can you describe the wallet?",
-        timestamp: '10:32 AM',
-      },
-      {
-        id: 'm3',
-        sender: 'customer',
-        text: 'It is a brown leather wallet. It has a small silver clasp on the front.',
-        timestamp: '10:42 AM',
-      },
-    ],
-  },
-  {
-    id: '2',
-    name: 'Bob Jones',
-    avatar: 'https://ui-avatars.com/api/?name=Bob+Jones&background=10b981&color=fff',
-    status: 'offline',
-    statusText: 'Yesterday',
-    caseTitle: 'Keys',
-    caseNumber: '#9920',
-    lastMessage: 'Has anyone turned in a set of keys?',
-    timestamp: 'Yesterday',
-    unreadCount: 1,
-    messages: [
-      {
-        id: 'm4',
-        sender: 'customer',
-        text: 'Has anyone turned in a set of keys?',
-        timestamp: 'Yesterday',
-      },
-    ],
-  },
-  {
-    id: '3',
-    name: 'Charlie Brown',
-    avatar: 'https://ui-avatars.com/api/?name=Charlie+Brown&background=f59e0b&color=fff',
-    status: 'date',
-    statusText: 'Oct 24',
-    caseTitle: 'Phone',
-    caseNumber: '#1102',
-    lastMessage: 'Thank you for finding it!',
-    timestamp: 'Oct 24',
-    messages: [
-      {
-        id: 'm5',
-        sender: 'customer',
-        text: 'Thank you for finding it!',
-        timestamp: 'Oct 24',
-      },
-    ],
-  },
-]
+// ── Message panel ────────────────────────────────────────
+
+function MessagePanel({ conversationId }: { conversationId: string }) {
+  const { data, isLoading, fetchNextPage, hasNextPage, isFetchingNextPage } =
+    useChatMessages(conversationId)
+  const { send } = useSendMessage()
+  const { startTyping, stopTyping } = useTypingIndicator()
+  const markSeen = useMarkSeen()
+
+  const [text, setText] = useState('')
+  const bottomRef = useRef<HTMLDivElement>(null)
+  const currentUid = auth.currentUser?.uid
+
+  // Subscribe to real-time messages for this conversation
+  useIncomingMessages(conversationId)
+
+  // Mark seen when the panel mounts or conversation changes
+  useEffect(() => {
+    markSeen(conversationId)
+  }, [conversationId, markSeen])
+
+  // Scroll to bottom on new messages
+  const allMessages = data?.pages.flatMap((p) => p.messages) ?? []
+  useEffect(() => {
+    bottomRef.current?.scrollIntoView({ behavior: 'smooth' })
+  }, [allMessages.length])
+
+  function handleSend() {
+    const trimmed = text.trim()
+    if (!trimmed) return
+    send({ conversationId, type: MessageType.TEXT, content: trimmed })
+    stopTyping()
+    setText('')
+  }
+
+  function handleKeyDown(e: React.KeyboardEvent<HTMLInputElement>) {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault()
+      handleSend()
+    }
+  }
+
+  if (isLoading) {
+    return (
+      <div className="flex-1 flex items-center justify-center">
+        <Loader2 className="w-6 h-6 animate-spin text-blue-500" />
+      </div>
+    )
+  }
+
+  return (
+    <>
+      {/* Load older messages */}
+      {hasNextPage && (
+        <div className="text-center py-2">
+          <button
+            onClick={() => fetchNextPage()}
+            disabled={isFetchingNextPage}
+            className="text-xs text-blue-500 hover:underline disabled:opacity-50"
+          >
+            {isFetchingNextPage ? 'Loading…' : 'Load older messages'}
+          </button>
+        </div>
+      )}
+
+      {/* Messages */}
+      <div className="flex-1 overflow-y-auto py-4 px-7 space-y-4 bg-gray-50">
+        {allMessages.length === 0 && (
+          <p className="text-center text-sm text-gray-400">No messages yet.</p>
+        )}
+
+        {[...allMessages].reverse().map((msg) => {
+          const isOwn = msg.senderId === currentUid
+          return (
+            <div key={msg.id} className={`flex ${isOwn ? 'justify-end' : 'justify-start'}`}>
+              <div
+                className={`max-w-[70%] ${
+                  isOwn
+                    ? 'bg-blue-600 text-white'
+                    : 'bg-white text-gray-900 border border-gray-200'
+                } rounded-lg px-4 py-2`}
+              >
+                <p className="text-sm">{msg.content}</p>
+                <p className={`text-xs mt-1 ${isOwn ? 'text-blue-100' : 'text-gray-500'}`}>
+                  {formatTime(msg.createdAt)}
+                </p>
+              </div>
+            </div>
+          )
+        })}
+
+        <div ref={bottomRef} />
+      </div>
+
+      {/* Typing */}
+      <TypingIndicator conversationId={conversationId} />
+
+      {/* Input */}
+      <div className="p-4 border-t border-gray-200">
+        <div className="flex items-center gap-2">
+          <button className="p-2 text-gray-500 hover:text-gray-700 transition-colors">
+            <Smile className="w-5 h-5" />
+          </button>
+          <button className="p-2 text-gray-500 hover:text-gray-700 transition-colors">
+            <Paperclip className="w-5 h-5" />
+          </button>
+          <button className="p-2 text-gray-500 hover:text-gray-700 transition-colors">
+            <ImageIcon className="w-5 h-5" />
+          </button>
+          <input
+            type="text"
+            placeholder="Type your message…"
+            value={text}
+            onChange={(e) => {
+              setText(e.target.value)
+              startTyping()
+            }}
+            onKeyDown={handleKeyDown}
+            className="flex-1 px-4 py-1.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+          <button
+            onClick={handleSend}
+            className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium text-sm"
+          >
+            Send
+          </button>
+        </div>
+      </div>
+    </>
+  )
+}
+
+// ── Conversation list item ────────────────────────────────
+
+function ConvItem({
+  conv,
+  isActive,
+  onSelect,
+}: {
+  conv: IConversation
+  isActive: boolean
+  onSelect: () => void
+}) {
+  const label = (conv.partner?.displayName ?? conv.partner?.email ?? conv.id ?? 'user').slice(0, 8)
+  return (
+    <button
+      onClick={onSelect}
+      className={`w-full p-4 border-b border-gray-100 hover:bg-gray-50 transition-colors text-left ${
+        isActive ? 'bg-blue-50' : ''
+      }`}
+    >
+      <div className="flex items-start gap-3">
+        <img
+          src={avatarUrl(label)}
+          alt={label}
+          className="w-12 h-12 rounded-full flex-shrink-0"
+        />
+        <div className="flex-1 min-w-0">
+          <div className="flex items-center justify-between mb-1">
+            <span className="text-sm font-semibold text-gray-900 truncate">
+              {label}
+            </span>
+            <span className="text-xs text-gray-500 ml-2">
+              {formatTime(conv.lastMessageAt)}
+            </span>
+          </div>
+          <p className="text-sm truncate text-gray-500">
+            {conv.lastMessageContent ?? 'No messages yet'}
+          </p>
+          {conv.ticketStatus && (
+            <span className={`text-xs font-medium mt-0.5 inline-block px-1.5 py-0.5 rounded-full ${
+              conv.ticketStatus === 'queued'
+                ? 'bg-yellow-100 text-yellow-700'
+                : conv.ticketStatus === 'assigned'
+                ? 'bg-blue-100 text-blue-700'
+                : 'bg-green-100 text-green-700'
+            }`}>
+              {conv.ticketStatus}
+            </span>
+          )}
+        </div>
+      </div>
+    </button>
+  )
+}
+
+// ── Main page ────────────────────────────────────────────
 
 export function StaffChatPage() {
-  const [selectedChat, setSelectedChat] = useState<string>('1')
-  const [filter, setFilter] = useState<'all' | 'unread' | 'resolved'>('all')
-  const [searchTerm, setSearchTerm] = useState('')
-  const debouncedSearchTerm = useDebouncedValue(searchTerm.trim(), SEARCH_DEBOUNCE_MS)
-  const [message, setMessage] = useState('')
+  const { currentOrgId } = useCurrentOrgId()
+  const { activeConversationId, setActiveConversationId, isConnected } = useChatContext()
 
-  const activeChat = mockChats.find((chat) => chat.id === selectedChat)
-  const filteredChats = mockChats.filter((chat) => {
-    if (filter === 'unread' && !chat.unreadCount) return false
-    if (filter === 'resolved') return false // Add resolved logic later
-    if (debouncedSearchTerm) {
-      const searchLower = debouncedSearchTerm.toLowerCase()
-      return (
-        chat.name.toLowerCase().includes(searchLower) ||
-        chat.caseTitle.toLowerCase().includes(searchLower) ||
-        chat.caseNumber.toLowerCase().includes(searchLower)
-      )
+  const [tab, setTab] = useState<'queue' | 'assigned'>('assigned')
+  const [searchTerm, setSearchTerm] = useState('')
+
+  const queueQuery = useChatQueue(currentOrgId ?? undefined)
+  const assignedQuery = useChatAssigned()
+  const assignMutation = useAssignConversation()
+
+  const rawQueue = queueQuery.data
+  const rawAssigned = assignedQuery.data
+
+  // Guard: data may be a cached object {conversations:[]} or an array — always normalise to array
+  const toArr = (d: unknown): IConversation[] => {
+    if (Array.isArray(d)) return d
+    if (d && typeof d === 'object' && 'conversations' in d) {
+      const inner = (d as { conversations: unknown }).conversations
+      if (Array.isArray(inner)) return inner
     }
-    return true
+    return []
+  }
+
+  const conversations = tab === 'queue' ? toArr(rawQueue) : toArr(rawAssigned)
+
+  const isLoadingList = tab === 'queue' ? queueQuery.isLoading : assignedQuery.isLoading
+
+  const filtered = conversations.filter((c) => {
+
+    if (!searchTerm) return true
+    return c.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (c.lastMessageContent ?? '').toLowerCase().includes(searchTerm.toLowerCase())
   })
 
-  const handleSendMessage = () => {
-    if (message.trim()) {
-      // Handle send message logic here
-      setMessage('')
-    }
+  function handleSelect(conv: IConversation) {
+    setActiveConversationId(conv.id)
+  }
+
+  function handleTakeFromQueue(conv: IConversation) {
+    assignMutation.mutate(conv.id, {
+      onSuccess: () => {
+        setTab('assigned')
+        setActiveConversationId(conv.id)
+      },
+    })
   }
 
   return (
     <StaffLayout>
       <div className="h-[calc(100vh-4rem)] flex">
-        {/* Left Pane - Chat List */}
+        {/* ── Left pane — conversation list ── */}
         <div className="w-96 border-r border-gray-200 bg-white flex flex-col">
           {/* Header */}
           <div className="p-4 border-b border-gray-200">
-            <h2 className="text-xl font-bold text-gray-900 mb-4">Customer Chat</h2>
-            
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-xl font-bold text-gray-900">Customer Chat</h2>
+              {/* Connection indicator */}
+              <div className="flex items-center gap-1.5">
+                <div className={`w-2 h-2 rounded-full ${isConnected ? 'bg-green-500' : 'bg-gray-400'}`} />
+                <span className="text-xs text-gray-500">
+                  {isConnected ? 'Live' : 'Connecting…'}
+                </span>
+              </div>
+            </div>
+
             {/* Search */}
             <div className="relative mb-3">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-3 text-gray-400" />
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
               <input
                 type="text"
-                placeholder="Search by name or item..."
+                placeholder="Search conversations…"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
               />
             </div>
 
-            {/* Filter Buttons */}
+            {/* Tabs */}
             <div className="flex gap-2">
               <button
-                onClick={() => setFilter('all')}
+                onClick={() => setTab('assigned')}
                 className={`flex-1 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
-                  filter === 'all'
-                    ? 'bg-blue-50 text-blue-500'
-                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                }`}
-              >
-                All Chats
-              </button>
-              <button
-                onClick={() => setFilter('unread')}
-                className={`flex-1 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
-                  filter === 'unread'
+                  tab === 'assigned'
                     ? 'bg-blue-50 text-blue-600'
                     : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                 }`}
               >
-                Unread
+                My Chats
               </button>
               <button
-                onClick={() => setFilter('resolved')}
+                onClick={() => setTab('queue')}
                 className={`flex-1 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
-                  filter === 'resolved'
+                  tab === 'queue'
                     ? 'bg-blue-50 text-blue-600'
                     : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                 }`}
               >
-                Resolved
+                Queue
+                {(queueQuery.data?.length ?? 0) > 0 && (
+                  <span className="ml-1.5 bg-yellow-500 text-white text-xs px-1.5 py-0.5 rounded-full">
+                    {queueQuery.data?.length}
+                  </span>
+                )}
               </button>
             </div>
           </div>
 
-          {/* Chat List */}
+          {/* List */}
           <div className="flex-1 overflow-y-auto">
-            {filteredChats.map((chat) => (
-              <button
-                key={chat.id}
-                onClick={() => setSelectedChat(chat.id)}
-                className={`w-full p-4 border-b border-gray-100 hover:bg-gray-50 transition-colors text-left ${
-                  selectedChat === chat.id ? 'bg-blue-50' : ''
-                }`}
-              >
-                <div className="flex items-start gap-3">
-                  {/* Avatar */}
-                  <div className="relative flex-shrink-0">
-                    <img
-                      src={chat.avatar}
-                      alt={chat.name}
-                      className="w-12 h-12 rounded-full"
-                    />
-                    {chat.status === 'online' && (
-                      <div className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 rounded-full border-2 border-white"></div>
-                    )}
-                    {chat.status === 'offline' && (
-                      <div className="absolute bottom-0 right-0 w-3 h-3 bg-gray-400 rounded-full border-2 border-white"></div>
-                    )}
-                  </div>
-
-                  {/* Content */}
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center justify-between mb-1">
-                      <span className="text-sm font-semibold text-gray-900 truncate">
-                        {chat.name}
-                      </span>
-                      <span className="text-xs text-gray-500 ml-2">{chat.timestamp}</span>
+            {isLoadingList ? (
+              <div className="flex items-center justify-center py-12">
+                <Loader2 className="w-5 h-5 animate-spin text-blue-400" />
+              </div>
+            ) : filtered.length === 0 ? (
+              <div className="flex flex-col items-center justify-center py-12 text-center px-4">
+                <RefreshCw className="w-8 h-8 text-gray-300 mb-3" />
+                <p className="text-sm text-gray-500">
+                  {tab === 'queue' ? 'No conversations in queue' : 'No assigned conversations'}
+                </p>
+              </div>
+            ) : (
+              filtered.map((conv, idx) => (
+                <div key={conv.id ?? String(idx)}>
+                  <ConvItem
+                    conv={conv}
+                    isActive={activeConversationId === conv.id}
+                    onSelect={() => handleSelect(conv)}
+                  />
+                  {tab === 'queue' && (
+                    <div className="px-4 pb-2">
+                      <button
+                        onClick={() => handleTakeFromQueue(conv)}
+                        disabled={assignMutation.isPending}
+                        className="w-full py-1 text-xs font-medium text-blue-600 border border-blue-300 rounded-lg hover:bg-blue-50 transition-colors disabled:opacity-50"
+                      >
+                        {assignMutation.isPending ? 'Assigning…' : 'Take this chat'}
+                      </button>
                     </div>
-                    <div className={`text-sm font-medium mb-1 ${
-                      selectedChat === chat.id ? 'text-blue-500' : 'text-gray-500'
-                    }`}>
-                      Case {chat.caseNumber}: {chat.caseTitle}
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <p className="text-sm truncate">{chat.lastMessage}</p>
-                      {chat.unreadCount && (
-                        <span className="ml-2 w-5 h-5 bg-blue-600 text-white text-xs rounded-full flex items-center justify-center flex-shrink-0">
-                          {chat.unreadCount}
-                        </span>
-                      )}
-                    </div>
-                  </div>
+                  )}
                 </div>
-              </button>
-            ))}
+              ))
+            )}
           </div>
         </div>
 
-        {/* Right Pane - Active Chat */}
+        {/* ── Right pane — active conversation ── */}
         <div className="flex-1 flex flex-col bg-white">
-          {activeChat ? (
+          {activeConversationId ? (
             <>
-              {/* Chat Header */}
+              {/* Chat header */}
               <div className="p-4 border-b border-gray-200 flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                  <div className="relative">
-                    <img
-                      src={activeChat.avatar}
-                      alt={activeChat.name}
-                      className="w-10 h-10 rounded-full"
-                    />
-                    {activeChat.status === 'online' && (
-                      <div className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 rounded-full border-2 border-white"></div>
-                    )}
-                    {activeChat.status === 'offline' && (
-                      <div className="absolute bottom-0 right-0 w-3 h-3 bg-gray-400 rounded-full border-2 border-white"></div>
-                    )}
-                  </div>
+                  <img
+                    src={avatarUrl(activeConversationId.slice(0, 8))}
+                    alt="chat"
+                    className="w-10 h-10 rounded-full"
+                  />
                   <div>
-                    <div className="flex items-center gap-2">
-                      <h3 className="font-semibold text-gray-900">{activeChat.name}</h3>
-                    </div>
-                    <p className="text-sm text-blue-500">
-                      Case {activeChat.caseNumber}: {activeChat.caseTitle}
-                    </p>
+                    <h3 className="font-semibold text-gray-900 text-sm">
+                      {activeConversationId.slice(0, 8)}
+                    </h3>
+                    <p className="text-xs text-blue-500">{activeConversationId}</p>
                   </div>
                 </div>
                 <div className="flex items-center gap-2">
-                  <button className="px-4 py-1.5 text-sm font-medium text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">
-                    View Details
-                  </button>
                   <button className="px-4 py-1.5 text-sm font-medium text-white bg-green-600 rounded-lg hover:bg-green-700 transition-colors flex items-center gap-2">
                     <CheckCircle2 className="w-4 h-4" />
                     Mark Resolved
@@ -280,75 +416,14 @@ export function StaffChatPage() {
               </div>
 
               {/* Messages */}
-              <div className="flex-1 overflow-y-auto py-4 px-7 space-y-4 bg-gray-50">
-                <div className="text-center">
-                  <span className="text-xs font-medium text-gray-500 bg-gray-100 px-3 py-1 rounded-full">
-                    TODAY
-                  </span>
-                </div>
-
-                {activeChat.messages.map((msg) => (
-                  <div
-                    key={msg.id}
-                    className={`flex ${msg.sender === 'staff' ? 'justify-end' : 'justify-start'}`}
-                  >
-                    <div
-                      className={`max-w-[70%] ${
-                        msg.sender === 'staff'
-                          ? 'bg-blue-600 text-white'
-                          : 'bg-white text-gray-900 border border-gray-200'
-                      } rounded-lg px-4 py-2`}
-                    >
-                      <p className="text-sm">{msg.text}</p>
-                      <p
-                        className={`text-xs mt-1 ${
-                          msg.sender === 'staff' ? 'text-blue-100' : 'text-gray-500'
-                        }`}
-                      >
-                        {msg.timestamp}
-                      </p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-
-              {/* Message Input */}
-              <div className="p-4 border-t border-gray-200">
-                <div className="flex items-center gap-2">
-                  <button className="p-2 text-gray-500 hover:text-gray-700 transition-colors">
-                    <Smile className="w-5 h-5" />
-                  </button>
-                  <button className="p-2 text-gray-500 hover:text-gray-700 transition-colors">
-                    <Paperclip className="w-5 h-5" />
-                  </button>
-                  <button className="p-2 text-gray-500 hover:text-gray-700 transition-colors">
-                    <ImageIcon className="w-5 h-5" />
-                  </button>
-                  <input
-                    type="text"
-                    placeholder="Type your message..."
-                    value={message}
-                    onChange={(e) => setMessage(e.target.value)}
-                    onKeyDown={(e) => {
-                      if (e.key === 'Enter' && !e.shiftKey) {
-                        e.preventDefault()
-                        handleSendMessage()
-                      }
-                    }}
-                    className="flex-1 px-4 py-1.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  />
-                  <button
-                    onClick={handleSendMessage}
-                    className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium text-sm"
-                  >
-                    Send
-                  </button>
-                </div>
-              </div>
+              <MessagePanel conversationId={activeConversationId} />
             </>
           ) : (
-            <div className="flex-1 flex items-center justify-center">
-              <p className="text-gray-500">Select a chat to start messaging</p>
+            <div className="flex-1 flex flex-col items-center justify-center gap-3 text-center px-8">
+              <div className="w-16 h-16 bg-blue-50 rounded-full flex items-center justify-center">
+                <Smile className="w-8 h-8 text-blue-300" />
+              </div>
+              <p className="text-gray-500 text-sm">Select a conversation to start chatting</p>
             </div>
           )}
         </div>

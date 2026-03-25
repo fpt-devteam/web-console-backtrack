@@ -1,4 +1,5 @@
-import { createContext, useCallback, useContext, useMemo, useState } from 'react';
+import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
+import { setActiveOrgId } from '@/lib/api-client';
 
 const STORAGE_KEY = 'backtrack_current_org_id';
 
@@ -32,6 +33,13 @@ export function CurrentOrgProvider({ children }: { children: React.ReactNode }) 
   const setCurrentOrgId = useCallback((orgId: string | null) => {
     setState(orgId);
     setStored(orgId);
+    setActiveOrgId(orgId); // keep Axios interceptor in sync
+  }, []);
+
+  // On mount: restore the bridge from sessionStorage (handles page refresh)
+  useEffect(() => {
+    setActiveOrgId(currentOrgId);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const value = useMemo(
