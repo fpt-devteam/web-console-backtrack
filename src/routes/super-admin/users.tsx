@@ -1,10 +1,18 @@
 import { UsersPage } from '@/modules/super-admin/pages/users';
-import { createFileRoute } from '@tanstack/react-router';
+import { Outlet, createFileRoute, useLocation } from '@tanstack/react-router';
 
 export const Route = createFileRoute('/super-admin/users')({
   component: RouteComponent,
 });
 
 function RouteComponent() {
-  return <UsersPage />;
+  const location = useLocation();
+  const isIndexRoute = location.pathname === '/super-admin/users';
+
+  return (
+    <>
+      {isIndexRoute ? <UsersPage /> : null}
+      <Outlet />
+    </>
+  );
 }

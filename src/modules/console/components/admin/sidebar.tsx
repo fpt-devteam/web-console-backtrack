@@ -1,5 +1,6 @@
-import { LayoutGrid, Users, CreditCard, Building2, Settings, ChevronLeft, ChevronRight } from 'lucide-react';
+import { LayoutGrid, Users, CreditCard, Building2, Settings, ChevronLeft, ChevronRight, ChevronDown, ChevronUp, ArrowLeftRight, Package } from 'lucide-react';
 import { Link, useLocation } from '@tanstack/react-router';
+import { useState, useEffect } from 'react';
 import { useCurrentOrgId } from '@/contexts/current-org.context';
 import { useOrganization } from '@/hooks/use-org';
 import { useCurrentUser } from '@/hooks/use-auth';
@@ -24,31 +25,31 @@ export function Sidebar({ isOpen, onToggle }: SidebarProps) {
   const userInitials = getInitials(user?.name);
   const userDisplayName = user?.name || user?.email || 'User';
 
-  const menuItems = [
-    {
-      name: 'Dashboard',
-      icon: LayoutGrid,
-      path: '/console/admin/dashboard',
-    },
-    {
-      name: 'Employee',
-      icon: Users,
-      path: '/console/admin/employee',
-    },
-    {
-      name: 'Plan',
-      icon: CreditCard,
-      path: '/console/admin/plan',
-    },
-    {
-      name: 'Branch',
-      icon: Building2,
-      path: '/console/admin/branch',
-    },
+  const settingSubPaths = [
+    '/console/admin/setting',
+    '/console/admin/setting/organization',
+    '/console/admin/setting/organization/edit',
+    '/console/account/security',
+  ];
+  const isSettingActive = settingSubPaths.some((p) => location.pathname === p || location.pathname.startsWith(p + '/'));
+  const [settingExpanded, setSettingExpanded] = useState(isSettingActive);
+  useEffect(() => {
+    if (isSettingActive) setSettingExpanded(true);
+  }, [isSettingActive]);
+
+  const menuItems: { name: string; icon: typeof LayoutGrid; path?: string; children?: { name: string; path: string }[] }[] = [
+    { name: 'Dashboard', icon: LayoutGrid, path: '/console/admin/dashboard' },
+    { name: 'Employee', icon: Users, path: '/console/admin/employee' },
+    { name: 'Plan', icon: CreditCard, path: '/console/admin/plan' },
+    { name: 'Branch', icon: Building2, path: '/console/admin/branch' },
+    { name: 'Inventory', icon: Package, path: '/console/admin/inventory' },
     {
       name: 'Setting',
       icon: Settings,
-      path: '/console/admin/setting',
+      children: [
+        { name: 'Organization Information', path: '/console/admin/setting/organization' },
+        { name: 'Security', path: '/console/account/security' },
+      ],
     },
   ];
 
@@ -75,15 +76,20 @@ export function Sidebar({ isOpen, onToggle }: SidebarProps) {
       }
     }
 
-    // For Setting menu, also highlight when on organization or security
-    if (path === '/console/admin/setting') {
-      if (currentPath === '/console/admin/setting' ||
-          currentPath === '/console/admin/setting/organization' ||
-          currentPath === '/console/admin/setting/security') {
+    if (path === '/console/admin/inventory') {
+      if (currentPath === '/console/admin/inventory' || currentPath.startsWith('/console/admin/inventory/')) {
         return true;
       }
     }
-    
+
+    return false;
+  };
+
+  const isSettingChildActive = (path: string) => {
+    const currentPath = location.pathname;
+    if (path === '/console/admin/setting/organization')
+      return currentPath === path || currentPath.startsWith('/console/admin/setting/organization/');
+    if (path === '/console/account/security') return currentPath === path;
     return false;
   };
 
@@ -122,20 +128,81 @@ export function Sidebar({ isOpen, onToggle }: SidebarProps) {
         <ul className="flex flex-col gap-1 px-2">
           {menuItems.map((item) => {
             const Icon = item.icon;
-            const active = isActive(item.path);
-            
+            const hasChildren = item.children && item.children.length > 0;
+            const active = hasChildren ? isSettingActive : isActive(item.path!);
+
+            if (hasChildren) {
+              const firstChildPath = item.children![0].path;
+              if (!isOpen) {
+                return (
+                  <li key={item.name}>
+                    <Link
+                      to={firstChildPath}
+                      className={`flex items-center gap-4 px-6 py-2 rounded-lg font-medium transition-all duration-300 ${
+                        active
+                          ? 'bg-gradient-to-r from-blue-600 to-blue-400 text-white shadow-lg'
+                          : 'hover:bg-blue-50 hover:text-blue-600'
+                      }`}
+                    >
+                      <Icon className="w-5 h-5 flex-shrink-0" />
+                    </Link>
+                  </li>
+                );
+              }
+              return (
+                <li key={item.name}>
+                  <button
+                    type="button"
+                    onClick={() => setSettingExpanded((prev) => !prev)}
+                    className={`flex items-center justify-between gap-2 w-full px-6 py-2 rounded-lg font-medium transition-all duration-300 text-left ${
+                      active
+                        ? 'bg-gradient-to-r from-blue-600 to-blue-400 text-white shadow-lg'
+                        : 'hover:bg-blue-50 hover:text-blue-600'
+                    }`}
+                  >
+                    <div className="flex items-center gap-4 min-w-0">
+                      <Icon className="w-5 h-5 flex-shrink-0" />
+                      <span className="whitespace-nowrap overflow-hidden">{item.name}</span>
+                    </div>
+                    {settingExpanded ? <ChevronUp className="w-4 h-4 flex-shrink-0" /> : <ChevronDown className="w-4 h-4 flex-shrink-0" />}
+                  </button>
+                  {settingExpanded && item.children && (
+                    <ul className="mt-1 ml-4 pl-4 border-l-2 border-gray-200 flex flex-col gap-0.5">
+                      {item.children.map((child) => {
+                        const childActive = isSettingChildActive(child.path);
+                        return (
+                          <li key={child.path}>
+                            <Link
+                              to={child.path}
+                              className={`block px-3 py-2 rounded-lg text-sm font-medium transition-all ${
+                                childActive
+                                  ? 'bg-blue-50 text-blue-700 border-l-2 border-blue-600 -ml-[2px] pl-[10px]'
+                                  : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900'
+                              }`}
+                            >
+                              {child.name}
+                            </Link>
+                          </li>
+                        );
+                      })}
+                    </ul>
+                  )}
+                </li>
+              );
+            }
+
             return (
               <li key={item.path}>
                 <Link
-                  to={item.path}
+                  to={item.path!}
                   className={`flex items-center gap-4 px-6 py-2 rounded-lg font-medium transition-all duration-300 ${
                     active
                       ? 'bg-gradient-to-r from-blue-600 to-blue-400 text-white shadow-lg'
-                      : ' hover:bg-blue-50 hover:text-blue-600'
+                      : 'hover:bg-blue-50 hover:text-blue-600'
                   }`}
                 >
                   <Icon className="w-5 h-5 flex-shrink-0" />
-                  <span 
+                  <span
                     className={`transition-all duration-300 whitespace-nowrap overflow-hidden ${
                       isOpen ? 'w-auto opacity-100' : 'w-0 opacity-0'
                     }`}
@@ -167,6 +234,13 @@ export function Sidebar({ isOpen, onToggle }: SidebarProps) {
             <p className="text-xs text-gray-500 truncate">Admin</p>
           </div>
         )}
+        <Link
+          to="/console/welcome"
+          className="p-1.5 rounded-md text-gray-500 hover:bg-gray-100 hover:text-gray-700 transition-colors flex-shrink-0"
+          title="change org"
+        >
+          <ArrowLeftRight className="w-4 h-4" aria-hidden />
+        </Link>
       </div>
 
       {/* Footer */}

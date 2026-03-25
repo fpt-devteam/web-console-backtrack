@@ -97,9 +97,7 @@ export function Sidebar({ isOpen, onToggle }: SidebarProps) {
     
     // For Organization, also highlight when on related organization pages
     if (path === '/super-admin/organization') {
-      if (currentPath.startsWith('/super-admin/organization') ||
-          currentPath.startsWith('/super-admin/add-tenant') ||
-          currentPath.startsWith('/super-admin/edit-tenant')) {
+      if (currentPath.startsWith('/super-admin/organization')) {
         return true;
       }
     }

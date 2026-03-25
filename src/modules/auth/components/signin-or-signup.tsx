@@ -8,6 +8,11 @@ import { useCheckEmail } from '@/hooks/use-auth';
 import { showToast } from '@/lib/toast';
 import { saveTempEmail, saveInvitationCode } from '@/lib/auth-storage';
 
+function isValidEmail(email: string): boolean {
+  // Basic FE validation before calling BE.
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+}
+
 export function SignInOrSignUp() {
   const [email, setEmail] = useState('');
   const router = useRouter();
@@ -28,13 +33,19 @@ export function SignInOrSignUp() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    const normalizedEmail = email.trim().toLowerCase();
 
-    if (!email.trim()) {
+    if (!normalizedEmail) {
       showToast.error('Please enter your email address');
       return;
     }
 
-    checkEmail.mutate(email, {
+    if (!isValidEmail(normalizedEmail)) {
+      showToast.error('Please enter a valid email address');
+      return;
+    }
+
+    checkEmail.mutate(normalizedEmail, {
       onSuccess: (result) => {
         saveTempEmail(result.email);
         

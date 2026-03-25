@@ -49,7 +49,8 @@ export function EditEmployeePage() {
           router.navigate({ to: '/console/admin/employee' });
         },
         onError: (err) => {
-          showToast.error(err instanceof Error ? err.message : 'Failed to update role');
+          const message = err instanceof Error ? err.message : 'Failed to update role';
+          setErrors({ role: message });
         },
       }
     );
@@ -124,15 +125,6 @@ export function EditEmployeePage() {
               <div>
                 <h2 className="text-xl font-bold text-gray-900 mb-4">Employee Information</h2>
                 <div className="space-y-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Full Name</label>
-                    <input
-                      type="text"
-                      value={member.displayName ?? ''}
-                      readOnly
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg bg-gray-50 text-gray-600 cursor-not-allowed"
-                    />
-                  </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">Email</label>
                     <input

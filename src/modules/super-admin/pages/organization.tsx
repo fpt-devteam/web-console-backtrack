@@ -1,8 +1,9 @@
 import { Layout } from '../components/layout';
-import { Plus, Edit, Trash2, Eye } from 'lucide-react';
+import { Trash2, Eye } from 'lucide-react';
 import { useState } from 'react';
 import { formatDistanceToNow } from 'date-fns';
 import { useRouter } from '@tanstack/react-router';
+import { useDebouncedValue, SEARCH_DEBOUNCE_MS } from '@/hooks/use-debounce';
 import { mockTenants, type TenantStatus } from '@/mock/data/mock-tenants';
 import { TableFiltersBar } from '@/components/filters/table-filters-bar';
 import { Pagination } from '@/components/ui/pagination';
@@ -17,16 +18,17 @@ export function OrganizationPage() {
   const router = useRouter();
   const [currentPage, setCurrentPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState('');
+  const debouncedSearchTerm = useDebouncedValue(searchTerm.trim(), SEARCH_DEBOUNCE_MS);
   const [statusFilter, setStatusFilter] = useState<TenantStatus | 'All'>('All');
   const [sortFilter, setSortFilter] = useState<'Newest' | 'Oldest' | 'Name A-Z' | 'Name Z-A'>('Newest');
-  const pageSize = 5;
+  const pageSize = 10;
 
   // Filter tenants by search term and status
   const filteredTenants = mockTenants.filter(tenant => {
     const matchesSearch = 
-      tenant.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      tenant.subdomain.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      tenant.adminEmail.toLowerCase().includes(searchTerm.toLowerCase());
+      tenant.name.toLowerCase().includes(debouncedSearchTerm.toLowerCase()) ||
+      tenant.subdomain.toLowerCase().includes(debouncedSearchTerm.toLowerCase()) ||
+      tenant.adminEmail.toLowerCase().includes(debouncedSearchTerm.toLowerCase());
     const matchesStatus = statusFilter === 'All' || tenant.status === statusFilter;
     return matchesSearch && matchesStatus;
   });
@@ -109,10 +111,6 @@ export function OrganizationPage() {
     return distance.replace('about ', '').replace(' ago', ' ago');
   };
 
-  const handleAddTenant = () => {
-    router.navigate({ to: '/super-admin/add-tenant' });
-  };
-
   /**
    * Handles navigation to tenant detail page
    * 
@@ -120,10 +118,6 @@ export function OrganizationPage() {
    */
   const handleViewTenant = (tenantId: string) => {
     router.navigate({ to: '/super-admin/organization/$tenantId', params: { tenantId } });
-  };
-
-  const handleEditTenant = (tenantId: string) => {
-    router.navigate({ to: '/super-admin/edit-tenant/$tenantId', params: { tenantId } });
   };
 
   const handleDeleteTenant = (tenantId: string, tenantName: string) => {
@@ -151,7 +145,7 @@ export function OrganizationPage() {
     <Layout>
       <div className="p-8 bg-gray-50 min-h-screen">
         {/* Breadcrumbs */}
-        <div className="mb-6">
+        <div className="mb-5">
           <nav className="text-sm text-gray-500">
             <span className="hover:text-gray-700 cursor-pointer">Organization</span>
             <span className="mx-2">/</span>
@@ -160,20 +154,13 @@ export function OrganizationPage() {
         </div>
 
         {/* Header */}
-        <div className="flex items-start justify-between mb-8">
+        <div className="flex items-start justify-between mb-4">
           <div>
             <h1 className="text-3xl font-bold text-gray-900 mb-2">Tenants</h1>
             <p className="">
               Manage and monitor all active tenant accounts and subscriptions.
             </p>
           </div>
-          <button
-            onClick={handleAddTenant}
-            className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-1.5 rounded-lg font-semibold flex items-center gap-2 transition-colors"
-          >
-            <Plus className="w-5 h-5" />
-            Add Tenant
-          </button>
         </div>
 
         {/* Search and Filter Bar */}
@@ -204,27 +191,24 @@ export function OrganizationPage() {
         <div className="bg-white rounded-xl shadow-sm overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full">
-              <thead className="bg-gray-50 border-b border-gray-200">
+              <thead className="bg-blue-50 border-b-1 ">
                 <tr>
-                  <th className="px-6 py-3 text-left text-xs font-semibold  uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-bold uppercase tracking-wider ">
                     Tenant Name
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-semibold  uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-bold uppercase tracking-wider ">
                     Subdomain
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-semibold  uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-bold uppercase tracking-wider ">
                     Status
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-semibold  uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-bold uppercase tracking-wider ">
                     Created Date
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-semibold  uppercase tracking-wider">
-                    Admin Email
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-semibold  uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-bold uppercase tracking-wider ">
                     Last Activity
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-semibold  uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-bold uppercase tracking-wider ">
                     Action
                   </th>
                 </tr>
@@ -240,7 +224,7 @@ export function OrganizationPage() {
                             {tenant.avatarText}
                           </div>
                           <button
-                            onClick={() => router.navigate({ to: '/super-admin/organization/$tenantId', params: { tenantId: tenant.id } })}
+                            onClick={() => handleViewTenant(tenant.id)}
                             className="font-medium text-gray-900 hover:text-blue-600 transition-colors text-left"
                           >
                             {tenant.name}
@@ -262,9 +246,6 @@ export function OrganizationPage() {
                         <span className="">{formatDate(tenant.createdDate)}</span>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
-                        <span className="">{tenant.adminEmail}</span>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
                         <span className="">{formatLastActivity(tenant.lastActivity)}</span>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
@@ -275,13 +256,6 @@ export function OrganizationPage() {
                             title="View Tenant Details"
                           >
                             <Eye className="w-4 h-4" />
-                          </button>
-                          <button
-                            onClick={() => handleEditTenant(tenant.id)}
-                            className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
-                            title="Edit Tenant"
-                          >
-                            <Edit className="w-4 h-4" />
                           </button>
                           <button
                             onClick={() => handleDeleteTenant(tenant.id, tenant.name)}
@@ -304,11 +278,13 @@ export function OrganizationPage() {
             <div className="text-sm ">
               Showing {startIndex + 1} to {Math.min(endIndex, sortedTenants.length)} of {sortedTenants.length} results
             </div>
-            <Pagination
-              currentPage={currentPage}
-              totalPages={totalPages}
-              onPageChange={setCurrentPage}
-            />
+            {totalPages > 1 ? (
+              <Pagination
+                currentPage={currentPage}
+                totalPages={totalPages}
+                onPageChange={setCurrentPage}
+              />
+            ) : null}
           </div>
         </div>
       </div>

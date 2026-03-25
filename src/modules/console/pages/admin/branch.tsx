@@ -2,6 +2,7 @@ import { Layout } from '../../components/admin/layout';
 import { Search, Filter, Plus, ChevronDown, Edit, Trash2 } from 'lucide-react';
 import { useState } from 'react';
 import { useRouter } from '@tanstack/react-router';
+import { useDebouncedValue, SEARCH_DEBOUNCE_MS } from '@/hooks/use-debounce';
 import { mockBranches, type Branch } from '@/mock/data';
 import { showToast } from '@/lib/toast';
 
@@ -9,15 +10,16 @@ export function BranchPage() {
   const router = useRouter();
   const [currentPage, setCurrentPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState('');
+  const debouncedSearchTerm = useDebouncedValue(searchTerm.trim(), SEARCH_DEBOUNCE_MS);
   const [statusFilter, setStatusFilter] = useState<'All' | 'Active' | 'Pending' | 'Inactive'>('All');
   const [showFilterDropdown, setShowFilterDropdown] = useState(false);
   const pageSize = 4;
 
   // Filter branches by search term and status
   const filteredBranches = mockBranches.filter(branch => {
-    const matchesSearch = branch.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      branch.code.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      branch.city.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesSearch = branch.name.toLowerCase().includes(debouncedSearchTerm.toLowerCase()) ||
+      branch.code.toLowerCase().includes(debouncedSearchTerm.toLowerCase()) ||
+      branch.city.toLowerCase().includes(debouncedSearchTerm.toLowerCase());
     const matchesStatus = statusFilter === 'All' || branch.status.toLowerCase() === statusFilter.toLowerCase();
     return matchesSearch && matchesStatus;
   });
