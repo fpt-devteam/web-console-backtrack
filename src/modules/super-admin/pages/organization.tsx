@@ -6,6 +6,7 @@ import { useRouter } from '@tanstack/react-router';
 import { useDebouncedValue, SEARCH_DEBOUNCE_MS } from '@/hooks/use-debounce';
 import { mockTenants, type TenantStatus } from '@/mock/data/mock-tenants';
 import { TableFiltersBar } from '@/components/filters/table-filters-bar';
+import { OrgLogo } from '@/components/org-logo';
 import { Pagination } from '@/components/ui/pagination';
 
 /**
@@ -220,9 +221,15 @@ export function OrganizationPage() {
                     <tr key={tenant.id} className="hover:bg-gray-50 transition-colors">
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="flex items-center gap-3">
-                          <div className={`w-10 h-10 rounded-full ${tenant.avatarColor} flex items-center justify-center text-gray-700 font-semibold text-sm`}>
-                            {tenant.avatarText}
-                          </div>
+                          {tenant.logoUrl ? (
+                            <OrgLogo logoUrl={tenant.logoUrl} alt={tenant.name} className="h-10 w-10" />
+                          ) : (
+                            <div
+                              className={`flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full text-sm font-semibold text-gray-700 ${tenant.avatarColor}`}
+                            >
+                              {tenant.avatarText}
+                            </div>
+                          )}
                           <button
                             onClick={() => handleViewTenant(tenant.id)}
                             className="font-medium text-gray-900 hover:text-blue-600 transition-colors text-left"

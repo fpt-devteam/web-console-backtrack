@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button'
 import { Spinner } from '@/components/ui/spinner'
 import { useInventoryItem, useDeleteInventoryItem } from '@/hooks/use-inventory'
 import { useCurrentOrgId } from '@/contexts/current-org.context'
+import { InventoryDetailPanels } from '@/modules/console/components/inventory-detail-panels'
 
 export function ItemDetailPage() {
   const { itemId } = useParams({ from: '/console/staff/item/$itemId' })
@@ -92,28 +93,35 @@ export function ItemDetailPage() {
               </p>
             </div>
             <div className="flex gap-3">
-              <Button
-                variant="outline"
-                className="text-red-600 border-red-300 hover:bg-red-50"
-                disabled={deleteItem.isPending}
-                onClick={() => {
-                  if (window.confirm('Are you sure you want to delete this item? This cannot be undone.')) {
-                    deleteItem.mutate(item.id, {
-                      onSuccess: () => navigate({ to: '/console/staff/inventory' }),
-                      onError: (err) => alert(err instanceof Error ? err.message : 'Failed to delete item'),
-                    })
-                  }
-                }}
-              >
-                <Trash2 className="w-4 h-4 mr-2" />
-                {deleteItem.isPending ? 'Deleting...' : 'Delete'}
-              </Button>
-              <Link to="/console/staff/item-edit/$itemId" params={{ itemId: item.id }}>
-                <Button className="bg-blue-600 hover:bg-blue-700">Edit</Button>
-              </Link>
-              <Link to="/console/staff/item-handover/$itemId" params={{ itemId: item.id }}>
-                <Button className="bg-blue-600 hover:bg-blue-700">Handover</Button>
-              </Link>
+              {item.status !== 'Returned' && (
+                <>
+                  <Button
+                    variant="outline"
+                    className="text-red-600 border-red-300 hover:bg-red-50"
+                    disabled={deleteItem.isPending}
+                    onClick={() => {
+                      if (
+                        window.confirm('Are you sure you want to delete this item? This cannot be undone.')
+                      ) {
+                        deleteItem.mutate(item.id, {
+                          onSuccess: () => navigate({ to: '/console/staff/inventory' }),
+                          onError: (err) =>
+                            alert(err instanceof Error ? err.message : 'Failed to delete item'),
+                        })
+                      }
+                    }}
+                  >
+                    <Trash2 className="w-4 h-4 mr-2" />
+                    {deleteItem.isPending ? 'Deleting...' : 'Delete'}
+                  </Button>
+                  <Link to="/console/staff/item-edit/$itemId" params={{ itemId: item.id }}>
+                    <Button className="bg-blue-600 hover:bg-blue-700">Edit</Button>
+                  </Link>
+                  <Link to="/console/staff/item-handover/$itemId" params={{ itemId: item.id }}>
+                    <Button className="bg-blue-600 hover:bg-blue-700">Handover</Button>
+                  </Link>
+                </>
+              )}
             </div>
           </div>
 
@@ -193,6 +201,8 @@ export function ItemDetailPage() {
             </div>
           </div>
         </div>
+
+        <InventoryDetailPanels item={item} />
       </div>
     </StaffLayout>
   )

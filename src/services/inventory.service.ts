@@ -6,6 +6,8 @@ export interface InventoryItem {
   id: string
   orgId: string
   loggedById: string
+  receiverStaffId?: string | null
+  handoverStaffId?: string | null
   itemName: string
   description: string
   distinctiveMarks?: string | null
@@ -14,10 +16,29 @@ export interface InventoryItem {
   status: string
   loggedAt: string
   createdAt: string
+  finderContact?: FinderContactResult | null
+}
+
+export interface FinderContactResult {
+  id: string
+  name: string
+  email?: string | null
+  phone?: string | null
+  nationalId?: string | null
+  orgMemberId?: string | null
 }
 
 export interface InventorySemanticResult extends InventoryItem {
   similarityScore: number
+}
+
+/** Khớp BE FinderContactInfo — chỉ gửi optional khi có giá trị (tránh chuỗi rỗng) */
+export interface FinderContactPayload {
+  name: string
+  email?: string
+  phone?: string
+  nationalId?: string
+  orgMemberId?: string
 }
 
 export interface CreateInventoryPayload {
@@ -26,6 +47,7 @@ export interface CreateInventoryPayload {
   distinctiveMarks?: string | null
   imageUrls?: string[]
   storageLocation?: string | null
+  finderContact: FinderContactPayload
 }
 
 export interface UpdateInventoryPayload {

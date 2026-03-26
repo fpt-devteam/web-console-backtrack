@@ -1,5 +1,6 @@
 import { Layout } from '../../components/admin/layout'
 import { Phone, Pencil } from 'lucide-react'
+import { OrgLogo } from '@/components/org-logo'
 import { useRouter } from '@tanstack/react-router'
 import { useCurrentUser } from '@/hooks/use-auth'
 import { useMyOrganizations, useOrganization } from '@/hooks/use-org'
@@ -91,6 +92,19 @@ export function OrganizationInfoViewPage() {
 
           <div className="bg-white rounded-xl shadow-sm p-8">
             <div className="space-y-6">
+              <div>
+                <label className="mb-3 block text-sm font-medium text-gray-700">Organization logo</label>
+                <div className="flex items-start gap-4">
+                  <OrgLogo
+                    logoUrl={org.logoUrl}
+                    alt={org.name}
+                    className="h-24 w-24"
+                    iconClassName="h-10 w-10"
+                    rounded="lg"
+                  />
+                </div>
+              </div>
+
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">Organization Name</label>

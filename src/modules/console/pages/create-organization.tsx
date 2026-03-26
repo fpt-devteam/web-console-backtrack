@@ -1,7 +1,7 @@
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Check } from 'lucide-react';
+import { Camera, Check, X } from 'lucide-react';
 import { useState } from 'react';
 import { useNavigate } from '@tanstack/react-router';
 import { useCreateOrganization } from '@/hooks/use-org';
@@ -30,6 +30,7 @@ export function CreateOrganizationPage() {
     phone: '',
     taxIdentificationNumber: '',
   });
+  const [logoUrl, setLogoUrl] = useState<string>('');
   /** Lat/lon from Nominatim when user selects a place; null if only typing. */
   const [location, setLocation] = useState<{ latitude: number; longitude: number } | null>(null);
   /** place_id from Nominatim (externalPlaceId for BE) when selected from dropdown. */
@@ -43,9 +44,98 @@ export function CreateOrganizationPage() {
     setError(null);
   };
 
+  const handleLogoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (!file.type.startsWith('image/')) {
+      setError('Logo must be an image file');
+      return;
+    }
+
+    setError(null);
+
+    try {
+      const loadImage = (f: File) =>
+        new Promise<HTMLImageElement>((resolve, reject) => {
+          const url = URL.createObjectURL(f);
+          const img = new Image();
+          img.onload = () => {
+            URL.revokeObjectURL(url);
+            resolve(img);
+          };
+          img.onerror = () => {
+            URL.revokeObjectURL(url);
+            reject(new Error('Failed to load image'));
+          };
+          img.src = url;
+        });
+
+      const compressToDataUrl = (img: HTMLImageElement, maxDim: number, mime: string, quality: number) => {
+        const canvas = document.createElement('canvas');
+        const w = img.naturalWidth || img.width;
+        const h = img.naturalHeight || img.height;
+        const largest = Math.max(w, h);
+        const scale = Math.min(1, maxDim / largest);
+
+        const outW = Math.max(1, Math.round(w * scale));
+        const outH = Math.max(1, Math.round(h * scale));
+
+        canvas.width = outW;
+        canvas.height = outH;
+        const ctx = canvas.getContext('2d');
+        if (!ctx) throw new Error('Canvas not supported');
+        ctx.drawImage(img, 0, 0, outW, outH);
+
+        return canvas.toDataURL(mime, quality);
+      };
+
+      const img = await loadImage(file);
+
+      // BE giới hạn `LogoUrl` max 2048 chars => cần resize/encode để string không vượt limit.
+      const BE_LOGO_MAX_CHARS = 2048;
+      const mimeTypes = ['image/webp', 'image/jpeg', 'image/png'];
+
+      let best = '';
+      for (const mime of mimeTypes) {
+        let maxDim = 256;
+        let quality = 0.72;
+        for (let i = 0; i < 6; i++) {
+          const dataUrl = compressToDataUrl(img, maxDim, mime, quality);
+          best = dataUrl;
+          if (dataUrl.length <= BE_LOGO_MAX_CHARS) break;
+          maxDim = Math.max(32, Math.floor(maxDim * 0.85));
+          quality = Math.max(0.25, quality * 0.8);
+        }
+        if (best.length <= BE_LOGO_MAX_CHARS) break;
+      }
+
+      if (!best || best.length > BE_LOGO_MAX_CHARS) {
+        setError('Logo is too large. Please upload a smaller image.');
+        return;
+      }
+
+      setLogoUrl(best);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to process logo image');
+      return;
+    } finally {
+      // Reset input so the same file can be re-selected if user wants.
+      e.target.value = '';
+    }
+  };
+
+  const removeLogo = () => {
+    setLogoUrl('');
+    setError(null);
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
+    if (!logoUrl) {
+      setError('Organization logo is required');
+      return;
+    }
     const displayAddress = form.address.trim() || form.name.trim() || '—';
     const coords = location ?? { latitude: 0, longitude: 0 };
     createOrg.mutate(
@@ -58,6 +148,8 @@ export function CreateOrganizationPage() {
         phone: form.phone.trim(),
         industryType: form.industryType,
         taxIdentificationNumber: form.taxIdentificationNumber.trim(),
+        // BE expects `LogoUrl` string (we send base64 data URL from FE).
+        logoUrl,
       },
       {
         onSuccess: (createdOrg) => {
@@ -89,6 +181,72 @@ export function CreateOrganizationPage() {
             {error && (
               <p className="text-sm text-red-600 bg-red-50 px-3 py-2 rounded-md">{error}</p>
             )}
+            {/* Logo — layout aligned with staff Add Found Item → Photos */}
+            <div>
+              <div className="flex items-center justify-between mb-4">
+                <Label className="text-base font-semibold text-gray-900">
+                  Organization logo <span className="text-red-500">*</span>
+                </Label>
+                <span className="text-sm text-gray-500">1 image</span>
+              </div>
+              <div className="flex gap-4 flex-wrap">
+                {logoUrl ? (
+                  <div className="relative w-32 h-32 rounded-lg overflow-hidden group">
+                    <img
+                      src={logoUrl}
+                      alt="Organization logo"
+                      className="w-full h-full object-cover"
+                    />
+                    <button
+                      type="button"
+                      onClick={removeLogo}
+                      className="absolute top-1 right-1 p-1 bg-red-500 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
+                      aria-label="Remove logo"
+                    >
+                      <X className="w-3 h-3" />
+                    </button>
+                  </div>
+                ) : null}
+                {!logoUrl ? (
+                  <label
+                    className={`w-32 h-32 border-2 border-dashed border-gray-300 rounded-lg flex flex-col items-center justify-center transition-colors ${
+                      createOrg.isPending
+                        ? 'cursor-not-allowed opacity-60'
+                        : 'cursor-pointer hover:border-blue-500 hover:bg-blue-50'
+                    }`}
+                  >
+                    <input
+                      id="orgLogo"
+                      type="file"
+                      accept="image/*"
+                      onChange={handleLogoUpload}
+                      className="hidden"
+                      disabled={createOrg.isPending}
+                    />
+                    <Camera className="w-6 h-6 text-gray-400 mb-2" />
+                    <span className="text-xs text-gray-500 text-center px-2">Add logo</span>
+                  </label>
+                ) : (
+                  <label
+                    className={`w-32 h-32 border-2 border-dashed border-gray-300 rounded-lg flex flex-col items-center justify-center transition-colors ${
+                      createOrg.isPending
+                        ? 'cursor-not-allowed opacity-60'
+                        : 'cursor-pointer hover:border-blue-500 hover:bg-blue-50'
+                    }`}
+                  >
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={handleLogoUpload}
+                      className="hidden"
+                      disabled={createOrg.isPending}
+                    />
+                    <Camera className="w-6 h-6 text-gray-400 mb-2" />
+                    <span className="text-xs text-gray-500 text-center px-2">Change</span>
+                  </label>
+                )}
+              </div>
+            </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
                 <Label htmlFor="companyName" className="text-sm font-semibold mb-2 block">Company Name <span className="text-red-500">*</span></Label>

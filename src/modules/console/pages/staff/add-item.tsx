@@ -9,6 +9,55 @@ import { Link, useNavigate } from '@tanstack/react-router'
 import { useCreateInventoryItem } from '@/hooks/use-inventory'
 import { useCurrentOrgId } from '@/contexts/current-org.context'
 import { useOrganization } from '@/hooks/use-org'
+import type { FinderContactField } from '@/types/organization.types'
+
+function optionalTrim(value: string): string | undefined {
+  const t = value.trim()
+  return t ? t : undefined
+}
+
+/** Ngoài name, BE/UX yêu cầu ít nhất một trong các trường liên hệ/định danh */
+function hasAtLeastOneFinderDetail(finder: {
+  email: string
+  phone: string
+  nationalId: string
+  orgMemberId: string
+}): boolean {
+  return Boolean(
+    finder.email.trim() ||
+      finder.phone.trim() ||
+      finder.nationalId.trim() ||
+      finder.orgMemberId.trim(),
+  )
+}
+
+function validateOrgRequiredFinderFields(
+  required: FinderContactField[] | undefined,
+  finder: {
+    email: string
+    phone: string
+    nationalId: string
+    orgMemberId: string
+  },
+): string | null {
+  for (const field of required ?? []) {
+    switch (field) {
+      case 'email':
+        if (!finder.email.trim()) return 'Finder email is required for this organization.'
+        break
+      case 'phone':
+        if (!finder.phone.trim()) return 'Finder phone is required for this organization.'
+        break
+      case 'nationalId':
+        if (!finder.nationalId.trim()) return 'Finder national ID is required for this organization.'
+        break
+      case 'orgMemberId':
+        if (!finder.orgMemberId.trim()) return 'Finder student/staff ID is required for this organization.'
+        break
+    }
+  }
+  return null
+}
 
 export function AddFoundItemPage() {
   const navigate = useNavigate()
@@ -20,7 +69,6 @@ export function AddFoundItemPage() {
   const [description, setDescription] = useState<string>('')
   const [distinctiveMarks, setDistinctiveMarks] = useState<string>('')
   const [storageLocation, setStorageLocation] = useState<string>('')
-  // UI-only contact/identity fields (not sent to API yet)
   const [finderFullName, setFinderFullName] = useState<string>('')
   const [finderEmail, setFinderEmail] = useState<string>('')
   const [finderNationalId, setFinderNationalId] = useState<string>('')
@@ -70,13 +118,23 @@ export function AddFoundItemPage() {
     setPhotos(photos.filter((_, i) => i !== index))
   }
 
+  const requiredFinderFields = org?.requiredFinderContactFields ?? []
+  const finderFieldRequired = (field: FinderContactField) => requiredFinderFields.includes(field)
+
   const buildPayload = () => ({
-      itemName: itemName.trim(),
-      description: description.trim(),
-      distinctiveMarks: distinctiveMarks.trim() || undefined,
-      imageUrls: photos.length > 0 ? photos : undefined,
-      storageLocation: storageLocation.trim() || undefined,
-    })
+    itemName: itemName.trim(),
+    description: description.trim(),
+    distinctiveMarks: distinctiveMarks.trim() || undefined,
+    imageUrls: photos.length > 0 ? photos : undefined,
+    storageLocation: storageLocation.trim() || undefined,
+    finderContact: {
+      name: finderFullName.trim(),
+      email: optionalTrim(finderEmail),
+      phone: optionalTrim(finderPhone),
+      nationalId: optionalTrim(finderNationalId),
+      orgMemberId: optionalTrim(finderInternalId),
+    },
+  })
 
   const handleSubmit = (addAnother: boolean) => {
     setSubmitError(null)
@@ -86,6 +144,33 @@ export function AddFoundItemPage() {
     }
     if (!description.trim()) {
       setSubmitError('Description is required.')
+      return
+    }
+    if (!finderFullName.trim()) {
+      setSubmitError('Finder full name is required.')
+      return
+    }
+    if (
+      !hasAtLeastOneFinderDetail({
+        email: finderEmail,
+        phone: finderPhone,
+        nationalId: finderNationalId,
+        orgMemberId: finderInternalId,
+      })
+    ) {
+      setSubmitError(
+        'Add at least one finder detail: email, phone, national ID, or student/staff ID.',
+      )
+      return
+    }
+    const orgFinderError = validateOrgRequiredFinderFields(org?.requiredFinderContactFields, {
+      email: finderEmail,
+      phone: finderPhone,
+      nationalId: finderNationalId,
+      orgMemberId: finderInternalId,
+    })
+    if (orgFinderError) {
+      setSubmitError(orgFinderError)
       return
     }
     createItem.mutate(buildPayload(), {
@@ -265,18 +350,22 @@ export function AddFoundItemPage() {
 
             {/* People information block */}
             <div className="space-y-8 rounded-lg border border-gray-200 p-4">
-              {/* Finder information (UI only) */}
+              {/* Finder information — POST finderContact */}
               <div className="space-y-4">
                 <div>
                   <h3 className="text-base font-semibold text-gray-900">Finder information</h3>
                   <p className="text-sm text-gray-600">
                     Contact and ID details of the person who found or handed in the item.
                   </p>
+                  <p className="text-sm text-gray-700 mt-1">
+                    Full name is required. Provide at least one of: email, phone, national ID, or
+                    student/staff ID.
+                  </p>
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
                     <Label htmlFor="finderFullName" className="text-sm font-medium text-gray-700">
-                      Full name
+                      Full name <span className="text-red-500">*</span>
                     </Label>
                     <Input
                       id="finderFullName"
@@ -289,7 +378,8 @@ export function AddFoundItemPage() {
                   </div>
                   <div>
                     <Label htmlFor="finderEmail" className="text-sm font-medium text-gray-700">
-                      Email (optional)
+                      Email
+                      {finderFieldRequired('email') && <span className="text-red-500"> *</span>}
                     </Label>
                     <Input
                       id="finderEmail"
@@ -303,6 +393,7 @@ export function AddFoundItemPage() {
                   <div>
                     <Label htmlFor="finderNationalId" className="text-sm font-medium text-gray-700">
                       National ID / citizen ID (number)
+                      {finderFieldRequired('nationalId') && <span className="text-red-500"> *</span>}
                     </Label>
                     <Input
                       id="finderNationalId"
@@ -316,6 +407,7 @@ export function AddFoundItemPage() {
                   <div>
                     <Label htmlFor="finderInternalId" className="text-sm font-medium text-gray-700">
                       Student / staff ID (internal)
+                      {finderFieldRequired('orgMemberId') && <span className="text-red-500"> *</span>}
                     </Label>
                     <Input
                       id="finderInternalId"
@@ -330,6 +422,7 @@ export function AddFoundItemPage() {
                 <div>
                   <Label htmlFor="finderPhone" className="text-sm font-medium text-gray-700">
                     Phone number
+                    {finderFieldRequired('phone') && <span className="text-red-500"> *</span>}
                   </Label>
                   <Input
                     id="finderPhone"

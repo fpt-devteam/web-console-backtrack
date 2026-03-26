@@ -10,7 +10,12 @@ export interface CreateOrganizationPayload {
   phone: string;
   industryType: string;
   taxIdentificationNumber: string;
+  /** BE CreateOrganizationCommand: required */
+  logoUrl: string;
 }
+
+/** BE FinderContactField — JSON camelCase từ JsonStringEnumConverter */
+export type FinderContactField = 'email' | 'phone' | 'nationalId' | 'orgMemberId';
 
 /** BE OrganizationResult / GET /api/core/orgs/{id} */
 export interface Organization {
@@ -23,8 +28,12 @@ export interface Organization {
   phone: string;
   industryType: string;
   taxIdentificationNumber: string;
+  /** BE OrganizationResult */
+  logoUrl: string;
   status: string;
   createdAt: string;
+  /** Các field finder bắt buộc theo cấu hình org (CreateInventoryItem) */
+  requiredFinderContactFields?: FinderContactField[];
 }
 
 /** Payload for PUT /api/core/orgs/{orgId} – matches UpdateOrganizationCommand */
@@ -62,6 +71,8 @@ export interface MyOrganization {
   phone: string;
   industryType: string;
   taxIdentificationNumber: string;
+  /** Present when BE includes it on my-orgs response */
+  logoUrl?: string | null;
   orgStatus: string;
   myRole: string;
   joinedAt: string;

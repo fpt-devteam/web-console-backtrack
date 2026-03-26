@@ -8,6 +8,7 @@ import { useMyOrganizations, useOrganization, useUpdateOrganization } from '@/ho
 import { useCurrentOrgId } from '@/contexts/current-org.context'
 import { Spinner } from '@/components/ui/spinner'
 import { PlaceSearchInput } from '@/components/place-search-input'
+import { OrgLogo } from '@/components/org-logo'
 
 const INDUSTRY_OPTIONS = [
   { value: 'technology', label: 'Technology & Software' },
@@ -213,6 +214,20 @@ export function SettingPage() {
 
           <div className="bg-white rounded-xl shadow-sm p-8">
             <form onSubmit={handleSubmit} className="space-y-6">
+              <div>
+                <label className="mb-3 block text-sm font-medium text-gray-700">Organization logo</label>
+                <div className="flex items-center gap-4">
+                  <OrgLogo
+                    logoUrl={org?.logoUrl}
+                    alt={org?.name ?? 'Organization'}
+                    className="h-24 w-24"
+                    iconClassName="h-10 w-10"
+                    rounded="lg"
+                  />
+                  <p className="text-sm text-gray-500">Read-only — logo is set when the organization is created.</p>
+                </div>
+              </div>
+
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">Organization Name <span className="text-red-500">*</span></label>

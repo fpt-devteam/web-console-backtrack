@@ -4,34 +4,70 @@ import { useMemo, useState, useEffect } from 'react'
 import { Pagination } from '@/components/ui/pagination'
 import { Link, useNavigate } from '@tanstack/react-router'
 import { useInventoryItems } from '@/hooks/use-inventory'
-import { useDebouncedValue, SEARCH_DEBOUNCE_MS } from '@/hooks/use-debounce'
 import { useCurrentOrgId } from '@/contexts/current-org.context'
 import { Spinner } from '@/components/ui/spinner'
+import type { InventoryItem } from '@/services/inventory.service'
 
 const pageSize = 8
+/** Lấy đủ bản ghi để lọc + phân trang trên FE (không gọi API theo search). */
+const fetchPageSize = 1000
+
+function matchesSearch(item: InventoryItem, q: string): boolean {
+  if (!q) return true
+  const n = q.toLowerCase()
+  const blob = [
+    item.itemName,
+    item.description,
+    item.distinctiveMarks ?? '',
+    item.storageLocation ?? '',
+    item.finderContact?.name ?? '',
+    item.finderContact?.email ?? '',
+    item.finderContact?.phone ?? '',
+    item.finderContact?.nationalId ?? '',
+    item.finderContact?.orgMemberId ?? '',
+  ]
+    .join(' ')
+    .toLowerCase()
+  return blob.includes(n)
+}
 
 export function StaffInventoryPage() {
   const navigate = useNavigate()
   const { currentOrgId } = useCurrentOrgId()
   const [searchTerm, setSearchTerm] = useState('')
-  const debouncedSearchTerm = useDebouncedValue(searchTerm.trim(), SEARCH_DEBOUNCE_MS)
   const [statusFilter, setStatusFilter] = useState<string>('All')
   const [currentPage, setCurrentPage] = useState(1)
 
+  const listParams = useMemo(
+    () => ({
+      page: 1,
+      pageSize: fetchPageSize,
+      status: statusFilter !== 'All' ? statusFilter : undefined,
+    }),
+    [statusFilter],
+  )
+
+  const { data, isLoading, isError } = useInventoryItems(currentOrgId, listParams)
+
+  const allItems = data?.items ?? []
+
+  const filteredItems = useMemo(() => {
+    const q = searchTerm.trim()
+    if (!q) return allItems
+    return allItems.filter((item) => matchesSearch(item, q))
+  }, [allItems, searchTerm])
+
+  const totalCount = filteredItems.length
+  const totalPages = Math.max(1, Math.ceil(totalCount / pageSize))
+
+  const items = useMemo(() => {
+    const start = (currentPage - 1) * pageSize
+    return filteredItems.slice(start, start + pageSize)
+  }, [filteredItems, currentPage])
+
   useEffect(() => {
     setCurrentPage(1)
-  }, [debouncedSearchTerm])
-
-  const { data, isLoading, isError } = useInventoryItems(currentOrgId, {
-    page: currentPage,
-    pageSize,
-    status: statusFilter !== 'All' ? statusFilter : undefined,
-    searchTerm: debouncedSearchTerm || undefined,
-  })
-
-  const items = data?.items ?? []
-  const totalCount = data?.totalCount ?? 0
-  const totalPages = Math.max(1, Math.ceil(totalCount / pageSize))
+  }, [searchTerm, statusFilter])
 
   const formatPosted = useMemo(() => {
     return (iso: string) => {
@@ -59,10 +95,14 @@ export function StaffInventoryPage() {
 
   const statusLabel = (s: string) => {
     switch (s) {
-      case 'InStorage': return 'In Storage'
-      case 'Returned': return 'Returned'
-      case 'Disposed': return 'Disposed'
-      default: return s
+      case 'InStorage':
+        return 'In Storage'
+      case 'Returned':
+        return 'Returned'
+      case 'Disposed':
+        return 'Disposed'
+      default:
+        return s
     }
   }
 
@@ -75,7 +115,7 @@ export function StaffInventoryPage() {
               Inventory Dashboard
             </h1>
             <p className="text-gray-600 mt-1 text-sm sm:text-base">
-              Manage lost and found items. Search uses semantic (AI) search.
+              Manage lost and found items. Search filters the list on this page (live).
             </p>
           </div>
           <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 w-full sm:w-auto">
@@ -98,19 +138,17 @@ export function StaffInventoryPage() {
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
             <input
               value={searchTerm}
-              onChange={(e) => {
-                setSearchTerm(e.target.value)
-                setCurrentPage(1)
-              }}
+              onChange={(e) => setSearchTerm(e.target.value)}
               onKeyDown={(e) => {
-                if (e.key === 'Enter' && searchTerm.trim()) {
-                  navigate({
-                    to: '/console/staff/inventory-search',
-                    search: { q: searchTerm.trim() },
-                  })
-                }
+                if (e.key !== 'Enter') return
+                const q = searchTerm.trim()
+                if (!q) return
+                navigate({
+                  to: '/console/staff/inventory-search',
+                  search: { q },
+                })
               }}
-              placeholder="Search by keyword (semantic search)..."
+              placeholder="Search by name, description, location…"
               className="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
@@ -127,19 +165,6 @@ export function StaffInventoryPage() {
             <option value="Returned">Returned</option>
             <option value="Disposed">Disposed</option>
           </select>
-          {searchTerm.trim() && (
-            <button
-              onClick={() => {
-                navigate({
-                  to: '/console/staff/inventory-search',
-                  search: { q: searchTerm.trim() },
-                })
-              }}
-              className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium"
-            >
-              Semantic search
-            </button>
-          )}
         </div>
 
         <div className="flex justify-end mb-4">
@@ -168,6 +193,7 @@ export function StaffInventoryPage() {
               </p>
               {(searchTerm || statusFilter !== 'All') && (
                 <button
+                  type="button"
                   onClick={() => {
                     setSearchTerm('')
                     setStatusFilter('All')
@@ -207,6 +233,12 @@ export function StaffInventoryPage() {
                   <h3 className="font-semibold text-gray-900 mb-3">{item.itemName}</h3>
                   <p className="text-sm text-gray-600 mb-3 line-clamp-2">{item.description}</p>
                   <div className="space-y-2 text-sm text-gray-600 mb-4">
+                    {item.finderContact?.name && (
+                      <div className="flex items-center gap-2">
+                        <span className="font-medium">Finder:</span>
+                        <span>{item.finderContact.name}</span>
+                      </div>
+                    )}
                     {item.storageLocation && (
                       <div className="flex items-center gap-2">
                         <Archive className="w-4 h-4 flex-shrink-0" />
