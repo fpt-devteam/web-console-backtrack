@@ -1,23 +1,14 @@
 import { StaffLayout } from '../../components/staff/layout'
-import { ChevronRight, AlertCircle, Info, Building2, Camera, Tag } from 'lucide-react'
+import { ChevronRight, AlertCircle, Building2, Camera, Tag } from 'lucide-react'
 import { useState, useEffect } from 'react'
 import { Link, useNavigate } from '@tanstack/react-router'
 import { Route } from '@/routes/console/staff/item-edit/$itemId'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select'
 import { useInventoryItem, useUpdateInventoryItem } from '@/hooks/use-inventory'
 import { useCurrentOrgId } from '@/contexts/current-org.context'
 import { Spinner } from '@/components/ui/spinner'
-
-const statusOptions = ['InStorage', 'Returned', 'Disposed'] as const
 
 export function EditItemPage() {
   const { itemId } = Route.useParams()
@@ -32,7 +23,6 @@ export function EditItemPage() {
   const [itemName, setItemName] = useState('')
   const [description, setDescription] = useState('')
   const [distinctiveMarks, setDistinctiveMarks] = useState('')
-  const [status, setStatus] = useState('InStorage')
   const [storageLocation, setStorageLocation] = useState('')
 
   useEffect(() => {
@@ -40,32 +30,9 @@ export function EditItemPage() {
       setItemName(item.itemName ?? '')
       setDescription(item.description ?? '')
       setDistinctiveMarks(item.distinctiveMarks ?? '')
-      setStatus(item.status ?? 'InStorage')
       setStorageLocation(item.storageLocation ?? '')
     }
   }, [item])
-
-  const getStatusColor = (s: string) => {
-    switch (s) {
-      case 'InStorage':
-        return 'bg-indigo-500 text-white'
-      case 'Returned':
-        return 'bg-green-500 text-white'
-      case 'Disposed':
-        return 'bg-gray-500 text-white'
-      default:
-        return 'bg-gray-500 text-white'
-    }
-  }
-
-  const statusLabel = (s: string) => {
-    switch (s) {
-      case 'InStorage': return 'In Storage'
-      case 'Returned': return 'Returned'
-      case 'Disposed': return 'Disposed'
-      default: return s
-    }
-  }
 
   if (isLoading) {
     return (
@@ -120,7 +87,6 @@ export function EditItemPage() {
           description: description.trim(),
           distinctiveMarks: distinctiveMarks.trim() || null,
           storageLocation: storageLocation.trim() || null,
-          status,
         },
       },
       {
@@ -158,18 +124,6 @@ export function EditItemPage() {
             <div>
               <div className="flex items-center gap-3 mb-2">
                 <h1 className="text-3xl font-bold text-gray-900">{item.itemName}</h1>
-                <Select value={status} onValueChange={setStatus}>
-                  <SelectTrigger className={`w-auto !border-0 !shadow-none !bg-transparent ${getStatusColor(status)} !px-3 !py-1 !rounded-md !text-xs !font-bold uppercase !h-auto !min-h-0 cursor-pointer hover:opacity-90 [&>span]:!text-white [&>svg]:hidden`}>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {statusOptions.map((s) => (
-                      <SelectItem key={s} value={s}>
-                        {statusLabel(s)}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
               </div>
               <p className="text-gray-600">
                 Added {new Date(item.createdAt).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })}
@@ -262,25 +216,6 @@ export function EditItemPage() {
                       placeholder="e.g. Blue Umbrella"
                       className={errors.itemName ? 'border-red-500' : ''}
                     />
-                  </div>
-
-                  <div>
-                    <div className="text-xs font-semibold uppercase mb-2">STATUS</div>
-                    <div className="flex items-center gap-2 text-gray-900">
-                      <Info className="w-4 h-4 text-blue-600" />
-                      <Select value={status} onValueChange={setStatus}>
-                        <SelectTrigger className="w-full">
-                          <SelectValue placeholder="Select status" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {statusOptions.map((s) => (
-                            <SelectItem key={s} value={s}>
-                              {statusLabel(s)}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    </div>
                   </div>
 
                   <div>

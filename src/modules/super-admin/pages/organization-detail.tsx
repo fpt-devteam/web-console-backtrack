@@ -3,6 +3,7 @@ import { useRouter, useParams } from '@tanstack/react-router';
 import { mockTenants } from '@/mock/data/mock-tenants';
 import { CheckCircle2, Calendar, ArrowLeft, Phone } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { OrgLogo } from '@/components/org-logo';
 
 const INDUSTRY_OPTIONS: Record<string, string> = {
   technology: 'Technology & Software',
@@ -215,15 +216,26 @@ export function OrganizationDetailPage() {
         {/* Organization Information (Org Admin card style) */}
         <div className="bg-white rounded-xl shadow-sm p-8 mb-6">
           <div className="space-y-6">
-          <div className="flex items-center gap-3 mb-4">
-                <h1 className="text-3xl font-bold text-gray-900">{tenant.name}</h1>
-                <span
-                  className={`px-3 py-1 rounded-full text-sm font-medium border ${getStatusBadgeClass(
-                    tenant.status
-                  )}`}
-                >
-                  {tenant.status}
-                </span>
+          <div className="mb-4 flex flex-wrap items-center gap-4">
+                {tenant.logoUrl ? (
+                  <OrgLogo logoUrl={tenant.logoUrl} alt={tenant.name} className="h-16 w-16" iconClassName="h-8 w-8" rounded="lg" />
+                ) : (
+                  <div
+                    className={`flex h-16 w-16 flex-shrink-0 items-center justify-center rounded-lg text-lg font-semibold text-gray-700 ${tenant.avatarColor}`}
+                  >
+                    {tenant.avatarText}
+                  </div>
+                )}
+                <div className="flex min-w-0 flex-1 flex-wrap items-center gap-3">
+                  <h1 className="text-3xl font-bold text-gray-900">{tenant.name}</h1>
+                  <span
+                    className={`rounded-full border px-3 py-1 text-sm font-medium ${getStatusBadgeClass(
+                      tenant.status
+                    )}`}
+                  >
+                    {tenant.status}
+                  </span>
+                </div>
               </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">

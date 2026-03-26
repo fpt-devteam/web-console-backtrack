@@ -62,6 +62,7 @@ export const orgService = {
       phone: payload.phone,
       industryType: payload.industryType,
       taxIdentificationNumber: payload.taxIdentificationNumber,
+      logoUrl: payload.logoUrl,
     };
     const { data } = await privateClient.post<ApiResponse<Organization>>('/api/core/orgs', body);
     if (!data.success) throw new Error(data.error?.message ?? 'Failed to create organization');

@@ -1,4 +1,5 @@
-import { Package, FileText, MessageCircle, Bell, Building2, ChevronLeft, ChevronRight, ArrowLeftRight } from 'lucide-react';
+import { Package, FileText, MessageCircle, Bell, ChevronLeft, ChevronRight, ArrowLeftRight } from 'lucide-react';
+import { OrgLogo } from '@/components/org-logo';
 import { Link, useLocation } from '@tanstack/react-router';
 import { useCurrentOrgId } from '@/contexts/current-org.context';
 import { useOrganization } from '@/hooks/use-org';
@@ -49,9 +50,7 @@ export function StaffSidebar({ isOpen, onToggle }: StaffSidebarProps) {
       {/* Header: Org + Toggle */}
       <div className="flex items-center gap-3 px-4 py-6 border-b border-gray-200 relative">
         <div className="flex items-center gap-3 flex-1 min-w-0">
-          <div className="w-10 h-10 bg-blue-500 rounded-full flex items-center justify-center flex-shrink-0">
-            <Building2 className="w-6 h-6 text-white" />
-          </div>
+          <OrgLogo logoUrl={org?.logoUrl} alt={org?.name ?? 'Organization'} className="h-10 w-10 flex-shrink-0" />
           <div className={`min-w-0 transition-all duration-300 ${isOpen ? 'opacity-100' : 'w-0 opacity-0 overflow-hidden'}`}>
             <h1 className="font-bold text-xl tracking-wide whitespace-nowrap truncate" title={org?.name}>
               {org?.name ?? 'Staff'}
