@@ -1,360 +1,390 @@
 import { Layout } from '../../components/admin/layout'
-import { AlertCircle, Phone, X } from 'lucide-react'
-import { useState, useEffect } from 'react'
+import { Clock3, Copy, Info, Link2, Mail, MapPin, Phone } from 'lucide-react'
+import { useState } from 'react'
 import { useRouter } from '@tanstack/react-router'
-import { showToast } from '@/lib/toast'
-import { useCurrentUser } from '@/hooks/use-auth'
-import { useMyOrganizations, useOrganization, useUpdateOrganization } from '@/hooks/use-org'
-import { useCurrentOrgId } from '@/contexts/current-org.context'
-import { Spinner } from '@/components/ui/spinner'
-import { PlaceSearchInput } from '@/components/place-search-input'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { Textarea } from '@/components/ui/textarea'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
 import { OrgLogo } from '@/components/org-logo'
 
+const MOCK_SHAREABLE = 'https://app.lostfoundpro.com/portal/acme-corp-global-v2'
+
 const INDUSTRY_OPTIONS = [
+  { value: 'enterprise', label: 'Enterprise Technology' },
   { value: 'technology', label: 'Technology & Software' },
-  { value: 'healthcare', label: 'Healthcare' },
-  { value: 'finance', label: 'Finance & Banking' },
-  { value: 'retail', label: 'Retail & E-commerce' },
   { value: 'education', label: 'Education' },
-  { value: 'manufacturing', label: 'Manufacturing' },
-  { value: 'hospitality', label: 'Hospitality & Tourism' },
-  { value: 'airport', label: 'Airport' },
-  { value: 'hotel', label: 'Hotel' },
-  { value: 'university', label: 'University' },
-  { value: 'mall', label: 'Shopping Mall' },
-  { value: 'stadium', label: 'Stadium/Arena' },
-  { value: 'transportation', label: 'Transportation Hub' },
   { value: 'other', label: 'Other' },
 ]
 
-interface SettingFormData {
-  name: string
-  slug: string
-  industryType: string
-  phone: string
-  displayAddress: string
-  taxIdentificationNumber: string
+/** Mốc giờ 30 phút (12h, en-US) — dùng cho dropdown */
+function buildTimeOptions(): string[] {
+  const out: string[] = []
+  for (let h = 0; h < 24; h++) {
+    for (const m of [0, 30]) {
+      const d = new Date(2000, 0, 1, h, m, 0, 0)
+      out.push(
+        d.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true }),
+      )
+    }
+  }
+  return out
 }
 
+const TIME_OPTIONS = buildTimeOptions()
+/** 8:00 AM, 6:00 PM, 8:00 PM — index trong TIME_OPTIONS (cách 30 phút) */
+const T08 = TIME_OPTIONS[16]
+const T18 = TIME_OPTIONS[36]
+const T20 = TIME_OPTIONS[40]
+
+type DaySchedule = {
+  day: string
+  closed: boolean
+  openTime: string
+  closeTime: string
+}
+
+const DEFAULT_HOURS: DaySchedule[] = [
+  { day: 'Monday', closed: false, openTime: T08, closeTime: T18 },
+  { day: 'Tuesday', closed: false, openTime: T08, closeTime: T18 },
+  { day: 'Wednesday', closed: false, openTime: T08, closeTime: T18 },
+  { day: 'Thursday', closed: false, openTime: T08, closeTime: T18 },
+  { day: 'Friday', closed: false, openTime: T08, closeTime: T20 },
+  { day: 'Saturday', closed: true, openTime: T08, closeTime: T18 },
+  { day: 'Sunday', closed: true, openTime: T08, closeTime: T18 },
+]
+
+/** Label kiểu trang view — uppercase nhỏ */
+function FieldLabel({ children, htmlFor }: { children: React.ReactNode; htmlFor?: string }) {
+  return (
+    <Label
+      htmlFor={htmlFor}
+      className="text-[10px] font-normal uppercase tracking-[0.16em] text-slate-400"
+    >
+      {children}
+    </Label>
+  )
+}
+
+/**
+ * Chỉnh sửa org — UI đồng bộ với trang view (`organization-info-view`).
+ * Route: /console/admin/setting/organization/edit — mock form, chưa nối API.
+ */
 export function SettingPage() {
   const router = useRouter()
-  const { data: currentUser } = useCurrentUser()
-  const { currentOrgId } = useCurrentOrgId()
-  const { data: myOrgs = [] } = useMyOrganizations({ enabled: !!currentUser })
-  const orgId = currentOrgId ?? myOrgs[0]?.orgId ?? null
-  const { data: org, isLoading: orgLoading, error: orgError } = useOrganization(orgId)
-  const updateOrg = useUpdateOrganization()
+  const [name, setName] = useState('Acme Corporation Global')
+  const [industry, setIndustry] = useState('enterprise')
+  const [phone, setPhone] = useState('+1 (555) 123-4567')
+  const [email, setEmail] = useState('support@acme-corp.com')
+  const [taxId, setTaxId] = useState('US-992033481-B')
+  const [slug, setSlug] = useState('acme-corp')
+  const [address, setAddress] = useState(
+    'One Infinite Loop, Suite 200\nCupertino, CA 95014\nUnited States',
+  )
+  const [deskNote, setDeskNote] = useState(
+    'Level 1, behind the main reception area near the elevators.',
+  )
+  const [hours, setHours] = useState(DEFAULT_HOURS)
 
-  const [formData, setFormData] = useState<SettingFormData>({
-    name: '',
-    slug: '',
-    industryType: '',
-    phone: '',
-    displayAddress: '',
-    taxIdentificationNumber: '',
-  })
-  const [errors, setErrors] = useState<Record<string, string>>({})
-  const [showError, setShowError] = useState(false)
-  /** Lat/lon from Nominatim when user selects a place; or from org when loaded. */
-  const [location, setLocation] = useState<{ latitude: number; longitude: number } | null>(null)
-  /** place_id from Nominatim (externalPlaceId for BE). */
-  const [externalPlaceId, setExternalPlaceId] = useState<string | null>(null)
-
-  useEffect(() => {
-    if (org) {
-      setFormData({
-        name: org.name,
-        slug: org.slug,
-        industryType: org.industryType,
-        phone: org.phone,
-        displayAddress: org.displayAddress ?? '',
-        taxIdentificationNumber: org.taxIdentificationNumber,
-      })
-      if (org.location) {
-        setLocation({ latitude: org.location.latitude, longitude: org.location.longitude })
-      } else {
-        setLocation(null)
-      }
-      setExternalPlaceId(org.externalPlaceId ?? null)
-    }
-  }, [org])
-
-  const handleInputChange = (field: keyof SettingFormData, value: string) => {
-    setFormData((prev) => ({ ...prev, [field]: value }))
-    if (errors[field]) setErrors((prev) => ({ ...prev, [field]: '' }))
-    setShowError(false)
-  }
-
-  const validateForm = (): Record<string, string> => {
-    const newErrors: Record<string, string> = {}
-    if (!formData.name.trim()) newErrors.name = 'Organization name is required'
-    if (!formData.slug.trim()) newErrors.slug = 'Workspace URL is required'
-    if (!formData.industryType) newErrors.industryType = 'Industry type is required'
-    if (!formData.phone.trim()) newErrors.phone = 'Phone number is required'
-    if (!formData.displayAddress.trim()) newErrors.displayAddress = 'Address is required'
-    return newErrors
-  }
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
-    if (!orgId) return
-    const newErrors = validateForm()
-    if (Object.keys(newErrors).length > 0) {
-      setErrors(newErrors)
-      setShowError(true)
-      return
-    }
-    const slug = formData.slug.trim().toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '')
-    if (!slug) {
-      setErrors((prev) => ({ ...prev, slug: 'Workspace URL must contain letters or numbers.' }))
-      setShowError(true)
-      return
-    }
-    const coords = location ?? org?.location ?? undefined
-    updateOrg.mutate(
-      {
-        orgId,
-        payload: {
-          name: formData.name.trim(),
-          slug,
-          displayAddress: formData.displayAddress.trim() || undefined,
-          location: coords ? { latitude: coords.latitude, longitude: coords.longitude } : undefined,
-          externalPlaceId: externalPlaceId ?? undefined,
-          phone: formData.phone.trim(),
-          industryType: formData.industryType,
-          taxIdentificationNumber: formData.taxIdentificationNumber.trim(),
-        },
-      },
-      {
-        onSuccess: () => {
-          showToast.success('Organization settings updated successfully!')
-          router.navigate({ to: '/console/admin/setting' })
-        },
-        onError: (err) => {
-          showToast.error(err instanceof Error ? err.message : 'Failed to update organization')
-        },
-      }
-    )
-  }
-
-  const handleCancel = () => {
-    router.navigate({ to: '/console/admin/setting' })
-  }
-
-  if (orgLoading && !org) {
-    return (
-      <Layout>
-        <div className="p-8 bg-gray-50 min-h-screen flex items-center justify-center">
-          <Spinner size="lg" />
-        </div>
-      </Layout>
-    )
-  }
-
-  if (orgError || (!orgLoading && (!orgId || !org))) {
-    return (
-      <Layout>
-        <div className="p-8 bg-gray-50 min-h-screen">
-          <div className="max-w-6xl mx-auto">
-            <p className="text-gray-600">
-              {!orgId ? 'No organization found. Create one first.' : 'Failed to load organization.'}
-            </p>
-            <button
-              type="button"
-              onClick={() => router.navigate({ to: '/console/welcome' })}
-              className="mt-4 text-blue-600 hover:underline"
-            >
-              Back to Welcome
-            </button>
-          </div>
-        </div>
-      </Layout>
-    )
-  }
+  const industryLabel = INDUSTRY_OPTIONS.find((o) => o.value === industry)?.label ?? industry
 
   return (
     <Layout>
-      <div className="p-8 bg-gray-50 min-h-screen">
-        <div className="max-w-5xl mx-auto">
-          <div className="mb-8">
-            <h1 className="text-3xl font-bold text-gray-900 mb-2">Organization Information</h1>
-            <p className="text-gray-600">Manage your company profile and contact details</p>
-            {org?.status && (
-              <p className="text-sm text-gray-500 mt-1 flex items-center gap-2">
-                Status:{' '}
-                <span
-                  className={`inline-flex px-2.5 py-0.5 rounded-full text-xs font-semibold capitalize ${
-                    org.status.toLowerCase() === 'active'
-                      ? 'bg-green-100 text-green-800'
-                      : org.status.toLowerCase() === 'suspended'
-                        ? 'bg-red-100 text-red-800'
-                        : 'bg-gray-100 text-gray-700'
-                  }`}
-                >
-                  {org.status.toLowerCase()}
-                </span>
-              </p>
-            )}
+      <div className="min-h-screen bg-slate-50 px-3 py-4 sm:px-6 sm:py-6 lg:px-8 xl:px-10 2xl:px-12">
+        <div className="mx-auto ">
+          <div className="mb-5 flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between xl:mb-6">
+            <h1 className="text-xl font-bold tracking-tight text-slate-900 sm:text-2xl xl:text-[28px]">
+              Organization Settings
+            </h1>
+            <div className="flex flex-wrap items-center gap-2">
+              <Button
+                type="button"
+                variant="outline"
+                className="rounded-full"
+                onClick={() => router.navigate({ to: '/console/admin/setting/organization' })}
+              >
+                Cancel
+              </Button>
+              <Button
+                type="button"
+                className="rounded-full bg-blue-600 px-5 hover:bg-blue-700"
+                onClick={() => {
+                  /* mock: chưa gọi API */
+                }}
+              >
+                Save changes
+              </Button>
+            </div>
           </div>
 
-          {showError && (
-            <div className="mb-6 bg-red-50 border border-red-200 rounded-lg p-4 flex items-start gap-3">
-              <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
-              <div className="flex-1">
-                <h3 className="text-sm font-semibold text-red-800">Submission Error</h3>
-                <p className="text-sm text-red-700 mt-1">
-                  Please correct the highlighted fields below before saving.
+          <section className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+            <div className="h-28 bg-[linear-gradient(120deg,#dbeafe,#eff6ff,#dbeafe)] sm:h-40 xl:h-48" />
+            <div className="relative px-4 pb-4 pt-3 sm:px-6 sm:pb-5 sm:pt-4 xl:px-8 xl:pb-6 xl:pt-5">
+              <div className="absolute -top-8 flex h-16 w-16 items-center justify-center overflow-hidden rounded-full border-4 border-white bg-slate-100 shadow sm:-top-10 sm:h-20 sm:w-20">
+                <OrgLogo alt={name} className="h-full w-full" rounded="full" />
+              </div>
+              <div className="ml-20 flex flex-col gap-3 sm:ml-24 sm:flex-row sm:items-start sm:justify-between xl:ml-28">
+                <div className="min-w-0 flex-1 space-y-3">
+                  <div>
+                    <FieldLabel htmlFor="edit-org-name">Organization name</FieldLabel>
+                    <Input
+                      id="edit-org-name"
+                      value={name}
+                      onChange={(e) => setName(e.target.value)}
+                      className="mt-1 max-w-xl border-slate-200 font-bold text-slate-900"
+                    />
+                  </div>
+                  <div className="max-w-xs">
+                    <FieldLabel>Industry</FieldLabel>
+                    <Select value={industry} onValueChange={setIndustry}>
+                      <SelectTrigger className="mt-1 border-slate-200">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {INDUSTRY_OPTIONS.map((o) => (
+                          <SelectItem key={o.value} value={o.value}>
+                            {o.label}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <p className="text-xs text-slate-500">Preview: {industryLabel}</p>
+                </div>
+                <span className="w-fit shrink-0 rounded-full bg-amber-50 px-3 py-1 text-[9px] font-bold uppercase tracking-wide text-amber-800 sm:text-[10px]">
+                  Editing
+                </span>
+              </div>
+            </div>
+          </section>
+
+          <div className="mt-6 flex flex-col gap-6 xl:gap-7">
+            <section className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm sm:p-6 xl:p-7">
+              <div className="mb-6 flex items-center gap-2">
+                <Info className="h-4 w-4 text-blue-600" />
+                <h2 className="text-xl font-semibold text-slate-900 xl:text-xl">General Information</h2>
+              </div>
+
+              <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 sm:gap-6">
+                <div className="space-y-1.5 sm:col-span-2">
+                  <FieldLabel>Organization name</FieldLabel>
+                  <Input value={name} onChange={(e) => setName(e.target.value)} className="border-slate-200" />
+                </div>
+                <div className="space-y-1.5">
+                  <FieldLabel>Phone number</FieldLabel>
+                  <div className="relative mt-1">
+                    <Phone className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+                    <Input
+                      value={phone}
+                      onChange={(e) => setPhone(e.target.value)}
+                      className="border-slate-200 pl-10"
+                    />
+                  </div>
+                </div>
+                <div className="space-y-1.5">
+                  <FieldLabel>Contact email</FieldLabel>
+                  <div className="relative mt-1">
+                    <Mail className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+                    <Input
+                      type="email"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      className="border-slate-200 pl-10"
+                    />
+                  </div>
+                </div>
+                <div className="space-y-1.5 sm:col-span-2">
+                  <FieldLabel>Tax ID / VAT</FieldLabel>
+                  <Input value={taxId} onChange={(e) => setTaxId(e.target.value)} className="mt-1 border-slate-200" />
+                </div>
+                <div className="space-y-1.5 sm:col-span-2">
+                  <FieldLabel>Organization slug</FieldLabel>
+                  <div className="mt-1 flex rounded-lg border border-slate-200 bg-white shadow-sm">
+                    <span className="flex items-center whitespace-nowrap rounded-l-lg border-r border-slate-200 bg-slate-100 px-3 text-sm text-slate-600">
+                      backtrack.com/
+                    </span>
+                    <Input
+                      value={slug}
+                      onChange={(e) => setSlug(e.target.value)}
+                      className="rounded-r-lg border-0 font-medium text-blue-600 focus-visible:ring-0"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <div className="mt-6 rounded-xl border border-slate-200 bg-slate-50 px-4 py-3">
+                <div className="mb-2 flex items-center gap-2 text-xs font-semibold text-slate-700">
+                  <Link2 className="h-3 w-3 text-blue-600" />
+                  Shareable Link
+                  <span className="font-normal text-slate-400">(mock)</span>
+                </div>
+                <div className="flex items-start justify-between gap-3">
+                  <span className="break-all text-xs text-blue-600">{MOCK_SHAREABLE}</span>
+                  <button
+                    type="button"
+                    className="rounded-md p-1.5 text-blue-600 hover:bg-slate-200"
+                    onClick={() => void navigator.clipboard.writeText(MOCK_SHAREABLE)}
+                  >
+                    <Copy className="h-4 w-4" />
+                  </button>
+                </div>
+              </div>
+            </section>
+
+            <section className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm sm:p-6 xl:p-7">
+              <div className="mb-6 flex items-center gap-2">
+                <Clock3 className="h-4 w-4 text-blue-600" />
+                <h2 className="text-xl font-semibold text-slate-900 xl:text-xl">Opening Hours</h2>
+              </div>
+
+              <div className="overflow-x-auto -mx-1 px-1">
+                <table className="w-full min-w-[580px] border-separate border-spacing-y-0 border-spacing-x-6 text-sm sm:border-spacing-x-8 sm:min-w-[620px]">
+                  <thead>
+                    <tr className="border-b border-slate-200 text-left">
+                      <th className="pb-3 pr-2 text-[10px] font-normal uppercase tracking-[0.16em] text-slate-400">
+                        Day
+                      </th>
+                      <th className="pb-3 pr-2 text-[10px] font-normal uppercase tracking-[0.16em] text-slate-400">
+                        Status
+                      </th>
+                      <th className="pb-3 pr-2 text-[10px] font-normal uppercase tracking-[0.16em] text-slate-400">
+                        Hours
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {hours.map((row, i) => (
+                      <tr key={row.day} className="border-b border-slate-100 last:border-0">
+                        <td className="py-3 pr-2 align-middle font-medium text-slate-700">{row.day}</td>
+                        <td className="py-3 pr-2 align-middle">
+                          <Select
+                            value={row.closed ? 'closed' : 'open'}
+                            onValueChange={(v) => {
+                              const next = [...hours]
+                              next[i] = { ...next[i], closed: v === 'closed' }
+                              setHours(next)
+                            }}
+                          >
+                            <SelectTrigger className="h-9 w-[120px] border-slate-200 text-sm">
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="open">Open</SelectItem>
+                              <SelectItem value="closed">Closed</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </td>
+                        <td className="py-3 pr-2 align-middle">
+                          {row.closed ? (
+                            <span className="text-sm font-semibold text-red-600">—</span>
+                          ) : (
+                            <div className="flex flex-wrap items-center gap-2">
+                              <span className="shrink-0 text-[10px] font-normal uppercase tracking-[0.16em] text-slate-400">
+                                Open
+                              </span>
+                              <Select
+                                value={row.openTime}
+                                onValueChange={(v) => {
+                                  const next = [...hours]
+                                  next[i] = { ...next[i], openTime: v }
+                                  setHours(next)
+                                }}
+                              >
+                                <SelectTrigger className="h-9 w-[130px] border-slate-200 text-sm">
+                                  <SelectValue placeholder="Open" />
+                                </SelectTrigger>
+                                <SelectContent className="max-h-60">
+                                  {TIME_OPTIONS.map((t) => (
+                                    <SelectItem key={`o-${row.day}-${t}`} value={t}>
+                                      {t}
+                                    </SelectItem>
+                                  ))}
+                                </SelectContent>
+                              </Select>
+                              <span className="text-slate-400">—</span>
+                              <span className="shrink-0 text-[10px] font-normal uppercase tracking-[0.16em] text-slate-400">
+                                Close
+                              </span>
+                              <Select
+                                value={row.closeTime}
+                                onValueChange={(v) => {
+                                  const next = [...hours]
+                                  next[i] = { ...next[i], closeTime: v }
+                                  setHours(next)
+                                }}
+                              >
+                                <SelectTrigger className="h-9 w-[130px] border-slate-200 text-sm">
+                                  <SelectValue placeholder="Close" />
+                                </SelectTrigger>
+                                <SelectContent className="max-h-60">
+                                  {TIME_OPTIONS.map((t) => (
+                                    <SelectItem key={`c-${row.day}-${t}`} value={t}>
+                                      {t}
+                                    </SelectItem>
+                                  ))}
+                                </SelectContent>
+                              </Select>
+                            </div>
+                          )}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </section>
+          </div>
+
+          <section className="mt-6 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm sm:p-6 xl:p-7">
+            <div className="mb-6 flex items-center gap-2">
+              <MapPin className="h-4 w-4 text-blue-600" />
+              <h2 className="text-xl font-semibold text-slate-900 xl:text-xl">Location &amp; Desk</h2>
+            </div>
+
+            <div className="grid grid-cols-1 gap-5 lg:grid-cols-[1.2fr_1fr] xl:grid-cols-[1.35fr_1fr] xl:gap-7">
+              <div className="space-y-5">
+                <div className="space-y-1.5">
+                  <FieldLabel htmlFor="edit-address">Physical address</FieldLabel>
+                  <Textarea
+                    id="edit-address"
+                    value={address}
+                    onChange={(e) => setAddress(e.target.value)}
+                    className="min-h-[100px] resize-y border-slate-200 text-sm"
+                  />
+                </div>
+                <div className="max-w-sm rounded-xl border border-slate-200 bg-slate-50 p-4">
+                  <p className="text-[10px] font-normal uppercase tracking-[0.16em] text-slate-400">
+                    Desk location note
+                  </p>
+                  <Textarea
+                    value={deskNote}
+                    onChange={(e) => setDeskNote(e.target.value)}
+                    className="mt-2 min-h-[80px] resize-y border-0 bg-transparent p-0 text-sm text-slate-700 focus-visible:ring-0"
+                  />
+                </div>
+              </div>
+
+              <div className="relative h-44 overflow-hidden rounded-xl border border-slate-200 sm:h-56 xl:h-64">
+                <div className="flex h-full items-center justify-center bg-[radial-gradient(circle_at_center,#ef4444_0_8px,transparent_9px),linear-gradient(135deg,#334155,#1e293b)]">
+                  <MapPin className="h-10 w-10 text-white opacity-90" />
+                </div>
+                <p className="absolute bottom-2 left-2 right-2 text-center text-[10px] text-white/80">
+                  Map preview — connect API to show real map
                 </p>
               </div>
-              <button onClick={() => setShowError(false)} className="text-red-400 hover:text-red-600">
-                <X className="w-5 h-5" />
-              </button>
             </div>
-          )}
+          </section>
 
-          <div className="bg-white rounded-xl shadow-sm p-8">
-            <form onSubmit={handleSubmit} className="space-y-6">
-              <div>
-                <label className="mb-3 block text-sm font-medium text-gray-700">Organization logo</label>
-                <div className="flex items-center gap-4">
-                  <OrgLogo
-                    logoUrl={org?.logoUrl}
-                    alt={org?.name ?? 'Organization'}
-                    className="h-24 w-24"
-                    iconClassName="h-10 w-10"
-                    rounded="lg"
-                  />
-                  <p className="text-sm text-gray-500">Read-only — logo is set when the organization is created.</p>
-                </div>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Organization Name <span className="text-red-500">*</span></label>
-                  <input
-                    type="text"
-                    value={formData.name}
-                    onChange={(e) => handleInputChange('name', e.target.value)}
-                    className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-                      errors.name ? 'border-red-500 bg-red-50' : 'border-gray-300'
-                    }`}
-                    placeholder="Enter organization name"
-                  />
-                  {errors.name && <p className="text-sm text-red-600 mt-1">{errors.name}</p>}
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Industry Type <span className="text-red-500">*</span></label>
-                  <select
-                    value={formData.industryType}
-                    onChange={(e) => handleInputChange('industryType', e.target.value)}
-                    className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-                      errors.industryType ? 'border-red-500 bg-red-50' : 'border-gray-300'
-                    }`}
-                  >
-                    <option value="">Select industry</option>
-                    {INDUSTRY_OPTIONS.map((o) => (
-                      <option key={o.value} value={o.value}>
-                        {o.label}
-                      </option>
-                    ))}
-                  </select>
-                  {errors.industryType && (
-                    <p className="text-sm text-red-600 mt-1">{errors.industryType}</p>
-                  )}
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Workspace URL (slug) <span className="text-red-500">*</span></label>
-                <div className="flex items-center gap-2">
-                  <input
-                    type="text"
-                    value={formData.slug}
-                    onChange={(e) => handleInputChange('slug', e.target.value)}
-                    className={`flex-1 px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-                      errors.slug ? 'border-red-500 bg-red-50' : 'border-gray-300'
-                    }`}
-                    placeholder="acme-corp"
-                  />
-                  <span className="text-sm text-gray-500">.backtrack.com</span>
-                </div>
-                {errors.slug && <p className="text-sm text-red-600 mt-1">{errors.slug}</p>}
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Phone Number <span className="text-red-500">*</span></label>
-                <div className="relative">
-                  <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500">
-                    <Phone className="w-4 h-4" />
-                  </span>
-                  <input
-                    type="tel"
-                    value={formData.phone}
-                    onChange={(e) => handleInputChange('phone', e.target.value)}
-                    className={`w-full pl-12 pr-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-                      errors.phone ? 'border-red-500 bg-red-50' : 'border-gray-300'
-                    }`}
-                    placeholder="Phone number"
-                  />
-                </div>
-                {errors.phone && <p className="text-sm text-red-600 mt-1">{errors.phone}</p>}
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Address <span className="text-red-500">*</span>
-                </label>
-                <PlaceSearchInput
-                  id="orgAddress"
-                  value={formData.displayAddress}
-                  onChange={(value) => handleInputChange('displayAddress', value)}
-                  onSelect={(place) => {
-                    handleInputChange('displayAddress', place.displayAddress)
-                    setLocation({ latitude: place.latitude, longitude: place.longitude })
-                    setExternalPlaceId(place.placeId ?? null)
-                  }}
-                  placeholder="Type address or place name, then select a result for coordinates (OpenStreetMap)"
-                />
-                {location && (
-                  <p className="text-xs text-green-600 mt-1">
-                    Selected coordinates: {location.latitude.toFixed(5)}, {location.longitude.toFixed(5)}
-                  </p>
-                )}
-                {errors.displayAddress && <p className="text-sm text-red-600 mt-1">{errors.displayAddress}</p>}
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Tax Identification Number
-                  <span className="ml-2 text-xs text-blue-600 bg-blue-50 px-2 py-0.5 rounded">Read-only</span>
-                </label>
-                <input
-                  type="text"
-                  value={formData.taxIdentificationNumber ?? ''}
-                  readOnly
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg bg-gray-50 text-gray-500 cursor-not-allowed"
-                  placeholder="XX-XXXXXX"
-                />
-              </div>
-
-              <div className="flex justify-end gap-4 pt-6 border-t border-gray-200">
-                <button
-                  type="button"
-                  onClick={handleCancel}
-                  className="px-6 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 font-medium"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  disabled={updateOrg.isPending}
-                  className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium disabled:opacity-50"
-                >
-                  {updateOrg.isPending ? 'Saving…' : 'Save Changes'}
-                </button>
-              </div>
-            </form>
-          </div>
+          <p className="mt-6 text-center text-xs text-slate-400">
+            Changes are not saved to the server yet (mock form).
+          </p>
         </div>
       </div>
     </Layout>
