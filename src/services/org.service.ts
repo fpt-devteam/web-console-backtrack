@@ -41,8 +41,16 @@ export const orgService = {
         : undefined,
       externalPlaceId: payload.externalPlaceId ?? undefined,
       phone: payload.phone,
+      contactEmail: payload.contactEmail?.trim() || undefined,
       industryType: payload.industryType,
       taxIdentificationNumber: payload.taxIdentificationNumber,
+      locationNote: payload.locationNote !== undefined && payload.locationNote !== null
+        ? payload.locationNote
+        : undefined,
+      businessHours: payload.businessHours ?? undefined,
+      logoUrl: payload.logoUrl ?? undefined,
+      coverImageUrl: payload.coverImageUrl ?? undefined,
+      requiredFinderContactFields: payload.requiredFinderContactFields ?? undefined,
     };
     const { data } = await privateClient.put<ApiResponse<Organization>>(`/api/core/orgs/${orgId}`, body);
     if (!data.success) throw new Error(data.error?.message ?? 'Failed to update organization');
@@ -60,9 +68,11 @@ export const orgService = {
       },
       externalPlaceId: payload.externalPlaceId ?? undefined,
       phone: payload.phone,
+      contactEmail: payload.contactEmail?.trim() || undefined,
       industryType: payload.industryType,
       taxIdentificationNumber: payload.taxIdentificationNumber,
       logoUrl: payload.logoUrl,
+      requiredFinderContactFields: payload.requiredFinderContactFields,
     };
     const { data } = await privateClient.post<ApiResponse<Organization>>('/api/core/orgs', body);
     if (!data.success) throw new Error(data.error?.message ?? 'Failed to create organization');

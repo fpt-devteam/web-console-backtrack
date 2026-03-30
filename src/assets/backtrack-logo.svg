@@ -61,7 +61,7 @@
   <text
     x="38"
     y="27"
-    font-family="'Plus Jakarta Sans','Montserrat','Poppins','Inter',system-ui,sans-serif"
+    font-family="'Inter','Plus Jakarta Sans','Poppins',system-ui,sans-serif"
     font-size="20"
     font-weight="900"
     letter-spacing="-0.6"
@@ -71,7 +71,7 @@
   <text
     x="86"
     y="27"
-    font-family="'Plus Jakarta Sans','Montserrat','Poppins','Inter',system-ui,sans-serif"
+    font-family="'Inter','Plus Jakarta Sans','Poppins',system-ui,sans-serif"
     font-size="20"
     font-weight="900"
     letter-spacing="-0.6"

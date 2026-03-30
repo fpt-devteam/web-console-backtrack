@@ -8,14 +8,36 @@ export interface CreateOrganizationPayload {
   location: { latitude: number; longitude: number };
   externalPlaceId?: string | null;
   phone: string;
+  /** BE CreateOrganizationCommand — optional */
+  contactEmail?: string | null;
   industryType: string;
   taxIdentificationNumber: string;
   /** BE CreateOrganizationCommand: required */
   logoUrl: string;
+  /** BE CreateOrganizationCommand: required — FE gửi default ['phone'] khi tạo mới */
+  requiredFinderContactFields: FinderContactField[];
 }
 
-/** BE FinderContactField — JSON camelCase từ JsonStringEnumConverter */
-export type FinderContactField = 'email' | 'phone' | 'nationalId' | 'orgMemberId';
+/** BE FinderContactField — JSON PascalCase (JsonStringEnumConverter không có CamelCase policy) */
+export type FinderContactField = 'Email' | 'Phone' | 'NationalId' | 'OrgMemberId';
+
+/** BE WeekDay — JSON string enum */
+export type OrgWeekDay =
+  | 'Monday'
+  | 'Tuesday'
+  | 'Wednesday'
+  | 'Thursday'
+  | 'Friday'
+  | 'Saturday'
+  | 'Sunday';
+
+/** BE DailySchedule trong OrganizationResult */
+export interface DailySchedule {
+  day: OrgWeekDay;
+  isClosed: boolean;
+  openTime?: string | null;
+  closeTime?: string | null;
+}
 
 /** BE OrganizationResult / GET /api/core/orgs/{id} */
 export interface Organization {
@@ -28,8 +50,12 @@ export interface Organization {
   phone: string;
   industryType: string;
   taxIdentificationNumber: string;
+  contactEmail?: string | null;
   /** BE OrganizationResult */
   logoUrl: string;
+  coverImageUrl?: string | null;
+  locationNote?: string | null;
+  businessHours?: DailySchedule[] | null;
   status: string;
   createdAt: string;
   /** Các field finder bắt buộc theo cấu hình org (CreateInventoryItem) */
@@ -44,8 +70,14 @@ export interface UpdateOrganizationPayload {
   location?: { latitude: number; longitude: number } | null;
   externalPlaceId?: string | null;
   phone: string;
+  contactEmail?: string | null;
   industryType: string;
   taxIdentificationNumber: string;
+  locationNote?: string | null;
+  businessHours?: DailySchedule[] | null;
+  logoUrl?: string | null;
+  coverImageUrl?: string | null;
+  requiredFinderContactFields?: FinderContactField[] | null;
 }
 
 /** Thành viên org – item từ GET /api/core/orgs/{orgId}/members */

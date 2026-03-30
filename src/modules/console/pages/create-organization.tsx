@@ -28,6 +28,7 @@ export function CreateOrganizationPage() {
     address: '',
     slug: '',
     phone: '',
+    contactEmail: '',
     taxIdentificationNumber: '',
   });
   const [logoUrl, setLogoUrl] = useState<string>('');
@@ -146,10 +147,13 @@ export function CreateOrganizationPage() {
         location: coords,
         externalPlaceId: externalPlaceId ?? undefined,
         phone: form.phone.trim(),
+        contactEmail: form.contactEmail.trim() || undefined,
         industryType: form.industryType,
         taxIdentificationNumber: form.taxIdentificationNumber.trim(),
         // BE expects `LogoUrl` string (we send base64 data URL from FE).
         logoUrl,
+        // Default: phone is always required. Admin can change this in Security settings.
+        requiredFinderContactFields: ['Phone'] as const,
       },
       {
         onSuccess: (createdOrg) => {
@@ -339,6 +343,19 @@ export function CreateOrganizationPage() {
                 />
               </div>
               <div>
+                <Label htmlFor="contactEmail" className="text-sm font-semibold mb-2 block">
+                  Contact email <span className="text-gray-400 font-normal">(optional)</span>
+                </Label>
+                <Input
+                  id="contactEmail"
+                  type="email"
+                  autoComplete="email"
+                  value={form.contactEmail}
+                  onChange={update('contactEmail')}
+                  placeholder="support@company.com"
+                />
+              </div>
+              <div className="md:col-span-2">
                 <Label htmlFor="taxId" className="text-sm font-semibold mb-2 block">Tax Identification Number <span className="text-red-500">*</span></Label>
                 <Input
                   id="taxId"

@@ -42,16 +42,16 @@ function validateOrgRequiredFinderFields(
 ): string | null {
   for (const field of required ?? []) {
     switch (field) {
-      case 'email':
+      case 'Email':
         if (!finder.email.trim()) return 'Finder email is required for this organization.'
         break
-      case 'phone':
+      case 'Phone':
         if (!finder.phone.trim()) return 'Finder phone is required for this organization.'
         break
-      case 'nationalId':
+      case 'NationalId':
         if (!finder.nationalId.trim()) return 'Finder national ID is required for this organization.'
         break
-      case 'orgMemberId':
+      case 'OrgMemberId':
         if (!finder.orgMemberId.trim()) return 'Finder student/staff ID is required for this organization.'
         break
     }
@@ -379,7 +379,7 @@ export function AddFoundItemPage() {
                   <div>
                     <Label htmlFor="finderEmail" className="text-sm font-medium text-gray-700">
                       Email
-                      {finderFieldRequired('email') && <span className="text-red-500"> *</span>}
+                      {finderFieldRequired('Email') && <span className="text-red-500"> *</span>}
                     </Label>
                     <Input
                       id="finderEmail"
@@ -393,7 +393,7 @@ export function AddFoundItemPage() {
                   <div>
                     <Label htmlFor="finderNationalId" className="text-sm font-medium text-gray-700">
                       National ID / citizen ID (number)
-                      {finderFieldRequired('nationalId') && <span className="text-red-500"> *</span>}
+                      {finderFieldRequired('NationalId') && <span className="text-red-500"> *</span>}
                     </Label>
                     <Input
                       id="finderNationalId"
@@ -407,7 +407,7 @@ export function AddFoundItemPage() {
                   <div>
                     <Label htmlFor="finderInternalId" className="text-sm font-medium text-gray-700">
                       Student / staff ID (internal)
-                      {finderFieldRequired('orgMemberId') && <span className="text-red-500"> *</span>}
+                      {finderFieldRequired('OrgMemberId') && <span className="text-red-500"> *</span>}
                     </Label>
                     <Input
                       id="finderInternalId"
@@ -422,7 +422,7 @@ export function AddFoundItemPage() {
                 <div>
                   <Label htmlFor="finderPhone" className="text-sm font-medium text-gray-700">
                     Phone number
-                    {finderFieldRequired('phone') && <span className="text-red-500"> *</span>}
+                    {finderFieldRequired('Phone') && <span className="text-red-500"> *</span>}
                   </Label>
                   <Input
                     id="finderPhone"
