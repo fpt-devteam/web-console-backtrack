@@ -1,13 +1,14 @@
 import { Layout } from '../../components/admin/layout';
 import { Search, Filter, Plus, ChevronDown, Edit, Trash2 } from 'lucide-react';
 import { useState } from 'react';
-import { useRouter } from '@tanstack/react-router';
+import { useRouter, useParams } from '@tanstack/react-router';
 import { useDebouncedValue, SEARCH_DEBOUNCE_MS } from '@/hooks/use-debounce';
 import { mockBranches, type Branch } from '@/mock/data';
 import { showToast } from '@/lib/toast';
 
 export function BranchPage() {
   const router = useRouter();
+  const { slug } = useParams({ strict: false }) as { slug: string };
   const [currentPage, setCurrentPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState('');
   const debouncedSearchTerm = useDebouncedValue(searchTerm.trim(), SEARCH_DEBOUNCE_MS);
@@ -60,7 +61,7 @@ export function BranchPage() {
   };
 
   const handleEditBranch = (branchId: string) => {
-    router.navigate({ to: '/console/admin/edit-branch/$branchId', params: { branchId } });
+    router.navigate({ to: `/console/${slug}/admin/edit-branch/${branchId}` });
   };
 
   const handleDeleteBranch = (branchName: string) => {

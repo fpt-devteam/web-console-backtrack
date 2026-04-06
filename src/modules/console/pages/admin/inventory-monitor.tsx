@@ -2,13 +2,14 @@ import { Layout } from '../../components/admin/layout';
 import { Calendar, Download, Search, Archive } from 'lucide-react';
 import { useMemo, useState } from 'react';
 import { Pagination } from '@/components/ui/pagination';
-import { Link } from '@tanstack/react-router';
+import { Link, useParams } from '@tanstack/react-router';
 import { queryMockAdminInventory } from '@/modules/console/mocks/admin-inventory.mock';
 
 const pageSize = 8;
 
 /** Org admin inventory — UI aligned with staff; sample data, no API. Simple text filter, no semantic search. */
 export function AdminInventoryMonitorPage() {
+  const { slug } = useParams({ strict: false }) as { slug: string };
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('All');
   const [currentPage, setCurrentPage] = useState(1);
@@ -179,7 +180,10 @@ export function AdminInventoryMonitorPage() {
                       <span>Added {formatPosted(item.createdAt)}</span>
                     </div>
                   </div>
-                  <Link to="/console/admin/inventory/$itemId" params={{ itemId: item.id }}>
+                  <Link
+                    to="/console/$slug/admin/inventory/$itemId"
+                    params={{ slug, itemId: item.id }}
+                  >
                     <button
                       type="button"
                       className="w-full py-1.5 border border-gray-300 text-black rounded-lg hover:bg-gray-50 transition-all font-medium text-sm"

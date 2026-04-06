@@ -2,7 +2,7 @@ import { StaffLayout } from '../../components/staff'
 import { Calendar, Download, Plus, Search, Archive } from 'lucide-react'
 import { useMemo, useState, useEffect } from 'react'
 import { Pagination } from '@/components/ui/pagination'
-import { Link, useNavigate } from '@tanstack/react-router'
+import { Link, useNavigate, useParams } from '@tanstack/react-router'
 import { useInventoryItems } from '@/hooks/use-inventory'
 import { useCurrentOrgId } from '@/contexts/current-org.context'
 import { Spinner } from '@/components/ui/spinner'
@@ -33,6 +33,7 @@ function matchesSearch(item: InventoryItem, q: string): boolean {
 
 export function StaffInventoryPage() {
   const navigate = useNavigate()
+  const { slug } = useParams({ strict: false }) as { slug: string }
   const { currentOrgId } = useCurrentOrgId()
   const [searchTerm, setSearchTerm] = useState('')
   const [statusFilter, setStatusFilter] = useState<string>('All')
@@ -123,7 +124,7 @@ export function StaffInventoryPage() {
               <Download className="w-4 h-4" />
               Export
             </button>
-            <Link to="/console/staff/inventory-add-item" className="w-full sm:w-auto">
+            <Link to="/console/$slug/staff/inventory-add-item" params={{ slug }} className="w-full sm:w-auto">
               <button className="flex items-center justify-center gap-2 px-4 py-1.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-all font-medium text-sm sm:text-base w-full sm:w-auto">
                 <Plus className="w-4 h-4" />
                 <span className="hidden sm:inline">Add found item</span>
@@ -144,7 +145,7 @@ export function StaffInventoryPage() {
                 const q = searchTerm.trim()
                 if (!q) return
                 navigate({
-                  to: '/console/staff/inventory-search',
+                  to: `/console/${slug}/staff/inventory-search`,
                   search: { q },
                 })
               }}
@@ -250,7 +251,7 @@ export function StaffInventoryPage() {
                       <span>Added {formatPosted(item.createdAt)}</span>
                     </div>
                   </div>
-                  <Link to="/console/staff/item/$itemId" params={{ itemId: item.id }}>
+                  <Link to="/console/$slug/staff/item/$itemId" params={{ slug, itemId: item.id }}>
                     <button className="w-full py-1.5 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-all font-medium text-sm">
                       View Details
                     </button>

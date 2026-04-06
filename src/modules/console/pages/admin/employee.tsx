@@ -1,7 +1,7 @@
 import { Layout } from '../../components/admin/layout';
 import { Search, Filter, Plus, ChevronDown, Edit, Trash2 } from 'lucide-react';
 import { useState, useEffect } from 'react';
-import { useRouter } from '@tanstack/react-router';
+import { useRouter, useParams } from '@tanstack/react-router';
 import { useCurrentUser } from '@/hooks/use-auth';
 import { useMyOrganizations, useOrgMembers, useRemoveMember } from '@/hooks/use-org';
 import { useCurrentOrgId } from '@/contexts/current-org.context';
@@ -53,6 +53,7 @@ const AVATAR_COLORS = [
 
 export function EmployeePage() {
   const router = useRouter();
+  const { slug } = useParams({ strict: false }) as { slug: string };
   const { data: user } = useCurrentUser();
   const { currentOrgId } = useCurrentOrgId();
   const { data: myOrgs = [] } = useMyOrganizations({ enabled: !!user });
@@ -122,8 +123,7 @@ export function EmployeePage() {
 
   const handleEditEmployee = (membershipId: string) => {
     router.navigate({
-      to: '/console/admin/edit-employee/$employeeId',
-      params: { employeeId: membershipId },
+      to: `/console/${slug}/admin/edit-employee/${membershipId}`,
     });
   };
 
@@ -158,7 +158,7 @@ export function EmployeePage() {
             <p className="text-gray-600">Manage your team members and their account permissions.</p>
           </div>
           <button
-            onClick={() => router.navigate({ to: '/console/admin/invite-employee' })}
+            onClick={() => router.navigate({ to: `/console/${slug}/admin/invite-employee` })}
             className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg font-semibold flex items-center gap-2 transition-colors"
           >
             <Plus className="w-5 h-5" />
@@ -383,7 +383,7 @@ export function EmployeePage() {
                   <p>No pending invitations.</p>
                   <button
                     type="button"
-                    onClick={() => router.navigate({ to: '/console/admin/invite-employee' })}
+                    onClick={() => router.navigate({ to: `/console/${slug}/admin/invite-employee` })}
                     className="mt-3 text-blue-600 hover:text-blue-700 font-medium"
                   >
                     Send an invitation

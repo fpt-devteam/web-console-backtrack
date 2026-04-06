@@ -1,7 +1,7 @@
 import { Layout } from '../../components/admin/layout'
 import { Clock3, Copy, Info, Link2, Mail, MapPin, Phone } from 'lucide-react'
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { useRouter } from '@tanstack/react-router'
+import { useRouter, useParams } from '@tanstack/react-router'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -159,6 +159,7 @@ function FieldLabel({
  */
 export function SettingPage() {
   const router = useRouter()
+  const { slug: orgSlug } = useParams({ strict: false }) as { slug: string }
   const { currentOrgId } = useCurrentOrgId()
   const {
     data: org,
@@ -293,8 +294,10 @@ export function SettingPage() {
         },
       },
       {
-        onSuccess: () => {
-          void router.navigate({ to: '/console/admin/setting/organization' })
+        onSuccess: (updatedOrg) => {
+          // If slug changed, jump to the new workspace URL
+          const nextSlug = updatedOrg?.slug || orgSlug
+          void router.navigate({ to: `/console/${nextSlug}/admin/setting/organization` })
         },
         onError: (err) => {
           setSaveError(
@@ -364,7 +367,7 @@ export function SettingPage() {
                 className="rounded-full"
                 disabled={updateOrg.isPending}
                 onClick={() =>
-                  router.navigate({ to: '/console/admin/setting/organization' })
+                  router.navigate({ to: `/console/${orgSlug}/admin/setting/organization` })
                 }
               >
                 Cancel

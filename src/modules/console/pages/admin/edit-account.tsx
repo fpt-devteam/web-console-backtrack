@@ -1,7 +1,7 @@
 import { Layout } from '../../components/admin/layout';
 import { useState } from 'react';
 import type { FormEvent } from 'react';
-import { useRouter } from '@tanstack/react-router';
+import { useRouter, useParams } from '@tanstack/react-router';
 import { 
   CreditCard, 
   Building2, 
@@ -26,6 +26,7 @@ import {
 
 export function EditAccountPage() {
   const router = useRouter();
+  const { slug } = useParams({ strict: false }) as { slug: string };
   
   // Load data from localStorage or use defaults
   const currentAccountDetails = getAccountDetails(mockAccountDetails);
@@ -92,11 +93,11 @@ export function EditAccountPage() {
     });
 
     showToast.success('Account information updated successfully!');
-    router.navigate({ to: '/console/admin/plan' });
+    router.navigate({ to: `/console/${slug}/admin/plan` });
   };
 
   const handleCancel = () => {
-    router.navigate({ to: '/console/admin/plan' });
+    router.navigate({ to: `/console/${slug}/admin/plan` });
   };
 
   return (

@@ -7,7 +7,7 @@ import { getMockAdminInventoryById } from '@/modules/console/mocks/admin-invento
 
 /** Org admin inventory detail — sample data, no API. */
 export function AdminInventoryItemDetailPage() {
-  const { itemId } = useParams({ from: '/console/admin/inventory/$itemId' });
+  const { slug, itemId } = useParams({ from: '/console/$slug/admin/inventory/$itemId' });
   const [mainImage, setMainImage] = useState(0);
 
   const item = useMemo(() => getMockAdminInventoryById(itemId), [itemId]);
@@ -45,7 +45,11 @@ export function AdminInventoryItemDetailPage() {
           <div className="text-center py-12">
             <h2 className="text-2xl font-bold text-black mb-2">Item not found</h2>
             <p className="text-black mb-6">No item found for this ID.</p>
-            <Link to="/console/admin/inventory" className="text-black font-medium underline hover:no-underline">
+            <Link
+              to="/console/$slug/admin/inventory"
+              params={{ slug }}
+              className="text-black font-medium underline hover:no-underline"
+            >
               Back to inventory
             </Link>
           </div>
@@ -61,7 +65,11 @@ export function AdminInventoryItemDetailPage() {
     <Layout>
       <div className="p-6 max-w-6xl mx-auto">
         <div className="mb-6 flex items-center gap-2 text-sm text-black">
-          <Link to="/console/admin/inventory" className="hover:underline transition-colors">
+          <Link
+            to="/console/$slug/admin/inventory"
+            params={{ slug }}
+            className="hover:underline transition-colors"
+          >
             Inventory
           </Link>
           <ChevronRight className="w-4 h-4 text-black" />
