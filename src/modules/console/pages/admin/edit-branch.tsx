@@ -7,7 +7,7 @@ import { ArrowLeft } from 'lucide-react';
 
 export function EditBranchPage() {
   const router = useRouter();
-  const { branchId } = useParams({ from: '/console/admin/edit-branch/$branchId' });
+  const { slug, branchId } = useParams({ from: '/console/$slug/admin/edit-branch/$branchId' });
   
   // Find branch by ID
   const branch = mockBranches.find(b => b.id === branchId);
@@ -79,11 +79,11 @@ export function EditBranchPage() {
 
     // In a real app, this would call an API
     showToast.success(`Branch "${formData.name}" updated successfully!`);
-    router.navigate({ to: '/console/admin/branch' });
+    router.navigate({ to: `/console/${slug}/admin/branch` });
   };
 
   const handleCancel = () => {
-    router.navigate({ to: '/console/admin/branch' });
+    router.navigate({ to: `/console/${slug}/admin/branch` });
   };
 
   if (!branch) {

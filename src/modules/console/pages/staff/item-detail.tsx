@@ -9,7 +9,7 @@ import { useCurrentOrgId } from '@/contexts/current-org.context'
 import { InventoryDetailPanels } from '@/modules/console/components/inventory-detail-panels'
 
 export function ItemDetailPage() {
-  const { itemId } = useParams({ from: '/console/staff/item/$itemId' })
+  const { slug, itemId } = useParams({ from: '/console/$slug/staff/item/$itemId' })
   const navigate = useNavigate()
   const { currentOrgId } = useCurrentOrgId()
   const [mainImage, setMainImage] = useState(0)
@@ -56,7 +56,7 @@ export function ItemDetailPage() {
           <div className="text-center py-12">
             <h2 className="text-2xl font-bold text-gray-900 mb-2">Item Not Found</h2>
             <p className="text-gray-600 mb-6">The item you're looking for doesn't exist.</p>
-            <Link to="/console/staff/inventory">
+            <Link to="/console/$slug/staff/inventory" params={{ slug }}>
               <Button>Back to Inventory</Button>
             </Link>
           </div>
@@ -72,7 +72,11 @@ export function ItemDetailPage() {
     <StaffLayout>
       <div className="p-6 h-full overflow-y-auto mx-6">
         <div className="mb-6 flex items-center gap-2 text-sm text-gray-600">
-          <Link to="/console/staff/inventory" className="hover:text-gray-900 transition-colors">
+          <Link
+            to="/console/$slug/staff/inventory"
+            params={{ slug }}
+            className="hover:text-gray-900 transition-colors"
+          >
             Inventory
           </Link>
           <ChevronRight className="w-4 h-4" />
@@ -104,7 +108,7 @@ export function ItemDetailPage() {
                         window.confirm('Are you sure you want to delete this item? This cannot be undone.')
                       ) {
                         deleteItem.mutate(item.id, {
-                          onSuccess: () => navigate({ to: '/console/staff/inventory' }),
+                          onSuccess: () => navigate({ to: `/console/${slug}/staff/inventory` }),
                           onError: (err) =>
                             alert(err instanceof Error ? err.message : 'Failed to delete item'),
                         })
@@ -114,10 +118,16 @@ export function ItemDetailPage() {
                     <Trash2 className="w-4 h-4 mr-2" />
                     {deleteItem.isPending ? 'Deleting...' : 'Delete'}
                   </Button>
-                  <Link to="/console/staff/item-edit/$itemId" params={{ itemId: item.id }}>
+                  <Link
+                    to="/console/$slug/staff/item-edit/$itemId"
+                    params={{ slug, itemId: item.id }}
+                  >
                     <Button className="bg-blue-600 hover:bg-blue-700">Edit</Button>
                   </Link>
-                  <Link to="/console/staff/item-handover/$itemId" params={{ itemId: item.id }}>
+                  <Link
+                    to="/console/$slug/staff/item-handover/$itemId"
+                    params={{ slug, itemId: item.id }}
+                  >
                     <Button className="bg-blue-600 hover:bg-blue-700">Handover</Button>
                   </Link>
                 </>

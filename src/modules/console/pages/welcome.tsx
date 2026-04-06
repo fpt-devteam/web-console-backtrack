@@ -3,21 +3,18 @@ import { OrgLogo } from '@/components/org-logo';
 import { Link, useRouter } from '@tanstack/react-router';
 import { useCurrentUser } from '@/hooks/use-auth';
 import { useMyOrganizations } from '@/hooks/use-org';
-import { useCurrentOrgId } from '@/contexts/current-org.context';
 import { Spinner } from '@/components/ui/spinner';
 import type { MyOrganization } from '@/types/organization.types';
 
 export function WelcomePage() {
   const router = useRouter();
-  const { setCurrentOrgId } = useCurrentOrgId();
   const { data: user, isLoading: userLoading } = useCurrentUser();
   const { data: orgs = [], isLoading: orgsLoading } = useMyOrganizations({ enabled: !!user });
 
   const handleOrganizationClick = (org: MyOrganization) => {
-    setCurrentOrgId(org.orgId);
     const destination = org.myRole === 'OrgAdmin'
-      ? '/console/admin/dashboard'
-      : '/console/staff/inventory';
+      ? `/console/${org.slug}/admin/dashboard`
+      : `/console/${org.slug}/staff/inventory`;
     router.navigate({ to: destination });
   };
 

@@ -1,6 +1,6 @@
 import { Package, FileText, MessageCircle, Bell, ChevronLeft, ChevronRight, ArrowLeftRight } from 'lucide-react';
 import { OrgLogo } from '@/components/org-logo';
-import { Link, useLocation } from '@tanstack/react-router';
+import { Link, useLocation, useParams } from '@tanstack/react-router';
 import { useCurrentOrgId } from '@/contexts/current-org.context';
 import { useOrganization } from '@/hooks/use-org';
 import { useCurrentUser } from '@/hooks/use-auth';
@@ -17,26 +17,29 @@ interface StaffSidebarProps {
   onToggle: () => void;
 }
 
-const menuItems = [
-  { name: 'Inventory', icon: Package, path: '/console/staff/inventory' },
-  { name: 'Feed', icon: FileText, path: '/console/staff/feed' },
-  { name: 'Chat', icon: MessageCircle, path: '/console/staff/chat' },
-  { name: 'Notification', icon: Bell, path: '/console/staff/notification' },
-];
-
 export function StaffSidebar({ isOpen, onToggle }: StaffSidebarProps) {
   const location = useLocation();
+  const { slug } = useParams({ strict: false }) as { slug?: string };
   const { currentOrgId } = useCurrentOrgId();
   const { data: org } = useOrganization(currentOrgId);
   const { data: user } = useCurrentUser();
   const userInitials = getInitials(user?.name);
   const userDisplayName = user?.name || user?.email || 'User';
 
+  const base = `/console/${slug ?? org?.slug ?? ''}`;
+
+  const menuItems = [
+    { name: 'Inventory', icon: Package, path: `${base}/staff/inventory` },
+    { name: 'Feed', icon: FileText, path: `${base}/staff/feed` },
+    { name: 'Chat', icon: MessageCircle, path: `${base}/staff/chat` },
+    { name: 'Notification', icon: Bell, path: `${base}/staff/notification` },
+  ];
+
   const isActive = (path: string) => {
     const currentPath = location.pathname;
     if (currentPath === path) return true;
-    if (path === '/console/staff/inventory') {
-      return currentPath === path || currentPath.startsWith('/console/staff/inventory') || currentPath.startsWith('/console/staff/item');
+    if (path === `${base}/staff/inventory`) {
+      return currentPath === path || currentPath.startsWith(`${base}/staff/inventory`) || currentPath.startsWith(`${base}/staff/item`);
     }
     return false;
   };

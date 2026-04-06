@@ -15,7 +15,7 @@ const ROLE_OPTIONS = [
 
 export function EditEmployeePage() {
   const router = useRouter();
-  const { employeeId: membershipId } = useParams({ from: '/console/admin/edit-employee/$employeeId' });
+  const { slug, employeeId: membershipId } = useParams({ from: '/console/$slug/admin/edit-employee/$employeeId' });
 
   const { data: user } = useCurrentUser();
   const { currentOrgId } = useCurrentOrgId();
@@ -46,7 +46,7 @@ export function EditEmployeePage() {
       {
         onSuccess: () => {
           showToast.success('Role updated successfully');
-          router.navigate({ to: '/console/admin/employee' });
+          router.navigate({ to: `/console/${slug}/admin/employee` });
         },
         onError: (err) => {
           const message = err instanceof Error ? err.message : 'Failed to update role';
@@ -57,7 +57,7 @@ export function EditEmployeePage() {
   };
 
   const handleCancel = () => {
-    router.navigate({ to: '/console/admin/employee' });
+    router.navigate({ to: `/console/${slug}/admin/employee` });
   };
 
   if (!orgId && !isLoading) {

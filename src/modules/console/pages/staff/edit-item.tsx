@@ -2,7 +2,7 @@ import { StaffLayout } from '../../components/staff/layout'
 import { ChevronRight, AlertCircle, Building2, Camera, Tag } from 'lucide-react'
 import { useState, useEffect } from 'react'
 import { Link, useNavigate } from '@tanstack/react-router'
-import { Route } from '@/routes/console/staff/item-edit/$itemId'
+import { Route } from '@/routes/console/$slug/staff/item-edit/$itemId'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
@@ -11,7 +11,7 @@ import { useCurrentOrgId } from '@/contexts/current-org.context'
 import { Spinner } from '@/components/ui/spinner'
 
 export function EditItemPage() {
-  const { itemId } = Route.useParams()
+  const { slug, itemId } = Route.useParams()
   const navigate = useNavigate()
   const { currentOrgId } = useCurrentOrgId()
   const [mainImage, setMainImage] = useState(0)
@@ -51,7 +51,7 @@ export function EditItemPage() {
           <div className="text-center py-12">
             <h2 className="text-2xl font-bold text-gray-900 mb-2">Item Not Found</h2>
             <p className="text-gray-600 mb-6">The item you're looking for doesn't exist.</p>
-            <Link to="/console/staff/inventory">
+            <Link to="/console/$slug/staff/inventory" params={{ slug }}>
               <Button>Back to Inventory</Button>
             </Link>
           </div>
@@ -91,7 +91,7 @@ export function EditItemPage() {
       },
       {
         onSuccess: () => {
-          navigate({ to: '/console/staff/item/$itemId', params: { itemId } })
+          navigate({ to: `/console/${slug}/staff/item/${itemId}` })
         },
         onError: (err) => {
           setErrors({ submit: err instanceof Error ? err.message : 'Failed to update item.' })
@@ -104,13 +104,17 @@ export function EditItemPage() {
     <StaffLayout>
       <div className="p-6 h-full overflow-y-auto mx-6">
         <div className="mb-6 flex items-center gap-2 text-sm text-gray-600">
-          <Link to="/console/staff/inventory" className="hover:text-gray-900 transition-colors">
+          <Link
+            to="/console/$slug/staff/inventory"
+            params={{ slug }}
+            className="hover:text-gray-900 transition-colors"
+          >
             Inventory
           </Link>
           <ChevronRight className="w-4 h-4" />
           <Link
-            to="/console/staff/item/$itemId"
-            params={{ itemId }}
+            to="/console/$slug/staff/item/$itemId"
+            params={{ slug, itemId }}
             className="hover:text-gray-900 transition-colors"
           >
             {item.itemName}
@@ -130,7 +134,7 @@ export function EditItemPage() {
               </p>
             </div>
             <div className="flex gap-3">
-              <Link to="/console/staff/item/$itemId" params={{ itemId }}>
+              <Link to="/console/$slug/staff/item/$itemId" params={{ slug, itemId }}>
                 <Button type="button" variant="outline">
                   Cancel
                 </Button>

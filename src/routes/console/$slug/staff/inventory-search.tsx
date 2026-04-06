@@ -1,0 +1,16 @@
+import { SearchResultsPage, type SearchResultsSearch } from '@/modules/console/pages/staff/search-results'
+import { createFileRoute } from '@tanstack/react-router'
+
+export const Route = createFileRoute('/console/$slug/staff/inventory-search')({
+  component: RouteComponent,
+  validateSearch: (search: Record<string, unknown>): SearchResultsSearch => {
+    return {
+      q: (search.q as string) || undefined,
+      page: search.page ? Number(search.page) : undefined,
+    }
+  },
+})
+
+function RouteComponent() {
+  return <SearchResultsPage />
+}

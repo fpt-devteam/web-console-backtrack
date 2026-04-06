@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
-import { Link, useNavigate } from '@tanstack/react-router'
+import { Link, useNavigate, useParams } from '@tanstack/react-router'
 import { useCreateInventoryItem } from '@/hooks/use-inventory'
 import { useCurrentOrgId } from '@/contexts/current-org.context'
 import { useOrganization } from '@/hooks/use-org'
@@ -61,6 +61,7 @@ function validateOrgRequiredFinderFields(
 
 export function AddFoundItemPage() {
   const navigate = useNavigate()
+  const { slug } = useParams({ strict: false }) as { slug: string }
   const { currentOrgId } = useCurrentOrgId()
   const { data: org } = useOrganization(currentOrgId)
   const createItem = useCreateInventoryItem(currentOrgId)
@@ -118,7 +119,7 @@ export function AddFoundItemPage() {
     setPhotos(photos.filter((_, i) => i !== index))
   }
 
-  const requiredFinderFields = org?.requiredFinderContactFields ?? []
+  const requiredFinderFields = org?.requiredFinderContractFields ?? []
   const finderFieldRequired = (field: FinderContactField) => requiredFinderFields.includes(field)
 
   const buildPayload = () => ({
@@ -163,7 +164,7 @@ export function AddFoundItemPage() {
       )
       return
     }
-    const orgFinderError = validateOrgRequiredFinderFields(org?.requiredFinderContactFields, {
+    const orgFinderError = validateOrgRequiredFinderFields(org?.requiredFinderContractFields, {
       email: finderEmail,
       phone: finderPhone,
       nationalId: finderNationalId,
@@ -190,7 +191,7 @@ export function AddFoundItemPage() {
           setRecipientEmail('')
         
         } else {
-          navigate({ to: '/console/staff/inventory' })
+          navigate({ to: `/console/${slug}/staff/inventory` })
         }
       },
       onError: (err) => {
@@ -211,7 +212,8 @@ export function AddFoundItemPage() {
           {/* Breadcrumb */}
           <div className="mb-6 flex items-center gap-2 text-sm text-gray-600">
             <Link
-              to="/console/staff/inventory"
+              to="/console/$slug/staff/inventory"
+              params={{ slug }}
               className="hover:text-gray-900 transition-colors"
             >
               Inventory
@@ -487,7 +489,7 @@ export function AddFoundItemPage() {
 
             {/* Action Buttons */}
             <div className="flex items-center justify-end gap-3 pt-4 border-t">
-              <Link to="/console/staff/inventory">
+              <Link to="/console/$slug/staff/inventory" params={{ slug }}>
                 <Button type="button" variant="outline">
                   Cancel
                 </Button>

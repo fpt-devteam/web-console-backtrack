@@ -9,7 +9,7 @@ import {
   Link2,
   MapPin,
 } from 'lucide-react'
-import { useRouter } from '@tanstack/react-router'
+import { useRouter, useParams } from '@tanstack/react-router'
 import { useEffect, useMemo } from 'react'
 import { OrgLogo } from '@/components/org-logo'
 import {
@@ -77,6 +77,7 @@ function formatStatusLabel(status: string): string {
 
 export function OrganizationInfoViewPage() {
   const router = useRouter()
+  const { slug } = useParams({ strict: false }) as { slug: string }
   const { currentOrgId } = useCurrentOrgId()
   const {
     data: org,
@@ -92,14 +93,9 @@ export function OrganizationInfoViewPage() {
     }
   }, [currentOrgId, router])
 
-  const shareUrl = useMemo(() => {
+  const workspaceUrl = useMemo(() => {
     if (!org?.slug || typeof window === 'undefined') return ''
-    return `${window.location.origin}/portal/${org.slug}`
-  }, [org?.slug])
-
-  const slugDisplayUrl = useMemo(() => {
-    if (!org?.slug || typeof window === 'undefined') return ''
-    return `${window.location.origin}/portal/${org.slug}`
+    return `${window.location.origin}/console/${org.slug}`
   }, [org?.slug])
 
   if (!currentOrgId) {
@@ -174,7 +170,8 @@ export function OrganizationInfoViewPage() {
                 type="button"
                 onClick={() =>
                   router.navigate({
-                    to: '/console/admin/setting/organization/edit',
+                    to: '/console/$slug/admin/setting/organization/edit',
+                    params: { slug },
                   })
                 }
                 className="inline-flex items-center rounded-full bg-blue-600 px-4 py-1.5 text-xs font-semibold text-white hover:bg-blue-700 sm:px-5 sm:py-2"
@@ -254,13 +251,16 @@ export function OrganizationInfoViewPage() {
                   <p className="text-[10px] font-normal uppercase tracking-[0.16em] text-slate-400">
                     Organization Slug
                   </p>
+                  <p className="mt-1 text-sm font-normal text-slate-800">
+                    {org.slug || '—'}
+                  </p>
                   <a
-                    href={slugDisplayUrl || '#'}
-                    className="mt-1 inline-block text-sm font-normal text-blue-600 hover:text-blue-700"
+                    href={workspaceUrl || '#'}
+                    className="mt-1 inline-block text-xs font-normal text-blue-600 hover:text-blue-700"
                     target="_blank"
                     rel="noreferrer"
                   >
-                    {slugDisplayUrl || org.slug}
+                    {workspaceUrl || '—'}
                   </a>
                 </div>
               </div>
@@ -268,23 +268,23 @@ export function OrganizationInfoViewPage() {
               <div className="mt-6 rounded-xl border border-slate-200 bg-slate-50 px-4 py-3">
                 <div className="mb-2 flex items-center gap-2 text-xs font-semibold text-slate-700">
                   <Link2 className="h-3 w-3 text-blue-600" />
-                  Shareable Link
+                  Shareable Link (Workspace)
                 </div>
                 <div className="flex items-start justify-between gap-3">
                   <a
-                    href={shareUrl || '#'}
+                    href={workspaceUrl || '#'}
                     className="break-all text-xs text-blue-600 hover:text-blue-700"
                     target="_blank"
                     rel="noreferrer"
                   >
-                    {shareUrl || '—'}
+                    {workspaceUrl || '—'}
                   </a>
                   <button
                     type="button"
-                    className="rounded-md p-1.5 text-blue-600 hover:bg-slate-200 disabled:opacity-40"
-                    disabled={!shareUrl}
+                    className="rounded-md  text-blue-600 hover:bg-slate-200 disabled:opacity-40"
+                    disabled={!workspaceUrl}
                     onClick={() =>
-                      shareUrl && void navigator.clipboard.writeText(shareUrl)
+                      workspaceUrl && void navigator.clipboard.writeText(workspaceUrl)
                     }
                   >
                     <Copy className="h-4 w-4" />

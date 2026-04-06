@@ -14,8 +14,10 @@ export interface CreateOrganizationPayload {
   taxIdentificationNumber: string;
   /** BE CreateOrganizationCommand: required */
   logoUrl: string;
-  /** BE CreateOrganizationCommand: required — FE gửi default ['phone'] khi tạo mới */
-  requiredFinderContactFields: FinderContactField[];
+  /** BE CreateOrganizationCommand: required — org policy for finder contact */
+  requiredFinderContractFields: FinderContactField[];
+  /** BE CreateOrganizationCommand: required — org policy for owner form */
+  requiredOwnerContractFields: FinderContactField[];
 }
 
 /** BE FinderContactField — JSON PascalCase (JsonStringEnumConverter không có CamelCase policy) */
@@ -59,7 +61,8 @@ export interface Organization {
   status: string;
   createdAt: string;
   /** Các field finder bắt buộc theo cấu hình org (CreateInventoryItem) */
-  requiredFinderContactFields?: FinderContactField[];
+  requiredFinderContractFields?: FinderContactField[];
+  requiredOwnerContractFields?: FinderContactField[];
 }
 
 /** Payload for PUT /api/core/orgs/{orgId} – matches UpdateOrganizationCommand */
@@ -77,7 +80,8 @@ export interface UpdateOrganizationPayload {
   businessHours?: DailySchedule[] | null;
   logoUrl?: string | null;
   coverImageUrl?: string | null;
-  requiredFinderContactFields?: FinderContactField[] | null;
+  requiredFinderContractFields?: FinderContactField[] | null;
+  requiredOwnerContractFields?: FinderContactField[] | null;
 }
 
 /** Thành viên org – item từ GET /api/core/orgs/{orgId}/members */

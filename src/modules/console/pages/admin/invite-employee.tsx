@@ -1,7 +1,7 @@
 import { Layout } from '../../components/admin/layout';
 import { AlertCircle, X } from 'lucide-react';
 import { useState } from 'react';
-import { useRouter } from '@tanstack/react-router';
+import { useRouter, useParams } from '@tanstack/react-router';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useCurrentUser } from '@/hooks/use-auth';
 import { useMyOrganizations, useOrgMembers } from '@/hooks/use-org';
@@ -17,6 +17,7 @@ const ROLE_OPTIONS = [
 
 export function InviteEmployeePage() {
   const router = useRouter();
+  const { slug } = useParams({ strict: false }) as { slug: string };
   const { data: user } = useCurrentUser();
   const { currentOrgId } = useCurrentOrgId();
   const { data: myOrgs = [] } = useMyOrganizations({ enabled: !!user });
@@ -73,7 +74,7 @@ export function InviteEmployeePage() {
       {
         onSuccess: () => {
           showToast.success(`Invitation sent to ${formData.email}`);
-          router.navigate({ to: '/console/admin/employee', search: { tab: 'invitation' } });
+          router.navigate({ to: `/console/${slug}/admin/employee`, search: { tab: 'invitation' } });
         },
         onError: (err) => {
           showToast.error(err instanceof Error ? err.message : 'Failed to send invitation');
@@ -82,7 +83,7 @@ export function InviteEmployeePage() {
     );
   };
 
-  const handleCancel = () => router.navigate({ to: '/console/admin/employee' });
+  const handleCancel = () => router.navigate({ to: `/console/${slug}/admin/employee` });
 
   return (
     <Layout>

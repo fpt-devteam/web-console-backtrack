@@ -2,7 +2,7 @@ import { StaffLayout } from '../../components/staff/layout'
 import { ChevronRight } from 'lucide-react'
 import { useState } from 'react'
 import { Link, useNavigate } from '@tanstack/react-router'
-import { Route } from '@/routes/console/staff/item-handover/$itemId'
+import { Route } from '@/routes/console/$slug/staff/item-handover/$itemId'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -20,7 +20,7 @@ import { Spinner } from '@/components/ui/spinner'
 const statusOptions = ['InStorage', 'Returned', 'Disposed'] as const
 
 export function HandoverItemPage() {
-  const { itemId } = Route.useParams()
+  const { slug, itemId } = Route.useParams()
   const navigate = useNavigate()
   const { currentOrgId } = useCurrentOrgId()
 
@@ -52,7 +52,7 @@ export function HandoverItemPage() {
           <div className="text-center py-12">
             <h2 className="text-2xl font-bold text-gray-900 mb-2">Item Not Found</h2>
             <p className="text-gray-600 mb-6">The item you're looking for doesn't exist.</p>
-            <Link to="/console/staff/inventory">
+            <Link to="/console/$slug/staff/inventory" params={{ slug }}>
               <Button>Back to Inventory</Button>
             </Link>
           </div>
@@ -66,13 +66,17 @@ export function HandoverItemPage() {
       <div className="p-8">
         <div className="max-w-4xl mx-auto">
           <div className="mb-6 flex items-center gap-2 text-sm text-gray-600">
-            <Link to="/console/staff/inventory" className="hover:text-gray-900 transition-colors">
+            <Link
+              to="/console/$slug/staff/inventory"
+              params={{ slug }}
+              className="hover:text-gray-900 transition-colors"
+            >
               Inventory
             </Link>
             <ChevronRight className="w-4 h-4" />
             <Link
-              to="/console/staff/item/$itemId"
-              params={{ itemId }}
+              to="/console/$slug/staff/item/$itemId"
+              params={{ slug, itemId }}
               className="hover:text-gray-900 transition-colors"
             >
               {item.itemName}
@@ -93,7 +97,7 @@ export function HandoverItemPage() {
               className="space-y-8"
               onSubmit={(e) => {
                 e.preventDefault()
-                navigate({ to: '/console/staff/item/$itemId', params: { itemId } })
+                navigate({ to: `/console/${slug}/staff/item/${itemId}` })
               }}
             >
               <div className="space-y-6">
@@ -207,7 +211,7 @@ export function HandoverItemPage() {
               </div>
 
               <div className="flex items-center justify-end gap-3 pt-4 border-t">
-                <Link to="/console/staff/item/$itemId" params={{ itemId }}>
+                <Link to="/console/$slug/staff/item/$itemId" params={{ slug, itemId }}>
                   <Button type="button" variant="outline">Cancel</Button>
                 </Link>
                 <Button type="submit" className="bg-blue-600 hover:bg-blue-700">

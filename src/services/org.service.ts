@@ -1,4 +1,4 @@
-import { privateClient } from '@/lib/api-client';
+import { privateClient, publicClient } from '@/lib/api-client';
 import type { ApiResponse } from '@/types/api-response.type';
 import type { PagedResponse } from '@/types/pagination.type';
 import type {
@@ -14,6 +14,14 @@ export const orgService = {
     const { data } = await privateClient.get<ApiResponse<MyOrganization[]>>('/api/core/orgs/me');
     if (!data.success) throw new Error(data.error?.message ?? 'Failed to fetch organizations');
     return data.data ?? [];
+  },
+
+  async getBySlug(slug: string): Promise<Organization> {
+    const { data } = await publicClient.get<ApiResponse<Organization>>(
+      `/api/core/orgs/public/${encodeURIComponent(slug)}`,
+    );
+    if (!data.success) throw new Error(data.error?.message ?? 'Organization not found');
+    return data.data;
   },
 
   async getById(orgId: string): Promise<Organization> {
@@ -50,7 +58,8 @@ export const orgService = {
       businessHours: payload.businessHours ?? undefined,
       logoUrl: payload.logoUrl ?? undefined,
       coverImageUrl: payload.coverImageUrl ?? undefined,
-      requiredFinderContactFields: payload.requiredFinderContactFields ?? undefined,
+      requiredFinderContractFields: payload.requiredFinderContractFields ?? undefined,
+      requiredOwnerContractFields: payload.requiredOwnerContractFields ?? undefined,
     };
     const { data } = await privateClient.put<ApiResponse<Organization>>(`/api/core/orgs/${orgId}`, body);
     if (!data.success) throw new Error(data.error?.message ?? 'Failed to update organization');
@@ -72,7 +81,8 @@ export const orgService = {
       industryType: payload.industryType,
       taxIdentificationNumber: payload.taxIdentificationNumber,
       logoUrl: payload.logoUrl,
-      requiredFinderContactFields: payload.requiredFinderContactFields,
+      requiredFinderContractFields: payload.requiredFinderContractFields,
+      requiredOwnerContractFields: payload.requiredOwnerContractFields,
     };
     const { data } = await privateClient.post<ApiResponse<Organization>>('/api/core/orgs', body);
     if (!data.success) throw new Error(data.error?.message ?? 'Failed to create organization');

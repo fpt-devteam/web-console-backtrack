@@ -1,7 +1,7 @@
 import { StaffLayout } from '../../components/staff/layout'
 import { Archive, Clock, ChevronRight } from 'lucide-react'
 import { useMemo } from 'react'
-import { Link, useNavigate, useSearch } from '@tanstack/react-router'
+import { Link, useNavigate, useSearch, useParams } from '@tanstack/react-router'
 import { Pagination } from '@/components/ui/pagination'
 import { useSearchInventorySemantic } from '@/hooks/use-inventory'
 import { useCurrentOrgId } from '@/contexts/current-org.context'
@@ -16,6 +16,7 @@ const pageSize = 10
 
 export function SearchResultsPage() {
   const navigate = useNavigate()
+  const { slug } = useParams({ strict: false }) as { slug: string }
   const { currentOrgId } = useCurrentOrgId()
   const searchParams = useSearch({ strict: false }) as SearchResultsSearch
   const searchTerm = searchParams?.q ?? ''
@@ -70,11 +71,19 @@ export function SearchResultsPage() {
         <div className="max-w-6xl mx-auto">
           {/* Breadcrumb */}
           <div className="mb-6 flex items-center gap-2 text-sm text-gray-600">
-            <Link to="/console/staff/inventory" className="hover:text-gray-900 transition-colors">
+            <Link
+              to="/console/$slug/staff/inventory"
+              params={{ slug }}
+              className="hover:text-gray-900 transition-colors"
+            >
               Dashboard
             </Link>
             <ChevronRight className="w-4 h-4" />
-            <Link to="/console/staff/inventory" className="hover:text-gray-900 transition-colors">
+            <Link
+              to="/console/$slug/staff/inventory"
+              params={{ slug }}
+              className="hover:text-gray-900 transition-colors"
+            >
               Inventory
             </Link>
             <ChevronRight className="w-4 h-4" />
@@ -162,7 +171,10 @@ export function SearchResultsPage() {
                             <span>Added {formatPosted(item.createdAt)}</span>
                           </div>
                         </div>
-                        <Link to="/console/staff/item/$itemId" params={{ itemId: item.id }}>
+                        <Link
+                          to="/console/$slug/staff/item/$itemId"
+                          params={{ slug, itemId: item.id }}
+                        >
                           <button className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-all font-medium text-sm">
                             View Details
                           </button>
@@ -180,7 +192,8 @@ export function SearchResultsPage() {
                     totalPages={totalPages}
                     onPageChange={(page) => {
                       navigate({
-                        to: '/console/staff/inventory-search',
+                        to: '/console/$slug/staff/inventory-search',
+                        params: { slug },
                         search: {
                           q: searchTerm || undefined,
                           page: page > 1 ? page : undefined,

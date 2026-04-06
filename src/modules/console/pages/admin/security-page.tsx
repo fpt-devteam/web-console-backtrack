@@ -41,8 +41,8 @@ export function SecurityPage() {
 
   useEffect(() => {
     if (!org) return;
-    if (org.requiredFinderContactFields && org.requiredFinderContactFields.length > 0) {
-      setCheckedFields(org.requiredFinderContactFields);
+    if (org.requiredFinderContractFields && org.requiredFinderContractFields.length > 0) {
+      setCheckedFields(org.requiredFinderContractFields);
     }
   }, [org]);
 
@@ -77,7 +77,9 @@ export function SecurityPage() {
           businessHours: org.businessHours ?? undefined,
           logoUrl: org.logoUrl ?? undefined,
           coverImageUrl: org.coverImageUrl ?? undefined,
-          requiredFinderContactFields: checkedFields,
+          requiredFinderContractFields: checkedFields,
+          // Keep owner policy unchanged when updating finder policy
+          requiredOwnerContractFields: org.requiredOwnerContractFields ?? ['Phone'],
         },
       },
       {

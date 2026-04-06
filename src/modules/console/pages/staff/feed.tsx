@@ -1,13 +1,14 @@
 import { StaffLayout } from '../../components/staff'
 import { Plus, MapPin, Clock, Search } from 'lucide-react'
 import { useMemo, useState, useEffect } from 'react'
-import { Link } from '@tanstack/react-router'
+import { Link, useParams } from '@tanstack/react-router'
 import { Spinner } from '@/components/ui/spinner'
 import { usePosts } from '@/hooks/use-post'
 import { useDebouncedValue, SEARCH_DEBOUNCE_MS } from '@/hooks/use-debounce'
 import type { PostTypeFilter } from '@/types/post.types'
 
 export function StaffFeedPage() {
+  const { slug } = useParams({ strict: false }) as { slug: string }
   const [searchTerm, setSearchTerm] = useState('')
   const debouncedSearchTerm = useDebouncedValue(searchTerm.trim(), SEARCH_DEBOUNCE_MS)
   const [postType, setPostType] = useState<PostTypeFilter>('All')
@@ -59,7 +60,7 @@ export function StaffFeedPage() {
           <div>
             <h1 className="text-3xl font-bold text-gray-900">Item Feed</h1>
           </div>
-          <Link to="/console/staff/inventory-add-item">
+          <Link to="/console/$slug/staff/inventory-add-item" params={{ slug }}>
             <button className="flex items-center gap-2 px-4 py-1.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-all font-medium">
               <Plus className="w-5 h-5" />
               Add found item
@@ -168,7 +169,10 @@ export function StaffFeedPage() {
                   </div>
 
                   {/* Button */}
-                  <Link to="/console/staff/item/$itemId" params={{ itemId: post.id }}>
+                  <Link
+                    to="/console/$slug/staff/item/$itemId"
+                    params={{ slug, itemId: post.id }}
+                  >
                     <button className="w-full py-2.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-all font-medium text-sm">
                       View Details
                     </button>
