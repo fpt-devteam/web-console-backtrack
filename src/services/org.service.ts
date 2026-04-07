@@ -10,9 +10,15 @@ import type {
 } from '@/types/organization.types';
 
 export const orgService = {
+  // Small helper so UI can show friendly messages by code.
+  // (ApiResponse carries `error.code`, but `Error` only carries message.)
+  _error(message: string, code?: string) {
+    return Object.assign(new Error(message), { code });
+  },
+
   async getMyOrgs(): Promise<MyOrganization[]> {
     const { data } = await privateClient.get<ApiResponse<MyOrganization[]>>('/api/core/orgs/me');
-    if (!data.success) throw new Error(data.error?.message ?? 'Failed to fetch organizations');
+    if (!data.success) throw orgService._error(data.error?.message ?? 'Failed to fetch organizations', data.error?.code);
     return data.data ?? [];
   },
 
@@ -20,13 +26,13 @@ export const orgService = {
     const { data } = await publicClient.get<ApiResponse<Organization>>(
       `/api/core/orgs/public/${encodeURIComponent(slug)}`,
     );
-    if (!data.success) throw new Error(data.error?.message ?? 'Organization not found');
+    if (!data.success) throw orgService._error(data.error?.message ?? 'Organization not found', data.error?.code);
     return data.data;
   },
 
   async getById(orgId: string): Promise<Organization> {
     const { data } = await privateClient.get<ApiResponse<Organization>>(`/api/core/orgs/${orgId}`);
-    if (!data.success) throw new Error(data.error?.message ?? 'Failed to fetch organization');
+    if (!data.success) throw orgService._error(data.error?.message ?? 'Failed to fetch organization', data.error?.code);
     return data.data;
   },
 
@@ -35,7 +41,7 @@ export const orgService = {
       `/api/core/orgs/${orgId}/members`,
       { params: { page, pageSize } }
     );
-    if (!data.success) throw new Error(data.error?.message ?? 'Failed to fetch members');
+    if (!data.success) throw orgService._error(data.error?.message ?? 'Failed to fetch members', data.error?.code);
     return data.data;
   },
 
@@ -62,7 +68,7 @@ export const orgService = {
       requiredOwnerContractFields: payload.requiredOwnerContractFields ?? undefined,
     };
     const { data } = await privateClient.put<ApiResponse<Organization>>(`/api/core/orgs/${orgId}`, body);
-    if (!data.success) throw new Error(data.error?.message ?? 'Failed to update organization');
+    if (!data.success) throw orgService._error(data.error?.message ?? 'Failed to update organization', data.error?.code);
     return data.data;
   },
 
@@ -85,7 +91,7 @@ export const orgService = {
       requiredOwnerContractFields: payload.requiredOwnerContractFields,
     };
     const { data } = await privateClient.post<ApiResponse<Organization>>('/api/core/orgs', body);
-    if (!data.success) throw new Error(data.error?.message ?? 'Failed to create organization');
+    if (!data.success) throw orgService._error(data.error?.message ?? 'Failed to create organization', data.error?.code);
     return data.data;
   },
 

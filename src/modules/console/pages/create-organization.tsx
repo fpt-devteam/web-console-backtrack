@@ -17,6 +17,18 @@ const INDUSTRY_OPTIONS = [
   { value: 'other', label: 'Other' },
 ] as const;
 
+const SLUG_PATTERN = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
+
+function normalizeSlug(raw: string): string {
+  return raw
+    .trim()
+    .toLowerCase()
+    .replace(/\s+/g, '-')
+    .replace(/[^a-z0-9-]/g, '') // drop invalid chars
+    .replace(/-+/g, '-')        // collapse dashes
+    .replace(/^-|-$/g, '');     // trim dashes
+}
+
 export function CreateOrganizationPage() {
   const navigate = useNavigate();
   const createOrg = useCreateOrganization();
@@ -36,7 +48,8 @@ export function CreateOrganizationPage() {
   const [externalPlaceId, setExternalPlaceId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
-  const slugOk = form.slug.length > 3;
+  const slugNormalized = normalizeSlug(form.slug);
+  const slugOk = slugNormalized.length > 0 && SLUG_PATTERN.test(slugNormalized) && slugNormalized.length <= 255;
 
   const update = (field: keyof typeof form) => (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     setForm((prev) => ({ ...prev, [field]: e.target.value }));
@@ -131,16 +144,38 @@ export function CreateOrganizationPage() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
+
+    const name = form.name.trim();
+    if (!name) {
+      setError('Please enter your organization name.');
+      return;
+    }
+    if (!form.industryType) {
+      setError('Please select an industry type.');
+      return;
+    }
+    if (!form.phone.trim()) {
+      setError('Please enter a phone number.');
+      return;
+    }
+    if (!form.taxIdentificationNumber.trim()) {
+      setError('Please enter your tax identification number.');
+      return;
+    }
+    if (!slugOk) {
+      setError('Workspace URL is invalid. Use lowercase letters, numbers, and hyphens only (e.g. acme-corp).');
+      return;
+    }
     if (!logoUrl) {
       setError('Organization logo is required');
       return;
     }
-    const displayAddress = form.address.trim() || form.name.trim() || '—';
+    const displayAddress = form.address.trim() || name;
     const coords = location ?? { latitude: 0, longitude: 0 };
     createOrg.mutate(
       {
-        name: form.name.trim(),
-        slug: form.slug.trim().toLowerCase().replace(/\s+/g, '-'),
+        name,
+        slug: slugNormalized,
         displayAddress,
         location: coords,
         externalPlaceId: externalPlaceId ?? undefined,
@@ -158,7 +193,15 @@ export function CreateOrganizationPage() {
         onSuccess: (createdOrg) => {
           navigate({ to: `/console/processing`, search: { slug: createdOrg.slug } });
         },
-        onError: (err) => setError(err instanceof Error ? err.message : 'Failed to create organization'),
+        onError: (err) => {
+          const e = err as Error & { code?: string };
+          if (e.code === 'SlugAlreadyExists') {
+            setError('That Workspace URL is already taken. Please choose another one.');
+            return;
+          }
+          // Fallback: show BE message (already user-facing from validators)
+          setError(e?.message || 'Failed to create organization');
+        },
       }
     );
   };
@@ -323,9 +366,14 @@ export function CreateOrganizationPage() {
                 )}
               </div>
               <div className="flex items-center justify-between mt-2">
-                <p className="text-xs text-gray-500">This will be your team's unique login URL.</p>
-                {slugOk && form.slug && <p className="text-xs text-green-600 font-medium">Subdomain available</p>}
+                <p className="text-xs text-gray-500">Lowercase letters, numbers, and hyphens only.</p>
+                {slugOk && form.slug && <p className="text-xs text-green-600 font-medium">Looks good</p>}
               </div>
+              {!slugOk && form.slug.trim() && (
+                <p className="mt-1 text-xs text-red-600">
+                  Example: <span className="font-mono">fpt-hcm</span>
+                </p>
+              )}
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
