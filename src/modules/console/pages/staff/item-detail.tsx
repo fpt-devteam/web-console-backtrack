@@ -19,12 +19,18 @@ export function ItemDetailPage() {
 
   const getStatusColor = (status: string) => {
     switch (status) {
+      case 'Active':
+        return 'bg-blue-600 text-white'
       case 'InStorage':
         return 'bg-indigo-500 text-white'
+      case 'ReturnScheduled':
+        return 'bg-amber-500 text-white'
       case 'Returned':
         return 'bg-green-500 text-white'
-      case 'Disposed':
-        return 'bg-gray-500 text-white'
+      case 'Archived':
+        return 'bg-slate-600 text-white'
+      case 'Expired':
+        return 'bg-gray-600 text-white'
       default:
         return 'bg-gray-500 text-white'
     }
@@ -32,9 +38,12 @@ export function ItemDetailPage() {
 
   const statusLabel = (s: string) => {
     switch (s) {
+      case 'Active': return 'Active'
       case 'InStorage': return 'In Storage'
+      case 'ReturnScheduled': return 'Return Scheduled'
       case 'Returned': return 'Returned'
-      case 'Disposed': return 'Disposed'
+      case 'Archived': return 'Archived'
+      case 'Expired': return 'Expired'
       default: return s
     }
   }
@@ -80,14 +89,14 @@ export function ItemDetailPage() {
             Inventory
           </Link>
           <ChevronRight className="w-4 h-4" />
-          <span className="text-gray-900 font-medium">{item.itemName}</span>
+          <span className="text-gray-900 font-medium">{item.item.itemName}</span>
         </div>
 
         <div className="bg-white rounded-xl shadow-sm">
           <div className="p-6 border-b border-gray-200 flex items-start justify-between">
             <div>
               <div className="flex items-center gap-3 mb-2">
-                <h1 className="text-3xl font-bold text-gray-900">{item.itemName}</h1>
+                <h1 className="text-3xl font-bold text-gray-900">{item.item.itemName}</h1>
                 <span className={`px-3 py-1 rounded-md text-xs font-bold uppercase ${getStatusColor(item.status)}`}>
                   {statusLabel(item.status)}
                 </span>
@@ -139,7 +148,7 @@ export function ItemDetailPage() {
             <div className="lg:col-span-3 p-6 border-r border-gray-200">
               <div className="relative h-[350px] bg-gradient-to-br from-gray-100 to-gray-200 rounded-lg overflow-hidden mb-4 flex items-center justify-center">
                 {mainImg ? (
-                  <img src={mainImg} alt={item.itemName} className="w-full h-full object-cover" />
+                  <img src={mainImg} alt={item.item.itemName} className="w-full h-full object-cover" />
                 ) : (
                   <div className="text-gray-400">No image</div>
                 )}
@@ -178,27 +187,62 @@ export function ItemDetailPage() {
                 </div>
 
                 <div>
-                  <div className="text-xs font-semibold uppercase mb-2">STORED LOCATION</div>
+                  <div className="text-xs font-semibold uppercase mb-2">CATEGORY</div>
                   <div className="flex items-center gap-2 text-gray-900">
                     <Building2 className="w-4 h-4 text-blue-600" />
-                    <span>{item.storageLocation || '—'}</span>
+                    <span>{item.item.category || '—'}</span>
                   </div>
                 </div>
 
                 <div>
-                  <div className="text-xs font-semibold uppercase mb-2">LOGGED AT</div>
+                  <div className="text-xs font-semibold uppercase mb-2">EVENT TIME</div>
                   <div className="flex items-center gap-2 text-gray-900">
                     <Calendar className="w-4 h-4 text-blue-600" />
-                    <span>{new Date(item.loggedAt).toLocaleString()}</span>
+                    <span>{item.eventTime ? new Date(item.eventTime).toLocaleString() : '—'}</span>
                   </div>
                 </div>
 
-                {item.distinctiveMarks && (
+                <div>
+                  <div className="text-xs font-semibold uppercase mb-2">BRAND</div>
+                  <div className="flex items-center gap-2 text-gray-900">
+                    <span>{item.item.brand || '—'}</span>
+                  </div>
+                </div>
+
+                <div>
+                  <div className="text-xs font-semibold uppercase mb-2">COLOR</div>
+                  <div className="flex items-center gap-2 text-gray-900">
+                    <span>{item.item.color || '—'}</span>
+                  </div>
+                </div>
+
+                <div>
+                  <div className="text-xs font-semibold uppercase mb-2">CONDITION</div>
+                  <div className="flex items-center gap-2 text-gray-900">
+                    <span>{item.item.condition || '—'}</span>
+                  </div>
+                </div>
+
+                <div>
+                  <div className="text-xs font-semibold uppercase mb-2">MATERIAL</div>
+                  <div className="flex items-center gap-2 text-gray-900">
+                    <span>{item.item.material || '—'}</span>
+                  </div>
+                </div>
+
+                <div>
+                  <div className="text-xs font-semibold uppercase mb-2">SIZE</div>
+                  <div className="flex items-center gap-2 text-gray-900">
+                    <span>{item.item.size || '—'}</span>
+                  </div>
+                </div>
+
+                {item.item.distinctiveMarks && (
                   <div>
                     <div className="text-xs font-semibold uppercase mb-2">DISTINCTIVE MARKS</div>
                     <div className="flex items-center gap-2 text-gray-900">
                       <Tag className="w-4 h-4 text-blue-600" />
-                      <span>{item.distinctiveMarks}</span>
+                      <span>{item.item.distinctiveMarks}</span>
                     </div>
                   </div>
                 )}
@@ -206,7 +250,7 @@ export function ItemDetailPage() {
 
               <div>
                 <div className="text-xs font-semibold uppercase mb-2">Description</div>
-                <p className="text-gray-700 leading-relaxed">{item.description}</p>
+                <p className="text-gray-700 leading-relaxed">{item.item.additionalDetails ?? '—'}</p>
               </div>
             </div>
           </div>

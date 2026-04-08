@@ -3,7 +3,7 @@ import { Archive, Clock, ChevronRight } from 'lucide-react'
 import { useMemo } from 'react'
 import { Link, useNavigate, useSearch, useParams } from '@tanstack/react-router'
 import { Pagination } from '@/components/ui/pagination'
-import { useSearchInventorySemantic } from '@/hooks/use-inventory'
+import { useInventoryItems } from '@/hooks/use-inventory'
 import { useCurrentOrgId } from '@/contexts/current-org.context'
 import { Spinner } from '@/components/ui/spinner'
 
@@ -22,8 +22,8 @@ export function SearchResultsPage() {
   const searchTerm = searchParams?.q ?? ''
   const currentPage = searchParams?.page ?? 1
 
-  const { data, isLoading, isError } = useSearchInventorySemantic(currentOrgId, {
-    searchText: searchTerm,
+  const { data, isLoading, isError } = useInventoryItems(currentOrgId, {
+    query: searchTerm,
     page: currentPage,
     pageSize,
   })
@@ -45,12 +45,18 @@ export function SearchResultsPage() {
 
   const statusBadgeClass = (s: string) => {
     switch (s) {
+      case 'Active':
+        return 'bg-blue-600 text-white'
       case 'InStorage':
         return 'bg-indigo-500 text-white'
+      case 'ReturnScheduled':
+        return 'bg-amber-500 text-white'
       case 'Returned':
         return 'bg-green-500 text-white'
-      case 'Disposed':
-        return 'bg-gray-500 text-white'
+      case 'Archived':
+        return 'bg-slate-600 text-white'
+      case 'Expired':
+        return 'bg-gray-600 text-white'
       default:
         return 'bg-gray-600 text-white'
     }
@@ -58,9 +64,12 @@ export function SearchResultsPage() {
 
   const statusLabel = (s: string) => {
     switch (s) {
+      case 'Active': return 'Active'
       case 'InStorage': return 'In Storage'
+      case 'ReturnScheduled': return 'Return Scheduled'
       case 'Returned': return 'Returned'
-      case 'Disposed': return 'Disposed'
+      case 'Archived': return 'Archived'
+      case 'Expired': return 'Expired'
       default: return s
     }
   }
@@ -94,7 +103,7 @@ export function SearchResultsPage() {
             <h1 className="text-3xl font-bold text-gray-900">Search Results</h1>
             {searchTerm && (
               <p className="text-gray-600 mt-1">
-                Kết quả tìm kiếm theo &quot;{searchTerm}&quot; (semantic search)
+                Kết quả tìm kiếm theo &quot;{searchTerm}&quot;
               </p>
             )}
           </div>
@@ -130,7 +139,7 @@ export function SearchResultsPage() {
                         {item.imageUrls?.[0] ? (
                           <img
                             src={item.imageUrls[0]}
-                            alt={item.itemName}
+                            alt={item.item.itemName}
                             className="w-full h-full object-cover"
                           />
                         ) : (
@@ -148,24 +157,16 @@ export function SearchResultsPage() {
                               {statusLabel(item.status)}
                             </span>
                           </div>
-                          {item.similarityScore != null && (
-                            <div className="text-right flex-shrink-0">
-                              <div className="text-xl font-bold text-blue-600">
-                                {Math.round(item.similarityScore * 100)}%
-                              </div>
-                              <div className="text-xs text-gray-500">Match</div>
-                            </div>
-                          )}
                         </div>
-                        <h3 className="text-xl font-semibold text-gray-900 mb-1">{item.itemName}</h3>
-                        <p className="text-sm text-gray-600 mb-3 line-clamp-2">{item.description}</p>
+                        <h3 className="text-xl font-semibold text-gray-900 mb-1">{item.item.itemName}</h3>
+                        <p className="text-sm text-gray-600 mb-3 line-clamp-2">
+                          {item.item.additionalDetails ?? '—'}
+                        </p>
                         <div className="space-y-2 text-sm text-gray-600 mb-4">
-                          {item.storageLocation && (
-                            <div className="flex items-center gap-2">
-                              <Archive className="w-4 h-4 flex-shrink-0" />
-                              <span>{item.storageLocation}</span>
-                            </div>
-                          )}
+                          <div className="flex items-center gap-2">
+                            <Archive className="w-4 h-4 flex-shrink-0" />
+                            <span>{item.item.category}</span>
+                          </div>
                           <div className="flex items-center gap-2">
                             <Clock className="w-4 h-4 flex-shrink-0" />
                             <span>Added {formatPosted(item.createdAt)}</span>

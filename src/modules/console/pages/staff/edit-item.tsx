@@ -9,6 +9,7 @@ import { Textarea } from '@/components/ui/textarea'
 import { useInventoryItem, useUpdateInventoryItem } from '@/hooks/use-inventory'
 import { useCurrentOrgId } from '@/contexts/current-org.context'
 import { Spinner } from '@/components/ui/spinner'
+import type { ItemCategory } from '@/services/inventory.service'
 
 export function EditItemPage() {
   const { slug, itemId } = Route.useParams()
@@ -23,14 +24,24 @@ export function EditItemPage() {
   const [itemName, setItemName] = useState('')
   const [description, setDescription] = useState('')
   const [distinctiveMarks, setDistinctiveMarks] = useState('')
-  const [storageLocation, setStorageLocation] = useState('')
+  const [category, setCategory] = useState<ItemCategory>('Other')
+  const [color, setColor] = useState('')
+  const [brand, setBrand] = useState('')
+  const [condition, setCondition] = useState('')
+  const [material, setMaterial] = useState('')
+  const [size, setSize] = useState('')
 
   useEffect(() => {
     if (item) {
-      setItemName(item.itemName ?? '')
-      setDescription(item.description ?? '')
-      setDistinctiveMarks(item.distinctiveMarks ?? '')
-      setStorageLocation(item.storageLocation ?? '')
+      setItemName(item.item?.itemName ?? '')
+      setDescription(item.item?.additionalDetails ?? '')
+      setDistinctiveMarks(item.item?.distinctiveMarks ?? '')
+      setCategory(item.item?.category ?? 'Other')
+      setColor(item.item?.color ?? '')
+      setBrand(item.item?.brand ?? '')
+      setCondition(item.item?.condition ?? '')
+      setMaterial(item.item?.material ?? '')
+      setSize(item.item?.size ?? '')
     }
   }, [item])
 
@@ -85,8 +96,13 @@ export function EditItemPage() {
         payload: {
           itemName: itemName.trim(),
           description: description.trim(),
-          distinctiveMarks: distinctiveMarks.trim() || null,
-          storageLocation: storageLocation.trim() || null,
+          distinctiveMarks: distinctiveMarks.trim() || undefined,
+          category,
+          color: color.trim() || undefined,
+          brand: brand.trim() || undefined,
+          condition: condition.trim() || undefined,
+          material: material.trim() || undefined,
+          size: size.trim() || undefined,
         },
       },
       {
@@ -117,7 +133,7 @@ export function EditItemPage() {
             params={{ slug, itemId }}
             className="hover:text-gray-900 transition-colors"
           >
-            {item.itemName}
+            {item.item.itemName}
           </Link>
           <ChevronRight className="w-4 h-4" />
           <span className="text-gray-900 font-medium">Edit</span>
@@ -127,7 +143,7 @@ export function EditItemPage() {
           <div className="p-6 border-b border-gray-200 flex items-start justify-between">
             <div>
               <div className="flex items-center gap-3 mb-2">
-                <h1 className="text-3xl font-bold text-gray-900">{item.itemName}</h1>
+                <h1 className="text-3xl font-bold text-gray-900">{item.item.itemName}</h1>
               </div>
               <p className="text-gray-600">
                 Added {new Date(item.createdAt).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })}
@@ -155,7 +171,7 @@ export function EditItemPage() {
               <div className="lg:col-span-3 p-6 border-r border-gray-200">
                 <div className="relative h-[350px] bg-gradient-to-br from-gray-100 to-gray-200 rounded-lg overflow-hidden mb-4 flex items-center justify-center">
                   {mainImg ? (
-                    <img src={mainImg} alt={item.itemName} className="w-full h-full object-cover" />
+                    <img src={mainImg} alt={item.item.itemName} className="w-full h-full object-cover" />
                   ) : (
                     <div className="text-gray-400">No image</div>
                   )}
@@ -205,6 +221,34 @@ export function EditItemPage() {
                 )}
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div>
+                    <div className="text-xs font-semibold uppercase mb-2">
+                      CATEGORY <span className="text-red-500">*</span>
+                    </div>
+                    <select
+                      value={category}
+                      onChange={(e) => setCategory(e.target.value as ItemCategory)}
+                      className="w-full px-3 py-2 border border-gray-200 rounded-lg bg-white text-gray-700 font-medium"
+                    >
+                      {(
+                        [
+                          'Electronics',
+                          'Clothing',
+                          'Accessories',
+                          'Documents',
+                          'Wallet',
+                          'Suitcase',
+                          'Bags',
+                          'Keys',
+                          'Other',
+                        ] as ItemCategory[]
+                      ).map((c) => (
+                        <option key={c} value={c}>
+                          {c}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
                   <div className="md:col-span-2">
                     <div className="text-xs font-semibold uppercase mb-2">
                       ITEM NAME <span className="text-red-500">*</span>
@@ -223,13 +267,13 @@ export function EditItemPage() {
                   </div>
 
                   <div>
-                    <div className="text-xs font-semibold uppercase mb-2">STORAGE LOCATION</div>
+                    <div className="text-xs font-semibold uppercase mb-2">DISPLAY ADDRESS</div>
                     <div className="flex items-center gap-2">
                       <Building2 className="w-4 h-4 text-blue-600 flex-shrink-0" />
                       <Input
-                        value={storageLocation}
-                        onChange={(e) => setStorageLocation(e.target.value)}
-                        placeholder="e.g. Shelf A, Room 101"
+                        value={item.displayAddress ?? ''}
+                        readOnly
+                        placeholder="—"
                       />
                     </div>
                   </div>
@@ -244,6 +288,29 @@ export function EditItemPage() {
                         placeholder="e.g. color, brand, serial number"
                       />
                     </div>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div>
+                    <div className="text-xs font-semibold uppercase mb-2">BRAND</div>
+                    <Input value={brand} onChange={(e) => setBrand(e.target.value)} placeholder="e.g. Apple" />
+                  </div>
+                  <div>
+                    <div className="text-xs font-semibold uppercase mb-2">COLOR</div>
+                    <Input value={color} onChange={(e) => setColor(e.target.value)} placeholder="e.g. Black" />
+                  </div>
+                  <div>
+                    <div className="text-xs font-semibold uppercase mb-2">CONDITION</div>
+                    <Input value={condition} onChange={(e) => setCondition(e.target.value)} placeholder="e.g. Used" />
+                  </div>
+                  <div>
+                    <div className="text-xs font-semibold uppercase mb-2">MATERIAL</div>
+                    <Input value={material} onChange={(e) => setMaterial(e.target.value)} placeholder="e.g. Leather" />
+                  </div>
+                  <div className="md:col-span-2">
+                    <div className="text-xs font-semibold uppercase mb-2">SIZE</div>
+                    <Input value={size} onChange={(e) => setSize(e.target.value)} placeholder="e.g. 15-inch" />
                   </div>
                 </div>
 

@@ -6,65 +6,36 @@ import { Link, useNavigate, useParams } from '@tanstack/react-router'
 import { useInventoryItems } from '@/hooks/use-inventory'
 import { useCurrentOrgId } from '@/contexts/current-org.context'
 import { Spinner } from '@/components/ui/spinner'
-import type { InventoryItem } from '@/services/inventory.service'
+import type { InventoryPost, PostStatus } from '@/services/inventory.service'
 
 const pageSize = 8
-/** Lấy đủ bản ghi để lọc + phân trang trên FE (không gọi API theo search). */
-const fetchPageSize = 1000
 
-function matchesSearch(item: InventoryItem, q: string): boolean {
-  if (!q) return true
-  const n = q.toLowerCase()
-  const blob = [
-    item.itemName,
-    item.description,
-    item.distinctiveMarks ?? '',
-    item.storageLocation ?? '',
-    item.finderContact?.name ?? '',
-    item.finderContact?.email ?? '',
-    item.finderContact?.phone ?? '',
-    item.finderContact?.nationalId ?? '',
-    item.finderContact?.orgMemberId ?? '',
-  ]
-    .join(' ')
-    .toLowerCase()
-  return blob.includes(n)
-}
+const ALL_STATUS = 'All' as const
+type StatusFilter = typeof ALL_STATUS | PostStatus
 
 export function StaffInventoryPage() {
   const navigate = useNavigate()
   const { slug } = useParams({ strict: false }) as { slug: string }
   const { currentOrgId } = useCurrentOrgId()
   const [searchTerm, setSearchTerm] = useState('')
-  const [statusFilter, setStatusFilter] = useState<string>('All')
+  const [statusFilter, setStatusFilter] = useState<StatusFilter>(ALL_STATUS)
   const [currentPage, setCurrentPage] = useState(1)
 
   const listParams = useMemo(
     () => ({
-      page: 1,
-      pageSize: fetchPageSize,
-      status: statusFilter !== 'All' ? statusFilter : undefined,
+      page: currentPage,
+      pageSize,
+      query: searchTerm.trim() || undefined,
+      status: statusFilter !== ALL_STATUS ? statusFilter : undefined,
     }),
-    [statusFilter],
+    [currentPage, searchTerm, statusFilter],
   )
 
   const { data, isLoading, isError } = useInventoryItems(currentOrgId, listParams)
 
-  const allItems = data?.items ?? []
-
-  const filteredItems = useMemo(() => {
-    const q = searchTerm.trim()
-    if (!q) return allItems
-    return allItems.filter((item) => matchesSearch(item, q))
-  }, [allItems, searchTerm])
-
-  const totalCount = filteredItems.length
+  const items: InventoryPost[] = data?.items ?? []
+  const totalCount = data?.totalCount ?? 0
   const totalPages = Math.max(1, Math.ceil(totalCount / pageSize))
-
-  const items = useMemo(() => {
-    const start = (currentPage - 1) * pageSize
-    return filteredItems.slice(start, start + pageSize)
-  }, [filteredItems, currentPage])
 
   useEffect(() => {
     setCurrentPage(1)
@@ -85,10 +56,16 @@ export function StaffInventoryPage() {
     switch (s) {
       case 'InStorage':
         return 'bg-indigo-500 text-white'
+      case 'Active':
+        return 'bg-blue-600 text-white'
+      case 'ReturnScheduled':
+        return 'bg-amber-500 text-white'
       case 'Returned':
         return 'bg-green-500 text-white'
-      case 'Disposed':
-        return 'bg-gray-500 text-white'
+      case 'Archived':
+        return 'bg-slate-600 text-white'
+      case 'Expired':
+        return 'bg-gray-600 text-white'
       default:
         return 'bg-gray-600 text-white'
     }
@@ -96,12 +73,18 @@ export function StaffInventoryPage() {
 
   const statusLabel = (s: string) => {
     switch (s) {
+      case 'Active':
+        return 'Active'
       case 'InStorage':
         return 'In Storage'
+      case 'ReturnScheduled':
+        return 'Return Scheduled'
       case 'Returned':
         return 'Returned'
-      case 'Disposed':
-        return 'Disposed'
+      case 'Archived':
+        return 'Archived'
+      case 'Expired':
+        return 'Expired'
       default:
         return s
     }
@@ -116,7 +99,7 @@ export function StaffInventoryPage() {
               Inventory Dashboard
             </h1>
             <p className="text-gray-600 mt-1 text-sm sm:text-base">
-              Manage lost and found items. Search filters the list on this page (live).
+              Manage lost and found items. Search by item name or details.
             </p>
           </div>
           <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 w-full sm:w-auto">
@@ -145,26 +128,30 @@ export function StaffInventoryPage() {
                 const q = searchTerm.trim()
                 if (!q) return
                 navigate({
-                  to: `/console/${slug}/staff/inventory-search`,
+                  to: '/console/$slug/staff/inventory-search',
+                  params: { slug },
                   search: { q },
                 })
               }}
-              placeholder="Search by name, description, location…"
+              placeholder="Search by item name or details…"
               className="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
           <select
             value={statusFilter}
             onChange={(e) => {
-              setStatusFilter(e.target.value)
+              setStatusFilter(e.target.value as StatusFilter)
               setCurrentPage(1)
             }}
             className="px-4 py-2 border border-gray-200 rounded-lg bg-white text-gray-700 font-medium"
           >
             <option value="All">All</option>
+            <option value="Active">Active</option>
             <option value="InStorage">In Storage</option>
+            <option value="ReturnScheduled">Return Scheduled</option>
             <option value="Returned">Returned</option>
-            <option value="Disposed">Disposed</option>
+            <option value="Archived">Archived</option>
+            <option value="Expired">Expired</option>
           </select>
         </div>
 
@@ -192,12 +179,12 @@ export function StaffInventoryPage() {
               <p className="text-gray-500 text-lg">
                 No items found{searchTerm.trim() ? ` matching "${searchTerm.trim()}"` : ''}
               </p>
-              {(searchTerm || statusFilter !== 'All') && (
+              {(searchTerm || statusFilter !== ALL_STATUS) && (
                 <button
                   type="button"
                   onClick={() => {
                     setSearchTerm('')
-                    setStatusFilter('All')
+                    setStatusFilter(ALL_STATUS)
                     setCurrentPage(1)
                   }}
                   className="mt-4 text-blue-600 hover:text-blue-700 font-medium"
@@ -216,7 +203,7 @@ export function StaffInventoryPage() {
                   {item.imageUrls?.[0] ? (
                     <img
                       src={item.imageUrls[0]}
-                      alt={item.itemName}
+                      alt={item.item.itemName}
                       className="w-full h-full object-cover"
                     />
                   ) : (
@@ -231,21 +218,15 @@ export function StaffInventoryPage() {
                   </span>
                 </div>
                 <div className="p-4">
-                  <h3 className="font-semibold text-gray-900 mb-3">{item.itemName}</h3>
-                  <p className="text-sm text-gray-600 mb-3 line-clamp-2">{item.description}</p>
+                  <h3 className="font-semibold text-gray-900 mb-3">{item.item.itemName}</h3>
+                  <p className="text-sm text-gray-600 mb-3 line-clamp-2">
+                    {item.item.additionalDetails ?? '—'}
+                  </p>
                   <div className="space-y-2 text-sm text-gray-600 mb-4">
-                    {item.finderContact?.name && (
-                      <div className="flex items-center gap-2">
-                        <span className="font-medium">Finder:</span>
-                        <span>{item.finderContact.name}</span>
-                      </div>
-                    )}
-                    {item.storageLocation && (
-                      <div className="flex items-center gap-2">
-                        <Archive className="w-4 h-4 flex-shrink-0" />
-                        <span>{item.storageLocation}</span>
-                      </div>
-                    )}
+                    <div className="flex items-center gap-2">
+                      <Archive className="w-4 h-4 flex-shrink-0" />
+                      <span>{item.item.category}</span>
+                    </div>
                     <div className="flex items-center gap-2">
                       <Calendar className="w-4 h-4 flex-shrink-0" />
                       <span>Added {formatPosted(item.createdAt)}</span>

@@ -1,12 +1,12 @@
 import type { ReactNode } from 'react'
-import { ArrowRightLeft, PackageCheck, Smartphone } from 'lucide-react'
-import type { InventoryItem } from '@/services/inventory.service'
+import { MapPin, Package, User } from 'lucide-react'
+import type { InventoryPost } from '@/services/inventory.service'
 
 type TableRow =
   | { kind: 'section'; title: string; hint?: string }
   | { kind: 'field'; label: string; value: ReactNode }
 
-function IdText({ children }: { children: ReactNode }) {
+function Mono({ children }: { children: ReactNode }) {
   return <span className="font-mono text-gray-900 tabular-nums">{children}</span>
 }
 
@@ -49,113 +49,77 @@ function vOrUnderscore(value: string | null | undefined): ReactNode {
   return v ? v : '_'
 }
 
-export function InventoryDetailPanels({ item }: { item: InventoryItem }) {
-  const finder = item.finderContact
-
-  const intakeRows: TableRow[] = [
+export function InventoryDetailPanels({ item }: { item: InventoryPost }) {
+  const rows: TableRow[] = [
+    { kind: 'section', title: 'Item' },
+    { kind: 'field', label: 'Name', value: vOrUnderscore(item.item?.itemName) },
+    { kind: 'field', label: 'Category', value: vOrUnderscore(item.item?.category) },
+    { kind: 'field', label: 'Distinctive marks', value: vOrUnderscore(item.item?.distinctiveMarks ?? undefined) },
+    { kind: 'field', label: 'Details', value: vOrUnderscore(item.item?.additionalDetails ?? undefined) },
+    { kind: 'section', title: 'Status & timing' },
+    { kind: 'field', label: 'Status', value: vOrUnderscore(item.status) },
+    { kind: 'field', label: 'Event time', value: fmtDateTime(item.eventTime ?? undefined) },
+    { kind: 'field', label: 'Created at', value: fmtDateTime(item.createdAt) },
+    { kind: 'section', title: 'Author / organization' },
     {
-      kind: 'section',
-      title: 'Finder — contact & ID',
-      hint: 'Person who found the item or handed it in for storage.',
-    },
-    { kind: 'field', label: 'Full name', value: vOrUnderscore(finder?.name) },
-    { kind: 'field', label: 'Email', value: vOrUnderscore(finder?.email ?? undefined) },
-    {
-      kind: 'section',
-      title: 'Finder — identification',
-      hint: 'National ID number and/or student or staff ID — stored as text and numbers only.',
+      kind: 'field',
+      label: 'Author',
+      value: item.author?.displayName ? (
+        <span className="inline-flex items-center gap-2">
+          <User className="w-4 h-4 text-gray-700 shrink-0" />
+          <span className="font-medium">{item.author.displayName}</span>
+          <span className="text-gray-600">(<Mono>{item.author.id}</Mono>)</span>
+        </span>
+      ) : item.author?.id ? (
+        <Mono>{item.author.id}</Mono>
+      ) : (
+        '_'
+      ),
     },
     {
       kind: 'field',
-      label: 'National ID / citizen ID',
-      value: finder?.nationalId ? <IdText>{finder.nationalId}</IdText> : '_',
-    },
-    {
-      kind: 'field',
-      label: 'Student / staff ID',
-      value: finder?.orgMemberId ? <IdText>{finder.orgMemberId}</IdText> : '_',
-    },
-    {
-      kind: 'field',
-      label: 'Phone number',
-      value: finder?.phone ? (
-        <span className="inline-flex items-center gap-1.5 font-medium">
-          <Smartphone className="w-4 h-4 text-gray-700 shrink-0" />
-          <IdText>{finder.phone}</IdText>
+      label: 'Organization',
+      value: item.organization?.name ? (
+        <span className="inline-flex items-center gap-2">
+          <Package className="w-4 h-4 text-gray-700 shrink-0" />
+          <span className="font-medium">{item.organization.name}</span>
+          {item.organization.id ? <span className="text-gray-600">(<Mono>{item.organization.id}</Mono>)</span> : null}
         </span>
       ) : (
         '_'
       ),
     },
-    { kind: 'section', title: 'Intake / handover to facility', hint: 'When the item entered your process.' },
-    { kind: 'field', label: 'Handover time', value: fmtDateTime(item.loggedAt) },
-    { kind: 'field', label: 'From · To', value: `${finder?.name?.trim() || 'Finder'} → ${item.storageLocation || '_'}` },
-    { kind: 'field', label: 'Receiving staff (ID)', value: vOrUnderscore(item.receiverStaffId ?? undefined) },
-    { kind: 'field', label: 'Notes', value: '_' },
-  ]
-
-  const hasReturnInfo = item.status === 'Returned' || Boolean(item.handoverStaffId)
-
-  const returnRows: TableRow[] = [
     {
-      kind: 'section',
-      title: 'Recipient — contact & ID',
-      hint: 'Person picking up the item (owner or authorized claimant).',
+      kind: 'field',
+      label: 'Display address',
+      value: item.displayAddress ? (
+        <span className="inline-flex items-center gap-2">
+          <MapPin className="w-4 h-4 text-gray-700 shrink-0" />
+          <span>{item.displayAddress}</span>
+        </span>
+      ) : (
+        '_'
+      ),
     },
-    { kind: 'field', label: 'Full name', value: hasReturnInfo ? '_' : '_' },
-    { kind: 'field', label: 'Email (optional)', value: '_' },
-    {
-      kind: 'section',
-      title: 'Recipient — identification',
-      hint: 'Must match your release policy. Text and numbers only.',
-    },
-    { kind: 'field', label: 'National ID / citizen ID', value: '_' },
-    { kind: 'field', label: 'Student / staff ID', value: '_' },
-    { kind: 'field', label: 'Phone number', value: '_' },
-    { kind: 'section', title: 'Return release', hint: 'When the item leaves storage to the recipient.' },
-    { kind: 'field', label: 'Status', value: hasReturnInfo ? item.status : '_' },
-    { kind: 'field', label: 'Expected / actual pickup date', value: '_' },
-    { kind: 'field', label: 'Releasing staff (ID)', value: hasReturnInfo ? vOrUnderscore(item.handoverStaffId) : '_' },
-    { kind: 'field', label: 'Signature / confirmation', value: '_' },
+    { kind: 'section', title: 'IDs' },
+    { kind: 'field', label: 'Post ID', value: <Mono>{item.id}</Mono> },
   ]
 
   return (
     <div className="mt-8 w-full">
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-start">
-        <section className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden min-w-0">
-          <div className="px-4 sm:px-5 py-3 border-b border-blue-100 bg-blue-100">
-            <div className="flex items-center gap-2 text-gray-900">
-              <ArrowRightLeft className="w-5 h-5 shrink-0" />
-              <div>
-                <h2 className="text-base font-semibold">Storage / handover</h2>
-                <p className="text-xs text-gray-800 mt-0.5">Finder — who found or turned in the item</p>
-              </div>
-            </div>
+      <section className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden min-w-0">
+        <div className="px-4 sm:px-5 py-3 border-b border-blue-100 bg-blue-100">
+          <div className="text-gray-900">
+            <h2 className="text-base font-semibold">Record details</h2>
+            <p className="text-xs text-gray-800 mt-0.5">This view reflects the current backend fields for inventory.</p>
           </div>
-          <div className="overflow-x-auto">
-            <table className="w-full text-sm">
-              <TableBody rows={intakeRows} />
-            </table>
-          </div>
-        </section>
-
-        <section className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden min-w-0">
-          <div className="px-4 sm:px-5 py-3 border-b border-blue-100 bg-blue-100">
-            <div className="flex items-center gap-2 text-gray-900">
-              <PackageCheck className="w-5 h-5 shrink-0" />
-              <div>
-                <h2 className="text-base font-semibold">Return to owner</h2>
-                <p className="text-xs text-gray-800 mt-0.5">Recipient — who receives the item</p>
-              </div>
-            </div>
-          </div>
-          <div className="overflow-x-auto">
-            <table className="w-full text-sm">
-              <TableBody rows={returnRows} />
-            </table>
-          </div>
-        </section>
-      </div>
+        </div>
+        <div className="overflow-x-auto">
+          <table className="w-full text-sm">
+            <TableBody rows={rows} />
+          </table>
+        </div>
+      </section>
     </div>
   )
 }
