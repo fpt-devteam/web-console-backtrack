@@ -107,7 +107,7 @@ export function AdminInventoryItemDetailPage() {
 
               {images.length > 1 && (
                 <div className="flex gap-3 flex-wrap">
-                  {images.map((img, idx) => (
+                  {images.map((img: string, idx: number) => (
                     <button
                       key={idx}
                       type="button"

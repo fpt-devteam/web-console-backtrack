@@ -17,7 +17,7 @@ import { useInventoryItem } from '@/hooks/use-inventory'
 import { useCurrentOrgId } from '@/contexts/current-org.context'
 import { Spinner } from '@/components/ui/spinner'
 
-const statusOptions = ['InStorage', 'Returned', 'Disposed'] as const
+const statusOptions = ['Active', 'InStorage', 'ReturnScheduled', 'Returned', 'Archived', 'Expired'] as const
 
 export function HandoverItemPage() {
   const { slug, itemId } = Route.useParams()
@@ -79,7 +79,7 @@ export function HandoverItemPage() {
               params={{ slug, itemId }}
               className="hover:text-gray-900 transition-colors"
             >
-              {item.itemName}
+              {item.item.itemName}
             </Link>
             <ChevronRight className="w-4 h-4" />
             <span className="text-gray-900 font-medium">Handover</span>
@@ -201,7 +201,11 @@ export function HandoverItemPage() {
                       <SelectContent>
                         {statusOptions.map((s) => (
                           <SelectItem key={s} value={s}>
-                            {s === 'InStorage' ? 'In Storage' : s}
+                            {s === 'InStorage'
+                              ? 'In Storage'
+                              : s === 'ReturnScheduled'
+                                ? 'Return Scheduled'
+                                : s}
                           </SelectItem>
                         ))}
                       </SelectContent>

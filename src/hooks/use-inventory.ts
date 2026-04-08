@@ -4,20 +4,18 @@ import {
   type CreateInventoryPayload,
   type UpdateInventoryPayload,
   type GetInventoryParams,
-  type SearchInventorySemanticParams,
 } from '@/services/inventory.service'
 
 export const INVENTORY_KEYS = {
   all: (orgId: string | null) => ['inventory', orgId] as const,
   list: (orgId: string | null, params?: GetInventoryParams) => ['inventory', orgId, 'list', params] as const,
   detail: (orgId: string | null, id: string) => ['inventory', orgId, id] as const,
-  search: (orgId: string | null, params?: SearchInventorySemanticParams) => ['inventory', orgId, 'search', params] as const,
 }
 
 export function useInventoryItems(orgId: string | null, params?: GetInventoryParams) {
   return useQuery({
     queryKey: INVENTORY_KEYS.list(orgId, params),
-    queryFn: () => inventoryService.getAll(orgId!, params),
+    queryFn: () => inventoryService.search(orgId!, params),
     enabled: !!orgId,
   })
 }
@@ -58,13 +56,5 @@ export function useDeleteInventoryItem(orgId: string | null) {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: INVENTORY_KEYS.all(orgId) })
     },
-  })
-}
-
-export function useSearchInventorySemantic(orgId: string | null, params?: SearchInventorySemanticParams) {
-  return useQuery({
-    queryKey: INVENTORY_KEYS.search(orgId, params),
-    queryFn: () => inventoryService.searchSemantic(orgId!, params!),
-    enabled: !!orgId && !!params?.searchText,
   })
 }
