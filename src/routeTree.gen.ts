@@ -46,7 +46,6 @@ import { Route as ConsoleSlugStaffFeedRouteImport } from './routes/console/$slug
 import { Route as ConsoleSlugStaffChatRouteImport } from './routes/console/$slug/staff/chat'
 import { Route as ConsoleSlugAdminSettingRouteImport } from './routes/console/$slug/admin/setting'
 import { Route as ConsoleSlugAdminPlanRouteImport } from './routes/console/$slug/admin/plan'
-import { Route as ConsoleSlugAdminInviteEmployeeRouteImport } from './routes/console/$slug/admin/invite-employee'
 import { Route as ConsoleSlugAdminInventoryRouteImport } from './routes/console/$slug/admin/inventory'
 import { Route as ConsoleSlugAdminEmployeeRouteImport } from './routes/console/$slug/admin/employee'
 import { Route as ConsoleSlugAdminEditAccountRouteImport } from './routes/console/$slug/admin/edit-account'
@@ -60,7 +59,6 @@ import { Route as ConsoleSlugStaffItemHandoverItemIdRouteImport } from './routes
 import { Route as ConsoleSlugStaffItemEditItemIdRouteImport } from './routes/console/$slug/staff/item-edit/$itemId'
 import { Route as ConsoleSlugAdminSettingOrganizationRouteImport } from './routes/console/$slug/admin/setting/organization'
 import { Route as ConsoleSlugAdminInventoryItemIdRouteImport } from './routes/console/$slug/admin/inventory/$itemId'
-import { Route as ConsoleSlugAdminEditEmployeeEmployeeIdRouteImport } from './routes/console/$slug/admin/edit-employee/$employeeId'
 import { Route as ConsoleSlugAdminEditBranchBranchIdRouteImport } from './routes/console/$slug/admin/edit-branch/$branchId'
 import { Route as ConsoleSlugAdminSettingOrganizationIndexRouteImport } from './routes/console/$slug/admin/setting/organization/index'
 import { Route as ConsoleSlugAdminSettingOrganizationEditRouteImport } from './routes/console/$slug/admin/setting/organization/edit'
@@ -256,12 +254,6 @@ const ConsoleSlugAdminPlanRoute = ConsoleSlugAdminPlanRouteImport.update({
   path: '/plan',
   getParentRoute: () => ConsoleSlugAdminRoute,
 } as any)
-const ConsoleSlugAdminInviteEmployeeRoute =
-  ConsoleSlugAdminInviteEmployeeRouteImport.update({
-    id: '/invite-employee',
-    path: '/invite-employee',
-    getParentRoute: () => ConsoleSlugAdminRoute,
-  } as any)
 const ConsoleSlugAdminInventoryRoute =
   ConsoleSlugAdminInventoryRouteImport.update({
     id: '/inventory',
@@ -339,12 +331,6 @@ const ConsoleSlugAdminInventoryItemIdRoute =
     path: '/$itemId',
     getParentRoute: () => ConsoleSlugAdminInventoryRoute,
   } as any)
-const ConsoleSlugAdminEditEmployeeEmployeeIdRoute =
-  ConsoleSlugAdminEditEmployeeEmployeeIdRouteImport.update({
-    id: '/edit-employee/$employeeId',
-    path: '/edit-employee/$employeeId',
-    getParentRoute: () => ConsoleSlugAdminRoute,
-  } as any)
 const ConsoleSlugAdminEditBranchBranchIdRoute =
   ConsoleSlugAdminEditBranchBranchIdRouteImport.update({
     id: '/edit-branch/$branchId',
@@ -399,7 +385,6 @@ export interface FileRoutesByFullPath {
   '/console/$slug/admin/edit-account': typeof ConsoleSlugAdminEditAccountRoute
   '/console/$slug/admin/employee': typeof ConsoleSlugAdminEmployeeRoute
   '/console/$slug/admin/inventory': typeof ConsoleSlugAdminInventoryRouteWithChildren
-  '/console/$slug/admin/invite-employee': typeof ConsoleSlugAdminInviteEmployeeRoute
   '/console/$slug/admin/plan': typeof ConsoleSlugAdminPlanRoute
   '/console/$slug/admin/setting': typeof ConsoleSlugAdminSettingRouteWithChildren
   '/console/$slug/staff/chat': typeof ConsoleSlugStaffChatRoute
@@ -409,7 +394,6 @@ export interface FileRoutesByFullPath {
   '/console/$slug/staff/inventory-search': typeof ConsoleSlugStaffInventorySearchRoute
   '/console/$slug/staff/notification': typeof ConsoleSlugStaffNotificationRoute
   '/console/$slug/admin/edit-branch/$branchId': typeof ConsoleSlugAdminEditBranchBranchIdRoute
-  '/console/$slug/admin/edit-employee/$employeeId': typeof ConsoleSlugAdminEditEmployeeEmployeeIdRoute
   '/console/$slug/admin/inventory/$itemId': typeof ConsoleSlugAdminInventoryItemIdRoute
   '/console/$slug/admin/setting/organization': typeof ConsoleSlugAdminSettingOrganizationRouteWithChildren
   '/console/$slug/staff/item-edit/$itemId': typeof ConsoleSlugStaffItemEditItemIdRoute
@@ -454,7 +438,6 @@ export interface FileRoutesByTo {
   '/console/$slug/admin/dashboard': typeof ConsoleSlugAdminDashboardRoute
   '/console/$slug/admin/edit-account': typeof ConsoleSlugAdminEditAccountRoute
   '/console/$slug/admin/employee': typeof ConsoleSlugAdminEmployeeRoute
-  '/console/$slug/admin/invite-employee': typeof ConsoleSlugAdminInviteEmployeeRoute
   '/console/$slug/admin/plan': typeof ConsoleSlugAdminPlanRoute
   '/console/$slug/staff/chat': typeof ConsoleSlugStaffChatRoute
   '/console/$slug/staff/feed': typeof ConsoleSlugStaffFeedRoute
@@ -463,7 +446,6 @@ export interface FileRoutesByTo {
   '/console/$slug/staff/inventory-search': typeof ConsoleSlugStaffInventorySearchRoute
   '/console/$slug/staff/notification': typeof ConsoleSlugStaffNotificationRoute
   '/console/$slug/admin/edit-branch/$branchId': typeof ConsoleSlugAdminEditBranchBranchIdRoute
-  '/console/$slug/admin/edit-employee/$employeeId': typeof ConsoleSlugAdminEditEmployeeEmployeeIdRoute
   '/console/$slug/admin/inventory/$itemId': typeof ConsoleSlugAdminInventoryItemIdRoute
   '/console/$slug/staff/item-edit/$itemId': typeof ConsoleSlugStaffItemEditItemIdRoute
   '/console/$slug/staff/item-handover/$itemId': typeof ConsoleSlugStaffItemHandoverItemIdRoute
@@ -510,7 +492,6 @@ export interface FileRoutesById {
   '/console/$slug/admin/edit-account': typeof ConsoleSlugAdminEditAccountRoute
   '/console/$slug/admin/employee': typeof ConsoleSlugAdminEmployeeRoute
   '/console/$slug/admin/inventory': typeof ConsoleSlugAdminInventoryRouteWithChildren
-  '/console/$slug/admin/invite-employee': typeof ConsoleSlugAdminInviteEmployeeRoute
   '/console/$slug/admin/plan': typeof ConsoleSlugAdminPlanRoute
   '/console/$slug/admin/setting': typeof ConsoleSlugAdminSettingRouteWithChildren
   '/console/$slug/staff/chat': typeof ConsoleSlugStaffChatRoute
@@ -520,7 +501,6 @@ export interface FileRoutesById {
   '/console/$slug/staff/inventory-search': typeof ConsoleSlugStaffInventorySearchRoute
   '/console/$slug/staff/notification': typeof ConsoleSlugStaffNotificationRoute
   '/console/$slug/admin/edit-branch/$branchId': typeof ConsoleSlugAdminEditBranchBranchIdRoute
-  '/console/$slug/admin/edit-employee/$employeeId': typeof ConsoleSlugAdminEditEmployeeEmployeeIdRoute
   '/console/$slug/admin/inventory/$itemId': typeof ConsoleSlugAdminInventoryItemIdRoute
   '/console/$slug/admin/setting/organization': typeof ConsoleSlugAdminSettingOrganizationRouteWithChildren
   '/console/$slug/staff/item-edit/$itemId': typeof ConsoleSlugStaffItemEditItemIdRoute
@@ -568,7 +548,6 @@ export interface FileRouteTypes {
     | '/console/$slug/admin/edit-account'
     | '/console/$slug/admin/employee'
     | '/console/$slug/admin/inventory'
-    | '/console/$slug/admin/invite-employee'
     | '/console/$slug/admin/plan'
     | '/console/$slug/admin/setting'
     | '/console/$slug/staff/chat'
@@ -578,7 +557,6 @@ export interface FileRouteTypes {
     | '/console/$slug/staff/inventory-search'
     | '/console/$slug/staff/notification'
     | '/console/$slug/admin/edit-branch/$branchId'
-    | '/console/$slug/admin/edit-employee/$employeeId'
     | '/console/$slug/admin/inventory/$itemId'
     | '/console/$slug/admin/setting/organization'
     | '/console/$slug/staff/item-edit/$itemId'
@@ -623,7 +601,6 @@ export interface FileRouteTypes {
     | '/console/$slug/admin/dashboard'
     | '/console/$slug/admin/edit-account'
     | '/console/$slug/admin/employee'
-    | '/console/$slug/admin/invite-employee'
     | '/console/$slug/admin/plan'
     | '/console/$slug/staff/chat'
     | '/console/$slug/staff/feed'
@@ -632,7 +609,6 @@ export interface FileRouteTypes {
     | '/console/$slug/staff/inventory-search'
     | '/console/$slug/staff/notification'
     | '/console/$slug/admin/edit-branch/$branchId'
-    | '/console/$slug/admin/edit-employee/$employeeId'
     | '/console/$slug/admin/inventory/$itemId'
     | '/console/$slug/staff/item-edit/$itemId'
     | '/console/$slug/staff/item-handover/$itemId'
@@ -678,7 +654,6 @@ export interface FileRouteTypes {
     | '/console/$slug/admin/edit-account'
     | '/console/$slug/admin/employee'
     | '/console/$slug/admin/inventory'
-    | '/console/$slug/admin/invite-employee'
     | '/console/$slug/admin/plan'
     | '/console/$slug/admin/setting'
     | '/console/$slug/staff/chat'
@@ -688,7 +663,6 @@ export interface FileRouteTypes {
     | '/console/$slug/staff/inventory-search'
     | '/console/$slug/staff/notification'
     | '/console/$slug/admin/edit-branch/$branchId'
-    | '/console/$slug/admin/edit-employee/$employeeId'
     | '/console/$slug/admin/inventory/$itemId'
     | '/console/$slug/admin/setting/organization'
     | '/console/$slug/staff/item-edit/$itemId'
@@ -978,13 +952,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ConsoleSlugAdminPlanRouteImport
       parentRoute: typeof ConsoleSlugAdminRoute
     }
-    '/console/$slug/admin/invite-employee': {
-      id: '/console/$slug/admin/invite-employee'
-      path: '/invite-employee'
-      fullPath: '/console/$slug/admin/invite-employee'
-      preLoaderRoute: typeof ConsoleSlugAdminInviteEmployeeRouteImport
-      parentRoute: typeof ConsoleSlugAdminRoute
-    }
     '/console/$slug/admin/inventory': {
       id: '/console/$slug/admin/inventory'
       path: '/inventory'
@@ -1075,13 +1042,6 @@ declare module '@tanstack/react-router' {
       fullPath: '/console/$slug/admin/inventory/$itemId'
       preLoaderRoute: typeof ConsoleSlugAdminInventoryItemIdRouteImport
       parentRoute: typeof ConsoleSlugAdminInventoryRoute
-    }
-    '/console/$slug/admin/edit-employee/$employeeId': {
-      id: '/console/$slug/admin/edit-employee/$employeeId'
-      path: '/edit-employee/$employeeId'
-      fullPath: '/console/$slug/admin/edit-employee/$employeeId'
-      preLoaderRoute: typeof ConsoleSlugAdminEditEmployeeEmployeeIdRouteImport
-      parentRoute: typeof ConsoleSlugAdminRoute
     }
     '/console/$slug/admin/edit-branch/$branchId': {
       id: '/console/$slug/admin/edit-branch/$branchId'
@@ -1232,11 +1192,9 @@ interface ConsoleSlugAdminRouteChildren {
   ConsoleSlugAdminEditAccountRoute: typeof ConsoleSlugAdminEditAccountRoute
   ConsoleSlugAdminEmployeeRoute: typeof ConsoleSlugAdminEmployeeRoute
   ConsoleSlugAdminInventoryRoute: typeof ConsoleSlugAdminInventoryRouteWithChildren
-  ConsoleSlugAdminInviteEmployeeRoute: typeof ConsoleSlugAdminInviteEmployeeRoute
   ConsoleSlugAdminPlanRoute: typeof ConsoleSlugAdminPlanRoute
   ConsoleSlugAdminSettingRoute: typeof ConsoleSlugAdminSettingRouteWithChildren
   ConsoleSlugAdminEditBranchBranchIdRoute: typeof ConsoleSlugAdminEditBranchBranchIdRoute
-  ConsoleSlugAdminEditEmployeeEmployeeIdRoute: typeof ConsoleSlugAdminEditEmployeeEmployeeIdRoute
 }
 
 const ConsoleSlugAdminRouteChildren: ConsoleSlugAdminRouteChildren = {
@@ -1245,13 +1203,10 @@ const ConsoleSlugAdminRouteChildren: ConsoleSlugAdminRouteChildren = {
   ConsoleSlugAdminEditAccountRoute: ConsoleSlugAdminEditAccountRoute,
   ConsoleSlugAdminEmployeeRoute: ConsoleSlugAdminEmployeeRoute,
   ConsoleSlugAdminInventoryRoute: ConsoleSlugAdminInventoryRouteWithChildren,
-  ConsoleSlugAdminInviteEmployeeRoute: ConsoleSlugAdminInviteEmployeeRoute,
   ConsoleSlugAdminPlanRoute: ConsoleSlugAdminPlanRoute,
   ConsoleSlugAdminSettingRoute: ConsoleSlugAdminSettingRouteWithChildren,
   ConsoleSlugAdminEditBranchBranchIdRoute:
     ConsoleSlugAdminEditBranchBranchIdRoute,
-  ConsoleSlugAdminEditEmployeeEmployeeIdRoute:
-    ConsoleSlugAdminEditEmployeeEmployeeIdRoute,
 }
 
 const ConsoleSlugAdminRouteWithChildren =
