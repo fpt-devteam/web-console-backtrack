@@ -4,7 +4,7 @@ import { ref, uploadBytesResumable, getDownloadURL } from 'firebase/storage'
 /**
  * Upload a single image File to Firebase Storage.
  *
- * Files are stored at:  inventory/<orgId>/<timestamp>-<filename>
+ * Files are stored at:  inventories/<orgId>/<timestamp>-<filename>
  *
  * Returns the public download URL (https://firebasestorage.googleapis.com/…).
  */
@@ -14,7 +14,7 @@ export async function uploadInventoryImage(
   onProgress?: (pct: number) => void,
 ): Promise<string> {
   const ext = file.name.split('.').pop() ?? 'jpg'
-  const path = `inventory/${orgId}/${Date.now()}-${crypto.randomUUID()}.${ext}`
+  const path = `inventories/${orgId}/${Date.now()}-${crypto.randomUUID()}.${ext}`
   const storageRef = ref(storage, path)
 
   return new Promise((resolve, reject) => {
