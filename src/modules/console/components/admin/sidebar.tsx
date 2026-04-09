@@ -62,7 +62,7 @@ export function Sidebar({ isOpen, onToggle }: SidebarProps) {
     if (currentPath === path) return true;
 
     if (path === `${base}/admin/employee`) {
-      if (currentPath === path || currentPath === `${base}/admin/invite-employee`) return true;
+      if (currentPath === path) return true;
     }
 
     if (path === `${base}/admin/plan`) {
