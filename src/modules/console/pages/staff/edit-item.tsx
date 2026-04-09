@@ -1,5 +1,5 @@
 import { StaffLayout } from '../../components/staff/layout'
-import { ChevronRight, AlertCircle, Building2, Camera, Tag } from 'lucide-react'
+import { ChevronRight, AlertCircle } from 'lucide-react'
 import { useState, useEffect } from 'react'
 import { Link, useNavigate } from '@tanstack/react-router'
 import { Route } from '@/routes/console/$slug/staff/item-edit/$itemId'
@@ -9,7 +9,37 @@ import { Textarea } from '@/components/ui/textarea'
 import { useInventoryItem, useUpdateInventoryItem } from '@/hooks/use-inventory'
 import { useCurrentOrgId } from '@/contexts/current-org.context'
 import { Spinner } from '@/components/ui/spinner'
-import type { ItemCategory } from '@/services/inventory.service'
+import type { ItemCategory, PostStatus } from '@/services/inventory.service'
+
+function statusLabel(status: PostStatus) {
+  switch (status) {
+    case 'InStorage':
+      return 'In Storage'
+    case 'ReturnScheduled':
+      return 'Return Scheduled'
+    default:
+      return status
+  }
+}
+
+function statusBadgeClass(status: PostStatus) {
+  switch (status) {
+    case 'Active':
+      return 'bg-blue-100 text-blue-800'
+    case 'InStorage':
+      return 'bg-indigo-100 text-indigo-800'
+    case 'ReturnScheduled':
+      return 'bg-amber-100 text-amber-800'
+    case 'Returned':
+      return 'bg-green-100 text-green-800'
+    case 'Archived':
+      return 'bg-gray-200 text-gray-800'
+    case 'Expired':
+      return 'bg-red-100 text-red-800'
+    default:
+      return 'bg-gray-100 text-gray-800'
+  }
+}
 
 export function EditItemPage() {
   const { slug, itemId } = Route.useParams()
@@ -30,6 +60,7 @@ export function EditItemPage() {
   const [condition, setCondition] = useState('')
   const [material, setMaterial] = useState('')
   const [size, setSize] = useState('')
+  const [status, setStatus] = useState<PostStatus>('Active')
 
   useEffect(() => {
     if (item) {
@@ -42,6 +73,7 @@ export function EditItemPage() {
       setCondition(item.item?.condition ?? '')
       setMaterial(item.item?.material ?? '')
       setSize(item.item?.size ?? '')
+      setStatus((item.status as PostStatus) ?? 'Active')
     }
   }, [item])
 
@@ -72,7 +104,6 @@ export function EditItemPage() {
   }
 
   const images = item.imageUrls?.length ? item.imageUrls : []
-  const mainImg = images[mainImage] ?? images[0]
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
@@ -94,6 +125,7 @@ export function EditItemPage() {
       {
         id: itemId,
         payload: {
+          status,
           itemName: itemName.trim(),
           description: description.trim(),
           distinctiveMarks: distinctiveMarks.trim() || undefined,
@@ -149,61 +181,41 @@ export function EditItemPage() {
                 Added {new Date(item.createdAt).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })}
               </p>
             </div>
-            <div className="flex gap-3">
-              <Link to="/console/$slug/staff/item/$itemId" params={{ slug, itemId }}>
-                <Button type="button" variant="outline">
-                  Cancel
-                </Button>
-              </Link>
-              <Button
-                type="submit"
-                form="edit-item-form"
-                className="bg-blue-600 hover:bg-blue-700"
-                disabled={updateItem.isPending}
+            <div className="flex items-center gap-3">
+              <span
+                className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold ${statusBadgeClass(status)}`}
               >
-                {updateItem.isPending ? 'Saving...' : 'Save Changes'}
-              </Button>
+                {statusLabel(status)}
+              </span>
             </div>
           </div>
 
           <form id="edit-item-form" onSubmit={handleSubmit}>
-            <div className="grid grid-cols-1 lg:grid-cols-7">
-              <div className="lg:col-span-3 p-6 border-r border-gray-200">
-                <div className="relative h-[350px] bg-gradient-to-br from-gray-100 to-gray-200 rounded-lg overflow-hidden mb-4 flex items-center justify-center">
-                  {mainImg ? (
-                    <img src={mainImg} alt={item.item.itemName} className="w-full h-full object-cover" />
-                  ) : (
-                    <div className="text-gray-400">No image</div>
-                  )}
-                </div>
-
-                {images.length > 1 && (
-                  <div className="flex gap-3">
+            <div className="p-6">
+              {/* Images (moved to top) */}
+              <div className="mb-6">
+                {images.length > 0 ? (
+                  <div className="flex gap-3 flex-wrap">
                     {images.map((img, idx) => (
                       <button
                         key={idx}
                         type="button"
                         onClick={() => setMainImage(idx)}
-                        className={`relative w-20 h-20 rounded-lg overflow-hidden border-2 transition-all ${
+                        className={`relative w-24 h-24 sm:w-28 sm:h-28 rounded-lg overflow-hidden border-2 transition-all ${
                           mainImage === idx
                             ? 'border-blue-600 ring-2 ring-blue-200'
                             : 'border-gray-300 hover:border-gray-400'
                         }`}
+                        aria-label={`View image ${idx + 1}`}
                       >
                         <img src={img} alt={`View ${idx + 1}`} className="w-full h-full object-cover" />
                       </button>
                     ))}
-                    <button
-                      type="button"
-                      className="w-20 h-20 rounded-lg border-2 border-dashed border-gray-300 flex items-center justify-center text-gray-400 hover:border-gray-400 hover:text-gray-500 transition-colors"
-                    >
-                      <Camera className="w-5 h-5" />
-                    </button>
                   </div>
-                )}
+                ) : null}
               </div>
 
-              <div className="lg:col-span-4 py-6 px-8 space-y-6">
+              <div className="space-y-6">
                 {Object.keys(errors).length > 0 && (
                   <div className="bg-red-50 border border-red-200 rounded-lg p-4 flex items-start gap-3">
                     <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
@@ -220,7 +232,24 @@ export function EditItemPage() {
                   </div>
                 )}
 
+                {/* Row 1: Status (full width) */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="md:col-span-2">
+                    <div className="text-xs font-semibold uppercase mb-2">STATUS</div>
+                    <select
+                      value={status}
+                      onChange={(e) => setStatus(e.target.value as PostStatus)}
+                      className="w-full px-3 py-2 border border-gray-200 rounded-lg bg-white text-gray-700 text-sm"
+                    >
+                      {(['Active', 'InStorage', 'ReturnScheduled', 'Archived', 'Expired'] as const).map((s) => (
+                        <option key={s} value={s}>
+                          {statusLabel(s)}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  {/* Row 2: Category + Item name */}
                   <div>
                     <div className="text-xs font-semibold uppercase mb-2">
                       CATEGORY <span className="text-red-500">*</span>
@@ -228,7 +257,7 @@ export function EditItemPage() {
                     <select
                       value={category}
                       onChange={(e) => setCategory(e.target.value as ItemCategory)}
-                      className="w-full px-3 py-2 border border-gray-200 rounded-lg bg-white text-gray-700 font-medium"
+                      className="w-full px-3 py-2 border border-gray-200 rounded-lg bg-white text-gray-700 text-sm"
                     >
                       {(
                         [
@@ -249,7 +278,7 @@ export function EditItemPage() {
                       ))}
                     </select>
                   </div>
-                  <div className="md:col-span-2">
+                  <div>
                     <div className="text-xs font-semibold uppercase mb-2">
                       ITEM NAME <span className="text-red-500">*</span>
                     </div>
@@ -266,26 +295,13 @@ export function EditItemPage() {
                     />
                   </div>
 
-                  <div>
+                  <div className="md:col-span-2">
                     <div className="text-xs font-semibold uppercase mb-2">DISPLAY ADDRESS</div>
                     <div className="flex items-center gap-2">
-                      <Building2 className="w-4 h-4 text-blue-600 flex-shrink-0" />
                       <Input
                         value={item.displayAddress ?? ''}
                         readOnly
                         placeholder="—"
-                      />
-                    </div>
-                  </div>
-
-                  <div className="md:col-span-2">
-                    <div className="text-xs font-semibold uppercase mb-2">DISTINCTIVE MARKS</div>
-                    <div className="flex items-center gap-2">
-                      <Tag className="w-4 h-4 text-blue-600 flex-shrink-0" />
-                      <Input
-                        value={distinctiveMarks}
-                        onChange={(e) => setDistinctiveMarks(e.target.value)}
-                        placeholder="e.g. color, brand, serial number"
                       />
                     </div>
                   </div>
@@ -315,6 +331,17 @@ export function EditItemPage() {
                 </div>
 
                 <div>
+                  <div className="text-xs font-semibold uppercase mb-2">DISTINCTIVE MARKS</div>
+                  <div className="flex items-center gap-2">
+                    <Input
+                      value={distinctiveMarks}
+                      onChange={(e) => setDistinctiveMarks(e.target.value)}
+                      placeholder="e.g. color, brand, serial number"
+                    />
+                  </div>
+                </div>
+
+                <div>
                   <div className="text-xs font-semibold uppercase mb-2">
                     DESCRIPTION <span className="text-red-500">*</span>
                   </div>
@@ -329,6 +356,21 @@ export function EditItemPage() {
                     className={`min-h-[120px] ${errors.description ? 'border-red-500' : ''}`}
                     placeholder="Enter item description..."
                   />
+                </div>
+
+                <div className="flex items-center justify-end gap-3 pt-4 border-t border-gray-100">
+                  <Link to="/console/$slug/staff/item/$itemId" params={{ slug, itemId }}>
+                    <Button type="button" variant="outline" disabled={updateItem.isPending}>
+                      Cancel
+                    </Button>
+                  </Link>
+                  <Button
+                    type="submit"
+                    className="bg-blue-600 hover:bg-blue-700"
+                    disabled={updateItem.isPending}
+                  >
+                    {updateItem.isPending ? 'Saving...' : 'Save Changes'}
+                  </Button>
                 </div>
               </div>
             </div>

@@ -16,6 +16,8 @@ import {
 import { useInventoryItem } from '@/hooks/use-inventory'
 import { useCurrentOrgId } from '@/contexts/current-org.context'
 import { Spinner } from '@/components/ui/spinner'
+import { useCreateOrgReturnReport } from '@/hooks/use-return-report'
+import { showToast } from '@/lib/toast'
 
 const statusOptions = ['Active', 'InStorage', 'ReturnScheduled', 'Returned', 'Archived', 'Expired'] as const
 
@@ -25,6 +27,7 @@ export function HandoverItemPage() {
   const { currentOrgId } = useCurrentOrgId()
 
   const { data: item, isLoading } = useInventoryItem(currentOrgId, itemId)
+  const createReturnReport = useCreateOrgReturnReport()
 
   // UI-only fields (not sent to API yet)
   const [recipientFullName, setRecipientFullName] = useState('')
@@ -97,7 +100,37 @@ export function HandoverItemPage() {
               className="space-y-8"
               onSubmit={(e) => {
                 e.preventDefault()
-                navigate({ to: `/console/${slug}/staff/item/${itemId}` })
+                if (!currentOrgId) {
+                  showToast.error('No active organization')
+                  return
+                }
+                if (!status) {
+                  showToast.error('Please select status')
+                  return
+                }
+
+                createReturnReport.mutate(
+                  {
+                    orgId: currentOrgId,
+                    postId: itemId,
+                    ownerInfo: {
+                      ownerName: recipientFullName.trim() || null,
+                      email: recipientEmail.trim() || null,
+                      phone: recipientPhone.trim() || null,
+                      nationalId: recipientNationalId.trim() || null,
+                      orgMemberId: recipientInternalId.trim() || null,
+                    },
+                  },
+                  {
+                    onSuccess: () => {
+                      showToast.success('Handover saved')
+                      navigate({ to: `/console/${slug}/staff/item/${itemId}` })
+                    },
+                    onError: (err) => {
+                      showToast.error(err instanceof Error ? err.message : 'Failed to save handover')
+                    },
+                  },
+                )
               }}
             >
               <div className="space-y-6">
@@ -216,10 +249,10 @@ export function HandoverItemPage() {
 
               <div className="flex items-center justify-end gap-3 pt-4 border-t">
                 <Link to="/console/$slug/staff/item/$itemId" params={{ slug, itemId }}>
-                  <Button type="button" variant="outline">Cancel</Button>
+                  <Button type="button" variant="outline" disabled={createReturnReport.isPending}>Cancel</Button>
                 </Link>
-                <Button type="submit" className="bg-blue-600 hover:bg-blue-700">
-                  Save handover
+                <Button type="submit" className="bg-blue-600 hover:bg-blue-700" disabled={createReturnReport.isPending}>
+                  {createReturnReport.isPending ? 'Saving…' : 'Save handover'}
                 </Button>
               </div>
             </form>

@@ -1,12 +1,13 @@
 import { StaffLayout } from '../../components/staff/layout'
 import { useEffect, useState } from 'react'
-import { ChevronRight, Check} from 'lucide-react'
+import { ChevronRight, Check } from 'lucide-react'
 import { Link, useNavigate, useParams } from '@tanstack/react-router'
 import { useCurrentOrgId } from '@/contexts/current-org.context'
 import { inventoryService } from '@/services/inventory.service'
 import type { ItemCategory } from '@/services/inventory.service'
 import { uploadInventoryImages } from '@/services/storage.service'
 import { useCreateInventoryItem } from '@/hooks/use-inventory'
+import { useUser } from '@/hooks/use-user'
 import { Step1PhotosAndItem, type PhotoPreview } from './add-item/step1-photos-item'
 import { Step2Finder, type FinderInfo } from './add-item/step2-finder'
 import { Step3Preview, type StaffInfo } from './add-item/step3-preview'
@@ -97,6 +98,7 @@ export function AddFoundItemPage() {
   const { slug } = useParams({ strict: false }) as { slug: string }
   const { currentOrgId } = useCurrentOrgId()
   const createItem = useCreateInventoryItem(currentOrgId)
+  const { data: me } = useUser()
 
   const [step, setStep] = useState<StepId>(1)
 
@@ -117,6 +119,7 @@ export function AddFoundItemPage() {
   const [isAnalyzing, setIsAnalyzing] = useState(false)
   const [analyzeError, setAnalyzeError] = useState<string | null>(null)
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [submittingAction, setSubmittingAction] = useState<'save' | 'addAnother' | null>(null)
   const [submitError, setSubmitError] = useState<string | null>(null)
 
   const [finder, setFinder] = useState<FinderInfo>({
@@ -125,10 +128,6 @@ export function AddFoundItemPage() {
     nationalId: '',
     orgMemberId: '',
     phone: '',
-    handoverTime: '',
-    fromTo: '',
-    receivingStaff: '',
-    notes: '',
   })
 
   const [staff, setStaff] = useState<StaffInfo>({
@@ -136,6 +135,15 @@ export function AddFoundItemPage() {
     email: '',
     staffId: '',
   })
+
+  useEffect(() => {
+    if (!me) return
+    setStaff((prev) => ({
+      ...prev,
+      fullName: me.name?.trim() || prev.fullName,
+      email: me.email?.trim() || prev.email,
+    }))
+  }, [me])
 
   const handlePhotoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files
@@ -244,6 +252,7 @@ export function AddFoundItemPage() {
 
     setSubmitError(null)
     setIsSubmitting(true)
+    setSubmittingAction(addAnother ? 'addAnother' : 'save')
 
     try {
       // Upload all photos to Firebase Storage and collect their public URLs
@@ -264,7 +273,7 @@ export function AddFoundItemPage() {
 
       if (addAnother) {
         resetItemForm()
-        setFinder({ fullName: '', email: '', nationalId: '', orgMemberId: '', phone: '', handoverTime: '', fromTo: '', receivingStaff: '', notes: '' })
+        setFinder({ fullName: '', email: '', nationalId: '', orgMemberId: '', phone: '' })
         setStaff({ fullName: '', email: '', staffId: '' })
         setStep(1)
       } else {
@@ -274,6 +283,7 @@ export function AddFoundItemPage() {
       setSubmitError(err instanceof Error ? err.message : 'Failed to save item. Please try again.')
     } finally {
       setIsSubmitting(false)
+      setSubmittingAction(null)
     }
   }
 
@@ -449,6 +459,7 @@ export function AddFoundItemPage() {
               staff={staff}
               setStaff={setStaff}
               isSubmitting={isSubmitting}
+              submittingAction={submittingAction}
               onBack={() => setStep(2)}
               onSaveAndAddAnother={handleSaveAndAddAnother}
               onSubmit={() => void handleSave(false)}
