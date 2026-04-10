@@ -2,6 +2,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
+import type { FinderContactField } from '@/types/organization.types'
 
 export type FinderInfo = {
   fullName: string
@@ -14,20 +15,43 @@ export type FinderInfo = {
 export function Step2Finder({
   finder,
   setFinder,
+  requiredFields,
   onBack,
   onNext,
 }: {
   finder: FinderInfo
   setFinder: (next: FinderInfo) => void
+  requiredFields: FinderContactField[] | null
   onBack: () => void
   onNext: () => void
 }) {
+  const required = requiredFields && requiredFields.length > 0 ? requiredFields : null
+  const isRequired = (field: FinderContactField) => required?.includes(field) ?? false
+
+  const requiredLabel = (f: FinderContactField) => {
+    switch (f) {
+      case 'Email':
+        return 'Email'
+      case 'Phone':
+        return 'Phone'
+      case 'NationalId':
+        return 'National ID'
+      case 'OrgMemberId':
+        return 'Student / staff ID'
+      default:
+        return f
+    }
+  }
+
   return (
     <div className="space-y-4 mt-6">
       <div>
         <div className="text-xl font-bold text-slate-950">Finder information</div>
         <div className="text-xs text-slate-800 mt-1">
-          Full name is required. Provide at least one detail: email, phone, national ID, or student/staff ID.
+          Full name is required.{' '}
+          {required
+            ? `Required by this organization: ${required.map(requiredLabel).join(', ')}.`
+            : 'Provide at least one detail: email, phone, national ID, or student/staff ID.'}
         </div>
       </div>
 
@@ -48,7 +72,9 @@ export function Step2Finder({
               </div>
 
               <div>
-                <Label className="text-sm font-semibold text-slate-950">Email</Label>
+                <Label className="text-sm font-semibold text-slate-950">
+                  Email {isRequired('Email') ? <span className="text-red-600">*</span> : null}
+                </Label>
                 <Input
                   value={finder.email}
                   onChange={(e) => setFinder({ ...finder, email: e.target.value })}
@@ -57,7 +83,9 @@ export function Step2Finder({
               </div>
 
               <div>
-                <Label className="text-sm font-semibold text-slate-950">Phone</Label>
+                <Label className="text-sm font-semibold text-slate-950">
+                  Phone {isRequired('Phone') ? <span className="text-red-600">*</span> : null}
+                </Label>
                 <Input
                   value={finder.phone}
                   onChange={(e) => setFinder({ ...finder, phone: e.target.value })}
@@ -66,7 +94,9 @@ export function Step2Finder({
               </div>
 
               <div>
-                <Label className="text-sm font-semibold text-slate-950">National ID</Label>
+                <Label className="text-sm font-semibold text-slate-950">
+                  National ID {isRequired('NationalId') ? <span className="text-red-600">*</span> : null}
+                </Label>
                 <Input
                   value={finder.nationalId}
                   onChange={(e) => setFinder({ ...finder, nationalId: e.target.value })}
@@ -75,7 +105,9 @@ export function Step2Finder({
               </div>
 
               <div>
-                <Label className="text-sm font-semibold text-slate-950">Student / staff ID</Label>
+                <Label className="text-sm font-semibold text-slate-950">
+                  Student / staff ID {isRequired('OrgMemberId') ? <span className="text-red-600">*</span> : null}
+                </Label>
                 <Input
                   value={finder.orgMemberId}
                   onChange={(e) => setFinder({ ...finder, orgMemberId: e.target.value })}
