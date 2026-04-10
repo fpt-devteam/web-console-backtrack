@@ -26,7 +26,6 @@ export function Step3Preview({
   item,
   finder,
   staff,
-  setStaff,
   isSubmitting,
   submittingAction,
   onBack,
@@ -47,7 +46,6 @@ export function Step3Preview({
   }
   finder: FinderInfo
   staff: StaffInfo
-  setStaff: (next: StaffInfo) => void
   isSubmitting: boolean
   submittingAction: 'save' | 'addAnother' | null
   onBack: () => void
@@ -123,24 +121,24 @@ export function Step3Preview({
                 <Label className="text-xs font-semibold text-slate-950">Full name</Label>
                 <Input
                   value={staff.fullName}
-                  onChange={(e) => setStaff({ ...staff, fullName: e.target.value })}
-                  className="mt-1 h-9 py-1.5"
+                  readOnly
+                  className="mt-1 h-9 py-1.5 bg-slate-50"
                 />
               </div>
               <div>
                 <Label className="text-xs font-semibold text-slate-950">Email</Label>
                 <Input
                   value={staff.email}
-                  onChange={(e) => setStaff({ ...staff, email: e.target.value })}
-                  className="mt-1 h-9 py-1.5"
+                  readOnly
+                  className="mt-1 h-9 py-1.5 bg-slate-50"
                 />
               </div>
               <div>
                 <Label className="text-xs font-semibold text-slate-950">Staff ID</Label>
                 <Input
                   value={staff.staffId}
-                  onChange={(e) => setStaff({ ...staff, staffId: e.target.value })}
-                  className="mt-1 h-9 py-1.5"
+                  readOnly
+                  className="mt-1 h-9 py-1.5 bg-slate-50"
                 />
               </div>
             </div>

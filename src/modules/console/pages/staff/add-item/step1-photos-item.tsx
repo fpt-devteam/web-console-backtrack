@@ -3,45 +3,17 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import type { ItemCategory } from '@/services/inventory.service'
-import { Camera, ChevronRight, Loader2, Sparkles, X } from 'lucide-react'
+import { Camera, ChevronRight, Sparkles, Star, X } from 'lucide-react'
 
 export type PhotoPreview = { file: File; url: string }
 
-export function Step1PhotosAndItem({
-  photoPreviews,
-  maxPhotos,
-  onPickPhotos,
-  onRemovePhoto,
-  isAnalyzing,
-  analyzeError,
-  onAnalyze,
-  itemName,
-  setItemName,
-  category,
-  setCategory,
-  brand,
-  setBrand,
-  color,
-  setColor,
-  condition,
-  setCondition,
-  material,
-  setMaterial,
-  size,
-  setSize,
-  distinctiveMarks,
-  setDistinctiveMarks,
-  description,
-  setDescription,
-  onNext,
-}: {
+export type Step1PhotosAndItemProps = {
   photoPreviews: PhotoPreview[]
   maxPhotos: number
   onPickPhotos: (e: React.ChangeEvent<HTMLInputElement>) => void
   onRemovePhoto: (index: number) => void
+  onReorderPhotos: (fromIndex: number, toIndex: number) => void
   isAnalyzing: boolean
-  analyzeError: string | null
-  onAnalyze: () => void
   itemName: string
   setItemName: (v: string) => void
   category: ItemCategory
@@ -61,7 +33,35 @@ export function Step1PhotosAndItem({
   description: string
   setDescription: (v: string) => void
   onNext: () => void
-}) {
+}
+
+export function Step1PhotosAndItem({
+  photoPreviews,
+  maxPhotos,
+  onPickPhotos,
+  onRemovePhoto,
+  onReorderPhotos,
+  isAnalyzing,
+  itemName,
+  setItemName,
+  category,
+  setCategory,
+  brand,
+  setBrand,
+  color,
+  setColor,
+  condition,
+  setCondition,
+  material,
+  setMaterial,
+  size,
+  setSize,
+  distinctiveMarks,
+  setDistinctiveMarks,
+  description,
+  setDescription,
+  onNext,
+}: Step1PhotosAndItemProps) {
   return (
     <div className="space-y-6 mt-3">
       {/* Photos Section */}
@@ -73,12 +73,52 @@ export function Step1PhotosAndItem({
 
         <div className="flex gap-4 flex-wrap">
           {photoPreviews.map((p, index) => (
-            <div key={p.url} className="relative w-32 h-32 rounded-lg overflow-hidden group">
+            <div
+              key={p.url}
+              className="relative w-32 h-32 rounded-lg overflow-hidden group"
+              draggable
+              onDragStart={(e) => {
+                e.dataTransfer.setData('text/plain', String(index))
+                e.dataTransfer.effectAllowed = 'move'
+              }}
+              onDragOver={(e) => {
+                e.preventDefault()
+                e.dataTransfer.dropEffect = 'move'
+              }}
+              onDrop={(e) => {
+                e.preventDefault()
+                const raw = e.dataTransfer.getData('text/plain')
+                const from = Number(raw)
+                if (!Number.isFinite(from)) return
+                onReorderPhotos(from, index)
+              }}
+              aria-label={index === 0 ? 'Analyzed photo (star slot)' : `Photo ${index + 1}`}
+              title={index === 0 ? 'This photo is used for auto-analyze' : 'Drag to reorder'}
+            >
               <img src={p.url} alt={`Upload ${index + 1}`} className="w-full h-full object-cover" />
+
+              {index === 0 && (
+                <>
+                  <div className="absolute top-1 right-1 rounded-full bg-white/90 p-0.5 shadow-sm">
+                    <Star className="h-3.5 w-3.5 text-amber-500" fill="currentColor" />
+                  </div>
+
+                  {isAnalyzing && (
+                    <div className="absolute inset-0 bg-black/25 flex items-center justify-center">
+                      <div className="relative w-12 h-12">
+                        <div className="absolute inset-0 rounded-full border-2 border-white/60 border-t-white animate-spin" />
+                        <div className="absolute inset-0 flex items-center justify-center">
+                          <Sparkles className="h-5 w-5 text-white drop-shadow" />
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </>
+              )}
               <button
                 type="button"
                 onClick={() => onRemovePhoto(index)}
-                className="absolute top-1 right-1 p-1 bg-red-600 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
+                className="absolute top-1 right-1 p-0.5 bg-red-600 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
                 aria-label="Remove photo"
               >
                 <X className="w-3 h-3" />
@@ -102,23 +142,13 @@ export function Step1PhotosAndItem({
           )}
         </div>
 
-        {/* Auto-fill from photo */}
-        {photoPreviews.length > 0 && (
-          <div className="mt-4 flex items-center gap-3">
-            <Button
-              type="button"
-              variant="outline"
-              size="sm"
-              disabled={isAnalyzing}
-              onClick={onAnalyze}
-              className="flex items-center gap-2 border-slate-300 text-slate-950 hover:bg-slate-50"
-            >
-              {isAnalyzing ? <Loader2 className="h-4 w-4 animate-spin" /> : <Sparkles className="h-4 w-4" />}
-              {isAnalyzing ? 'Analyzing…' : 'Auto-fill from photo'}
-            </Button>
-            {analyzeError && <span className="text-xs text-red-600">{analyzeError}</span>}
-          </div>
-        )}
+        <div className="mt-3 text-xs text-slate-600">
+          Drag and drop photos. The photo with the{' '}
+          <span className="inline-flex items-center">
+            <Star className="relative top-[1px] h-3.5 w-3.5 text-amber-500" fill="currentColor" />
+          </span>{' '}
+          is automatically analyzed.
+        </div>
       </div>
 
       {/* Item fields */}

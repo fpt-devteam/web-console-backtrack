@@ -1,13 +1,15 @@
 import { StaffLayout } from '../../components/staff/layout'
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { ChevronRight, Check } from 'lucide-react'
 import { Link, useNavigate, useParams } from '@tanstack/react-router'
 import { useCurrentOrgId } from '@/contexts/current-org.context'
 import { inventoryService } from '@/services/inventory.service'
 import type { ItemCategory } from '@/services/inventory.service'
-import { uploadInventoryImages } from '@/services/storage.service'
+import { uploadInventoryImage } from '@/services/storage.service'
 import { useCreateInventoryItem } from '@/hooks/use-inventory'
 import { useUser } from '@/hooks/use-user'
+import { useOrganization } from '@/hooks/use-org'
+import type { FinderContactField } from '@/types/organization.types'
 import { Step1PhotosAndItem, type PhotoPreview } from './add-item/step1-photos-item'
 import { Step2Finder, type FinderInfo } from './add-item/step2-finder'
 import { Step3Preview, type StaffInfo } from './add-item/step3-preview'
@@ -16,6 +18,23 @@ type StepId = 1 | 2 | 3
 
 function cx(...classes: Array<string | false | null | undefined>) {
   return classes.filter(Boolean).join(' ')
+}
+
+type AddInventoryDraft = {
+  v: 1
+  step: StepId
+  item: {
+    itemName: string
+    description: string
+    distinctiveMarks: string
+    category: ItemCategory
+    color: string
+    brand: string
+    condition: string
+    material: string
+    size: string
+  }
+  finder: FinderInfo
 }
 
 function Stepper({
@@ -99,6 +118,7 @@ export function AddFoundItemPage() {
   const { currentOrgId } = useCurrentOrgId()
   const createItem = useCreateInventoryItem(currentOrgId)
   const { data: me } = useUser()
+  const { data: org } = useOrganization(currentOrgId)
 
   const [step, setStep] = useState<StepId>(1)
 
@@ -117,10 +137,21 @@ export function AddFoundItemPage() {
   const [size, setSize] = useState<string>('')
 
   const [isAnalyzing, setIsAnalyzing] = useState(false)
-  const [analyzeError, setAnalyzeError] = useState<string | null>(null)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [submittingAction, setSubmittingAction] = useState<'save' | 'addAnother' | null>(null)
   const [submitError, setSubmitError] = useState<string | null>(null)
+
+  const lastAnalyzedKeyRef = useRef<string | null>(null)
+  const analyzeTimerRef = useRef<number | null>(null)
+  const photoPreviewsRef = useRef<PhotoPreview[]>([])
+  const uploadedUrlByFileKeyRef = useRef<Map<string, string>>(new Map())
+  const draftHydratedRef = useRef(false)
+  const draftSaveTimerRef = useRef<number | null>(null)
+
+  const draftKey = useMemo(() => {
+    // Keyed per org so staff can switch orgs safely.
+    return currentOrgId ? `inventoryAddDraft:v1:${currentOrgId}` : null
+  }, [currentOrgId])
 
   const [finder, setFinder] = useState<FinderInfo>({
     fullName: '',
@@ -136,14 +167,171 @@ export function AddFoundItemPage() {
     staffId: '',
   })
 
+  // Hydrate draft on first load (text fields only; photos can't survive reload).
+  useEffect(() => {
+    if (!draftKey) return
+    if (draftHydratedRef.current) return
+    try {
+      const raw = window.localStorage.getItem(draftKey)
+      if (!raw) {
+        draftHydratedRef.current = true
+        return
+      }
+      const parsed = JSON.parse(raw) as AddInventoryDraft
+      if (!parsed || parsed.v !== 1) {
+        draftHydratedRef.current = true
+        return
+      }
+
+      setStep(parsed.step ?? 1)
+      setItemName(parsed.item?.itemName ?? '')
+      setDescription(parsed.item?.description ?? '')
+      setDistinctiveMarks(parsed.item?.distinctiveMarks ?? '')
+      setCategory(parsed.item?.category ?? 'Other')
+      setColor(parsed.item?.color ?? '')
+      setBrand(parsed.item?.brand ?? '')
+      setCondition(parsed.item?.condition ?? '')
+      setMaterial(parsed.item?.material ?? '')
+      setSize(parsed.item?.size ?? '')
+      setFinder(parsed.finder ?? { fullName: '', email: '', nationalId: '', orgMemberId: '', phone: '' })
+    } catch {
+      // ignore draft parse errors
+    } finally {
+      draftHydratedRef.current = true
+    }
+  }, [draftKey])
+
+  // Persist draft changes (debounced).
+  useEffect(() => {
+    if (!draftKey) return
+    if (!draftHydratedRef.current) return
+
+    if (draftSaveTimerRef.current) {
+      window.clearTimeout(draftSaveTimerRef.current)
+      draftSaveTimerRef.current = null
+    }
+
+    draftSaveTimerRef.current = window.setTimeout(() => {
+      const draft: AddInventoryDraft = {
+        v: 1,
+        step,
+        item: {
+          itemName,
+          description,
+          distinctiveMarks,
+          category,
+          color,
+          brand,
+          condition,
+          material,
+          size,
+        },
+        finder,
+      }
+      try {
+        window.localStorage.setItem(draftKey, JSON.stringify(draft))
+      } catch {
+        // ignore quota / storage errors
+      }
+    }, 250)
+
+    return () => {
+      if (draftSaveTimerRef.current) {
+        window.clearTimeout(draftSaveTimerRef.current)
+        draftSaveTimerRef.current = null
+      }
+    }
+  }, [
+    draftKey,
+    step,
+    itemName,
+    description,
+    distinctiveMarks,
+    category,
+    color,
+    brand,
+    condition,
+    material,
+    size,
+    finder,
+  ])
+
   useEffect(() => {
     if (!me) return
     setStaff((prev) => ({
       ...prev,
       fullName: me.name?.trim() || prev.fullName,
       email: me.email?.trim() || prev.email,
+      staffId: me.id || prev.staffId,
     }))
   }, [me])
+
+  const analyzeFromFile = async (file: File) => {
+    if (!currentOrgId) return
+
+    setIsAnalyzing(true)
+    setSubmitError(null)
+
+    try {
+      // Upload only the first image; we just need its public URL for analysis
+      const key = fileKey(file)
+      const cached = uploadedUrlByFileKeyRef.current.get(key)
+      const url = cached ?? (await uploadInventoryImage(currentOrgId, file))
+      if (!cached) uploadedUrlByFileKeyRef.current.set(key, url)
+      const result = await inventoryService.analyzeImage(url)
+
+      if (result.itemName) setItemName(result.itemName)
+      if (result.category) setCategory(result.category)
+      if (result.color) setColor(result.color)
+      if (result.brand) setBrand(result.brand)
+      if (result.condition) setCondition(result.condition)
+      if (result.material) setMaterial(result.material)
+      if (result.size) setSize(result.size)
+      if (result.distinctiveMarks) setDistinctiveMarks(result.distinctiveMarks)
+      if (result.additionalDetails) setDescription(result.additionalDetails)
+    } catch (err) {
+      setSubmitError(err instanceof Error ? err.message : 'Image analysis failed. Please try again.')
+    } finally {
+      setIsAnalyzing(false)
+    }
+  }
+
+  const fileKey = (file: File) => `${file.name}:${file.size}:${file.lastModified}:${file.type}`
+
+  // Auto-analyze the photo in the "star" slot (index 0). Re-runs when user reorders or deletes
+  // so a different photo becomes index 0. Uses a small debounce + cache key to avoid spamming calls.
+  useEffect(() => {
+    if (!currentOrgId) return
+    const first = photoPreviews[0]
+    if (!first) return
+    if (isAnalyzing) return
+
+    const key = fileKey(first.file)
+    if (lastAnalyzedKeyRef.current === key) return
+
+    if (analyzeTimerRef.current) {
+      window.clearTimeout(analyzeTimerRef.current)
+      analyzeTimerRef.current = null
+    }
+
+    analyzeTimerRef.current = window.setTimeout(() => {
+      // Ensure the first photo didn't change during debounce.
+      const currentFirst = photoPreviews[0]
+      if (!currentFirst) return
+      const currentKey = fileKey(currentFirst.file)
+      if (currentKey !== key) return
+
+      lastAnalyzedKeyRef.current = key
+      void analyzeFromFile(currentFirst.file)
+    }, 450)
+
+    return () => {
+      if (analyzeTimerRef.current) {
+        window.clearTimeout(analyzeTimerRef.current)
+        analyzeTimerRef.current = null
+      }
+    }
+  }, [currentOrgId, photoPreviews, isAnalyzing])
 
   const handlePhotoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files
@@ -159,41 +347,25 @@ export function AddFoundItemPage() {
     e.target.value = ''
   }
 
+  const reorderPhotos = (fromIndex: number, toIndex: number) => {
+    if (fromIndex === toIndex) return
+    setPhotoPreviews((prev) => {
+      if (fromIndex < 0 || toIndex < 0) return prev
+      if (fromIndex >= prev.length || toIndex >= prev.length) return prev
+      const next = prev.slice()
+      const [moved] = next.splice(fromIndex, 1)
+      if (!moved) return prev
+      next.splice(toIndex, 0, moved)
+      return next
+    })
+  }
+
   const removePhoto = (index: number) => {
     setPhotoPreviews((prev) => {
       const target = prev[index]
       if (target) URL.revokeObjectURL(target.url)
       return prev.filter((_, i) => i !== index)
     })
-  }
-
-  /** Upload first photo to Firebase → ask BE to analyze → auto-fill fields */
-  const handleAnalyze = async () => {
-    if (photoPreviews.length === 0) return
-    if (!currentOrgId) return
-
-    setIsAnalyzing(true)
-    setAnalyzeError(null)
-
-    try {
-      // Upload only the first image; we just need its public URL for analysis
-      const [url] = await uploadInventoryImages(currentOrgId, [photoPreviews[0].file])
-      const result = await inventoryService.analyzeImage(url)
-
-      if (result.itemName) setItemName(result.itemName)
-      if (result.category) setCategory(result.category)
-      if (result.color) setColor(result.color)
-      if (result.brand) setBrand(result.brand)
-      if (result.condition) setCondition(result.condition)
-      if (result.material) setMaterial(result.material)
-      if (result.size) setSize(result.size)
-      if (result.distinctiveMarks) setDistinctiveMarks(result.distinctiveMarks)
-      if (result.additionalDetails) setDescription(result.additionalDetails)
-    } catch (err) {
-      setAnalyzeError(err instanceof Error ? err.message : 'Image analysis failed. Please try again.')
-    } finally {
-      setIsAnalyzing(false)
-    }
   }
 
   const buildPayload = (imageUrls: string[]) => ({
@@ -207,6 +379,13 @@ export function AddFoundItemPage() {
     material: material.trim() || undefined,
     size: size.trim() || undefined,
     imageUrls,
+    finderInfo: {
+      finderName: finder.fullName.trim() || undefined,
+      email: finder.email.trim() || undefined,
+      phone: finder.phone.trim() || undefined,
+      nationalId: finder.nationalId.trim() || undefined,
+      orgMemberId: finder.orgMemberId.trim() || undefined,
+    },
   })
 
   const validateStep1 = (): string | null => {
@@ -218,13 +397,28 @@ export function AddFoundItemPage() {
 
   const validateStep2 = (): string | null => {
     if (!finder.fullName.trim()) return 'Finder full name is required.'
-    // At least one identification/contact
-    const hasAny =
-      Boolean(finder.email.trim()) ||
-      Boolean(finder.nationalId.trim()) ||
-      Boolean(finder.orgMemberId.trim()) ||
-      Boolean(finder.phone.trim())
-    if (!hasAny) return 'Provide at least one finder detail: email, phone, national ID, or student/staff ID.'
+
+    const required = (org?.requiredFinderContractFields ?? []).filter(Boolean) as FinderContactField[]
+
+    // Fallback to old rule when org policy isn't configured/loaded.
+    if (required.length === 0) {
+      const hasAny =
+        Boolean(finder.email.trim()) ||
+        Boolean(finder.nationalId.trim()) ||
+        Boolean(finder.orgMemberId.trim()) ||
+        Boolean(finder.phone.trim())
+      if (!hasAny) return 'Provide at least one finder detail: email, phone, national ID, or student/staff ID.'
+      return null
+    }
+
+    const missing: string[] = []
+    for (const f of required) {
+      if (f === 'Email' && !finder.email.trim()) missing.push('email')
+      if (f === 'Phone' && !finder.phone.trim()) missing.push('phone')
+      if (f === 'NationalId' && !finder.nationalId.trim()) missing.push('national ID')
+      if (f === 'OrgMemberId' && !finder.orgMemberId.trim()) missing.push('student/staff ID')
+    }
+    if (missing.length > 0) return `Missing required finder fields: ${missing.join(', ')}.`
     return null
   }
 
@@ -242,6 +436,7 @@ export function AddFoundItemPage() {
     setCondition('')
     setMaterial('')
     setSize('')
+    uploadedUrlByFileKeyRef.current.clear()
   }
 
   const handleSave = async (addAnother: boolean) => {
@@ -255,14 +450,20 @@ export function AddFoundItemPage() {
     setSubmittingAction(addAnother ? 'addAnother' : 'save')
 
     try {
-      // Upload all photos to Firebase Storage and collect their public URLs
-      const imageUrls =
-        photoPreviews.length > 0
-          ? await uploadInventoryImages(
-              currentOrgId,
-              photoPreviews.map((p) => p.file),
-            )
-          : []
+      // Upload photos to Firebase Storage and collect their public URLs.
+      // Reuse any URLs already uploaded during auto-analyze to avoid double uploads.
+      const imageUrls: string[] = []
+      for (const p of photoPreviews) {
+        const key = fileKey(p.file)
+        const cached = uploadedUrlByFileKeyRef.current.get(key)
+        if (cached) {
+          imageUrls.push(cached)
+          continue
+        }
+        const url = await uploadInventoryImage(currentOrgId, p.file)
+        uploadedUrlByFileKeyRef.current.set(key, url)
+        imageUrls.push(url)
+      }
 
       await new Promise<void>((resolve, reject) => {
         createItem.mutate(buildPayload(imageUrls), {
@@ -277,6 +478,14 @@ export function AddFoundItemPage() {
         setStaff({ fullName: '', email: '', staffId: '' })
         setStep(1)
       } else {
+        if (draftKey) {
+          try {
+            window.localStorage.removeItem(draftKey)
+          } catch {
+            // ignore
+          }
+        }
+        uploadedUrlByFileKeyRef.current.clear()
         navigate({ to: `/console/${slug}/staff/inventory` })
       }
     } catch (err) {
@@ -356,11 +565,17 @@ export function AddFoundItemPage() {
     }
   }
 
+  // Keep latest previews for unmount cleanup without revoking active URLs on every change.
+  useEffect(() => {
+    photoPreviewsRef.current = photoPreviews
+  }, [photoPreviews])
+
+  // Revoke any remaining objectURLs when leaving the page.
   useEffect(() => {
     return () => {
-      photoPreviews.forEach((p) => URL.revokeObjectURL(p.url))
+      photoPreviewsRef.current.forEach((p) => URL.revokeObjectURL(p.url))
     }
-  }, [photoPreviews])
+  }, [])
 
 
   return (
@@ -407,9 +622,8 @@ export function AddFoundItemPage() {
               maxPhotos={MAX_PHOTOS}
               onPickPhotos={handlePhotoUpload}
               onRemovePhoto={removePhoto}
+              onReorderPhotos={reorderPhotos}
               isAnalyzing={isAnalyzing}
-              analyzeError={analyzeError}
-              onAnalyze={() => void handleAnalyze()}
               itemName={itemName}
               setItemName={setItemName}
               category={category}
@@ -436,6 +650,7 @@ export function AddFoundItemPage() {
             <Step2Finder
               finder={finder}
               setFinder={setFinder}
+              requiredFields={org?.requiredFinderContractFields ?? null}
               onBack={() => setStep(1)}
               onNext={nextFromStep2}
             />
@@ -457,7 +672,6 @@ export function AddFoundItemPage() {
               }}
               finder={finder}
               staff={staff}
-              setStaff={setStaff}
               isSubmitting={isSubmitting}
               submittingAction={submittingAction}
               onBack={() => setStep(2)}

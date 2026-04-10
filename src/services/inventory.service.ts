@@ -67,6 +67,13 @@ export interface CreateInventoryPayload {
   condition?: string | null
   material?: string | null
   size?: string | null
+  finderInfo?: {
+    finderName?: string | null
+    email?: string | null
+    phone?: string | null
+    nationalId?: string | null
+    orgMemberId?: string | null
+  } | null
 }
 
 export interface UpdateInventoryPayload {
@@ -126,6 +133,7 @@ export const inventoryService = {
         additionalDetails: payload.description,
       },
       imageUrls: payload.imageUrls ?? [],
+      finderInfo: payload.finderInfo ?? undefined,
     }
 
     const { data } = await privateClient.post<ApiResponse<InventoryPost>>(
