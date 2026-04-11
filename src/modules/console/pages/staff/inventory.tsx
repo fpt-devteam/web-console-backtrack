@@ -92,13 +92,13 @@ export function StaffInventoryPage() {
 
   return (
     <StaffLayout>
-      <div className="p-4 sm:p-6 lg:p-8 min-h-screen mx-0 sm:mx-4">
+      <div className="p-4 sm:p-4 lg:p-6 min-h-screen  sm:mx-4">
         <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4 mb-6">
           <div>
             <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">
               Inventory Dashboard
             </h1>
-            <p className="text-gray-600 mt-1 text-sm sm:text-base">
+            <p className="text-gray-600  text-xs sm:text-base">
               Manage lost and found items. Search by item name or details.
             </p>
           </div>
@@ -117,9 +117,9 @@ export function StaffInventoryPage() {
           </div>
         </div>
 
-        <div className="mb-6 flex flex-col gap-3 lg:flex-row lg:items-center">
+        <div className=" flex flex-col gap-3 lg:flex-row lg:items-center">
           <div className="flex-1 relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
             <input
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
@@ -219,8 +219,14 @@ export function StaffInventoryPage() {
                 </div>
                 <div className="p-4">
                   <h3 className="font-semibold text-gray-900 mb-3">{item.item.itemName}</h3>
-                  <p className="text-sm text-gray-600 mb-3 line-clamp-2">
-                    {item.item.additionalDetails ?? '—'}
+                  <p className="text-sm text-gray-600 mb-3 line-clamp-2 leading-5 min-h-[40px]">
+                    {(() => {
+                      const d = item.item.additionalDetails?.trim()
+                      if (!d) return ''
+                      // Defensive: some older records may store a literal dash placeholder.
+                      if (d === '—' || d === '-') return ''
+                      return d
+                    })()}
                   </p>
                   <div className="space-y-2 text-sm text-gray-600 mb-4">
                     <div className="flex items-center gap-2">

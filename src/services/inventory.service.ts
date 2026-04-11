@@ -54,6 +54,13 @@ export interface InventoryPost {
   createdAt: string
   author?: PostAuthorResult | null
   organization?: { id: string; name: string; slug: string } | null
+  finderInfo?: {
+    finderName?: string | null
+    email?: string | null
+    phone?: string | null
+    nationalId?: string | null
+    orgMemberId?: string | null
+  } | null
 }
 
 export interface CreateInventoryPayload {
