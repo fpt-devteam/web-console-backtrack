@@ -24,7 +24,11 @@ export function OrgLogo({
   if (logoUrl?.trim()) {
     return (
       <div className={cn('overflow-hidden bg-gray-100 flex-shrink-0', roundCls, className)}>
-        <img src={logoUrl.trim()} alt={alt} className="h-full w-full object-cover" />
+        <img
+          src={logoUrl.trim()}
+          alt={alt}
+          className="h-full w-full object-contain bg-white p-0.5"
+        />
       </div>
     );
   }

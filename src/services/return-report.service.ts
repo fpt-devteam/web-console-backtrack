@@ -1,5 +1,6 @@
 import { privateClient } from '@/lib/api-client';
 import type { ApiResponse } from '@/types/api-response.type';
+import type { PagedResponse } from '@/types/pagination.type';
 
 export type OwnerInfoPayload = {
   ownerName?: string | null;
@@ -13,6 +14,9 @@ export type OrgReturnReportResult = {
   id: string;
   expiresAt: string;
   createdAt: string;
+  staff?: { id: string; displayName?: string | null; avatarUrl?: string | null } | null;
+  ownerInfo?: OwnerInfoPayload | null;
+  post?: { id: string } | null;
 };
 
 export const returnReportService = {
@@ -22,6 +26,15 @@ export const returnReportService = {
       payload,
     );
     if (!data.success) throw new Error(data.error?.message ?? 'Failed to create return report');
+    return data.data;
+  },
+
+  async getOrgReturnReports(orgId: string, page = 1, pageSize = 50): Promise<PagedResponse<OrgReturnReportResult>> {
+    const { data } = await privateClient.get<ApiResponse<PagedResponse<OrgReturnReportResult>>>(
+      `/api/core/return-reports/org/${orgId}`,
+      { params: { page, pageSize } },
+    );
+    if (!data.success) throw new Error(data.error?.message ?? 'Failed to fetch return reports');
     return data.data;
   },
 };

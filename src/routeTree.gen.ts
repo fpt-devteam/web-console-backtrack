@@ -55,7 +55,6 @@ import { Route as ConsoleSlugAccountSecurityRouteImport } from './routes/console
 import { Route as ConsoleSlugAdminSettingIndexRouteImport } from './routes/console/$slug/admin/setting/index'
 import { Route as ConsoleSlugAdminInventoryIndexRouteImport } from './routes/console/$slug/admin/inventory/index'
 import { Route as ConsoleSlugStaffItemItemIdRouteImport } from './routes/console/$slug/staff/item/$itemId'
-import { Route as ConsoleSlugStaffItemHandoverItemIdRouteImport } from './routes/console/$slug/staff/item-handover/$itemId'
 import { Route as ConsoleSlugStaffItemEditItemIdRouteImport } from './routes/console/$slug/staff/item-edit/$itemId'
 import { Route as ConsoleSlugAdminSettingOrganizationRouteImport } from './routes/console/$slug/admin/setting/organization'
 import { Route as ConsoleSlugAdminInventoryItemIdRouteImport } from './routes/console/$slug/admin/inventory/$itemId'
@@ -307,12 +306,6 @@ const ConsoleSlugStaffItemItemIdRoute =
     path: '/item/$itemId',
     getParentRoute: () => ConsoleSlugStaffRoute,
   } as any)
-const ConsoleSlugStaffItemHandoverItemIdRoute =
-  ConsoleSlugStaffItemHandoverItemIdRouteImport.update({
-    id: '/item-handover/$itemId',
-    path: '/item-handover/$itemId',
-    getParentRoute: () => ConsoleSlugStaffRoute,
-  } as any)
 const ConsoleSlugStaffItemEditItemIdRoute =
   ConsoleSlugStaffItemEditItemIdRouteImport.update({
     id: '/item-edit/$itemId',
@@ -397,7 +390,6 @@ export interface FileRoutesByFullPath {
   '/console/$slug/admin/inventory/$itemId': typeof ConsoleSlugAdminInventoryItemIdRoute
   '/console/$slug/admin/setting/organization': typeof ConsoleSlugAdminSettingOrganizationRouteWithChildren
   '/console/$slug/staff/item-edit/$itemId': typeof ConsoleSlugStaffItemEditItemIdRoute
-  '/console/$slug/staff/item-handover/$itemId': typeof ConsoleSlugStaffItemHandoverItemIdRoute
   '/console/$slug/staff/item/$itemId': typeof ConsoleSlugStaffItemItemIdRoute
   '/console/$slug/admin/inventory/': typeof ConsoleSlugAdminInventoryIndexRoute
   '/console/$slug/admin/setting/': typeof ConsoleSlugAdminSettingIndexRoute
@@ -448,7 +440,6 @@ export interface FileRoutesByTo {
   '/console/$slug/admin/edit-branch/$branchId': typeof ConsoleSlugAdminEditBranchBranchIdRoute
   '/console/$slug/admin/inventory/$itemId': typeof ConsoleSlugAdminInventoryItemIdRoute
   '/console/$slug/staff/item-edit/$itemId': typeof ConsoleSlugStaffItemEditItemIdRoute
-  '/console/$slug/staff/item-handover/$itemId': typeof ConsoleSlugStaffItemHandoverItemIdRoute
   '/console/$slug/staff/item/$itemId': typeof ConsoleSlugStaffItemItemIdRoute
   '/console/$slug/admin/inventory': typeof ConsoleSlugAdminInventoryIndexRoute
   '/console/$slug/admin/setting': typeof ConsoleSlugAdminSettingIndexRoute
@@ -504,7 +495,6 @@ export interface FileRoutesById {
   '/console/$slug/admin/inventory/$itemId': typeof ConsoleSlugAdminInventoryItemIdRoute
   '/console/$slug/admin/setting/organization': typeof ConsoleSlugAdminSettingOrganizationRouteWithChildren
   '/console/$slug/staff/item-edit/$itemId': typeof ConsoleSlugStaffItemEditItemIdRoute
-  '/console/$slug/staff/item-handover/$itemId': typeof ConsoleSlugStaffItemHandoverItemIdRoute
   '/console/$slug/staff/item/$itemId': typeof ConsoleSlugStaffItemItemIdRoute
   '/console/$slug/admin/inventory/': typeof ConsoleSlugAdminInventoryIndexRoute
   '/console/$slug/admin/setting/': typeof ConsoleSlugAdminSettingIndexRoute
@@ -560,7 +550,6 @@ export interface FileRouteTypes {
     | '/console/$slug/admin/inventory/$itemId'
     | '/console/$slug/admin/setting/organization'
     | '/console/$slug/staff/item-edit/$itemId'
-    | '/console/$slug/staff/item-handover/$itemId'
     | '/console/$slug/staff/item/$itemId'
     | '/console/$slug/admin/inventory/'
     | '/console/$slug/admin/setting/'
@@ -611,7 +600,6 @@ export interface FileRouteTypes {
     | '/console/$slug/admin/edit-branch/$branchId'
     | '/console/$slug/admin/inventory/$itemId'
     | '/console/$slug/staff/item-edit/$itemId'
-    | '/console/$slug/staff/item-handover/$itemId'
     | '/console/$slug/staff/item/$itemId'
     | '/console/$slug/admin/inventory'
     | '/console/$slug/admin/setting'
@@ -666,7 +654,6 @@ export interface FileRouteTypes {
     | '/console/$slug/admin/inventory/$itemId'
     | '/console/$slug/admin/setting/organization'
     | '/console/$slug/staff/item-edit/$itemId'
-    | '/console/$slug/staff/item-handover/$itemId'
     | '/console/$slug/staff/item/$itemId'
     | '/console/$slug/admin/inventory/'
     | '/console/$slug/admin/setting/'
@@ -1015,13 +1002,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ConsoleSlugStaffItemItemIdRouteImport
       parentRoute: typeof ConsoleSlugStaffRoute
     }
-    '/console/$slug/staff/item-handover/$itemId': {
-      id: '/console/$slug/staff/item-handover/$itemId'
-      path: '/item-handover/$itemId'
-      fullPath: '/console/$slug/staff/item-handover/$itemId'
-      preLoaderRoute: typeof ConsoleSlugStaffItemHandoverItemIdRouteImport
-      parentRoute: typeof ConsoleSlugStaffRoute
-    }
     '/console/$slug/staff/item-edit/$itemId': {
       id: '/console/$slug/staff/item-edit/$itemId'
       path: '/item-edit/$itemId'
@@ -1220,7 +1200,6 @@ interface ConsoleSlugStaffRouteChildren {
   ConsoleSlugStaffInventorySearchRoute: typeof ConsoleSlugStaffInventorySearchRoute
   ConsoleSlugStaffNotificationRoute: typeof ConsoleSlugStaffNotificationRoute
   ConsoleSlugStaffItemEditItemIdRoute: typeof ConsoleSlugStaffItemEditItemIdRoute
-  ConsoleSlugStaffItemHandoverItemIdRoute: typeof ConsoleSlugStaffItemHandoverItemIdRoute
   ConsoleSlugStaffItemItemIdRoute: typeof ConsoleSlugStaffItemItemIdRoute
 }
 
@@ -1232,8 +1211,6 @@ const ConsoleSlugStaffRouteChildren: ConsoleSlugStaffRouteChildren = {
   ConsoleSlugStaffInventorySearchRoute: ConsoleSlugStaffInventorySearchRoute,
   ConsoleSlugStaffNotificationRoute: ConsoleSlugStaffNotificationRoute,
   ConsoleSlugStaffItemEditItemIdRoute: ConsoleSlugStaffItemEditItemIdRoute,
-  ConsoleSlugStaffItemHandoverItemIdRoute:
-    ConsoleSlugStaffItemHandoverItemIdRoute,
   ConsoleSlugStaffItemItemIdRoute: ConsoleSlugStaffItemItemIdRoute,
 }
 
