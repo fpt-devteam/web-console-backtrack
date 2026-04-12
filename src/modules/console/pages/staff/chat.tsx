@@ -1,28 +1,33 @@
+/* eslint-disable @typescript-eslint/no-unnecessary-condition */
 import { useEffect, useRef, useState } from 'react'
-import { StaffLayout } from '../../components/staff/layout'
 import {
+  CheckCircle2,
+  Image as ImageIcon,
+  Loader2,
+  Paperclip,
+  RefreshCw,
   Search,
   Smile,
-  Paperclip,
-  Image as ImageIcon,
-  CheckCircle2,
-  Loader2,
-  RefreshCw,
+  UserCheck,
+  X,
 } from 'lucide-react'
+import { StaffLayout } from '../../components/staff/layout'
+import type {IConversation} from '@/types/chat.types';
 import { useChatContext } from '@/contexts/chat.context'
 import {
-  useChatAssigned,
-  useChatQueue,
-  useChatMessages,
   useAssignConversation,
+  useChatAssigned,
+  useChatMessages,
+  useChatQueue,
 } from '@/hooks/use-chat'
 import {
+  useConversationUpdates,
   useIncomingMessages,
+  useMarkSeen,
   useSendMessage,
   useTypingIndicator,
-  useMarkSeen,
 } from '@/hooks/use-chat-socket'
-import { MessageType, type IConversation } from '@/types/chat.types'
+import { ConversationStatus,  MessageType } from '@/types/chat.types'
 import { useCurrentOrgId } from '@/contexts/current-org.context'
 import { auth } from '@/lib/firebase'
 
@@ -186,7 +191,102 @@ function MessagePanel({ conversationId }: { conversationId: string }) {
   )
 }
 
+// ── Assign confirm dialog ────────────────────────────────
+
+function AssignConfirmDialog({
+  conv,
+  isPending,
+  onConfirm,
+  onCancel,
+}: {
+  conv: IConversation
+  isPending: boolean
+  onConfirm: () => void
+  onCancel: () => void
+}) {
+  const label = conv.partner?.displayName ?? conv.partner?.email ?? conv.id.slice(0, 8)
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
+      <div className="bg-white rounded-xl shadow-xl w-full max-w-sm mx-4 p-6">
+        <div className="flex items-start justify-between mb-4">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0">
+              <UserCheck className="w-5 h-5 text-blue-600" />
+            </div>
+            <div>
+              <h3 className="font-semibold text-gray-900 text-sm">Assign conversation?</h3>
+              <p className="text-xs text-gray-500 mt-0.5">This will assign the chat to you</p>
+            </div>
+          </div>
+          <button onClick={onCancel} className="text-gray-400 hover:text-gray-600 transition-colors">
+            <X className="w-4 h-4" />
+          </button>
+        </div>
+
+        <div className="bg-gray-50 rounded-lg p-3 mb-5">
+          <div className="flex items-center gap-2">
+            <img
+              src={conv.partner?.avatarUrl ?? avatarUrl(label)}
+              alt={label}
+              className="w-8 h-8 rounded-full flex-shrink-0"
+            />
+            <div className="min-w-0">
+              <p className="text-sm font-medium text-gray-900 truncate">{label}</p>
+              {conv.lastMessageContent && (
+                <p className="text-xs text-gray-500 truncate">{conv.lastMessageContent}</p>
+              )}
+            </div>
+          </div>
+        </div>
+
+        <div className="flex gap-2">
+          <button
+            onClick={onCancel}
+            disabled={isPending}
+            className="flex-1 px-4 py-2 text-sm font-medium text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors disabled:opacity-50"
+          >
+            Cancel
+          </button>
+          <button
+            onClick={onConfirm}
+            disabled={isPending}
+            className="flex-1 px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 flex items-center justify-center gap-1.5"
+          >
+            {isPending ? (
+              <><Loader2 className="w-4 h-4 animate-spin" /> Assigning…</>
+            ) : (
+              <><UserCheck className="w-4 h-4" /> Assign to me</>
+            )}
+          </button>
+        </div>
+      </div>
+    </div>
+  )
+}
+
 // ── Conversation list item ────────────────────────────────
+
+function statusBadge(status: ConversationStatus | undefined) {
+  switch (status) {
+    case ConversationStatus.QUEUE:
+      return 'bg-yellow-100 text-yellow-700'
+    case ConversationStatus.IN_PROGRESS:
+      return 'bg-blue-100 text-blue-700'
+    case ConversationStatus.CLOSED:
+      return 'bg-green-100 text-green-700'
+    default:
+      return 'bg-gray-100 text-gray-600'
+  }
+}
+
+function statusLabel(status: ConversationStatus | undefined) {
+  switch (status) {
+    case ConversationStatus.QUEUE:      return 'Queue'
+    case ConversationStatus.IN_PROGRESS: return 'In Progress'
+    case ConversationStatus.CLOSED:     return 'Closed'
+    default: return status ?? ''
+  }
+}
 
 function ConvItem({
   conv,
@@ -197,6 +297,7 @@ function ConvItem({
   isActive: boolean
   onSelect: () => void
 }) {
+  // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
   const label = (conv.partner?.displayName ?? conv.partner?.email ?? conv.id ?? 'user').slice(0, 8)
   return (
     <button
@@ -207,31 +308,32 @@ function ConvItem({
     >
       <div className="flex items-start gap-3">
         <img
-          src={avatarUrl(label)}
+          src={conv.partner?.avatarUrl ?? avatarUrl(label)}
           alt={label}
           className="w-12 h-12 rounded-full flex-shrink-0"
         />
         <div className="flex-1 min-w-0">
           <div className="flex items-center justify-between mb-1">
             <span className="text-sm font-semibold text-gray-900 truncate">
-              {label}
+              {conv.partner?.displayName ?? conv.partner?.email ?? label}
             </span>
-            <span className="text-xs text-gray-500 ml-2">
-              {formatTime(conv.lastMessageAt)}
-            </span>
+            <div className="flex items-center gap-1.5 ml-2 flex-shrink-0">
+              {(conv.unreadCount ?? 0) > 0 && (
+                <span className="bg-blue-500 text-white text-xs px-1.5 py-0.5 rounded-full">
+                  {conv.unreadCount}
+                </span>
+              )}
+              <span className="text-xs text-gray-500">
+                {formatTime(conv.lastMessageAt)}
+              </span>
+            </div>
           </div>
           <p className="text-sm truncate text-gray-500">
             {conv.lastMessageContent ?? 'No messages yet'}
           </p>
-          {conv.ticketStatus && (
-            <span className={`text-xs font-medium mt-0.5 inline-block px-1.5 py-0.5 rounded-full ${
-              conv.ticketStatus === 'queued'
-                ? 'bg-yellow-100 text-yellow-700'
-                : conv.ticketStatus === 'assigned'
-                ? 'bg-blue-100 text-blue-700'
-                : 'bg-green-100 text-green-700'
-            }`}>
-              {conv.ticketStatus}
+          {conv.status && (
+            <span className={`text-xs font-medium mt-0.5 inline-block px-1.5 py-0.5 rounded-full ${statusBadge(conv.status)}`}>
+              {statusLabel(conv.status)}
             </span>
           )}
         </div>
@@ -248,50 +350,60 @@ export function StaffChatPage() {
 
   const [tab, setTab] = useState<'queue' | 'assigned'>('assigned')
   const [searchTerm, setSearchTerm] = useState('')
+  const [assignConfirmConv, setAssignConfirmConv] = useState<IConversation | null>(null)
 
   const queueQuery = useChatQueue(currentOrgId ?? undefined)
   const assignedQuery = useChatAssigned()
   const assignMutation = useAssignConversation()
 
-  const rawQueue = queueQuery.data
-  const rawAssigned = assignedQuery.data
+  // Keep conversation list up-to-date via socket events
+  useConversationUpdates()
 
-  // Guard: data may be a cached object {conversations:[]} or an array — always normalise to array
-  const toArr = (d: unknown): IConversation[] => {
-    if (Array.isArray(d)) return d
-    if (d && typeof d === 'object' && 'conversations' in d) {
-      const inner = (d as { conversations: unknown }).conversations
-      if (Array.isArray(inner)) return inner
-    }
-    return []
-  }
+  const queueList: Array<IConversation> = Array.isArray(queueQuery.data) ? queueQuery.data : []
+  const assignedList: Array<IConversation> = Array.isArray(assignedQuery.data) ? assignedQuery.data : []
 
-  const conversations = tab === 'queue' ? toArr(rawQueue) : toArr(rawAssigned)
-
+  const conversations = tab === 'queue' ? queueList : assignedList
   const isLoadingList = tab === 'queue' ? queueQuery.isLoading : assignedQuery.isLoading
 
   const filtered = conversations.filter((c) => {
-
     if (!searchTerm) return true
-    return c.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    const name = (c.partner?.displayName ?? c.partner?.email ?? '').toLowerCase()
+    return (
+      name.includes(searchTerm.toLowerCase()) ||
+      c.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
       (c.lastMessageContent ?? '').toLowerCase().includes(searchTerm.toLowerCase())
+    )
   })
 
   function handleSelect(conv: IConversation) {
-    setActiveConversationId(conv.id)
+    if (tab === 'queue') {
+      setAssignConfirmConv(conv)
+    } else {
+      setActiveConversationId(conv.id)
+    }
   }
 
-  function handleTakeFromQueue(conv: IConversation) {
-    assignMutation.mutate(conv.id, {
+  function handleConfirmAssign() {
+    if (!assignConfirmConv) return
+    assignMutation.mutate(assignConfirmConv.id, {
       onSuccess: () => {
+        setAssignConfirmConv(null)
         setTab('assigned')
-        setActiveConversationId(conv.id)
+        setActiveConversationId(assignConfirmConv.id)
       },
     })
   }
 
   return (
     <StaffLayout>
+      {assignConfirmConv && (
+        <AssignConfirmDialog
+          conv={assignConfirmConv}
+          isPending={assignMutation.isPending}
+          onConfirm={handleConfirmAssign}
+          onCancel={() => setAssignConfirmConv(null)}
+        />
+      )}
       <div className="h-[calc(100vh-4rem)] flex">
         {/* ── Left pane — conversation list ── */}
         <div className="w-96 border-r border-gray-200 bg-white flex flex-col">
@@ -341,9 +453,9 @@ export function StaffChatPage() {
                 }`}
               >
                 Queue
-                {(queueQuery.data?.length ?? 0) > 0 && (
+                {queueList.length > 0 && (
                   <span className="ml-1.5 bg-yellow-500 text-white text-xs px-1.5 py-0.5 rounded-full">
-                    {queueQuery.data?.length}
+                    {queueList.length}
                   </span>
                 )}
               </button>
@@ -365,24 +477,12 @@ export function StaffChatPage() {
               </div>
             ) : (
               filtered.map((conv, idx) => (
-                <div key={conv.id ?? String(idx)}>
-                  <ConvItem
-                    conv={conv}
-                    isActive={activeConversationId === conv.id}
-                    onSelect={() => handleSelect(conv)}
-                  />
-                  {tab === 'queue' && (
-                    <div className="px-4 pb-2">
-                      <button
-                        onClick={() => handleTakeFromQueue(conv)}
-                        disabled={assignMutation.isPending}
-                        className="w-full py-1 text-xs font-medium text-blue-600 border border-blue-300 rounded-lg hover:bg-blue-50 transition-colors disabled:opacity-50"
-                      >
-                        {assignMutation.isPending ? 'Assigning…' : 'Take this chat'}
-                      </button>
-                    </div>
-                  )}
-                </div>
+                <ConvItem
+                  key={conv.id ?? String(idx)}
+                  conv={conv}
+                  isActive={activeConversationId === conv.id}
+                  onSelect={() => handleSelect(conv)}
+                />
               ))
             )}
           </div>
@@ -390,7 +490,7 @@ export function StaffChatPage() {
 
         {/* ── Right pane — active conversation ── */}
         <div className="flex-1 flex flex-col bg-white">
-          {activeConversationId ? (
+          {activeConversationId && assignedList.some((c) => c.id === activeConversationId) ? (
             <>
               {/* Chat header */}
               <div className="p-4 border-b border-gray-200 flex items-center justify-between">

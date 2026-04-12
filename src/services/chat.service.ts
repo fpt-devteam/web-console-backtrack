@@ -1,6 +1,10 @@
-import { privateClient } from '@/lib/api-client';
 import type { ApiResponse } from '@/types/api-response.type';
-import type { IConversation, MessageListResponse } from '@/types/chat.types';
+import type {
+  ConversationListResponse,
+  IConversation,
+  MessageListResponse,
+} from '@/types/chat.types';
+import { privateClient } from '@/lib/api-client';
 
 const BASE = '/api/chat';
 
@@ -12,6 +16,11 @@ interface RawConversation {
   id?: string;
   type?: string;
   orgId?: string | null;
+  orgName?: string | null;
+  orgSlug?: string | null;
+  orgLogoUrl?: string | null;
+  assignedStaffId?: string | null;
+  status?: string;
   partner?: {
     id: string;
     displayName: string | null;
@@ -24,7 +33,6 @@ interface RawConversation {
     timestamp: string | null;
   } | null;
   unreadCount?: number;
-  ticketStatus?: string;
   createdAt?: string;
   updatedAt?: string;
   deletedAt?: string | null;
@@ -33,8 +41,8 @@ interface RawConversation {
 /**
  * Normalise the raw backend ConversationResponse into the frontend IConversation.
  * Handles two backend shapes:
- *   1. Queue/assigned lists  → { conversationId, type, partner, lastMessage, … }
- *   2. Single GET / assign   → { conversation: { conversationId, … } }
+ *   1. List responses   → { conversationId, type, partner, lastMessage, … }
+ *   2. Single GET/assign → { conversation: { conversationId, … } }
  */
 function normalizeConv(raw: unknown): IConversation {
   const obj = (
@@ -44,69 +52,90 @@ function normalizeConv(raw: unknown): IConversation {
   ) as RawConversation;
 
   return {
-    id: (obj.conversationId ?? obj._id ?? obj.id ?? '') as string,
+    id: (obj.conversationId ?? obj._id ?? obj.id ?? ''),
     type: obj.type as IConversation['type'],
     orgId: obj.orgId ?? null,
+    orgName: obj.orgName ?? null,
+    orgSlug: obj.orgSlug ?? null,
+    orgLogoUrl: obj.orgLogoUrl ?? null,
+    assignedStaffId: obj.assignedStaffId ?? null,
     partner: obj.partner ?? null,
     lastMessage: obj.lastMessage ?? null,
     lastMessageAt: obj.lastMessage?.timestamp ?? null,
     lastMessageContent: obj.lastMessage?.content ?? null,
     unreadCount: obj.unreadCount ?? 0,
-    ticketStatus: obj.ticketStatus as IConversation['ticketStatus'],
-    createdAt: (obj.createdAt ?? '') as string,
-    updatedAt: (obj.updatedAt ?? '') as string,
+    status: obj.status as IConversation['status'],
+    createdAt: (obj.createdAt ?? ''),
+    updatedAt: (obj.updatedAt ?? ''),
     deletedAt: obj.deletedAt ?? null,
   };
 }
 
-/** Normalise either a plain array or a `{ conversations: [] }` wrapper. */
-function toArray(data: unknown): IConversation[] {
-  if (!data) return [];
-  const items: unknown[] = Array.isArray(data)
+interface RawListPayload {
+  conversations?: Array<unknown>;
+  nextCursor?: string | null;
+  hasMore?: boolean;
+}
+
+/** Normalise a `{ conversations, nextCursor, hasMore }` wrapper or plain array. */
+function toList(data: unknown): ConversationListResponse {
+  if (!data) return { conversations: [] };
+  const items: Array<unknown> = Array.isArray(data)
     ? data
-    : ((data as { conversations?: unknown[] }).conversations ?? []);
-  return items.map(normalizeConv);
+    : ((data as RawListPayload).conversations ?? []);
+  const payload = data as RawListPayload;
+  return {
+    conversations: items.map(normalizeConv),
+    nextCursor: payload.nextCursor ?? null,
+    hasMore: payload.hasMore ?? false,
+  };
 }
 
 
 export const chatService = {
+  // ── Support conversation ────────────────────────────────
+
+  /**
+   * Create or find an active support conversation with the given organisation.
+   * If an active conversation already exists for the current user + org, it is returned.
+   */
+  async createOrFindConversation(orgId: string): Promise<IConversation> {
+    const { data } = await privateClient.post<ApiResponse<unknown>>(
+      `${BASE}/conversations/organization`,
+      { orgId }
+    );
+    if (!data.success) throw new Error(data.error?.message ?? 'Failed to create conversation');
+    return normalizeConv(data.data);
+  },
+
   // ── Queue ──────────────────────────────────────────────
 
   /**
-   * Get all conversations in the org queue (not yet assigned).
-   *
-   * [B1 FIX] Backend constant `Constants.HEADERS.ORG_ID = 'x-org-id'`.
-   * The correct request header is therefore `X-Org-Id`.
+   * List support conversations currently waiting in queue for the caller's org.
+   * Requires X-Org-Id header (injected automatically by the Axios interceptor).
    */
-  async listQueue(orgId?: string): Promise<IConversation[]> {
+  async listQueue(orgId?: string): Promise<Array<IConversation>> {
     const { data } = await privateClient.get<ApiResponse<unknown>>(
-      `${BASE}/conversations/queue/staff`,
+      `${BASE}/conversations/organization/queue`,
       {
         headers: orgId ? { 'X-Org-Id': orgId } : undefined,
       }
     );
     if (!data.success) throw new Error(data.error?.message ?? 'Failed to fetch queue');
-    return toArray(data.data);
+    return toList(data.data).conversations;
   },
 
-
-  /** Get conversations currently assigned to the authenticated staff. */
-  async listAssigned(): Promise<IConversation[]> {
+  /** List conversations currently assigned to the authenticated staff member. */
+  async listAssigned(): Promise<Array<IConversation>> {
     const { data } = await privateClient.get<ApiResponse<unknown>>(
-      `${BASE}/conversations/assigned/staff`
+      `${BASE}/conversations/organization/assigned`
     );
     if (!data.success) throw new Error(data.error?.message ?? 'Failed to fetch assigned conversations');
-    return toArray(data.data);
+    return toList(data.data).conversations;
   },
 
   // ── Conversation detail ─────────────────────────────────
 
-  /**
-   * Get a single conversation by ID.
-   *
-   * [B3 FIX] Backend wraps the object: { success, data: { conversation: … } }.
-   * normalizeConv automatically unwraps the inner `conversation` key.
-   */
   async getConversation(conversationId: string): Promise<IConversation> {
     const { data } = await privateClient.get<ApiResponse<unknown>>(
       `${BASE}/conversations/${conversationId}`
@@ -117,30 +146,23 @@ export const chatService = {
 
   // ── Messages ────────────────────────────────────────────
 
-  /** Get messages for a conversation (most recent first, cursor-based pagination). */
+  /** Get messages for a conversation (newest first, cursor-based pagination). */
   async getMessages(
     conversationId: string,
     params?: { cursor?: string; limit?: number }
   ): Promise<MessageListResponse> {
     const { data } = await privateClient.get<ApiResponse<MessageListResponse>>(
-      // Backend (chat-service) exposes messages at: GET /api/chat/messages/:conversationId
-      `${BASE}/messages/${conversationId}`,
+      `${BASE}/conversations/${conversationId}/messages`,
       { params: { ...params } }
     );
     if (!data.success) throw new Error(data.error?.message ?? 'Failed to fetch messages');
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
     return data.data ?? { messages: [] };
   },
 
-
-
   // ── Assignment actions ──────────────────────────────────
 
-  /**
-   * Staff assigns themselves to a conversation from the queue.
-   *
-   * [B4 FIX] Backend wraps response: { success, data: { conversation: … } }.
-   * normalizeConv automatically unwraps.
-   */
+  /** Staff assigns themselves to a queued conversation. */
   async assignSelf(conversationId: string): Promise<IConversation> {
     const { data } = await privateClient.post<ApiResponse<unknown>>(
       `${BASE}/conversations/${conversationId}/assign-staff`
