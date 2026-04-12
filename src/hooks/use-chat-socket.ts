@@ -1,12 +1,15 @@
 import { useCallback, useEffect, useRef } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
-import { useChatContext } from '@/contexts/chat.context';
 import { chatKeys } from './use-chat';
 import type {
   IMessage,
-  WSSendMessagePayload,
+  WSConversationUpdatedEvent,
   WSMessageSendSuccess,
+  WSSendSupportMessagePayload,
 } from '@/types/chat.types';
+import { useChatContext } from '@/contexts/chat.context';
+import { auth } from '@/lib/firebase';
+import { MessageType } from '@/types/chat.types';
 
 // ── useIncomingMessages ─────────────────────────────────
 
@@ -28,14 +31,15 @@ export function useIncomingMessages(conversationId: string | null) {
 
       // Prepend to first (newest) page of the infinite query
       queryClient.setQueryData(
-        chatKeys.messages(conversationId!),
-        (old: { pages: { messages: IMessage[] }[] } | undefined) => {
+        chatKeys.messages(conversationId),
+        (old: { pages: Array<{ messages: Array<IMessage> }> } | undefined) => {
           if (!old) return old;
           const [firstPage, ...rest] = old.pages;
           return {
             ...old,
             pages: [
-              { ...firstPage, messages: [msg, ...(firstPage?.messages ?? [])] },
+              // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+              { ...firstPage, messages: [msg, ...(firstPage.messages ?? [])] },
               ...rest,
             ],
           };
@@ -51,9 +55,9 @@ export function useIncomingMessages(conversationId: string | null) {
 // ── useSendMessage ─────────────────────────────────────
 
 /**
- * Returns a `send` function that emits a `message:send` WS event.
- * On `message:send:success` the returned message is injected into cache.
- * On `message:send:error` the optional `onError` callback is called.
+ * Returns a `send` function that emits a `message:send:support` WS event.
+ * On `message:send:support:success` the returned message is injected into cache.
+ * On `message:send:support:error` the optional `onError` callback is called.
  */
 export function useSendMessage(options?: {
   onSuccess?: (data: WSMessageSendSuccess) => void;
@@ -70,14 +74,10 @@ export function useSendMessage(options?: {
     function handleSuccess(data: WSMessageSendSuccess) {
       const { conversationId, message } = data;
 
-      // Inject sent message into cache.
-      // If the infinite query hasn't fetched yet (old === undefined),
-      // seed it with an initial page so the message is visible immediately.
       queryClient.setQueryData(
         chatKeys.messages(conversationId),
-        (old: { pages: { messages: IMessage[] }[]; pageParams: unknown[] } | undefined) => {
+        (old: { pages: Array<{ messages: Array<IMessage> }>; pageParams: unknown[] } | undefined) => {
           if (!old) {
-            // No pages yet — create the first page
             return {
               pages: [{ messages: [message], nextCursor: null }],
               pageParams: [undefined],
@@ -87,7 +87,8 @@ export function useSendMessage(options?: {
           return {
             ...old,
             pages: [
-              { ...firstPage, messages: [message, ...(firstPage?.messages ?? [])] },
+              // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+              { ...firstPage, messages: [message, ...(firstPage.messages ?? [])] },
               ...rest,
             ],
           };
@@ -101,28 +102,34 @@ export function useSendMessage(options?: {
       optionsRef.current?.onError?.(err);
     }
 
-    socket.on('message:send:success', handleSuccess);
-    socket.on('message:send:error', handleError);
+    socket.on('message:send:support:success', handleSuccess);
+    socket.on('message:send:support:error', handleError);
 
     return () => {
-      socket.off('message:send:success', handleSuccess);
-      socket.off('message:send:error', handleError);
+      socket.off('message:send:support:success', handleSuccess);
+      socket.off('message:send:support:error', handleError);
     };
   }, [socket, queryClient]);
 
   const send = useCallback(
-    (payload: WSSendMessagePayload) => {
+    (payload: Omit<WSSendSupportMessagePayload, 'conversationId'> & { conversationId?: string }) => {
       if (!socket?.connected) {
         console.warn('[useSendMessage] Socket not connected');
         return;
       }
-      // Fill conversationId from context if sending to current room
-      const finalPayload: WSSendMessagePayload =
-        !payload.conversationId && !payload.recipientId && !payload.orgId && activeConversationId
-          ? { ...payload, conversationId: activeConversationId }
-          : payload;
+      const conversationId = payload.conversationId ?? activeConversationId;
+      if (!conversationId) {
+        console.warn('[useSendMessage] No conversationId');
+        return;
+      }
+      const finalPayload: WSSendSupportMessagePayload = {
+        conversationId,
+        type: payload.type ?? MessageType.TEXT,
+        content: payload.content,
+        attachments: payload.attachments,
+      };
 
-      socket.emit('message:send', finalPayload);
+      socket.emit('message:send:support', finalPayload);
     },
     [socket, activeConversationId]
   );
@@ -135,6 +142,7 @@ export function useSendMessage(options?: {
 /**
  * Returns `startTyping` / `stopTyping` helpers that emit WS events,
  * with debounce so `stopTyping` fires automatically after 3 s of silence.
+ * Includes the current user's displayName in the payload per API spec.
  */
 export function useTypingIndicator() {
   const { socket, activeConversationId } = useChatContext();
@@ -143,19 +151,23 @@ export function useTypingIndicator() {
   const stopTyping = useCallback(() => {
     if (!socket?.connected || !activeConversationId) return;
     if (stopTimer.current) { clearTimeout(stopTimer.current); stopTimer.current = null; }
-    socket.emit('typing:stop', { conversationId: activeConversationId });
+    socket.emit('typing:stop', {
+      conversationId: activeConversationId,
+      displayName: auth.currentUser?.displayName ?? undefined,
+    });
   }, [socket, activeConversationId]);
 
   const startTyping = useCallback(() => {
     if (!socket?.connected || !activeConversationId) return;
-    socket.emit('typing:start', { conversationId: activeConversationId });
+    socket.emit('typing:start', {
+      conversationId: activeConversationId,
+      displayName: auth.currentUser?.displayName ?? undefined,
+    });
 
-    // Auto-stop after 3 seconds
     if (stopTimer.current) clearTimeout(stopTimer.current);
     stopTimer.current = setTimeout(stopTyping, 3000);
   }, [socket, activeConversationId, stopTyping]);
 
-  // Cleanup on unmount
   useEffect(() => {
     return () => {
       if (stopTimer.current) clearTimeout(stopTimer.current);
@@ -178,4 +190,56 @@ export function useMarkSeen() {
     },
     [socket]
   );
+}
+
+// ── useConversationUpdates ─────────────────────────────
+
+/**
+ * Listen to `conversation:updated` events pushed to the user's personal room.
+ * Updates the conversation's lastMessage and unreadCount in the React Query cache
+ * for both queue and assigned lists without requiring a full refetch.
+ *
+ * Mount once at the chat page level.
+ */
+export function useConversationUpdates() {
+  const { socket } = useChatContext();
+  const queryClient = useQueryClient();
+
+  useEffect(() => {
+    if (!socket) return;
+
+    function handleConversationUpdated(event: WSConversationUpdatedEvent) {
+      const { conversationId, unreadCount, lastMessage } = event;
+
+      type ConvEntry = { id?: string; unreadCount?: number; lastMessage?: unknown; lastMessageAt?: string; lastMessageContent?: string };
+
+      // Patch both queue and assigned caches in-place
+      const patchList = (queryKey: ReadonlyArray<unknown>) => {
+        queryClient.setQueryData(
+          queryKey,
+          (old: Array<ConvEntry> | undefined) => {
+            if (!Array.isArray(old)) return old;
+            return old.map((conv) => {
+              if (conv.id !== conversationId) return conv;
+              return {
+                ...conv,
+                unreadCount,
+                ...(lastMessage != null && {
+                  lastMessage,
+                  lastMessageAt: lastMessage.timestamp,
+                  lastMessageContent: lastMessage.content,
+                }),
+              };
+            });
+          }
+        );
+      };
+
+      patchList(chatKeys.queue());
+      patchList(chatKeys.assigned());
+    }
+
+    socket.on('conversation:updated', handleConversationUpdated);
+    return () => { socket.off('conversation:updated', handleConversationUpdated); };
+  }, [socket, queryClient]);
 }
