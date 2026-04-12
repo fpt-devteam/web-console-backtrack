@@ -5,6 +5,7 @@ import { orgService } from '@/services/org.service'
 import { ORG_KEYS } from '@/hooks/use-org'
 import { persistActiveOrgIdForSession, requireSignedIn } from '@/lib/route-guards'
 import { useCurrentOrgId } from '@/contexts/current-org.context'
+import { ChatProvider } from '@/contexts/chat.context'
 import type { Organization } from '@/types/organization.types'
 
 export const Route = createFileRoute('/console/$slug')({
@@ -47,5 +48,9 @@ function OrgShell() {
     setCurrentOrgId(currentOrg.id)
   }, [currentOrg.id, setCurrentOrgId])
 
-  return <Outlet />
+  return (
+    <ChatProvider>
+      <Outlet />
+    </ChatProvider>
+  )
 }

@@ -103,6 +103,12 @@ export interface GetInventoryParams {
   query?: string
   status?: PostStatus
   category?: ItemCategory
+  color?: string
+  brand?: string
+  fromDate?: string
+  toDate?: string
+  intakeStaffId?: string
+  returnStaffId?: string
 }
 
 /** Shape returned by BE POST /post-image/analyze */
@@ -120,7 +126,16 @@ export interface AnalyzeImageResult {
 
 type SearchInventoriesBody = {
   query?: string
-  filters?: { status?: PostStatus; category?: ItemCategory }
+  filters?: {
+    status?: PostStatus
+    category?: ItemCategory
+    color?: string
+    brand?: string
+    fromDate?: string
+    toDate?: string
+    intakeStaffId?: string
+    returnStaffId?: string
+  }
   page?: number
   pageSize?: number
 }
@@ -157,13 +172,30 @@ export const inventoryService = {
       filters: {
         status: params?.status ?? undefined,
         category: params?.category ?? undefined,
+        color: params?.color?.trim() || undefined,
+        brand: params?.brand?.trim() || undefined,
+        fromDate: params?.fromDate || undefined,
+        toDate: params?.toDate || undefined,
+        intakeStaffId: params?.intakeStaffId?.trim() || undefined,
+        returnStaffId: params?.returnStaffId?.trim() || undefined,
       },
       page: params?.page ?? 1,
       pageSize: params?.pageSize ?? 10,
     }
 
     // Keep payload minimal (avoid sending empty filters)
-    if (!body.filters?.status && !body.filters?.category) delete body.filters
+    if (
+      !body.filters?.status &&
+      !body.filters?.category &&
+      !body.filters?.color &&
+      !body.filters?.brand &&
+      !body.filters?.fromDate &&
+      !body.filters?.toDate &&
+      !body.filters?.intakeStaffId &&
+      !body.filters?.returnStaffId
+    ) {
+      delete body.filters
+    }
 
     const { data } = await privateClient.post<ApiResponse<PagedResponse<InventoryPost>>>(
       `/api/core/orgs/${orgId}/inventory/search`,

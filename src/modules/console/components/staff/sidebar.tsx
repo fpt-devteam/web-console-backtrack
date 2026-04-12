@@ -1,4 +1,4 @@
-import { Package, FileText, MessageCircle, Bell, ChevronLeft, ChevronRight, ArrowLeftRight } from 'lucide-react';
+import { Package, FileText, MessageCircle, Bell, ChevronLeft, ChevronRight, ArrowLeftRight, History } from 'lucide-react';
 import { OrgLogo } from '@/components/org-logo';
 import { Link, useLocation, useParams } from '@tanstack/react-router';
 import { useCurrentOrgId } from '@/contexts/current-org.context';
@@ -32,6 +32,7 @@ export function StaffSidebar({ isOpen, onToggle }: StaffSidebarProps) {
     { name: 'Inventory', icon: Package, path: `${base}/staff/inventory` },
     { name: 'Feed', icon: FileText, path: `${base}/staff/feed` },
     { name: 'Chat', icon: MessageCircle, path: `${base}/staff/chat` },
+    { name: 'History', icon: History, path: `${base}/staff/history` },
     { name: 'Notification', icon: Bell, path: `${base}/staff/notification` },
   ];
 
@@ -39,7 +40,7 @@ export function StaffSidebar({ isOpen, onToggle }: StaffSidebarProps) {
     const currentPath = location.pathname;
     if (currentPath === path) return true;
     if (path === `${base}/staff/inventory`) {
-      return currentPath === path || currentPath.startsWith(`${base}/staff/inventory`) || currentPath.startsWith(`${base}/staff/item`);
+      return (currentPath === path || currentPath.startsWith(`${base}/staff/inventory`) || currentPath.startsWith(`${base}/staff/item`)) && !currentPath.startsWith(`${base}/staff/history`);
     }
     return false;
   };
