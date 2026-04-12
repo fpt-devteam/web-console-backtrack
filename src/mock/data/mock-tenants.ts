@@ -116,6 +116,8 @@ export interface Tenant {
    * Backward compat (older UI used taxId). Prefer taxIdentificationNumber.
    */
   taxId?: string;
+  /** Org logo URL (e.g. public URL or data URL) */
+  logoUrl?: string;
   subscriptionPlan?: SubscriptionPlan;
   usageOverview?: UsageOverview;
   enabledModules?: EnabledModule[];
@@ -165,6 +167,7 @@ export const mockTenants: Tenant[] = [
     lastActivity: new Date(Date.now() - 2 * 60 * 1000), // 2 mins ago
     avatarColor: 'bg-gray-200',
     avatarText: 'AME',
+    logoUrl: 'https://picsum.photos/seed/acme-org-logo/128/128',
     taxIdentificationNumber: 'US-84-39201',
     taxId: 'US-84-39201',
     subscriptionPlan: {

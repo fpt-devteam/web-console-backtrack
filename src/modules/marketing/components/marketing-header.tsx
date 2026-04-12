@@ -2,7 +2,7 @@ import { Link } from '@tanstack/react-router';
 import { Button } from '@/components/ui/button';
 import { Menu, X } from 'lucide-react';
 import { useState } from 'react';
-import logo from '@/assets/logo.png';
+import logo from '@/assets/backtrack-logo.svg';
 
 export function MarketingHeader() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -12,11 +12,12 @@ export function MarketingHeader() {
       <div className="max-w-8xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
-          <Link to="/" className="flex items-center gap-3 hover:opacity-80 transition-opacity">
-            <img src={logo} alt="Backtrack Logo" className="h-10 w-auto" />
-            <span className="text-xl font-bold ">
-              Backtrack Enterprise
-            </span>
+          <Link to="/" className="flex items-center hover:opacity-80 transition-opacity">
+            <img
+              src={logo}
+              alt="Backtrack"
+              className="h-9 w-auto max-w-[min(100%,200px)] sm:h-10 object-contain object-left"
+            />
           </Link>
 
           {/* Desktop Navigation */}

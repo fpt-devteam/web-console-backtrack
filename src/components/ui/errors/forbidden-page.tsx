@@ -6,6 +6,7 @@ import type { ErrorComponentProps } from '@tanstack/react-router';
 const MESSAGES: Record<string, string> = {
   FORBIDDEN_ORG_ADMIN: 'You need OrgAdmin privileges to access this page.',
   FORBIDDEN_ORG_STAFF: 'You need OrgStaff membership to access this page.',
+  FORBIDDEN_ORG_NOT_MEMBER: 'You are not a member of this organization.',
   FORBIDDEN_SUPER_ADMIN: 'Super-admin access is required.',
 };
 

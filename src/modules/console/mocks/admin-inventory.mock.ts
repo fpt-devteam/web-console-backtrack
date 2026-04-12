@@ -1,8 +1,20 @@
-import type { InventoryItem } from '@/services/inventory.service';
-
 export const ADMIN_MOCK_ORG_ID = '00000000-0000-0000-0000-000000000001';
 
-export const MOCK_ADMIN_INVENTORY_ITEMS: InventoryItem[] = [
+export type AdminInventoryItemMock = {
+  id: string;
+  orgId: string;
+  loggedById: string;
+  itemName: string;
+  description: string;
+  distinctiveMarks?: string | null;
+  imageUrls: string[];
+  storageLocation?: string | null;
+  status: string;
+  loggedAt: string;
+  createdAt: string;
+};
+
+export const MOCK_ADMIN_INVENTORY_ITEMS: AdminInventoryItemMock[] = [
   {
     id: 'a1000000-0000-4000-8000-000000000001',
     orgId: ADMIN_MOCK_ORG_ID,
@@ -139,7 +151,7 @@ function normalize(s: string) {
   return s.toLowerCase().trim();
 }
 
-function matchesSearch(item: InventoryItem, q: string) {
+function matchesSearch(item: AdminInventoryItemMock, q: string) {
   if (!q) return true;
   const n = normalize(q);
   return (
@@ -158,7 +170,7 @@ export interface MockAdminInventoryQuery {
 }
 
 export function queryMockAdminInventory(params: MockAdminInventoryQuery): {
-  items: InventoryItem[];
+  items: AdminInventoryItemMock[];
   totalCount: number;
 } {
   let list = [...MOCK_ADMIN_INVENTORY_ITEMS];
@@ -181,6 +193,6 @@ export function queryMockAdminInventory(params: MockAdminInventoryQuery): {
   return { items, totalCount };
 }
 
-export function getMockAdminInventoryById(id: string): InventoryItem | undefined {
+export function getMockAdminInventoryById(id: string): AdminInventoryItemMock | undefined {
   return MOCK_ADMIN_INVENTORY_ITEMS.find((i) => i.id === id);
 }

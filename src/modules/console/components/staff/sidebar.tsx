@@ -1,5 +1,6 @@
-import { Package, FileText, MessageCircle, Bell, Building2, ChevronLeft, ChevronRight, ArrowLeftRight } from 'lucide-react';
-import { Link, useLocation } from '@tanstack/react-router';
+import { Package, FileText, MessageCircle, Bell, ChevronLeft, ChevronRight, ArrowLeftRight, History } from 'lucide-react';
+import { OrgLogo } from '@/components/org-logo';
+import { Link, useLocation, useParams } from '@tanstack/react-router';
 import { useCurrentOrgId } from '@/contexts/current-org.context';
 import { useOrganization } from '@/hooks/use-org';
 import { useCurrentUser } from '@/hooks/use-auth';
@@ -16,26 +17,30 @@ interface StaffSidebarProps {
   onToggle: () => void;
 }
 
-const menuItems = [
-  { name: 'Inventory', icon: Package, path: '/console/staff/inventory' },
-  { name: 'Feed', icon: FileText, path: '/console/staff/feed' },
-  { name: 'Chat', icon: MessageCircle, path: '/console/staff/chat' },
-  { name: 'Notification', icon: Bell, path: '/console/staff/notification' },
-];
-
 export function StaffSidebar({ isOpen, onToggle }: StaffSidebarProps) {
   const location = useLocation();
+  const { slug } = useParams({ strict: false }) as { slug?: string };
   const { currentOrgId } = useCurrentOrgId();
   const { data: org } = useOrganization(currentOrgId);
   const { data: user } = useCurrentUser();
   const userInitials = getInitials(user?.name);
   const userDisplayName = user?.name || user?.email || 'User';
 
+  const base = `/console/${slug ?? org?.slug ?? ''}`;
+
+  const menuItems = [
+    { name: 'Inventory', icon: Package, path: `${base}/staff/inventory` },
+    { name: 'Feed', icon: FileText, path: `${base}/staff/feed` },
+    { name: 'Chat', icon: MessageCircle, path: `${base}/staff/chat` },
+    { name: 'History', icon: History, path: `${base}/staff/history` },
+    { name: 'Notification', icon: Bell, path: `${base}/staff/notification` },
+  ];
+
   const isActive = (path: string) => {
     const currentPath = location.pathname;
     if (currentPath === path) return true;
-    if (path === '/console/staff/inventory') {
-      return currentPath === path || currentPath.startsWith('/console/staff/inventory') || currentPath.startsWith('/console/staff/item');
+    if (path === `${base}/staff/inventory`) {
+      return (currentPath === path || currentPath.startsWith(`${base}/staff/inventory`) || currentPath.startsWith(`${base}/staff/item`)) && !currentPath.startsWith(`${base}/staff/history`);
     }
     return false;
   };
@@ -49,9 +54,7 @@ export function StaffSidebar({ isOpen, onToggle }: StaffSidebarProps) {
       {/* Header: Org + Toggle */}
       <div className="flex items-center gap-3 px-4 py-6 border-b border-gray-200 relative">
         <div className="flex items-center gap-3 flex-1 min-w-0">
-          <div className="w-10 h-10 bg-blue-500 rounded-full flex items-center justify-center flex-shrink-0">
-            <Building2 className="w-6 h-6 text-white" />
-          </div>
+          <OrgLogo logoUrl={org?.logoUrl} alt={org?.name ?? 'Organization'} className="h-10 w-10 flex-shrink-0" />
           <div className={`min-w-0 transition-all duration-300 ${isOpen ? 'opacity-100' : 'w-0 opacity-0 overflow-hidden'}`}>
             <h1 className="font-bold text-xl tracking-wide whitespace-nowrap truncate" title={org?.name}>
               {org?.name ?? 'Staff'}

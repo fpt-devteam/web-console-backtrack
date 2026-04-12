@@ -13,8 +13,14 @@ export const userService = {
   async getMe(): Promise<UserProfile> {
     const { data } = await privateClient.get<ApiResponse<UserProfile>>('/api/core/users/me');
     if (!data.success) throw new Error(data.error?.message ?? 'Failed to fetch user profile');
-    const d = data.data as UserProfile;
-    return { ...d, name: d.displayName ?? d.name ?? null };
+    // BE payloads may vary (id vs userId vs uid). Normalize to `UserProfile.id`.
+    const raw = data.data as unknown as Record<string, unknown>;
+    const id =
+      (raw?.id as string | undefined) ??
+      (raw?.userId as string | undefined) ??
+      (raw?.uid as string | undefined);
+    const d = raw as unknown as UserProfile;
+    return { ...d, id: id ?? d.id, name: d.displayName ?? d.name ?? null };
   },
 
   async upsertUser(): Promise<UserProfile> {

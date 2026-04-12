@@ -2,22 +2,65 @@ import { privateClient } from '@/lib/api-client'
 import type { ApiResponse } from '@/types/api-response.type'
 import type { PagedResponse } from '@/types/pagination.type'
 
-export interface InventoryItem {
-  id: string
-  orgId: string
-  loggedById: string
+export type PostStatus =
+  | 'Active'
+  | 'InStorage'
+  | 'ReturnScheduled'
+  | 'Returned'
+  | 'Archived'
+  | 'Expired'
+
+export type PostType = 'Lost' | 'Found'
+
+export type ItemCategory =
+  | 'Electronics'
+  | 'Clothing'
+  | 'Accessories'
+  | 'Documents'
+  | 'Wallet'
+  | 'Suitcase'
+  | 'Bags'
+  | 'Keys'
+  | 'Other'
+
+export interface PostItem {
   itemName: string
-  description: string
+  category: ItemCategory
+  color?: string | null
+  brand?: string | null
+  condition?: string | null
+  material?: string | null
+  size?: string | null
   distinctiveMarks?: string | null
-  imageUrls: string[]
-  storageLocation?: string | null
-  status: string
-  loggedAt: string
-  createdAt: string
+  additionalDetails?: string | null
 }
 
-export interface InventorySemanticResult extends InventoryItem {
-  similarityScore: number
+export interface PostAuthorResult {
+  id: string
+  displayName?: string | null
+  avatarUrl?: string | null
+}
+
+export interface InventoryPost {
+  id: string
+  postType: PostType
+  status: PostStatus
+  item: PostItem
+  imageUrls: string[]
+  location?: { latitude: number; longitude: number } | null
+  displayAddress?: string | null
+  externalPlaceId?: string | null
+  eventTime?: string | null
+  createdAt: string
+  author?: PostAuthorResult | null
+  organization?: { id: string; name: string; slug: string } | null
+  finderInfo?: {
+    finderName?: string | null
+    email?: string | null
+    phone?: string | null
+    nationalId?: string | null
+    orgMemberId?: string | null
+  } | null
 }
 
 export interface CreateInventoryPayload {
@@ -25,7 +68,19 @@ export interface CreateInventoryPayload {
   description: string
   distinctiveMarks?: string | null
   imageUrls?: string[]
-  storageLocation?: string | null
+  category?: ItemCategory
+  color?: string | null
+  brand?: string | null
+  condition?: string | null
+  material?: string | null
+  size?: string | null
+  finderInfo?: {
+    finderName?: string | null
+    email?: string | null
+    phone?: string | null
+    nationalId?: string | null
+    orgMemberId?: string | null
+  } | null
 }
 
 export interface UpdateInventoryPayload {
@@ -33,54 +88,162 @@ export interface UpdateInventoryPayload {
   description?: string
   distinctiveMarks?: string | null
   imageUrls?: string[]
-  storageLocation?: string | null
-  status?: string
+  category?: ItemCategory
+  color?: string | null
+  brand?: string | null
+  condition?: string | null
+  material?: string | null
+  size?: string | null
+  status?: PostStatus
 }
 
 export interface GetInventoryParams {
   page?: number
   pageSize?: number
-  searchTerm?: string
-  status?: string
+  query?: string
+  status?: PostStatus
+  category?: ItemCategory
+  color?: string
+  brand?: string
+  fromDate?: string
+  toDate?: string
+  intakeStaffId?: string
+  returnStaffId?: string
 }
 
-export interface SearchInventorySemanticParams {
-  searchText: string
+/** Shape returned by BE POST /post-image/analyze */
+export interface AnalyzeImageResult {
+  itemName?: string | null
+  category?: ItemCategory | null
+  color?: string | null
+  brand?: string | null
+  condition?: string | null
+  material?: string | null
+  size?: string | null
+  distinctiveMarks?: string | null
+  additionalDetails?: string | null
+}
+
+type SearchInventoriesBody = {
+  query?: string
+  filters?: {
+    status?: PostStatus
+    category?: ItemCategory
+    color?: string
+    brand?: string
+    fromDate?: string
+    toDate?: string
+    intakeStaffId?: string
+    returnStaffId?: string
+  }
   page?: number
   pageSize?: number
 }
 
 export const inventoryService = {
-  async create(orgId: string, payload: CreateInventoryPayload): Promise<InventoryItem> {
-    const { data } = await privateClient.post<ApiResponse<InventoryItem>>(
+  async create(orgId: string, payload: CreateInventoryPayload): Promise<InventoryPost> {
+    const body = {
+      item: {
+        itemName: payload.itemName,
+        category: payload.category ?? 'Other',
+        distinctiveMarks: payload.distinctiveMarks ?? undefined,
+        color: payload.color ?? undefined,
+        brand: payload.brand ?? undefined,
+        condition: payload.condition ?? undefined,
+        material: payload.material ?? undefined,
+        size: payload.size ?? undefined,
+        additionalDetails: payload.description,
+      },
+      imageUrls: payload.imageUrls ?? [],
+      finderInfo: payload.finderInfo ?? undefined,
+    }
+
+    const { data } = await privateClient.post<ApiResponse<InventoryPost>>(
       `/api/core/orgs/${orgId}/inventory`,
-      payload,
+      body,
     )
     if (!data.success) throw new Error(data.error?.message ?? 'Failed to create inventory item')
     return data.data
   },
 
-  async getAll(orgId: string, params?: GetInventoryParams): Promise<PagedResponse<InventoryItem>> {
-    const { data } = await privateClient.get<ApiResponse<PagedResponse<InventoryItem>>>(
-      `/api/core/orgs/${orgId}/inventory`,
-      { params },
+  async search(orgId: string, params?: GetInventoryParams): Promise<PagedResponse<InventoryPost>> {
+    const body: SearchInventoriesBody = {
+      query: params?.query?.trim() || undefined,
+      filters: {
+        status: params?.status ?? undefined,
+        category: params?.category ?? undefined,
+        color: params?.color?.trim() || undefined,
+        brand: params?.brand?.trim() || undefined,
+        fromDate: params?.fromDate || undefined,
+        toDate: params?.toDate || undefined,
+        intakeStaffId: params?.intakeStaffId?.trim() || undefined,
+        returnStaffId: params?.returnStaffId?.trim() || undefined,
+      },
+      page: params?.page ?? 1,
+      pageSize: params?.pageSize ?? 10,
+    }
+
+    // Keep payload minimal (avoid sending empty filters)
+    if (
+      !body.filters?.status &&
+      !body.filters?.category &&
+      !body.filters?.color &&
+      !body.filters?.brand &&
+      !body.filters?.fromDate &&
+      !body.filters?.toDate &&
+      !body.filters?.intakeStaffId &&
+      !body.filters?.returnStaffId
+    ) {
+      delete body.filters
+    }
+
+    const { data } = await privateClient.post<ApiResponse<PagedResponse<InventoryPost>>>(
+      `/api/core/orgs/${orgId}/inventory/search`,
+      body,
     )
     if (!data.success) throw new Error(data.error?.message ?? 'Failed to fetch inventory')
     return data.data
   },
 
-  async getById(orgId: string, id: string): Promise<InventoryItem> {
-    const { data } = await privateClient.get<ApiResponse<InventoryItem>>(
+  async getById(orgId: string, id: string): Promise<InventoryPost> {
+    const { data } = await privateClient.get<ApiResponse<InventoryPost>>(
       `/api/core/orgs/${orgId}/inventory/${id}`,
     )
     if (!data.success) throw new Error(data.error?.message ?? 'Failed to fetch inventory item')
     return data.data
   },
 
-  async update(orgId: string, id: string, payload: UpdateInventoryPayload): Promise<InventoryItem> {
-    const { data } = await privateClient.put<ApiResponse<InventoryItem>>(
+  async update(orgId: string, id: string, payload: UpdateInventoryPayload): Promise<InventoryPost> {
+    const body = {
+      status: payload.status ?? undefined,
+      item:
+        payload.itemName ||
+        payload.description ||
+        payload.distinctiveMarks ||
+        payload.category ||
+        payload.color ||
+        payload.brand ||
+        payload.condition ||
+        payload.material ||
+        payload.size
+          ? {
+              itemName: payload.itemName,
+              category: payload.category,
+              distinctiveMarks: payload.distinctiveMarks ?? undefined,
+              color: payload.color ?? undefined,
+              brand: payload.brand ?? undefined,
+              condition: payload.condition ?? undefined,
+              material: payload.material ?? undefined,
+              size: payload.size ?? undefined,
+              additionalDetails: payload.description,
+            }
+          : undefined,
+      imageUrls: payload.imageUrls ?? undefined,
+    }
+
+    const { data } = await privateClient.put<ApiResponse<InventoryPost>>(
       `/api/core/orgs/${orgId}/inventory/${id}`,
-      payload,
+      body,
     )
     if (!data.success) throw new Error(data.error?.message ?? 'Failed to update inventory item')
     return data.data
@@ -90,15 +253,17 @@ export const inventoryService = {
     await privateClient.delete(`/api/core/orgs/${orgId}/inventory/${id}`)
   },
 
-  async searchSemantic(
-    orgId: string,
-    params: SearchInventorySemanticParams,
-  ): Promise<PagedResponse<InventorySemanticResult>> {
-    const { data } = await privateClient.get<ApiResponse<PagedResponse<InventorySemanticResult>>>(
-      `/api/core/orgs/${orgId}/inventory/search/semantic`,
-      { params },
+  /**
+   * Ask BE to analyse an image URL and return suggested PostItem fields.
+   * Endpoint: POST /api/core/post-image/analyze
+   * Body:     { imageUrl: string }
+   */
+  async analyzeImage(imageUrl: string): Promise<AnalyzeImageResult> {
+    const { data } = await privateClient.post<ApiResponse<AnalyzeImageResult>>(
+      '/api/core/post-image/analyze',
+      { imageUrl },
     )
-    if (!data.success) throw new Error(data.error?.message ?? 'Failed to search inventory')
+    if (!data.success) throw new Error(data.error?.message ?? 'Failed to analyze image')
     return data.data
   },
 }

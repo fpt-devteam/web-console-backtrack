@@ -1,12 +1,15 @@
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Check } from 'lucide-react';
+import { Camera, Check, X } from 'lucide-react';
 import { useState } from 'react';
 import { useNavigate } from '@tanstack/react-router';
 import { useCreateOrganization } from '@/hooks/use-org';
-import { useCurrentOrgId } from '@/contexts/current-org.context';
 import { PlaceSearchInput } from '@/components/place-search-input';
+import { useDebouncedValue } from '@/hooks/use-debounce';
+import { orgService } from '@/services/org.service';
+import { uploadOrgLogo } from '@/services/storage.service';
+import { useEffect } from 'react';
 
 const INDUSTRY_OPTIONS = [
   { value: 'airport', label: 'Airport' },
@@ -18,9 +21,20 @@ const INDUSTRY_OPTIONS = [
   { value: 'other', label: 'Other' },
 ] as const;
 
+const SLUG_PATTERN = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
+
+function normalizeSlug(raw: string): string {
+  return raw
+    .trim()
+    .toLowerCase()
+    .replace(/\s+/g, '-')
+    .replace(/[^a-z0-9-]/g, '') // drop invalid chars
+    .replace(/-+/g, '-')        // collapse dashes
+    .replace(/^-|-$/g, '');     // trim dashes
+}
+
 export function CreateOrganizationPage() {
   const navigate = useNavigate();
-  const { setCurrentOrgId } = useCurrentOrgId();
   const createOrg = useCreateOrganization();
   const [form, setForm] = useState({
     name: '',
@@ -28,43 +42,146 @@ export function CreateOrganizationPage() {
     address: '',
     slug: '',
     phone: '',
+    contactEmail: '',
     taxIdentificationNumber: '',
   });
+  const [logoUrl, setLogoUrl] = useState<string>('');
+  const [isUploadingLogo, setIsUploadingLogo] = useState(false);
   /** Lat/lon from Nominatim when user selects a place; null if only typing. */
   const [location, setLocation] = useState<{ latitude: number; longitude: number } | null>(null);
   /** place_id from Nominatim (externalPlaceId for BE) when selected from dropdown. */
   const [externalPlaceId, setExternalPlaceId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
-  const slugOk = form.slug.length > 3;
+  const slugNormalized = normalizeSlug(form.slug);
+  const slugOk = slugNormalized.length > 0 && SLUG_PATTERN.test(slugNormalized) && slugNormalized.length <= 255;
+  const debouncedSlug = useDebouncedValue(slugNormalized, 500);
+  const [isSlugChecking, setIsSlugChecking] = useState(false);
+  const [slugExistsError, setSlugExistsError] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!debouncedSlug || !slugOk) {
+      setSlugExistsError(null);
+      setIsSlugChecking(false);
+      return;
+    }
+    let ignore = false;
+    setIsSlugChecking(true);
+    setSlugExistsError(null);
+    orgService.getBySlug(debouncedSlug)
+      .then(() => {
+        if (!ignore) {
+          setSlugExistsError('That Workspace URL is already taken. Please choose another one.');
+          setIsSlugChecking(false);
+        }
+      })
+      .catch(() => {
+        if (!ignore) {
+          // If error (like 404), it's likely available
+          setSlugExistsError(null);
+          setIsSlugChecking(false);
+        }
+      });
+    return () => { ignore = true; };
+  }, [debouncedSlug, slugOk]);
 
   const update = (field: keyof typeof form) => (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     setForm((prev) => ({ ...prev, [field]: e.target.value }));
     setError(null);
   };
 
+  const handleLogoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (!file.type.startsWith('image/')) {
+      setError('Logo must be an image file');
+      return;
+    }
+
+    setError(null);
+    setIsUploadingLogo(true);
+    try {
+      const url = await uploadOrgLogo(file);
+      setLogoUrl(url);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to upload logo image');
+    } finally {
+      setIsUploadingLogo(false);
+      // Reset input so the same file can be re-selected if user wants.
+      e.target.value = '';
+    }
+  };
+
+  const removeLogo = () => {
+    setLogoUrl('');
+    setError(null);
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
-    const displayAddress = form.address.trim() || form.name.trim() || '—';
+
+    const name = form.name.trim();
+    if (!name) {
+      setError('Please enter your organization name.');
+      return;
+    }
+    if (!form.industryType) {
+      setError('Please select an industry type.');
+      return;
+    }
+    if (!form.phone.trim()) {
+      setError('Please enter a phone number.');
+      return;
+    }
+    if (!form.taxIdentificationNumber.trim()) {
+      setError('Please enter your tax identification number.');
+      return;
+    }
+    if (!slugOk) {
+      setError('Workspace URL is invalid. Use lowercase letters, numbers, and hyphens only (e.g. acme-corp).');
+      return;
+    }
+    if (slugExistsError) {
+      setError(slugExistsError);
+      return;
+    }
+    if (!logoUrl) {
+      setError('Organization logo is required');
+      return;
+    }
+    const displayAddress = form.address.trim() || name;
     const coords = location ?? { latitude: 0, longitude: 0 };
     createOrg.mutate(
       {
-        name: form.name.trim(),
-        slug: form.slug.trim().toLowerCase().replace(/\s+/g, '-'),
+        name,
+        slug: slugNormalized,
         displayAddress,
         location: coords,
         externalPlaceId: externalPlaceId ?? undefined,
         phone: form.phone.trim(),
+        contactEmail: form.contactEmail.trim() || undefined,
         industryType: form.industryType,
         taxIdentificationNumber: form.taxIdentificationNumber.trim(),
+        // BE expects `LogoUrl` string (we send base64 data URL from FE).
+        logoUrl,
+        // Default: phone is always required. Admin can change this in Security settings.
+        requiredFinderContractFields: ['Phone'] as const,
+        requiredOwnerContractFields: ['Phone'] as const,
       },
       {
         onSuccess: (createdOrg) => {
-          setCurrentOrgId(createdOrg.id);
-          navigate({ to: '/console/processing' });
+          navigate({ to: `/console/processing`, search: { slug: createdOrg.slug } });
         },
-        onError: (err) => setError(err instanceof Error ? err.message : 'Failed to create organization'),
+        onError: (err) => {
+          const e = err as Error & { code?: string };
+          if (e.code === 'SlugAlreadyExists') {
+            setError('That Workspace URL is already taken. Please choose another one.');
+            return;
+          }
+          // Fallback: show BE message (already user-facing from validators)
+          setError(e?.message || 'Failed to create organization');
+        },
       }
     );
   };
@@ -89,6 +206,76 @@ export function CreateOrganizationPage() {
             {error && (
               <p className="text-sm text-red-600 bg-red-50 px-3 py-2 rounded-md">{error}</p>
             )}
+            {/* Logo — layout aligned with staff Add Found Item → Photos */}
+            <div>
+              <div className="flex items-center justify-between mb-4">
+                <Label className="text-base font-semibold text-gray-900">
+                  Organization logo <span className="text-red-500">*</span>
+                </Label>
+                <span className="text-sm text-gray-500">1 image</span>
+              </div>
+              <div className="flex gap-4 flex-wrap">
+                {logoUrl ? (
+                  <div className="relative w-32 h-32 rounded-lg overflow-hidden group">
+                    <img
+                      src={logoUrl}
+                      alt="Organization logo"
+                      className="w-full h-full object-cover"
+                    />
+                    <button
+                      type="button"
+                      onClick={removeLogo}
+                      className="absolute top-1 right-1 p-1 bg-red-500 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
+                      aria-label="Remove logo"
+                    >
+                      <X className="w-3 h-3" />
+                    </button>
+                  </div>
+                ) : null}
+                {!logoUrl ? (
+                  <label
+                    className={`w-32 h-32 border-2 border-dashed border-gray-300 rounded-lg flex flex-col items-center justify-center transition-colors ${
+                      createOrg.isPending || isUploadingLogo
+                        ? 'cursor-not-allowed opacity-60'
+                        : 'cursor-pointer hover:border-blue-500 hover:bg-blue-50'
+                    }`}
+                  >
+                    <input
+                      id="orgLogo"
+                      type="file"
+                      accept="image/*"
+                      onChange={handleLogoUpload}
+                      className="hidden"
+                      disabled={createOrg.isPending || isUploadingLogo}
+                    />
+                    <Camera className="w-6 h-6 text-gray-400 mb-2" />
+                    <span className="text-xs text-gray-500 text-center px-2">
+                      {isUploadingLogo ? 'Uploading...' : 'Add logo'}
+                    </span>
+                  </label>
+                ) : (
+                  <label
+                    className={`w-32 h-32 border-2 border-dashed border-gray-300 rounded-lg flex flex-col items-center justify-center transition-colors ${
+                      createOrg.isPending || isUploadingLogo
+                        ? 'cursor-not-allowed opacity-60'
+                        : 'cursor-pointer hover:border-blue-500 hover:bg-blue-50'
+                    }`}
+                  >
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={handleLogoUpload}
+                      className="hidden"
+                      disabled={createOrg.isPending || isUploadingLogo}
+                    />
+                    <Camera className="w-6 h-6 text-gray-400 mb-2" />
+                    <span className="text-xs text-gray-500 text-center px-2">
+                       {isUploadingLogo ? 'Uploading...' : 'Change'}
+                    </span>
+                  </label>
+                )}
+              </div>
+            </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
                 <Label htmlFor="companyName" className="text-sm font-semibold mb-2 block">Company Name <span className="text-red-500">*</span></Label>
@@ -163,9 +350,20 @@ export function CreateOrganizationPage() {
                 )}
               </div>
               <div className="flex items-center justify-between mt-2">
-                <p className="text-xs text-gray-500">This will be your team's unique login URL.</p>
-                {slugOk && form.slug && <p className="text-xs text-green-600 font-medium">Subdomain available</p>}
+                <p className="text-xs text-gray-500">Lowercase letters, numbers, and hyphens only.</p>
+                {slugOk && form.slug && !isSlugChecking && !slugExistsError && <p className="text-xs text-green-600 font-medium">Looks good</p>}
+                {isSlugChecking && <p className="text-xs text-blue-600 font-medium">Checking...</p>}
               </div>
+              {!slugOk && form.slug.trim() && (
+                <p className="mt-1 text-xs text-red-600">
+                  Example: <span className="font-mono">fpt-hcm</span>
+                </p>
+              )}
+              {slugExistsError && (
+                <p className="mt-1 text-xs text-red-600 border border-red-200 bg-red-50 px-2 py-1 rounded inline-block">
+                  {slugExistsError}
+                </p>
+              )}
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -181,6 +379,19 @@ export function CreateOrganizationPage() {
                 />
               </div>
               <div>
+                <Label htmlFor="contactEmail" className="text-sm font-semibold mb-2 block">
+                  Contact email <span className="text-gray-400 font-normal">(optional)</span>
+                </Label>
+                <Input
+                  id="contactEmail"
+                  type="email"
+                  autoComplete="email"
+                  value={form.contactEmail}
+                  onChange={update('contactEmail')}
+                  placeholder="support@company.com"
+                />
+              </div>
+              <div className="md:col-span-2">
                 <Label htmlFor="taxId" className="text-sm font-semibold mb-2 block">Tax Identification Number <span className="text-red-500">*</span></Label>
                 <Input
                   id="taxId"
