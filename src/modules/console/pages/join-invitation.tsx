@@ -2,9 +2,9 @@ import { Loader2, Check, XCircle } from 'lucide-react'
 import { useState, useEffect } from 'react'
 import { useRouter } from '@tanstack/react-router'
 import { Button } from '@/components/ui/button'
-import { useCurrentOrgId } from '@/contexts/current-org.context'
 import { getInvitationCode, clearInvitationCode } from '@/lib/auth-storage'
 import { invitationService } from '@/services/invitation.service'
+import { orgService } from '@/services/org.service'
 import { auth } from '@/lib/firebase'
 import { onAuthStateChanged } from 'firebase/auth'
 
@@ -15,7 +15,6 @@ type PageState =
 
 export function JoinInvitationPage() {
   const router = useRouter()
-  const { setCurrentOrgId } = useCurrentOrgId()
   const [state, setState] = useState<PageState>({ status: 'joining' })
 
   useEffect(() => {
@@ -35,11 +34,11 @@ export function JoinInvitationPage() {
         clearInvitationCode()
         setState({ status: 'success' })
 
-        setCurrentOrgId(joinResult.organizationId)
+        const org = await orgService.getById(joinResult.organizationId)
         setTimeout(() => {
           const destination = joinResult.role === 'OrgAdmin'
-            ? '/console/admin/dashboard'
-            : '/console/staff/inventory'
+            ? `/console/${org.slug}/admin/dashboard`
+            : `/console/${org.slug}/staff/inventory`
           window.location.href = destination
         }, 1500)
       } catch (err) {
@@ -52,7 +51,7 @@ export function JoinInvitationPage() {
     })
 
     return () => unsubscribe()
-  }, [setCurrentOrgId])
+  }, [])
 
   const handleGoToWelcome = () => {
     clearInvitationCode()

@@ -1,5 +1,6 @@
 import { redirect } from '@tanstack/react-router';
 import type { QueryClient } from '@tanstack/react-query';
+import { setActiveOrgId } from '@/lib/api-client';
 import { authService } from '@/services';
 import { orgService } from '@/services/org.service';
 import { UserGlobalRole } from '@/types/user.types';
@@ -7,12 +8,25 @@ import { UserGlobalRole } from '@/types/user.types';
 const AUTH_CURRENT_USER_KEY = ['auth', 'currentUser'] as const;
 const ORG_MY_ORGS_KEY = ['orgs', 'me'] as const;
 
+/** Same key as `CurrentOrgProvider` — session must be set before nested `beforeLoad` runs. */
+const SESSION_ORG_ID_KEY = 'backtrack_current_org_id';
+
 function getCurrentOrgIdFromSession(): string | null {
   try {
-    return sessionStorage.getItem('backtrack_current_org_id');
+    return sessionStorage.getItem(SESSION_ORG_ID_KEY);
   } catch {
     return null;
   }
+}
+
+/** Persist org id for route guards + Axios interceptor before child routes' `beforeLoad` runs. */
+export function persistActiveOrgIdForSession(orgId: string): void {
+  try {
+    sessionStorage.setItem(SESSION_ORG_ID_KEY, orgId);
+  } catch {
+    /* ignore */
+  }
+  setActiveOrgId(orgId);
 }
 
 export async function requireSignedIn(queryClient: QueryClient) {
@@ -47,11 +61,18 @@ export async function requireOrgMember(queryClient: QueryClient) {
   });
 
   const currentOrgId = getCurrentOrgIdFromSession();
-  const activeOrg = (currentOrgId ? myOrgs.find((o) => o.orgId === currentOrgId) : null) ?? myOrgs[0];
+
+  if (!currentOrgId) {
+    if (myOrgs.length === 0) {
+      throw redirect({ to: '/console/create-organization' });
+    }
+    throw redirect({ to: '/console/welcome' });
+  }
+
+  const activeOrg = myOrgs.find((o) => o.orgId === currentOrgId);
 
   if (!activeOrg) {
-    // User has no org membership — send them to create/join one
-    throw redirect({ to: '/console/create-organization' });
+    throw new Error('FORBIDDEN_ORG_NOT_MEMBER');
   }
 
   return activeOrg;

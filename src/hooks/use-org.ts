@@ -5,6 +5,7 @@ import type { CreateOrganizationPayload, UpdateOrganizationPayload } from '@/typ
 export const ORG_KEYS = {
   myOrgs: ['orgs', 'me'] as const,
   byId: (id: string) => ['orgs', id] as const,
+  bySlug: (slug: string) => ['orgs', 'slug', slug] as const,
   members: (orgId: string, page?: number, pageSize?: number) =>
     ['orgs', orgId, 'members', page, pageSize] as const,
 };
@@ -22,6 +23,15 @@ export function useOrganization(orgId: string | null) {
     queryKey: ORG_KEYS.byId(orgId ?? ''),
     queryFn: () => orgService.getById(orgId!),
     enabled: !!orgId,
+  });
+}
+
+export function useOrgBySlug(slug: string | undefined) {
+  return useQuery({
+    queryKey: ORG_KEYS.bySlug(slug ?? ''),
+    queryFn: () => orgService.getBySlug(slug!),
+    enabled: !!slug,
+    staleTime: 5 * 60 * 1000,
   });
 }
 

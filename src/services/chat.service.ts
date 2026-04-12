@@ -123,7 +123,8 @@ export const chatService = {
     params?: { cursor?: string; limit?: number }
   ): Promise<MessageListResponse> {
     const { data } = await privateClient.get<ApiResponse<MessageListResponse>>(
-      `${BASE}/conversations/${conversationId}/messages`,
+      // Backend (chat-service) exposes messages at: GET /api/chat/messages/:conversationId
+      `${BASE}/messages/${conversationId}`,
       { params: { ...params } }
     );
     if (!data.success) throw new Error(data.error?.message ?? 'Failed to fetch messages');

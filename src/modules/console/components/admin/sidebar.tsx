@@ -1,6 +1,7 @@
 import { LayoutGrid, Users, CreditCard, Building2, Settings, ChevronLeft, ChevronRight, ChevronDown, ChevronUp, ArrowLeftRight, Package } from 'lucide-react';
-import { Link, useLocation } from '@tanstack/react-router';
-import { useState, useEffect } from 'react';
+import { OrgLogo } from '@/components/org-logo';
+import { Link, useLocation, useParams } from '@tanstack/react-router';
+import { useState, useEffect, useMemo } from 'react';
 import { useCurrentOrgId } from '@/contexts/current-org.context';
 import { useOrganization } from '@/hooks/use-org';
 import { useCurrentUser } from '@/hooks/use-auth';
@@ -19,18 +20,21 @@ interface SidebarProps {
 
 export function Sidebar({ isOpen, onToggle }: SidebarProps) {
   const location = useLocation();
+  const { slug } = useParams({ strict: false }) as { slug?: string };
   const { currentOrgId } = useCurrentOrgId();
   const { data: org } = useOrganization(currentOrgId);
   const { data: user } = useCurrentUser();
   const userInitials = getInitials(user?.name);
   const userDisplayName = user?.name || user?.email || 'User';
 
-  const settingSubPaths = [
-    '/console/admin/setting',
-    '/console/admin/setting/organization',
-    '/console/admin/setting/organization/edit',
-    '/console/account/security',
-  ];
+  const base = `/console/${slug ?? org?.slug ?? ''}`;
+
+  const settingSubPaths = useMemo(() => [
+    `${base}/admin/setting`,
+    `${base}/admin/setting/organization`,
+    `${base}/admin/setting/organization/edit`,
+    `${base}/account/security`,
+  ], [base]);
   const isSettingActive = settingSubPaths.some((p) => location.pathname === p || location.pathname.startsWith(p + '/'));
   const [settingExpanded, setSettingExpanded] = useState(isSettingActive);
   useEffect(() => {
@@ -38,48 +42,35 @@ export function Sidebar({ isOpen, onToggle }: SidebarProps) {
   }, [isSettingActive]);
 
   const menuItems: { name: string; icon: typeof LayoutGrid; path?: string; children?: { name: string; path: string }[] }[] = [
-    { name: 'Dashboard', icon: LayoutGrid, path: '/console/admin/dashboard' },
-    { name: 'Employee', icon: Users, path: '/console/admin/employee' },
-    { name: 'Plan', icon: CreditCard, path: '/console/admin/plan' },
-    { name: 'Branch', icon: Building2, path: '/console/admin/branch' },
-    { name: 'Inventory', icon: Package, path: '/console/admin/inventory' },
+    { name: 'Dashboard', icon: LayoutGrid, path: `${base}/admin/dashboard` },
+    { name: 'Employee', icon: Users, path: `${base}/admin/employee` },
+    { name: 'Plan', icon: CreditCard, path: `${base}/admin/plan` },
+    { name: 'Branch', icon: Building2, path: `${base}/admin/branch` },
+    { name: 'Inventory', icon: Package, path: `${base}/admin/inventory` },
     {
       name: 'Setting',
       icon: Settings,
       children: [
-        { name: 'Organization Information', path: '/console/admin/setting/organization' },
-        { name: 'Security', path: '/console/account/security' },
+        { name: 'Organization Information', path: `${base}/admin/setting/organization` },
+        { name: 'Security', path: `${base}/account/security` },
       ],
     },
   ];
 
   const isActive = (path: string) => {
     const currentPath = location.pathname;
-    
-    // Exact match
     if (currentPath === path) return true;
-    
-    // For Employee menu, also highlight when on related employee pages
-    if (path === '/console/admin/employee') {
-      // Check if current path is any employee-related page
-      if (currentPath === '/console/admin/employee' || 
-          currentPath === '/console/admin/invite-employee') {
-        return true;
-      }
-    }
-    
-    // For Plan menu, also highlight when on edit-account page
-    if (path === '/console/admin/plan') {
-      if (currentPath === '/console/admin/plan' || 
-          currentPath === '/console/admin/edit-account') {
-        return true;
-      }
+
+    if (path === `${base}/admin/employee`) {
+      if (currentPath === path) return true;
     }
 
-    if (path === '/console/admin/inventory') {
-      if (currentPath === '/console/admin/inventory' || currentPath.startsWith('/console/admin/inventory/')) {
-        return true;
-      }
+    if (path === `${base}/admin/plan`) {
+      if (currentPath === path || currentPath === `${base}/admin/edit-account`) return true;
+    }
+
+    if (path === `${base}/admin/inventory`) {
+      if (currentPath === path || currentPath.startsWith(`${base}/admin/inventory/`)) return true;
     }
 
     return false;
@@ -87,9 +78,9 @@ export function Sidebar({ isOpen, onToggle }: SidebarProps) {
 
   const isSettingChildActive = (path: string) => {
     const currentPath = location.pathname;
-    if (path === '/console/admin/setting/organization')
-      return currentPath === path || currentPath.startsWith('/console/admin/setting/organization/');
-    if (path === '/console/account/security') return currentPath === path;
+    if (path === `${base}/admin/setting/organization`)
+      return currentPath === path || currentPath.startsWith(`${base}/admin/setting/organization/`);
+    if (path === `${base}/account/security`) return currentPath === path;
     return false;
   };
 
@@ -102,9 +93,7 @@ export function Sidebar({ isOpen, onToggle }: SidebarProps) {
       {/* Header: Org + Toggle */}
       <div className="flex items-center gap-3 px-4 py-6 border-b border-gray-200 relative">
         <div className="flex items-center gap-3 flex-1 min-w-0">
-          <div className="w-10 h-10 bg-blue-500 rounded-full flex items-center justify-center flex-shrink-0">
-            <Building2 className="w-6 h-6 text-white" />
-          </div>
+          <OrgLogo logoUrl={org?.logoUrl} alt={org?.name ?? 'Organization'} className="h-10 w-10 flex-shrink-0" />
           <div className={`min-w-0 transition-all duration-300 ${isOpen ? 'opacity-100' : 'w-0 opacity-0 overflow-hidden'}`}>
             <h1 className="font-bold text-xl tracking-wide whitespace-nowrap truncate" title={org?.name}>
               {org?.name ?? 'Admin'}

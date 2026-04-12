@@ -1,24 +1,17 @@
 import { Loader2, Check } from 'lucide-react';
 import { useState, useEffect } from 'react';
-import { useRouter } from '@tanstack/react-router';
 
-export function ProcessingPage() {
+export function ProcessingPage({ slug }: { slug?: string }) {
   const [currentStep, setCurrentStep] = useState(1);
-  const router = useRouter();
 
-  // Simulate progress steps
   useEffect(() => {
-    const timer1 = setTimeout(() => {
-      setCurrentStep(2);
-    }, 2000);
-
-    const timer2 = setTimeout(() => {
-      setCurrentStep(3);
-    }, 4000);
-
-    // Redirect to admin dashboard after all steps complete
+    const timer1 = setTimeout(() => setCurrentStep(2), 2000);
+    const timer2 = setTimeout(() => setCurrentStep(3), 4000);
     const timer3 = setTimeout(() => {
-      window.location.href = '/console/admin/dashboard';
+      const dest = slug
+        ? `/console/${slug}/admin/dashboard`
+        : '/console/welcome';
+      window.location.href = dest;
     }, 6000);
 
     return () => {
@@ -26,7 +19,7 @@ export function ProcessingPage() {
       clearTimeout(timer2);
       clearTimeout(timer3);
     };
-  }, [router]);
+  }, [slug]);
 
   const steps = [
     { id: 1, label: 'Verifying details' },

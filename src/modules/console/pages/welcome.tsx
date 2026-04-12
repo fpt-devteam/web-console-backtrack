@@ -1,22 +1,20 @@
-import { Building2, ChevronRight } from 'lucide-react';
+import { ChevronRight } from 'lucide-react';
+import { OrgLogo } from '@/components/org-logo';
 import { Link, useRouter } from '@tanstack/react-router';
 import { useCurrentUser } from '@/hooks/use-auth';
 import { useMyOrganizations } from '@/hooks/use-org';
-import { useCurrentOrgId } from '@/contexts/current-org.context';
 import { Spinner } from '@/components/ui/spinner';
 import type { MyOrganization } from '@/types/organization.types';
 
 export function WelcomePage() {
   const router = useRouter();
-  const { setCurrentOrgId } = useCurrentOrgId();
   const { data: user, isLoading: userLoading } = useCurrentUser();
   const { data: orgs = [], isLoading: orgsLoading } = useMyOrganizations({ enabled: !!user });
 
   const handleOrganizationClick = (org: MyOrganization) => {
-    setCurrentOrgId(org.orgId);
     const destination = org.myRole === 'OrgAdmin'
-      ? '/console/admin/dashboard'
-      : '/console/staff/inventory';
+      ? `/console/${org.slug}/admin/dashboard`
+      : `/console/${org.slug}/staff/inventory`;
     router.navigate({ to: destination });
   };
 
@@ -63,9 +61,13 @@ export function WelcomePage() {
                   >
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-4">
-                        <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
-                          <Building2 className="w-6 h-6 text-blue-600" />
-                        </div>
+                        <OrgLogo
+                          logoUrl={org.logoUrl}
+                          alt={org.name}
+                          className="h-12 w-12"
+                          iconClassName="h-7 w-7"
+                          rounded="lg"
+                        />
                         <div>
                           <h3 className="text-base font-semibold mb-0.5">{org.name}</h3>
                           <p className="text-sm text-gray-500">{org.slug}.backtrack.com</p>
