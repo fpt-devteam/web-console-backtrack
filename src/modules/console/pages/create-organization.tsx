@@ -6,6 +6,10 @@ import { useState } from 'react';
 import { useNavigate } from '@tanstack/react-router';
 import { useCreateOrganization } from '@/hooks/use-org';
 import { PlaceSearchInput } from '@/components/place-search-input';
+import { useDebouncedValue } from '@/hooks/use-debounce';
+import { orgService } from '@/services/org.service';
+import { uploadOrgLogo } from '@/services/storage.service';
+import { useEffect } from 'react';
 
 const INDUSTRY_OPTIONS = [
   { value: 'airport', label: 'Airport' },
@@ -42,6 +46,7 @@ export function CreateOrganizationPage() {
     taxIdentificationNumber: '',
   });
   const [logoUrl, setLogoUrl] = useState<string>('');
+  const [isUploadingLogo, setIsUploadingLogo] = useState(false);
   /** Lat/lon from Nominatim when user selects a place; null if only typing. */
   const [location, setLocation] = useState<{ latitude: number; longitude: number } | null>(null);
   /** place_id from Nominatim (externalPlaceId for BE) when selected from dropdown. */
@@ -50,6 +55,35 @@ export function CreateOrganizationPage() {
 
   const slugNormalized = normalizeSlug(form.slug);
   const slugOk = slugNormalized.length > 0 && SLUG_PATTERN.test(slugNormalized) && slugNormalized.length <= 255;
+  const debouncedSlug = useDebouncedValue(slugNormalized, 500);
+  const [isSlugChecking, setIsSlugChecking] = useState(false);
+  const [slugExistsError, setSlugExistsError] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!debouncedSlug || !slugOk) {
+      setSlugExistsError(null);
+      setIsSlugChecking(false);
+      return;
+    }
+    let ignore = false;
+    setIsSlugChecking(true);
+    setSlugExistsError(null);
+    orgService.getBySlug(debouncedSlug)
+      .then(() => {
+        if (!ignore) {
+          setSlugExistsError('That Workspace URL is already taken. Please choose another one.');
+          setIsSlugChecking(false);
+        }
+      })
+      .catch(() => {
+        if (!ignore) {
+          // If error (like 404), it's likely available
+          setSlugExistsError(null);
+          setIsSlugChecking(false);
+        }
+      });
+    return () => { ignore = true; };
+  }, [debouncedSlug, slugOk]);
 
   const update = (field: keyof typeof form) => (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     setForm((prev) => ({ ...prev, [field]: e.target.value }));
@@ -65,72 +99,14 @@ export function CreateOrganizationPage() {
     }
 
     setError(null);
-
+    setIsUploadingLogo(true);
     try {
-      const loadImage = (f: File) =>
-        new Promise<HTMLImageElement>((resolve, reject) => {
-          const url = URL.createObjectURL(f);
-          const img = new Image();
-          img.onload = () => {
-            URL.revokeObjectURL(url);
-            resolve(img);
-          };
-          img.onerror = () => {
-            URL.revokeObjectURL(url);
-            reject(new Error('Failed to load image'));
-          };
-          img.src = url;
-        });
-
-      const compressToDataUrl = (img: HTMLImageElement, maxDim: number, mime: string, quality: number) => {
-        const canvas = document.createElement('canvas');
-        const w = img.naturalWidth || img.width;
-        const h = img.naturalHeight || img.height;
-        const largest = Math.max(w, h);
-        const scale = Math.min(1, maxDim / largest);
-
-        const outW = Math.max(1, Math.round(w * scale));
-        const outH = Math.max(1, Math.round(h * scale));
-
-        canvas.width = outW;
-        canvas.height = outH;
-        const ctx = canvas.getContext('2d');
-        if (!ctx) throw new Error('Canvas not supported');
-        ctx.drawImage(img, 0, 0, outW, outH);
-
-        return canvas.toDataURL(mime, quality);
-      };
-
-      const img = await loadImage(file);
-
-      // BE giới hạn `LogoUrl` max 2048 chars => cần resize/encode để string không vượt limit.
-      const BE_LOGO_MAX_CHARS = 2048;
-      const mimeTypes = ['image/webp', 'image/jpeg', 'image/png'];
-
-      let best = '';
-      for (const mime of mimeTypes) {
-        let maxDim = 256;
-        let quality = 0.72;
-        for (let i = 0; i < 6; i++) {
-          const dataUrl = compressToDataUrl(img, maxDim, mime, quality);
-          best = dataUrl;
-          if (dataUrl.length <= BE_LOGO_MAX_CHARS) break;
-          maxDim = Math.max(32, Math.floor(maxDim * 0.85));
-          quality = Math.max(0.25, quality * 0.8);
-        }
-        if (best.length <= BE_LOGO_MAX_CHARS) break;
-      }
-
-      if (!best || best.length > BE_LOGO_MAX_CHARS) {
-        setError('Logo is too large. Please upload a smaller image.');
-        return;
-      }
-
-      setLogoUrl(best);
+      const url = await uploadOrgLogo(file);
+      setLogoUrl(url);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to process logo image');
-      return;
+      setError(err instanceof Error ? err.message : 'Failed to upload logo image');
     } finally {
+      setIsUploadingLogo(false);
       // Reset input so the same file can be re-selected if user wants.
       e.target.value = '';
     }
@@ -164,6 +140,10 @@ export function CreateOrganizationPage() {
     }
     if (!slugOk) {
       setError('Workspace URL is invalid. Use lowercase letters, numbers, and hyphens only (e.g. acme-corp).');
+      return;
+    }
+    if (slugExistsError) {
+      setError(slugExistsError);
       return;
     }
     if (!logoUrl) {
@@ -255,7 +235,7 @@ export function CreateOrganizationPage() {
                 {!logoUrl ? (
                   <label
                     className={`w-32 h-32 border-2 border-dashed border-gray-300 rounded-lg flex flex-col items-center justify-center transition-colors ${
-                      createOrg.isPending
+                      createOrg.isPending || isUploadingLogo
                         ? 'cursor-not-allowed opacity-60'
                         : 'cursor-pointer hover:border-blue-500 hover:bg-blue-50'
                     }`}
@@ -266,15 +246,17 @@ export function CreateOrganizationPage() {
                       accept="image/*"
                       onChange={handleLogoUpload}
                       className="hidden"
-                      disabled={createOrg.isPending}
+                      disabled={createOrg.isPending || isUploadingLogo}
                     />
                     <Camera className="w-6 h-6 text-gray-400 mb-2" />
-                    <span className="text-xs text-gray-500 text-center px-2">Add logo</span>
+                    <span className="text-xs text-gray-500 text-center px-2">
+                      {isUploadingLogo ? 'Uploading...' : 'Add logo'}
+                    </span>
                   </label>
                 ) : (
                   <label
                     className={`w-32 h-32 border-2 border-dashed border-gray-300 rounded-lg flex flex-col items-center justify-center transition-colors ${
-                      createOrg.isPending
+                      createOrg.isPending || isUploadingLogo
                         ? 'cursor-not-allowed opacity-60'
                         : 'cursor-pointer hover:border-blue-500 hover:bg-blue-50'
                     }`}
@@ -284,10 +266,12 @@ export function CreateOrganizationPage() {
                       accept="image/*"
                       onChange={handleLogoUpload}
                       className="hidden"
-                      disabled={createOrg.isPending}
+                      disabled={createOrg.isPending || isUploadingLogo}
                     />
                     <Camera className="w-6 h-6 text-gray-400 mb-2" />
-                    <span className="text-xs text-gray-500 text-center px-2">Change</span>
+                    <span className="text-xs text-gray-500 text-center px-2">
+                       {isUploadingLogo ? 'Uploading...' : 'Change'}
+                    </span>
                   </label>
                 )}
               </div>
@@ -367,11 +351,17 @@ export function CreateOrganizationPage() {
               </div>
               <div className="flex items-center justify-between mt-2">
                 <p className="text-xs text-gray-500">Lowercase letters, numbers, and hyphens only.</p>
-                {slugOk && form.slug && <p className="text-xs text-green-600 font-medium">Looks good</p>}
+                {slugOk && form.slug && !isSlugChecking && !slugExistsError && <p className="text-xs text-green-600 font-medium">Looks good</p>}
+                {isSlugChecking && <p className="text-xs text-blue-600 font-medium">Checking...</p>}
               </div>
               {!slugOk && form.slug.trim() && (
                 <p className="mt-1 text-xs text-red-600">
                   Example: <span className="font-mono">fpt-hcm</span>
+                </p>
+              )}
+              {slugExistsError && (
+                <p className="mt-1 text-xs text-red-600 border border-red-200 bg-red-50 px-2 py-1 rounded inline-block">
+                  {slugExistsError}
                 </p>
               )}
             </div>

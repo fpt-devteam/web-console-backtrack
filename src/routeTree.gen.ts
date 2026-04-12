@@ -42,6 +42,7 @@ import { Route as ConsoleSlugStaffNotificationRouteImport } from './routes/conso
 import { Route as ConsoleSlugStaffInventorySearchRouteImport } from './routes/console/$slug/staff/inventory-search'
 import { Route as ConsoleSlugStaffInventoryAddItemRouteImport } from './routes/console/$slug/staff/inventory-add-item'
 import { Route as ConsoleSlugStaffInventoryRouteImport } from './routes/console/$slug/staff/inventory'
+import { Route as ConsoleSlugStaffHistoryRouteImport } from './routes/console/$slug/staff/history'
 import { Route as ConsoleSlugStaffFeedRouteImport } from './routes/console/$slug/staff/feed'
 import { Route as ConsoleSlugStaffChatRouteImport } from './routes/console/$slug/staff/chat'
 import { Route as ConsoleSlugAdminSettingRouteImport } from './routes/console/$slug/admin/setting'
@@ -233,6 +234,11 @@ const ConsoleSlugStaffInventoryRoute =
     path: '/inventory',
     getParentRoute: () => ConsoleSlugStaffRoute,
   } as any)
+const ConsoleSlugStaffHistoryRoute = ConsoleSlugStaffHistoryRouteImport.update({
+  id: '/history',
+  path: '/history',
+  getParentRoute: () => ConsoleSlugStaffRoute,
+} as any)
 const ConsoleSlugStaffFeedRoute = ConsoleSlugStaffFeedRouteImport.update({
   id: '/feed',
   path: '/feed',
@@ -382,6 +388,7 @@ export interface FileRoutesByFullPath {
   '/console/$slug/admin/setting': typeof ConsoleSlugAdminSettingRouteWithChildren
   '/console/$slug/staff/chat': typeof ConsoleSlugStaffChatRoute
   '/console/$slug/staff/feed': typeof ConsoleSlugStaffFeedRoute
+  '/console/$slug/staff/history': typeof ConsoleSlugStaffHistoryRoute
   '/console/$slug/staff/inventory': typeof ConsoleSlugStaffInventoryRoute
   '/console/$slug/staff/inventory-add-item': typeof ConsoleSlugStaffInventoryAddItemRoute
   '/console/$slug/staff/inventory-search': typeof ConsoleSlugStaffInventorySearchRoute
@@ -433,6 +440,7 @@ export interface FileRoutesByTo {
   '/console/$slug/admin/plan': typeof ConsoleSlugAdminPlanRoute
   '/console/$slug/staff/chat': typeof ConsoleSlugStaffChatRoute
   '/console/$slug/staff/feed': typeof ConsoleSlugStaffFeedRoute
+  '/console/$slug/staff/history': typeof ConsoleSlugStaffHistoryRoute
   '/console/$slug/staff/inventory': typeof ConsoleSlugStaffInventoryRoute
   '/console/$slug/staff/inventory-add-item': typeof ConsoleSlugStaffInventoryAddItemRoute
   '/console/$slug/staff/inventory-search': typeof ConsoleSlugStaffInventorySearchRoute
@@ -487,6 +495,7 @@ export interface FileRoutesById {
   '/console/$slug/admin/setting': typeof ConsoleSlugAdminSettingRouteWithChildren
   '/console/$slug/staff/chat': typeof ConsoleSlugStaffChatRoute
   '/console/$slug/staff/feed': typeof ConsoleSlugStaffFeedRoute
+  '/console/$slug/staff/history': typeof ConsoleSlugStaffHistoryRoute
   '/console/$slug/staff/inventory': typeof ConsoleSlugStaffInventoryRoute
   '/console/$slug/staff/inventory-add-item': typeof ConsoleSlugStaffInventoryAddItemRoute
   '/console/$slug/staff/inventory-search': typeof ConsoleSlugStaffInventorySearchRoute
@@ -542,6 +551,7 @@ export interface FileRouteTypes {
     | '/console/$slug/admin/setting'
     | '/console/$slug/staff/chat'
     | '/console/$slug/staff/feed'
+    | '/console/$slug/staff/history'
     | '/console/$slug/staff/inventory'
     | '/console/$slug/staff/inventory-add-item'
     | '/console/$slug/staff/inventory-search'
@@ -593,6 +603,7 @@ export interface FileRouteTypes {
     | '/console/$slug/admin/plan'
     | '/console/$slug/staff/chat'
     | '/console/$slug/staff/feed'
+    | '/console/$slug/staff/history'
     | '/console/$slug/staff/inventory'
     | '/console/$slug/staff/inventory-add-item'
     | '/console/$slug/staff/inventory-search'
@@ -646,6 +657,7 @@ export interface FileRouteTypes {
     | '/console/$slug/admin/setting'
     | '/console/$slug/staff/chat'
     | '/console/$slug/staff/feed'
+    | '/console/$slug/staff/history'
     | '/console/$slug/staff/inventory'
     | '/console/$slug/staff/inventory-add-item'
     | '/console/$slug/staff/inventory-search'
@@ -909,6 +921,13 @@ declare module '@tanstack/react-router' {
       path: '/inventory'
       fullPath: '/console/$slug/staff/inventory'
       preLoaderRoute: typeof ConsoleSlugStaffInventoryRouteImport
+      parentRoute: typeof ConsoleSlugStaffRoute
+    }
+    '/console/$slug/staff/history': {
+      id: '/console/$slug/staff/history'
+      path: '/history'
+      fullPath: '/console/$slug/staff/history'
+      preLoaderRoute: typeof ConsoleSlugStaffHistoryRouteImport
       parentRoute: typeof ConsoleSlugStaffRoute
     }
     '/console/$slug/staff/feed': {
@@ -1195,6 +1214,7 @@ const ConsoleSlugAdminRouteWithChildren =
 interface ConsoleSlugStaffRouteChildren {
   ConsoleSlugStaffChatRoute: typeof ConsoleSlugStaffChatRoute
   ConsoleSlugStaffFeedRoute: typeof ConsoleSlugStaffFeedRoute
+  ConsoleSlugStaffHistoryRoute: typeof ConsoleSlugStaffHistoryRoute
   ConsoleSlugStaffInventoryRoute: typeof ConsoleSlugStaffInventoryRoute
   ConsoleSlugStaffInventoryAddItemRoute: typeof ConsoleSlugStaffInventoryAddItemRoute
   ConsoleSlugStaffInventorySearchRoute: typeof ConsoleSlugStaffInventorySearchRoute
@@ -1206,6 +1226,7 @@ interface ConsoleSlugStaffRouteChildren {
 const ConsoleSlugStaffRouteChildren: ConsoleSlugStaffRouteChildren = {
   ConsoleSlugStaffChatRoute: ConsoleSlugStaffChatRoute,
   ConsoleSlugStaffFeedRoute: ConsoleSlugStaffFeedRoute,
+  ConsoleSlugStaffHistoryRoute: ConsoleSlugStaffHistoryRoute,
   ConsoleSlugStaffInventoryRoute: ConsoleSlugStaffInventoryRoute,
   ConsoleSlugStaffInventoryAddItemRoute: ConsoleSlugStaffInventoryAddItemRoute,
   ConsoleSlugStaffInventorySearchRoute: ConsoleSlugStaffInventorySearchRoute,
