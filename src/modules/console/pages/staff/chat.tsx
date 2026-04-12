@@ -1,28 +1,31 @@
+/* eslint-disable @typescript-eslint/no-unnecessary-condition */
 import { useEffect, useRef, useState } from 'react'
-import { StaffLayout } from '../../components/staff/layout'
 import {
+  CheckCircle2,
+  Image as ImageIcon,
+  Loader2,
+  Paperclip,
+  RefreshCw,
   Search,
   Smile,
-  Paperclip,
-  Image as ImageIcon,
-  CheckCircle2,
-  Loader2,
-  RefreshCw,
 } from 'lucide-react'
+import { StaffLayout } from '../../components/staff/layout'
+import type {IConversation} from '@/types/chat.types';
 import { useChatContext } from '@/contexts/chat.context'
 import {
-  useChatAssigned,
-  useChatQueue,
-  useChatMessages,
   useAssignConversation,
+  useChatAssigned,
+  useChatMessages,
+  useChatQueue,
 } from '@/hooks/use-chat'
 import {
+  useConversationUpdates,
   useIncomingMessages,
+  useMarkSeen,
   useSendMessage,
   useTypingIndicator,
-  useMarkSeen,
 } from '@/hooks/use-chat-socket'
-import { MessageType, type IConversation } from '@/types/chat.types'
+import { ConversationStatus,  MessageType } from '@/types/chat.types'
 import { useCurrentOrgId } from '@/contexts/current-org.context'
 import { auth } from '@/lib/firebase'
 
@@ -188,6 +191,28 @@ function MessagePanel({ conversationId }: { conversationId: string }) {
 
 // ── Conversation list item ────────────────────────────────
 
+function statusBadge(status: ConversationStatus | undefined) {
+  switch (status) {
+    case ConversationStatus.QUEUE:
+      return 'bg-yellow-100 text-yellow-700'
+    case ConversationStatus.IN_PROGRESS:
+      return 'bg-blue-100 text-blue-700'
+    case ConversationStatus.CLOSED:
+      return 'bg-green-100 text-green-700'
+    default:
+      return 'bg-gray-100 text-gray-600'
+  }
+}
+
+function statusLabel(status: ConversationStatus | undefined) {
+  switch (status) {
+    case ConversationStatus.QUEUE:      return 'Queue'
+    case ConversationStatus.IN_PROGRESS: return 'In Progress'
+    case ConversationStatus.CLOSED:     return 'Closed'
+    default: return status ?? ''
+  }
+}
+
 function ConvItem({
   conv,
   isActive,
@@ -197,6 +222,7 @@ function ConvItem({
   isActive: boolean
   onSelect: () => void
 }) {
+  // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
   const label = (conv.partner?.displayName ?? conv.partner?.email ?? conv.id ?? 'user').slice(0, 8)
   return (
     <button
@@ -207,31 +233,32 @@ function ConvItem({
     >
       <div className="flex items-start gap-3">
         <img
-          src={avatarUrl(label)}
+          src={conv.partner?.avatarUrl ?? avatarUrl(label)}
           alt={label}
           className="w-12 h-12 rounded-full flex-shrink-0"
         />
         <div className="flex-1 min-w-0">
           <div className="flex items-center justify-between mb-1">
             <span className="text-sm font-semibold text-gray-900 truncate">
-              {label}
+              {conv.partner?.displayName ?? conv.partner?.email ?? label}
             </span>
-            <span className="text-xs text-gray-500 ml-2">
-              {formatTime(conv.lastMessageAt)}
-            </span>
+            <div className="flex items-center gap-1.5 ml-2 flex-shrink-0">
+              {(conv.unreadCount ?? 0) > 0 && (
+                <span className="bg-blue-500 text-white text-xs px-1.5 py-0.5 rounded-full">
+                  {conv.unreadCount}
+                </span>
+              )}
+              <span className="text-xs text-gray-500">
+                {formatTime(conv.lastMessageAt)}
+              </span>
+            </div>
           </div>
           <p className="text-sm truncate text-gray-500">
             {conv.lastMessageContent ?? 'No messages yet'}
           </p>
-          {conv.ticketStatus && (
-            <span className={`text-xs font-medium mt-0.5 inline-block px-1.5 py-0.5 rounded-full ${
-              conv.ticketStatus === 'queued'
-                ? 'bg-yellow-100 text-yellow-700'
-                : conv.ticketStatus === 'assigned'
-                ? 'bg-blue-100 text-blue-700'
-                : 'bg-green-100 text-green-700'
-            }`}>
-              {conv.ticketStatus}
+          {conv.status && (
+            <span className={`text-xs font-medium mt-0.5 inline-block px-1.5 py-0.5 rounded-full ${statusBadge(conv.status)}`}>
+              {statusLabel(conv.status)}
             </span>
           )}
         </div>
@@ -253,28 +280,23 @@ export function StaffChatPage() {
   const assignedQuery = useChatAssigned()
   const assignMutation = useAssignConversation()
 
-  const rawQueue = queueQuery.data
-  const rawAssigned = assignedQuery.data
+  // Keep conversation list up-to-date via socket events
+  useConversationUpdates()
 
-  // Guard: data may be a cached object {conversations:[]} or an array — always normalise to array
-  const toArr = (d: unknown): IConversation[] => {
-    if (Array.isArray(d)) return d
-    if (d && typeof d === 'object' && 'conversations' in d) {
-      const inner = (d as { conversations: unknown }).conversations
-      if (Array.isArray(inner)) return inner
-    }
-    return []
-  }
+  const queueList: Array<IConversation> = Array.isArray(queueQuery.data) ? queueQuery.data : []
+  const assignedList: Array<IConversation> = Array.isArray(assignedQuery.data) ? assignedQuery.data : []
 
-  const conversations = tab === 'queue' ? toArr(rawQueue) : toArr(rawAssigned)
-
+  const conversations = tab === 'queue' ? queueList : assignedList
   const isLoadingList = tab === 'queue' ? queueQuery.isLoading : assignedQuery.isLoading
 
   const filtered = conversations.filter((c) => {
-
     if (!searchTerm) return true
-    return c.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    const name = (c.partner?.displayName ?? c.partner?.email ?? '').toLowerCase()
+    return (
+      name.includes(searchTerm.toLowerCase()) ||
+      c.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
       (c.lastMessageContent ?? '').toLowerCase().includes(searchTerm.toLowerCase())
+    )
   })
 
   function handleSelect(conv: IConversation) {
@@ -341,9 +363,9 @@ export function StaffChatPage() {
                 }`}
               >
                 Queue
-                {(queueQuery.data?.length ?? 0) > 0 && (
+                {queueList.length > 0 && (
                   <span className="ml-1.5 bg-yellow-500 text-white text-xs px-1.5 py-0.5 rounded-full">
-                    {queueQuery.data?.length}
+                    {queueList.length}
                   </span>
                 )}
               </button>

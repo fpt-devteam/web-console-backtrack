@@ -1,9 +1,10 @@
 import {
-  useQuery,
-  useMutation,
   useInfiniteQuery,
+  useMutation,
+  useQuery,
   useQueryClient,
 } from '@tanstack/react-query';
+import type { IConversation } from '@/types/chat.types';
 import { chatService } from '@/services/chat.service';
 
 // ── Query key factory ───────────────────────────────────
@@ -64,7 +65,7 @@ export function useChatMessages(conversationId: string | null) {
     queryKey: chatKeys.messages(conversationId ?? ''),
     queryFn: ({ pageParam }) =>
       chatService.getMessages(conversationId!, {
-        cursor: pageParam as string | undefined,
+        cursor: pageParam,
         limit: 30,
       }),
     enabled: !!conversationId,
@@ -99,5 +100,18 @@ export function useReturnToQueue() {
       queryClient.invalidateQueries({ queryKey: chatKeys.queue() });
       queryClient.invalidateQueries({ queryKey: chatKeys.assigned() });
     },
+  });
+}
+
+/**
+ * Create or find an active support conversation with an organisation.
+ * Returns the existing conversation if one is already open.
+ */
+export function useCreateOrFindConversation(options?: {
+  onSuccess?: (conv: IConversation) => void;
+}) {
+  return useMutation({
+    mutationFn: (orgId: string) => chatService.createOrFindConversation(orgId),
+    onSuccess: options?.onSuccess,
   });
 }
