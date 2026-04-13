@@ -103,12 +103,25 @@ export interface GetInventoryParams {
   query?: string
   status?: PostStatus
   category?: ItemCategory
-  color?: string
-  brand?: string
+  /** Maps to BE `InventoryFilter.staffId` → post author (Firebase UID). */
+  staffId?: string
+  /** HTML `input type="date"` value `YYYY-MM-DD`; sent as `filters.time.from` / `.to` (UTC day bounds). */
   fromDate?: string
   toDate?: string
-  intakeStaffId?: string
-  returnStaffId?: string
+}
+
+/** BE expects `filters.time: { from?, to? }` as ISO-8601 DateTimeOffset strings. */
+function buildInventoryTimeFilter(
+  fromDate?: string,
+  toDate?: string,
+): { from?: string; to?: string } | undefined {
+  const from = fromDate?.trim()
+  const to = toDate?.trim()
+  if (!from && !to) return undefined
+  return {
+    ...(from ? { from: `${from}T00:00:00.000Z` } : {}),
+    ...(to ? { to: `${to}T23:59:59.999Z` } : {}),
+  }
 }
 
 /** Shape returned by BE POST /post-image/analyze */
@@ -129,12 +142,8 @@ type SearchInventoriesBody = {
   filters?: {
     status?: PostStatus
     category?: ItemCategory
-    color?: string
-    brand?: string
-    fromDate?: string
-    toDate?: string
-    intakeStaffId?: string
-    returnStaffId?: string
+    staffId?: string
+    time?: { from?: string; to?: string }
   }
   page?: number
   pageSize?: number
@@ -167,17 +176,14 @@ export const inventoryService = {
   },
 
   async search(orgId: string, params?: GetInventoryParams): Promise<PagedResponse<InventoryPost>> {
+    const time = buildInventoryTimeFilter(params?.fromDate, params?.toDate)
     const body: SearchInventoriesBody = {
       query: params?.query?.trim() || undefined,
       filters: {
         status: params?.status ?? undefined,
         category: params?.category ?? undefined,
-        color: params?.color?.trim() || undefined,
-        brand: params?.brand?.trim() || undefined,
-        fromDate: params?.fromDate || undefined,
-        toDate: params?.toDate || undefined,
-        intakeStaffId: params?.intakeStaffId?.trim() || undefined,
-        returnStaffId: params?.returnStaffId?.trim() || undefined,
+        staffId: params?.staffId?.trim() || undefined,
+        time,
       },
       page: params?.page ?? 1,
       pageSize: params?.pageSize ?? 10,
@@ -187,12 +193,8 @@ export const inventoryService = {
     if (
       !body.filters?.status &&
       !body.filters?.category &&
-      !body.filters?.color &&
-      !body.filters?.brand &&
-      !body.filters?.fromDate &&
-      !body.filters?.toDate &&
-      !body.filters?.intakeStaffId &&
-      !body.filters?.returnStaffId
+      !body.filters?.staffId &&
+      !body.filters?.time
     ) {
       delete body.filters
     }

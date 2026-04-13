@@ -1,6 +1,7 @@
 import { privateClient } from '@/lib/api-client';
 import type { ApiResponse } from '@/types/api-response.type';
 import type { PagedResponse } from '@/types/pagination.type';
+import type { InventoryPost } from '@/services/inventory.service';
 
 export type OwnerInfoPayload = {
   ownerName?: string | null;
@@ -16,7 +17,8 @@ export type OrgReturnReportResult = {
   createdAt: string;
   staff?: { id: string; displayName?: string | null; avatarUrl?: string | null } | null;
   ownerInfo?: OwnerInfoPayload | null;
-  post?: { id: string } | null;
+  /** Full post payload from BE (`PostResult`); used for history cards. */
+  post?: InventoryPost | null;
 };
 
 export const returnReportService = {

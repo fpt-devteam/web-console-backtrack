@@ -1,45 +1,86 @@
 import { useState, useMemo, useEffect } from 'react'
 import { useParams, Link } from '@tanstack/react-router'
 import { useCurrentOrgId } from '@/contexts/current-org.context'
-import { useUser } from '@/hooks/use-user'
-import { useInventoryItems } from '@/hooks/use-inventory'
+import { useOrgReturnReports } from '@/hooks/use-return-report'
 import { useDebouncedValue } from '@/hooks/use-debounce'
 import { Search, Calendar, Archive } from 'lucide-react'
 import { Spinner } from '@/components/ui/spinner'
 import { Pagination } from '@/components/ui/pagination'
-import type { InventoryPost } from '@/services/inventory.service'
+import type { OrgReturnReportResult } from '@/services/return-report.service'
 
 const pageSize = 8
+/** Staff return history: BE caps page size; load one batch then filter client-side. */
+const FETCH_PAGE_SIZE = 200
 
 function statusBadgeClass(s: string) {
   switch (s) {
-    case 'InStorage': return 'bg-indigo-500 text-white'
-    case 'Active': return 'bg-blue-600 text-white'
-    case 'ReturnScheduled': return 'bg-amber-500 text-white'
-    case 'Returned': return 'bg-green-500 text-white'
-    case 'Archived': return 'bg-slate-600 text-white'
-    case 'Expired': return 'bg-gray-600 text-white'
-    default: return 'bg-gray-600 text-white'
+    case 'InStorage':
+      return 'bg-indigo-500 text-white'
+    case 'Active':
+      return 'bg-blue-600 text-white'
+    case 'ReturnScheduled':
+      return 'bg-amber-500 text-white'
+    case 'Returned':
+      return 'bg-green-500 text-white'
+    case 'Archived':
+      return 'bg-slate-600 text-white'
+    case 'Expired':
+      return 'bg-gray-600 text-white'
+    default:
+      return 'bg-gray-600 text-white'
   }
 }
 
 function statusLabel(s: string) {
   switch (s) {
-    case 'Active': return 'Active'
-    case 'InStorage': return 'In Storage'
-    case 'ReturnScheduled': return 'Return Scheduled'
-    case 'Returned': return 'Returned'
-    case 'Archived': return 'Archived'
-    case 'Expired': return 'Expired'
-    default: return s
+    case 'Active':
+      return 'Active'
+    case 'InStorage':
+      return 'In Storage'
+    case 'ReturnScheduled':
+      return 'Return Scheduled'
+    case 'Returned':
+      return 'Returned'
+    case 'Archived':
+      return 'Archived'
+    case 'Expired':
+      return 'Expired'
+    default:
+      return s
   }
+}
+
+function reportCreatedDateKey(iso: string): string {
+  return iso.slice(0, 10)
+}
+
+function matchesDateRange(createdAt: string, fromDate: string, toDate: string): boolean {
+  const key = reportCreatedDateKey(createdAt)
+  if (fromDate && key < fromDate) return false
+  if (toDate && key > toDate) return false
+  return true
+}
+
+function matchesSearch(report: OrgReturnReportResult, q: string): boolean {
+  if (!q) return true
+  const post = report.post
+  if (!post) return false
+  const item = post.item
+  const hay = [
+    item.itemName,
+    item.additionalDetails,
+    item.category,
+    item.distinctiveMarks,
+  ]
+    .filter(Boolean)
+    .join(' ')
+    .toLowerCase()
+  return hay.includes(q.toLowerCase())
 }
 
 export function HandoverHistory() {
   const { slug } = useParams({ strict: false }) as { slug: string }
   const { currentOrgId } = useCurrentOrgId()
-  const { data: user } = useUser()
-  
   const [searchTerm, setSearchTerm] = useState('')
   const [fromDate, setFromDate] = useState('')
   const [toDate, setToDate] = useState('')
@@ -47,38 +88,42 @@ export function HandoverHistory() {
 
   const debouncedSearch = useDebouncedValue(searchTerm.trim(), 500)
 
-  const listParams = useMemo(
-    () => ({
-      page: currentPage,
-      pageSize,
-      query: debouncedSearch || undefined,
-      fromDate: fromDate || undefined,
-      toDate: toDate || undefined,
-      returnStaffId: user?.id,
-    }),
-    [currentPage, debouncedSearch, fromDate, toDate, user?.id],
-  )
+  const { data, isLoading, isError } = useOrgReturnReports(currentOrgId, 1, FETCH_PAGE_SIZE)
 
-  const { data, isLoading, isError } = useInventoryItems(currentOrgId, listParams)
+  const filteredReports = useMemo(() => {
+    const items = data?.items ?? []
+    return items.filter((r) => {
+      if (!r.post) return false
+      if (!matchesDateRange(r.createdAt, fromDate, toDate)) return false
+      if (!matchesSearch(r, debouncedSearch)) return false
+      return true
+    })
+  }, [data?.items, fromDate, toDate, debouncedSearch])
 
-  const items: InventoryPost[] = data?.items ?? []
-  const totalCount = data?.totalCount ?? 0
+  const totalCount = filteredReports.length
   const totalPages = Math.max(1, Math.ceil(totalCount / pageSize))
+  const pageItems = useMemo(() => {
+    const start = (currentPage - 1) * pageSize
+    return filteredReports.slice(start, start + pageSize)
+  }, [filteredReports, currentPage])
 
   useEffect(() => {
     setCurrentPage(1)
   }, [debouncedSearch, fromDate, toDate])
 
+  useEffect(() => {
+    if (currentPage > totalPages) setCurrentPage(totalPages)
+  }, [currentPage, totalPages])
+
   return (
     <div className="space-y-6">
-      {/* Filters */}
       <div className="flex flex-wrap items-center gap-4 bg-white p-3 rounded-lg border border-gray-200 shadow-sm text-sm">
         <div className="relative min-w-[200px] flex-1 lg:flex-none">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
           <input
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            placeholder="Search returned items..."
+            placeholder="Search by item name or details..."
             className="w-full pl-9 pr-3 py-1.5 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500 text-gray-900"
           />
         </div>
@@ -98,9 +143,11 @@ export function HandoverHistory() {
             className="bg-transparent border-none focus:outline-none text-gray-900 w-[115px]"
           />
         </div>
+        <span className="text-xs text-gray-500 hidden sm:inline">Dates filter by handover (return report) date.</span>
 
         {(searchTerm || fromDate || toDate) && (
           <button
+            type="button"
             onClick={() => {
               setSearchTerm('')
               setFromDate('')
@@ -113,10 +160,9 @@ export function HandoverHistory() {
         )}
       </div>
 
-      {/* Grid */}
       {isError && (
         <div className="text-center py-12">
-          <p className="text-gray-500 text-lg">Failed to load handover history.</p>
+          <p className="text-gray-500 text-lg">Failed to load return history.</p>
         </div>
       )}
 
@@ -125,63 +171,75 @@ export function HandoverHistory() {
           <div className="col-span-full py-12">
             <Spinner className="mx-auto" />
           </div>
-        ) : items.length === 0 ? (
+        ) : pageItems.length === 0 ? (
           <div className="col-span-full text-center py-12 bg-gray-50 rounded-lg border border-dashed border-gray-300">
-            <p className="text-gray-500 text-lg">No handover history found matching your filters.</p>
+            <p className="text-gray-500 text-lg">No return handovers found matching your filters.</p>
           </div>
         ) : (
-          items.map((item) => (
-            <div
-              key={item.id}
-              className="bg-white rounded-xl shadow-sm overflow-hidden hover:shadow-md transition-shadow flex flex-col"
-            >
-              <div className="relative h-48 bg-gradient-to-br from-gray-100 to-gray-200 shrink-0">
-                {item.imageUrls?.[0] ? (
-                  <img
-                    src={item.imageUrls[0]}
-                    alt={item.item.itemName}
-                    className="w-full h-full object-cover"
-                  />
-                ) : (
-                  <div className="w-full h-full flex items-center justify-center text-gray-400">
-                    No image
-                  </div>
-                )}
-                <span
-                  className={`absolute top-3 right-3 px-3 py-1 rounded-full text-xs font-semibold ${statusBadgeClass(item.status)}`}
-                >
-                  {statusLabel(item.status)}
-                </span>
-              </div>
-              <div className="p-4 flex flex-col flex-1">
-                <h3 className="font-semibold text-gray-900 mb-3">{item.item.itemName}</h3>
-                <div className="space-y-2 text-sm text-gray-600 mb-4 flex-1">
-                  <div className="flex items-center gap-2">
-                    <Archive className="w-4 h-4 flex-shrink-0" />
-                    <span>{item.item.category || '—'}</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <Calendar className="w-4 h-4 flex-shrink-0" />
-                    <span>{item.eventTime ? new Date(item.eventTime).toLocaleDateString() : new Date(item.createdAt).toLocaleDateString()}</span>
-                  </div>
+          pageItems.map((report) => {
+            const item = report.post!
+            return (
+              <div
+                key={report.id}
+                className="bg-white rounded-xl shadow-sm overflow-hidden hover:shadow-md transition-shadow flex flex-col"
+              >
+                <div className="relative h-48 bg-gradient-to-br from-gray-100 to-gray-200 shrink-0">
+                  {item.imageUrls?.[0] ? (
+                    <img
+                      src={item.imageUrls[0]}
+                      alt={item.item.itemName}
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center text-gray-400">No image</div>
+                  )}
+                  <span
+                    className={`absolute top-3 right-3 px-3 py-1 rounded-full text-xs font-semibold ${statusBadgeClass(item.status)}`}
+                  >
+                    {statusLabel(item.status)}
+                  </span>
                 </div>
-                <Link to="/console/$slug/staff/item/$itemId" params={{ slug, itemId: item.id }} className="mt-auto block">
-                  <button className="w-full py-1.5 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-all font-medium text-sm">
-                    View Details
-                  </button>
-                </Link>
+                <div className="p-4 flex flex-col flex-1">
+                  <h3 className="font-semibold text-gray-900 mb-3">{item.item.itemName}</h3>
+                  <div className="space-y-2 text-sm text-gray-600 mb-4 flex-1">
+                    <div className="flex items-center gap-2">
+                      <Archive className="w-4 h-4 flex-shrink-0" />
+                      <span>{item.item.category || '—'}</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Calendar className="w-4 h-4 flex-shrink-0" />
+                      <span title="Handover recorded">
+                        {new Date(report.createdAt).toLocaleDateString()}
+                      </span>
+                    </div>
+                  </div>
+                  <Link
+                    to="/console/$slug/staff/item/$itemId"
+                    params={{ slug, itemId: item.id }}
+                    className="mt-auto block"
+                  >
+                    <button
+                      type="button"
+                      className="w-full py-1.5 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-all font-medium text-sm"
+                    >
+                      View Details
+                    </button>
+                  </Link>
+                </div>
               </div>
-            </div>
-          ))
+            )
+          })
         )}
       </div>
 
       {!isLoading && totalCount > pageSize && (
-        <Pagination
-          currentPage={currentPage}
-          totalPages={totalPages}
-          onPageChange={setCurrentPage}
-        />
+        <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={setCurrentPage} />
+      )}
+
+      {!isLoading && (data?.items?.length ?? 0) >= FETCH_PAGE_SIZE && (
+        <p className="text-xs text-amber-700 text-center">
+          Showing up to {FETCH_PAGE_SIZE} most recent handovers. Narrow filters or ask for server-side paging if you need more.
+        </p>
       )}
     </div>
   )
