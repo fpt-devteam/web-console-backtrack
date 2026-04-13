@@ -1,5 +1,4 @@
 export { StaffInventoryPage } from './inventory'
-export { StaffFeedPage } from './feed'
 export { StaffChatPage } from './chat'
 export { StaffNotificationPage } from './notification'
 export { AddFoundItemPage } from './add-item'

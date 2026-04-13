@@ -1,4 +1,4 @@
-import { LayoutGrid, Users, CreditCard, Building2, Settings, ChevronLeft, ChevronRight, ChevronDown, ChevronUp, ArrowLeftRight, Package } from 'lucide-react';
+import { LayoutGrid, Users, CreditCard, Settings, ChevronLeft, ChevronRight, ChevronDown, ChevronUp, ArrowLeftRight, Package } from 'lucide-react';
 import { OrgLogo } from '@/components/org-logo';
 import { Link, useLocation, useParams } from '@tanstack/react-router';
 import { useState, useEffect, useMemo } from 'react';
@@ -45,7 +45,6 @@ export function Sidebar({ isOpen, onToggle }: SidebarProps) {
     { name: 'Dashboard', icon: LayoutGrid, path: `${base}/admin/dashboard` },
     { name: 'Employee', icon: Users, path: `${base}/admin/employee` },
     { name: 'Plan', icon: CreditCard, path: `${base}/admin/plan` },
-    { name: 'Branch', icon: Building2, path: `${base}/admin/branch` },
     { name: 'Inventory', icon: Package, path: `${base}/admin/inventory` },
     {
       name: 'Setting',

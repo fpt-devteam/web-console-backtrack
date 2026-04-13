@@ -3,7 +3,6 @@ import { useState, useEffect } from 'react';
 // import { useRouter } from '@tanstack/react-router';
 import { 
   CreditCard, 
-  Building2, 
   Mail, 
   Receipt, 
   Check,
@@ -82,7 +81,7 @@ export function PlanPage() {
               </div>
 
               {/* Usage Stats */}
-              <div className="grid grid-cols-3 gap-4 mb-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
                 <div className="p-4 bg-gray-50 rounded-lg">
                   <div className="flex items-center gap-2 text-sm text-gray-600 mb-1">
                     <Receipt className="w-4 h-4" />
@@ -93,17 +92,6 @@ export function PlanPage() {
                     <span className="text-base text-gray-500">
                       {mockCurrentPlan.usage.posts.limit ? ` / ${mockCurrentPlan.usage.posts.limit}` : ' / ∞'}
                     </span>
-                  </div>
-                </div>
-
-                <div className="p-4 bg-gray-50 rounded-lg">
-                  <div className="flex items-center gap-2 text-sm text-gray-600 mb-1">
-                    <Building2 className="w-4 h-4" />
-                    <span>Branches</span>
-                  </div>
-                  <div className="text-2xl font-bold text-gray-900">
-                    {mockCurrentPlan.usage.branches.current}
-                    <span className="text-base text-gray-500"> / {mockCurrentPlan.usage.branches.limit}</span>
                   </div>
                 </div>
 
@@ -229,10 +217,6 @@ export function PlanPage() {
                       </div>
 
                       <ul className="space-y-2 mb-5">
-                        <li className="flex items-start gap-2 text-sm">
-                          <Check className="w-4 h-4 text-green-600 mt-0.5 flex-shrink-0" />
-                          <span className="text-gray-700">{plan.features.branches}</span>
-                        </li>
                         <li className="flex items-start gap-2 text-sm">
                           <Check className="w-4 h-4 text-green-600 mt-0.5 flex-shrink-0" />
                           <span className="text-gray-700">{plan.features.employees}</span>

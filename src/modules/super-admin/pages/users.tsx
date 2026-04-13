@@ -1,129 +1,95 @@
 import { Layout } from '../components/layout';
 import { Eye, Trash2 } from 'lucide-react';
-import { useState } from 'react';
-import { formatDistanceToNow } from 'date-fns';
+import { useEffect, useMemo, useState } from 'react';
 import { useDebouncedValue, SEARCH_DEBOUNCE_MS } from '@/hooks/use-debounce';
-import { mockSuperAdminUsers, type UserRole, type UserStatus } from '@/mock/data/mock-super-admin-users';
+import type { AdminUserStatus, AdminUserSummary } from '@/types/admin-user.types';
 import { TableFiltersBar } from '@/components/filters/table-filters-bar';
 import { Pagination } from '@/components/ui/pagination';
 import { useRouter } from '@tanstack/react-router';
+import { useAdminUsers } from '@/hooks/use-admin-users';
+
+function rowDisplayName(u: AdminUserSummary): string {
+  return (u.displayName || u.email || 'Unknown').trim();
+}
+
+function roleLabel(u: AdminUserSummary): string {
+  return u.globalRole === 'PlatformSuperAdmin' ? 'Super Admin' : 'User';
+}
 
 /**
  * User Management Page
- * 
- * Displays a table of all users with search, filter by role and status,
- * and pagination functionality.
+ *
+ * GET /api/core/admin/users — paginated list, search, status filter.
  */
 export function UsersPage() {
   const router = useRouter();
   const [currentPage, setCurrentPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState('');
   const debouncedSearchTerm = useDebouncedValue(searchTerm.trim(), SEARCH_DEBOUNCE_MS);
-  const [roleFilter, setRoleFilter] = useState<UserRole | 'All'>('All');
-  const [statusFilter, setStatusFilter] = useState<UserStatus | 'All'>('All');
+  const [statusFilter, setStatusFilter] = useState<AdminUserStatus | 'All'>('All');
   const [sortFilter, setSortFilter] = useState<'Newest' | 'Oldest' | 'Name A-Z' | 'Name Z-A'>('Newest');
   const pageSize = 10;
 
-  // Filter users by search term, role, and status
-  const filteredUsers = mockSuperAdminUsers.filter(user => {
-    const matchesSearch = 
-      user.email.toLowerCase().includes(debouncedSearchTerm.toLowerCase()) ||
-      user.name.toLowerCase().includes(debouncedSearchTerm.toLowerCase());
-    const matchesRole = roleFilter === 'All' || user.role === roleFilter;
-    const matchesStatus = statusFilter === 'All' || user.status === statusFilter;
-    return matchesSearch && matchesRole && matchesStatus;
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [debouncedSearchTerm, statusFilter]);
+
+  const { data, isLoading, isError, error, refetch, isFetching } = useAdminUsers({
+    page: currentPage,
+    pageSize,
+    search: debouncedSearchTerm || undefined,
+    status: statusFilter === 'All' ? undefined : statusFilter,
   });
 
-  // Sort users
-  const sortedUsers = [...filteredUsers].sort((a, b) => {
-    switch (sortFilter) {
-      case 'Newest':
-        return b.createdAt.getTime() - a.createdAt.getTime();
-      case 'Oldest':
-        return a.createdAt.getTime() - b.createdAt.getTime();
-      case 'Name A-Z':
-        return a.name.localeCompare(b.name);
-      case 'Name Z-A':
-        return b.name.localeCompare(a.name);
-      default:
-        return 0;
-    }
-  });
+  const sortedItems = useMemo(() => {
+    const items = [...(data?.items ?? [])];
+    items.sort((a, b) => {
+      const nameA = rowDisplayName(a);
+      const nameB = rowDisplayName(b);
+      switch (sortFilter) {
+        case 'Newest':
+          return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+        case 'Oldest':
+          return new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
+        case 'Name A-Z':
+          return nameA.localeCompare(nameB);
+        case 'Name Z-A':
+          return nameB.localeCompare(nameA);
+        default:
+          return 0;
+      }
+    });
+    return items;
+  }, [data?.items, sortFilter]);
 
-  // Pagination
-  const totalPages = Math.ceil(sortedUsers.length / pageSize);
-  const startIndex = (currentPage - 1) * pageSize;
-  const endIndex = startIndex + pageSize;
-  const currentUsers = sortedUsers.slice(startIndex, endIndex);
+  const total = data?.total ?? 0;
+  const totalPages = Math.max(1, Math.ceil(total / pageSize));
+  const startIndex = total === 0 ? 0 : (currentPage - 1) * pageSize + 1;
+  const endIndex = total === 0 ? 0 : Math.min(currentPage * pageSize, total);
 
-  /**
-   * Gets status color based on user status
-   * 
-   * @param status - User status
-   * @returns Object with dot and text colors
-   */
-  const getStatusStyle = (status: UserStatus) => {
+  const getStatusStyle = (status: AdminUserStatus) => {
     switch (status) {
       case 'Active':
-        return {
-          dot: 'bg-green-500',
-          text: 'text-green-700',
-        };
+        return { dot: 'bg-green-500', text: 'text-green-700' };
       case 'Inactive':
-        return {
-          dot: 'bg-gray-400',
-          text: 'text-gray-600',
-        };
+        return { dot: 'bg-gray-400', text: 'text-gray-600' };
       default:
-        return {
-          dot: 'bg-gray-400',
-          text: 'text-gray-600',
-        };
+        return { dot: 'bg-gray-400', text: 'text-gray-600' };
     }
   };
 
-  /**
-   * Formats date to readable string
-   * 
-   * @param date - Date to format
-   * @returns Formatted date string
-   */
-  const formatDate = (date: Date) => {
-    return date.toLocaleDateString('en-US', { 
-      month: 'short', 
-      day: 'numeric', 
-      year: 'numeric' 
-    });
-  };
-
-  /**
-   * Formats last login to relative time or "Never"
-   * 
-   * @param date - Date to format or null
-   * @returns Relative time string or "Never"
-   */
-  const formatLastLogin = (date: Date | null) => {
-    if (!date) return 'Never';
-    const distance = formatDistanceToNow(date, { addSuffix: true });
-    return distance.replace('about ', '').replace(' ago', ' ago');
-  };
+  const formatDate = (iso: string) =>
+    new Date(iso).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
 
   const handleViewUser = (userId: string) => {
     router.navigate({ to: '/super-admin/users/$userId', params: { userId } });
   };
 
   const handleDeleteUser = (userId: string, userName: string) => {
-    // TODO: Implement delete user functionality
     if (window.confirm(`Are you sure you want to delete ${userName}?`)) {
       console.log('Delete user:', userId);
     }
   };
-
-  // Filter options
-  const roleOptions = [
-    { value: 'Staff', label: 'Staff' },
-    { value: 'User', label: 'User' },
-  ];
 
   const statusOptions = [
     { value: 'Active', label: 'Active' },
@@ -137,17 +103,17 @@ export function UsersPage() {
     { value: 'Name Z-A', label: 'Name Z-A' },
   ];
 
+  const errMessage = error instanceof Error ? error.message : 'Failed to load users';
+
   return (
     <Layout>
       <div className="p-8 bg-gray-50 min-h-screen">
-        {/* Breadcrumbs */}
         <div className="mb-4">
           <nav className="text-sm text-gray-500">
             <span className="hover:text-gray-700 cursor-pointer">User Management</span>
           </nav>
         </div>
 
-        {/* Header */}
         <div className="flex items-start justify-between mb-4">
           <div>
             <h1 className="text-3xl font-bold text-gray-900 mb-2">Users</h1>
@@ -157,19 +123,24 @@ export function UsersPage() {
           </div>
         </div>
 
-        {/* Search and Filter Bar */}
+        {isError ? (
+          <div className="mb-4 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800 flex items-center justify-between gap-4">
+            <span>{errMessage}</span>
+            <button
+              type="button"
+              className="shrink-0 font-medium text-red-900 underline"
+              onClick={() => void refetch()}
+            >
+              Retry
+            </button>
+          </div>
+        ) : null}
+
         <TableFiltersBar
           searchValue={searchTerm}
           onSearchChange={setSearchTerm}
           searchPlaceholder="Search by name or email..."
           filters={[
-            {
-              label: 'Role',
-              value: roleFilter,
-              onChange: (value) => setRoleFilter(value as typeof roleFilter),
-              options: roleOptions,
-              allLabel: 'All',
-            },
             {
               label: 'Status',
               value: statusFilter,
@@ -188,91 +159,92 @@ export function UsersPage() {
           className="mb-6"
         />
 
-        {/* Users Table */}
-        <div className="bg-white rounded-xl shadow-sm overflow-hidden">
+        <div className="bg-white rounded-xl shadow-sm overflow-hidden relative">
+          {isFetching ? (
+            <div className="absolute inset-0 z-10 bg-white/50 pointer-events-none" aria-hidden />
+          ) : null}
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead className="bg-blue-50 border-b-1 ">
                 <tr>
-                  <th className="px-6 py-3 text-left text-xs font-bold uppercase tracking-wider ">
-                    User
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-bold uppercase tracking-wider ">
-                    Email
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-bold uppercase tracking-wider ">
-                    Status
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-bold uppercase tracking-wider ">
-                    Created Date
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-bold uppercase tracking-wider ">
-                    Last Login
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-bold uppercase tracking-wider ">
-                    Action
-                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-bold uppercase tracking-wider ">Email</th>
+                  <th className="px-6 py-3 text-left text-xs font-bold uppercase tracking-wider ">Role</th>
+                  <th className="px-6 py-3 text-left text-xs font-bold uppercase tracking-wider ">Status</th>
+                  <th className="px-6 py-3 text-left text-xs font-bold uppercase tracking-wider ">Created Date</th>
+                  <th className="px-6 py-3 text-left text-xs font-bold uppercase tracking-wider ">Last Login</th>
+                  <th className="px-6 py-3 text-left text-xs font-bold uppercase tracking-wider ">Action</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-200">
-                {currentUsers.map((user) => {
-                  const statusStyle = getStatusStyle(user.status);
-                  return (
-                    <tr key={user.id} className="hover:bg-gray-50 transition-colors">
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="flex items-center gap-3">
-                          <div className={`w-10 h-10 rounded-full ${user.avatarColor} flex items-center justify-center text-gray-700 font-semibold text-sm`}>
-                            {user.avatarText}
+                {isLoading ? (
+                  <tr>
+                    <td colSpan={6} className="px-6 py-12 text-center text-gray-500">
+                      Loading users…
+                    </td>
+                  </tr>
+                ) : sortedItems.length === 0 ? (
+                  <tr>
+                    <td colSpan={6} className="px-6 py-12 text-center text-gray-500">
+                      No users match your filters.
+                    </td>
+                  </tr>
+                ) : (
+                  sortedItems.map((user) => {
+                    const statusStyle = getStatusStyle(user.status);
+                    const label = rowDisplayName(user);
+                    return (
+                      <tr key={user.id} className="hover:bg-gray-50 transition-colors">
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <span className="text-gray-600">{user.email ?? '—'}</span>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <span className="text-gray-600">{roleLabel(user)}</span>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <div className="flex items-center gap-2">
+                            <span className={`w-2 h-2 rounded-full ${statusStyle.dot}`} />
+                            <span className={`text-sm font-medium ${statusStyle.text}`}>{user.status}</span>
                           </div>
-                          <span className="font-medium text-gray-900">{user.name}</span>
-                        </div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <span className="text-gray-600">{user.email}</span>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="flex items-center gap-2">
-                          <span className={`w-2 h-2 rounded-full ${statusStyle.dot}`}></span>
-                          <span className={`text-sm font-medium ${statusStyle.text}`}>
-                            {user.status}
-                          </span>
-                        </div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <span className="text-gray-600">{formatDate(user.createdAt)}</span>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <span className="text-gray-600">{formatLastLogin(user.lastLogin)}</span>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="flex items-center gap-2">
-                          <button
-                            onClick={() => handleViewUser(user.id)}
-                            className="p-2 text-gray-400 hover:text-green-600 hover:bg-green-50 rounded-lg transition-colors"
-                            title="View User Details"
-                          >
-                            <Eye className="w-4 h-4" />
-                          </button>
-                          <button
-                            onClick={() => handleDeleteUser(user.id, user.name)}
-                            className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
-                            title="Delete User"
-                          >
-                            <Trash2 className="w-4 h-4" />
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
-                  );
-                })}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <span className="text-gray-600">{formatDate(user.createdAt)}</span>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <span className="text-gray-600">—</span>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <div className="flex items-center gap-2">
+                            <button
+                              type="button"
+                              onClick={() => handleViewUser(user.id)}
+                              className="p-2 text-gray-400 hover:text-green-600 hover:bg-green-50 rounded-lg transition-colors"
+                              title="View User Details"
+                            >
+                              <Eye className="w-4 h-4" />
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => handleDeleteUser(user.id, label)}
+                              className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                              title="Delete User"
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    );
+                  })
+                )}
               </tbody>
             </table>
           </div>
 
-          {/* Pagination */}
           <div className="px-6 py-4 border-t border-gray-200 flex items-center justify-between">
             <div className="text-sm text-gray-600">
-              Showing {startIndex + 1} to {Math.min(endIndex, sortedUsers.length)} of {sortedUsers.length} results
+              {total === 0
+                ? 'No results'
+                : `Showing ${startIndex} to ${endIndex} of ${total} results`}
             </div>
             <Pagination
               currentPage={currentPage}
@@ -285,4 +257,3 @@ export function UsersPage() {
     </Layout>
   );
 }
-
