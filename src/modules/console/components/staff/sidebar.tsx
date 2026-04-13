@@ -1,4 +1,4 @@
-import { Package, FileText, MessageCircle, Bell, ChevronLeft, ChevronRight, ArrowLeftRight, History } from 'lucide-react';
+import { Package, MessageCircle, Bell, ChevronLeft, ChevronRight, ArrowLeftRight, History } from 'lucide-react';
 import { OrgLogo } from '@/components/org-logo';
 import { Link, useLocation, useParams } from '@tanstack/react-router';
 import { useCurrentOrgId } from '@/contexts/current-org.context';
@@ -30,7 +30,6 @@ export function StaffSidebar({ isOpen, onToggle }: StaffSidebarProps) {
 
   const menuItems = [
     { name: 'Inventory', icon: Package, path: `${base}/staff/inventory` },
-    { name: 'Feed', icon: FileText, path: `${base}/staff/feed` },
     { name: 'Chat', icon: MessageCircle, path: `${base}/staff/chat` },
     { name: 'History', icon: History, path: `${base}/staff/history` },
     { name: 'Notification', icon: Bell, path: `${base}/staff/notification` },
