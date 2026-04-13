@@ -7,7 +7,6 @@
 export * from './mock-analytics';
 // export * from './mock-admin-dashboard';
 export * from './mock-plan';
-export * from './mock-branches';
 export * from './mock-inventory';
 export * from './mock-tenants';
 export * from './mock-super-admin-users';

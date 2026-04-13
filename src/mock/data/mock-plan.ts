@@ -6,7 +6,6 @@ export interface PlanDetails {
   renewsOn: string;
   usage: {
     posts: { current: number; limit: number | null };
-    branches: { current: number; limit: number };
     employees: { current: number; limit: number };
   };
 }
@@ -18,7 +17,6 @@ export interface AvailablePlan {
   monthlyPrice: number;
   yearlyPrice: number;
   features: {
-    branches: string;
     employees: string;
     posts: string;
     analytics?: boolean;
@@ -56,7 +54,6 @@ export const mockCurrentPlan: PlanDetails = {
   renewsOn: 'Feb 14, 2024',
   usage: {
     posts: { current: 842, limit: null }, // null = unlimited
-    branches: { current: 3, limit: 5 },
     employees: { current: 12, limit: 20 },
   },
 };
@@ -69,7 +66,6 @@ export const mockAvailablePlans: AvailablePlan[] = [
     monthlyPrice: 0,
     yearlyPrice: 0,
     features: {
-      branches: '1 Branch',
       employees: '5 Employees',
       posts: '50 Posts/mo',
     },
@@ -81,7 +77,6 @@ export const mockAvailablePlans: AvailablePlan[] = [
     monthlyPrice: 49,
     yearlyPrice: 470, // ~20% discount
     features: {
-      branches: 'Up to 5 Branches',
       employees: '20 Employees',
       posts: 'Unlimited Posts',
       analytics: true,
@@ -94,7 +89,6 @@ export const mockAvailablePlans: AvailablePlan[] = [
     monthlyPrice: 199,
     yearlyPrice: 1910, // ~20% discount
     features: {
-      branches: 'Unlimited Branches',
       employees: 'Unlimited Employees',
       posts: 'Unlimited Posts',
       support: 'Priority Support',

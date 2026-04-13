@@ -58,7 +58,7 @@ export function IntakeHistory() {
       status: statusFilter !== ALL_STATUS ? statusFilter : undefined,
       fromDate: fromDate || undefined,
       toDate: toDate || undefined,
-      intakeStaffId: user?.id,
+      staffId: user?.id,
     }),
     [currentPage, debouncedSearch, statusFilter, fromDate, toDate, user?.id],
   )
