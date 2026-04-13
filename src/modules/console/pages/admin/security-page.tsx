@@ -20,6 +20,13 @@ const FINDER_FIELDS: { value: FinderContactField; label: string; description: st
   { value: 'OrgMemberId', label: 'Student / Staff ID',   description: 'Internal organisation member ID' },
 ];
 
+const OWNER_FIELDS: { value: FinderContactField; label: string; description: string }[] = [
+  { value: 'Phone',       label: 'Phone number',         description: 'Mobile or landline contact number' },
+  { value: 'Email',       label: 'Email',                description: 'Personal or work email address'   },
+  { value: 'NationalId',  label: 'National / Citizen ID', description: 'Government-issued ID number'     },
+  { value: 'OrgMemberId', label: 'Student / Staff ID',   description: 'Internal organisation member ID' },
+];
+
 export function SecurityPage() {
   /* ── Change password ── */
   const [currentPassword, setCurrentPassword] = useState('');
@@ -36,19 +43,32 @@ export function SecurityPage() {
   const { data: org } = useOrganization(currentOrgId);
   const updateOrg = useUpdateOrganization();
   const [checkedFields, setCheckedFields] = useState<FinderContactField[]>(['Phone']);
+  const [checkedOwnerFields, setCheckedOwnerFields] = useState<FinderContactField[]>(['Phone']);
   const [policyError, setPolicyError] = useState<string | null>(null);
+  const [ownerPolicyError, setOwnerPolicyError] = useState<string | null>(null);
   const [policySaving, setPolicySaving] = useState(false);
+  const [ownerPolicySaving, setOwnerPolicySaving] = useState(false);
 
   useEffect(() => {
     if (!org) return;
     if (org.requiredFinderContractFields && org.requiredFinderContractFields.length > 0) {
       setCheckedFields(org.requiredFinderContractFields);
     }
+    if (org.requiredOwnerContractFields && org.requiredOwnerContractFields.length > 0) {
+      setCheckedOwnerFields(org.requiredOwnerContractFields);
+    }
   }, [org]);
 
   const toggleField = (field: FinderContactField) => {
     setPolicyError(null);
     setCheckedFields((prev) =>
+      prev.includes(field) ? prev.filter((f) => f !== field) : [...prev, field],
+    );
+  };
+
+  const toggleOwnerField = (field: FinderContactField) => {
+    setOwnerPolicyError(null);
+    setCheckedOwnerFields((prev) =>
       prev.includes(field) ? prev.filter((f) => f !== field) : [...prev, field],
     );
   };
@@ -90,6 +110,48 @@ export function SecurityPage() {
         onError: (err) => {
           setPolicyError(err instanceof Error ? err.message : 'Failed to save policy.');
           setPolicySaving(false);
+        },
+      },
+    );
+  };
+
+  const handleSaveOwnerPolicy = () => {
+    if (checkedOwnerFields.length === 0) {
+      setOwnerPolicyError('At least one field must be required.');
+      return;
+    }
+    if (!currentOrgId || !org) return;
+    setOwnerPolicySaving(true);
+    updateOrg.mutate(
+      {
+        orgId: currentOrgId,
+        payload: {
+          name: org.name,
+          slug: org.slug,
+          displayAddress: org.displayAddress ?? undefined,
+          location: org.location ?? undefined,
+          externalPlaceId: org.externalPlaceId ?? undefined,
+          phone: org.phone,
+          contactEmail: org.contactEmail ?? undefined,
+          industryType: org.industryType,
+          taxIdentificationNumber: org.taxIdentificationNumber,
+          locationNote: org.locationNote ?? undefined,
+          businessHours: org.businessHours ?? undefined,
+          logoUrl: org.logoUrl ?? undefined,
+          coverImageUrl: org.coverImageUrl ?? undefined,
+          // Keep finder policy unchanged when updating owner policy
+          requiredFinderContractFields: org.requiredFinderContractFields ?? ['Phone'],
+          requiredOwnerContractFields: checkedOwnerFields,
+        },
+      },
+      {
+        onSuccess: () => {
+          showToast.success('Owner contact policy updated.');
+          setOwnerPolicySaving(false);
+        },
+        onError: (err) => {
+          setOwnerPolicyError(err instanceof Error ? err.message : 'Failed to save policy.');
+          setOwnerPolicySaving(false);
         },
       },
     );
@@ -344,6 +406,94 @@ export function SecurityPage() {
                 className="w-full md:w-auto px-6 py-1.5 md:py-2 xl:px-8 xl:py-2.5 xl:text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium disabled:opacity-50 transition-colors"
               >
                 {policySaving ? 'Saving…' : 'Save policy'}
+              </button>
+            </div>
+          </div>
+
+          {/* ── Owner Contact Policy ── */}
+          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4 md:p-6 xl:p-8">
+            <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-2 md:gap-4 mb-2 xl:mb-3">
+              <div className="flex items-center gap-2">
+                <ShieldCheck className="w-3.5 h-3.5 xl:w-4 xl:h-4 text-blue-600 shrink-0" />
+                <h2 className="text-base md:text-lg xl:text-lg font-semibold text-gray-900">Owner Contact Policy</h2>
+              </div>
+              <span className="flex items-center gap-1 text-[10px] xl:text-[10px] text-gray-500 shrink-0 sself-start sm:self-auto">
+                <Check className="w-3 h-3 xl:w-3.5 xl:h-3.5 text-blue-600" />
+                = Required
+              </span>
+            </div>
+            <p className="text-[10px] md:text-xs xl:text-sm text-gray-500 mb-3 xl:mb-6 ">
+              Fields marked as required must be provided when staff hands over an item to the owner.
+            </p>
+
+            {ownerPolicyError && (
+              <p className="mb-4 xl:mb-6 text-[10px] md:text-xs xl:text-xs text-red-600 bg-red-50  rounded-lg">
+                {ownerPolicyError}
+              </p>
+            )}
+
+            <div className="overflow-x-auto rounded-lg border border-gray-200">
+              <table className="w-full text-sm min-w-[300px]">
+                <thead>
+                  <tr className="border-b border-gray-200 bg-gray-50">
+                    <th className="py-2 px-3 md:py-3 md:px-4 xl:py-4 xl:px-6 text-left text-[10px] md:text-xs xl:text-xs font-semibold uppercase tracking-widest text-gray-400">
+                      Field
+                    </th>
+                    <th className="py-2 px-3 md:py-3 md:px-4 xl:py-4 xl:px-6 text-left text-[10px] md:text-xs xl:text-xs font-semibold uppercase tracking-widest text-gray-400 hidden sm:table-cell">
+                      Description
+                    </th>
+                    <th className="py-2 px-3 md:py-3 md:px-4 xl:py-4 xl:px-6 text-center text-[10px] md:text-xs xl:text-xs font-semibold uppercase tracking-widest text-gray-400 w-20 md:w-24 xl:w-32">
+                      Required
+                    </th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-100">
+                  {OWNER_FIELDS.map((f) => {
+                    const checked = checkedOwnerFields.includes(f.value);
+                    return (
+                      <tr
+                        key={f.value}
+                        onClick={() => toggleOwnerField(f.value)}
+                        className="cursor-pointer hover:bg-blue-50/50 transition-colors"
+                      >
+                        <td className="py-3 px-3 md:py-4 md:px-4 xl:py-5 xl:px-6">
+                          <div className="font-medium text-gray-800 text-xs md:text-sm xl:text-sm">{f.label}</div>
+                          <div className="text-gray-500 text-[10px] md:hidden mt-0.5">{f.description}</div>
+                        </td>
+                        <td className="py-3 px-3 md:py-4 md:px-4 xl:py-5 xl:px-6 text-gray-500 text-xs md:text-sm xl:text-sm hidden sm:table-cell">
+                          {f.description}
+                        </td>
+                        <td className="py-3 px-3 md:py-4 md:px-4 xl:py-5 xl:px-6">
+                          <div className="flex justify-center">
+                            <div
+                              className={`w-3.5 h-3.5 md:w-4 md:h-4 xl:w-5 xl:h-5 rounded flex items-center justify-center border-2 xl:border-[3px] transition-colors ${
+                                checked ? 'bg-blue-600 border-blue-600' : 'border-gray-300 bg-white'
+                              }`}
+                            >
+                              {checked && (
+                                <Check
+                                  className="w-2.5 h-2.5 md:w-3 md:h-3 xl:w-3.5 xl:h-3.5 text-white"
+                                  strokeWidth={3}
+                                />
+                              )}
+                            </div>
+                          </div>
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+
+            <div className="flex justify-end mt-4 md:mt-5 xl:mt-8">
+              <button
+                type="button"
+                disabled={ownerPolicySaving || !org}
+                onClick={handleSaveOwnerPolicy}
+                className="w-full md:w-auto px-6 py-1.5 md:py-2 xl:px-8 xl:py-2.5 xl:text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium disabled:opacity-50 transition-colors"
+              >
+                {ownerPolicySaving ? 'Saving…' : 'Save policy'}
               </button>
             </div>
           </div>

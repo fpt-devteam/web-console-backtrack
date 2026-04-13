@@ -136,3 +136,13 @@ code {
     @apply bg-background font-sans text-foreground antialiased;
   }
 }
+
+/* Hide scrollbars (keep scroll interaction) */
+.scrollbar-none {
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE/Edge legacy */
+}
+.scrollbar-none::-webkit-scrollbar {
+  width: 0;
+  height: 0;
+}

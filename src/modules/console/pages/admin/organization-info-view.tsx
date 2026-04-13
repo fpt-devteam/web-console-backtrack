@@ -93,9 +93,9 @@ export function OrganizationInfoViewPage() {
     }
   }, [currentOrgId, router])
 
-  const workspaceUrl = useMemo(() => {
-    if (!org?.slug || typeof window === 'undefined') return ''
-    return `${window.location.origin}/console/${org.slug}`
+  const publicOrgUrl = useMemo(() => {
+    if (!org?.slug) return ''
+    return `https://thebacktrack.vercel.app/organizations/${org.slug}`
   }, [org?.slug])
 
   if (!currentOrgId) {
@@ -162,6 +162,10 @@ export function OrganizationInfoViewPage() {
               <button
                 type="button"
                 className="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white px-3 py-1.5 text-xs font-medium text-slate-700 hover:bg-slate-100 sm:px-4 sm:py-2"
+                onClick={() => {
+                  if (publicOrgUrl) window.open(publicOrgUrl, '_blank', 'noreferrer')
+                }}
+                disabled={!publicOrgUrl}
               >
                 <Eye className="h-4 w-4" />
                 Public Profile Preview
@@ -255,12 +259,12 @@ export function OrganizationInfoViewPage() {
                     {org.slug || '—'}
                   </p>
                   <a
-                    href={workspaceUrl || '#'}
-                    className="mt-1 inline-block text-xs font-normal text-blue-600 hover:text-blue-700"
+                    href={publicOrgUrl || '#'}
+                    className="mt-1 inline-block max-w-full break-all text-xs font-normal text-blue-600 hover:text-blue-700"
                     target="_blank"
                     rel="noreferrer"
                   >
-                    {workspaceUrl || '—'}
+                    {publicOrgUrl || '—'}
                   </a>
                 </div>
               </div>
@@ -270,21 +274,21 @@ export function OrganizationInfoViewPage() {
                   <Link2 className="h-3 w-3 text-blue-600" />
                   Shareable Link (Workspace)
                 </div>
-                <div className="flex items-start justify-between gap-3">
+                <div className="flex items-start justify-between gap-3 min-w-0">
                   <a
-                    href={workspaceUrl || '#'}
-                    className="break-all text-xs text-blue-600 hover:text-blue-700"
+                    href={publicOrgUrl || '#'}
+                    className="min-w-0 flex-1 break-all text-xs text-blue-600 hover:text-blue-700"
                     target="_blank"
                     rel="noreferrer"
                   >
-                    {workspaceUrl || '—'}
+                    {publicOrgUrl || '—'}
                   </a>
                   <button
                     type="button"
-                    className="rounded-md  text-blue-600 hover:bg-slate-200 disabled:opacity-40"
-                    disabled={!workspaceUrl}
+                    className="shrink-0 rounded-md text-blue-600 hover:bg-slate-200 disabled:opacity-40"
+                    disabled={!publicOrgUrl}
                     onClick={() =>
-                      workspaceUrl && void navigator.clipboard.writeText(workspaceUrl)
+                      publicOrgUrl && void navigator.clipboard.writeText(publicOrgUrl)
                     }
                   >
                     <Copy className="h-4 w-4" />

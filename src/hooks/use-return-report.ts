@@ -1,5 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { returnReportService, type OwnerInfoPayload } from '@/services/return-report.service';
+import { INVENTORY_KEYS } from '@/hooks/use-inventory'
 
 export function useCreateOrgReturnReport() {
   const queryClient = useQueryClient();
@@ -8,6 +9,8 @@ export function useCreateOrgReturnReport() {
       returnReportService.createOrgReturnReport(args.orgId, { postId: args.postId, ownerInfo: args.ownerInfo }),
     onSuccess: (_data, args) => {
       queryClient.invalidateQueries({ queryKey: ['return-reports', 'org', args.orgId] });
+      queryClient.invalidateQueries({ queryKey: INVENTORY_KEYS.all(args.orgId) })
+      queryClient.invalidateQueries({ queryKey: INVENTORY_KEYS.detail(args.orgId, args.postId) })
     },
   });
 }

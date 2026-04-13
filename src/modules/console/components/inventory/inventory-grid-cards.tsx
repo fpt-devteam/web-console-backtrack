@@ -4,6 +4,7 @@ import { Link } from '@tanstack/react-router'
 import { Spinner } from '@/components/ui/spinner'
 import type { InventoryPost } from '@/services/inventory.service'
 import { inventoryStatusBadgeClass, inventoryStatusLabel } from './status'
+import { NoResultsEmptyState } from './no-results-empty-state'
 
 export function InventoryGridCards({
   items,
@@ -47,8 +48,8 @@ export function InventoryGridCards({
           <Spinner className="mx-auto" />
         </div>
       ) : items.length === 0 ? (
-        <div className="col-span-full text-center py-12 bg-gray-50 rounded-lg border border-dashed border-gray-300">
-          <p className="text-gray-500 text-lg">{emptyText}</p>
+        <div className="col-span-full">
+          <NoResultsEmptyState title={emptyText} />
         </div>
       ) : (
         items.map((item) => (

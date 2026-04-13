@@ -58,3 +58,13 @@ export function useDeleteInventoryItem(orgId: string | null) {
     },
   })
 }
+
+export function usePublishInventoryItem(orgId: string | null) {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: (id: string) => inventoryService.publish(orgId!, id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: INVENTORY_KEYS.all(orgId) })
+    },
+  })
+}

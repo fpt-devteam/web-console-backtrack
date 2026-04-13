@@ -14,13 +14,15 @@ const TABS: StatusFilter[] = [
 export function InventoryStatusTabs({
   value,
   onChange,
+  className,
 }: {
   value: StatusFilter
   onChange: (v: StatusFilter) => void
+  className?: string
 }) {
   return (
-    <div className="mb-4 border-b border-gray-200">
-      <div className="flex items-center gap-8 overflow-x-auto">
+    <div className={['border-b border-gray-200', className].filter(Boolean).join(' ')}>
+      <div className="flex items-center gap-8 overflow-x-auto scrollbar-none">
         {TABS.map((t) => {
           const active = value === t
           return (

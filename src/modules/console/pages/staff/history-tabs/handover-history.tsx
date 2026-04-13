@@ -7,6 +7,7 @@ import { Search, Calendar, Archive } from 'lucide-react'
 import { Spinner } from '@/components/ui/spinner'
 import { Pagination } from '@/components/ui/pagination'
 import type { OrgReturnReportResult } from '@/services/return-report.service'
+import { NoResultsEmptyState } from '@/modules/console/components/inventory/no-results-empty-state'
 
 const pageSize = 8
 /** Staff return history: BE caps page size; load one batch then filter client-side. */
@@ -117,33 +118,35 @@ export function HandoverHistory() {
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-wrap items-center gap-4 bg-white p-3 rounded-lg border border-gray-200 shadow-sm text-sm">
-        <div className="relative min-w-[200px] flex-1 lg:flex-none">
+      <div className="text-sm">
+        <div className="flex flex-col md:flex-row md:items-center gap-4">
+          <div className="relative w-full md:w-1/2">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
           <input
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             placeholder="Search by item name or details..."
-            className="w-full pl-9 pr-3 py-1.5 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500 text-gray-900"
+            className="w-full bg-white pl-9 pr-3 py-1.5 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500 text-gray-900"
           />
         </div>
 
-        <div className="flex items-center gap-2 bg-gray-50 border border-gray-300 rounded-md px-2 py-1">
+          <div className="w-full md:w-1/2 flex items-center gap-2">
           <input
             type="date"
             value={fromDate}
             onChange={(e) => setFromDate(e.target.value)}
-            className="bg-transparent border-none focus:outline-none text-gray-900 w-[115px]"
+            max={toDate || undefined}
+            className="w-full rounded-md border border-gray-300 bg-white px-3 py-1.5 text-gray-900 focus:outline-none focus:ring-1 focus:ring-blue-500"
           />
           <span className="text-gray-400">to</span>
           <input
             type="date"
             value={toDate}
             onChange={(e) => setToDate(e.target.value)}
-            className="bg-transparent border-none focus:outline-none text-gray-900 w-[115px]"
+            min={fromDate || undefined}
+            className="w-full rounded-md border border-gray-300 bg-white px-3 py-1.5 text-gray-900 focus:outline-none focus:ring-1 focus:ring-blue-500"
           />
         </div>
-        <span className="text-xs text-gray-500 hidden sm:inline">Dates filter by handover (return report) date.</span>
 
         {(searchTerm || fromDate || toDate) && (
           <button
@@ -153,11 +156,12 @@ export function HandoverHistory() {
               setFromDate('')
               setToDate('')
             }}
-            className="text-blue-600 hover:underline ml-auto font-medium"
+            className="text-red-600 font-medium transition-all hover:scale-[1.03] hover:drop-shadow-sm md:ml-auto"
           >
             Clear
           </button>
         )}
+        </div>
       </div>
 
       {isError && (
@@ -172,8 +176,8 @@ export function HandoverHistory() {
             <Spinner className="mx-auto" />
           </div>
         ) : pageItems.length === 0 ? (
-          <div className="col-span-full text-center py-12 bg-gray-50 rounded-lg border border-dashed border-gray-300">
-            <p className="text-gray-500 text-lg">No return handovers found matching your filters.</p>
+          <div className="col-span-full">
+            <NoResultsEmptyState title="No matching returns found" />
           </div>
         ) : (
           pageItems.map((report) => {

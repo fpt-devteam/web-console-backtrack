@@ -1,8 +1,10 @@
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import { Switch } from '@/components/ui/switch'
 import type { ItemCategory } from '@/services/inventory.service'
 import { ChevronLeft, Loader2 } from 'lucide-react'
+import { useState } from 'react'
 import type { FinderInfo } from './step2-finder'
 import type { PhotoPreview } from './step1-photos-item'
 
@@ -28,6 +30,7 @@ export function Step3Preview({
   staff,
   isSubmitting,
   submittingAction,
+  defaultPublic = true,
   onBack,
   onSaveAndAddAnother,
   onSubmit,
@@ -48,10 +51,13 @@ export function Step3Preview({
   staff: StaffInfo
   isSubmitting: boolean
   submittingAction: 'save' | 'addAnother' | null
+  defaultPublic?: boolean
   onBack: () => void
-  onSaveAndAddAnother: () => void
-  onSubmit: () => void
+  onSaveAndAddAnother: (isPublic: boolean) => void
+  onSubmit: (isPublic: boolean) => void
 }) {
+  const [isPublic, setIsPublic] = useState(defaultPublic)
+
   return (
     <div className="space-y-4 mt-6">
       <div>
@@ -146,6 +152,18 @@ export function Step3Preview({
         </div>
       </div>
 
+      <div className="px-1">
+        <div className="flex items-center justify-between gap-4">
+          <div>
+            <div className="text-sm font-semibold text-slate-950">Public</div>
+            <div className="text-xs text-slate-700 mt-0.5">
+              Note: If turned off, the item will be saved but won&apos;t be published until you publish it later.
+            </div>
+          </div>
+          <Switch checked={isPublic} onCheckedChange={setIsPublic} disabled={isSubmitting} />
+        </div>
+      </div>
+
       <div className="flex items-center justify-between gap-3 pt-4 border-t border-slate-100">
         <Button
           type="button"
@@ -159,7 +177,7 @@ export function Step3Preview({
         <div className="flex items-center gap-3">
           <Button
             type="button"
-            onClick={onSaveAndAddAnother}
+            onClick={() => onSaveAndAddAnother(isPublic)}
             disabled={isSubmitting}
             className="border border-slate-200 bg-slate-50 text-slate-950 hover:bg-slate-950 hover:text-white transition-colors"
           >
@@ -168,7 +186,7 @@ export function Step3Preview({
           </Button>
           <Button
             type="button"
-            onClick={onSubmit}
+            onClick={() => onSubmit(isPublic)}
             disabled={isSubmitting}
             className="border border-slate-200 bg-slate-50 text-slate-950 hover:bg-slate-950 hover:text-white transition-colors"
           >
