@@ -255,6 +255,14 @@ export const inventoryService = {
     await privateClient.delete(`/api/core/orgs/${orgId}/inventory/${id}`)
   },
 
+  async publish(orgId: string, id: string): Promise<InventoryPost> {
+    const { data } = await privateClient.post<ApiResponse<InventoryPost>>(
+      `/api/core/orgs/${orgId}/inventory/${id}/publish`,
+    )
+    if (!data.success) throw new Error(data.error?.message ?? 'Failed to publish inventory item')
+    return data.data
+  },
+
   /**
    * Ask BE to analyse an image URL and return suggested PostItem fields.
    * Endpoint: POST /api/core/post-image/analyze

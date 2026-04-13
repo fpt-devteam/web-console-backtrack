@@ -6,7 +6,7 @@ import { useCurrentOrgId } from '@/contexts/current-org.context'
 import { inventoryService } from '@/services/inventory.service'
 import type { ItemCategory } from '@/services/inventory.service'
 import { uploadInventoryImage } from '@/services/storage.service'
-import { useCreateInventoryItem } from '@/hooks/use-inventory'
+import { useCreateInventoryItem, usePublishInventoryItem } from '@/hooks/use-inventory'
 import { useUser } from '@/hooks/use-user'
 import { useOrganization } from '@/hooks/use-org'
 import type { FinderContactField } from '@/types/organization.types'
@@ -117,6 +117,7 @@ export function AddFoundItemPage() {
   const { slug } = useParams({ strict: false }) as { slug: string }
   const { currentOrgId } = useCurrentOrgId()
   const createItem = useCreateInventoryItem(currentOrgId)
+  const publishItem = usePublishInventoryItem(currentOrgId)
   const { data: me } = useUser()
   const { data: org } = useOrganization(currentOrgId)
 
@@ -439,7 +440,7 @@ export function AddFoundItemPage() {
     uploadedUrlByFileKeyRef.current.clear()
   }
 
-  const handleSave = async (addAnother: boolean) => {
+  const handleSave = async (addAnother: boolean, isPublic: boolean) => {
     if (!currentOrgId) {
       setSubmitError('No active organization. Please reload the page.')
       return
@@ -467,7 +468,16 @@ export function AddFoundItemPage() {
 
       await new Promise<void>((resolve, reject) => {
         createItem.mutate(buildPayload(imageUrls), {
-          onSuccess: () => resolve(),
+          onSuccess: (created) => {
+            if (isPublic) {
+              publishItem.mutate(created.id, {
+                onSuccess: () => resolve(),
+                onError: (err) => reject(err),
+              })
+            } else {
+              resolve()
+            }
+          },
           onError: (err) => reject(err),
         })
       })
@@ -494,10 +504,6 @@ export function AddFoundItemPage() {
       setIsSubmitting(false)
       setSubmittingAction(null)
     }
-  }
-
-  const handleSaveAndAddAnother = () => {
-    void handleSave(true)
   }
 
   const nextFromStep1 = () => {
@@ -675,8 +681,8 @@ export function AddFoundItemPage() {
               isSubmitting={isSubmitting}
               submittingAction={submittingAction}
               onBack={() => setStep(2)}
-              onSaveAndAddAnother={handleSaveAndAddAnother}
-              onSubmit={() => void handleSave(false)}
+              onSaveAndAddAnother={(isPublic) => void handleSave(true, isPublic)}
+              onSubmit={(isPublic) => void handleSave(false, isPublic)}
             />
           ) : null}
         </div>

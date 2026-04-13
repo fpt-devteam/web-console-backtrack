@@ -212,7 +212,7 @@ export function InventoryItemDetailView({
               </div>
 
               {item.item.distinctiveMarks ? (
-                <div>
+                <div className="md:col-span-2">
                   <div className="text-sm font-semibold uppercase mb-2">DISTINCTIVE MARKS</div>
                   <div className="flex items-center gap-2 text-gray-900">
                     <Tag className="w-4 h-4 text-blue-600" />
@@ -268,10 +268,10 @@ export function InventoryItemDetailView({
             <SectionTitle title="Recipient — contact & ID" />
             <div className="mt-2">
               <DetailRow label="Full name" value={formatOrDash(returnReportForPost?.ownerInfo?.ownerName)} />
-              <DetailRow label="Email (optional)" value={formatOrDash(returnReportForPost?.ownerInfo?.email)} />
+              <DetailRow label="Email " value={formatOrDash(returnReportForPost?.ownerInfo?.email)} />
             </div>
 
-            <SectionTitle title="Recipient — identification (at least one)" />
+            <SectionTitle title="Recipient — identification " />
             <div className="mt-2">
               <DetailRow label="National ID / citizen ID" value={formatOrDash(returnReportForPost?.ownerInfo?.nationalId)} />
               <DetailRow label="Student / staff ID" value={formatOrDash(returnReportForPost?.ownerInfo?.orgMemberId)} />

@@ -6,6 +6,8 @@ import { useCreateOrgReturnReport } from '@/hooks/use-return-report'
 import { useUser } from '@/hooks/use-user'
 import { showToast } from '@/lib/toast'
 import { AdminModal } from '@/modules/console/components/admin/AdminModal'
+import { useOrganization } from '@/hooks/use-org'
+import type { FinderContactField } from '@/types/organization.types'
 
 export function HandoverItemModal({
   open,
@@ -22,6 +24,7 @@ export function HandoverItemModal({
 }) {
   const createReturnReport = useCreateOrgReturnReport()
   const { data: me } = useUser()
+  const { data: org } = useOrganization(orgId)
 
   const [recipientFullName, setRecipientFullName] = useState('')
   const [recipientEmail, setRecipientEmail] = useState('')
@@ -32,6 +35,17 @@ export function HandoverItemModal({
   const staffName = me?.name ?? me?.displayName ?? me?.email ?? '—'
   const staffId = me?.id ?? '—'
 
+  const requiredOwnerFields: FinderContactField[] = org?.requiredOwnerContractFields ?? ['Phone']
+  const isRequired = (f: FinderContactField) => requiredOwnerFields.includes(f)
+
+  const validateRequired = () => {
+    if (isRequired('Email') && !recipientEmail.trim()) return 'Email is required.'
+    if (isRequired('Phone') && !recipientPhone.trim()) return 'Phone number is required.'
+    if (isRequired('NationalId') && !recipientNationalId.trim()) return 'National ID / citizen ID is required.'
+    if (isRequired('OrgMemberId') && !recipientInternalId.trim()) return 'Student / staff ID is required.'
+    return null
+  }
+
   return (
     <AdminModal open={open} title={title} onClose={onClose}>
       <form
@@ -40,6 +54,12 @@ export function HandoverItemModal({
           e.preventDefault()
           if (!orgId) {
             showToast.error('No active organization')
+            return
+          }
+
+          const validationError = validateRequired()
+          if (validationError) {
+            showToast.error(validationError)
             return
           }
 
@@ -87,7 +107,7 @@ export function HandoverItemModal({
           </div>
           <div>
             <Label htmlFor="recipientEmail" className="text-sm font-medium text-slate-950">
-              Email
+              Email {isRequired('Email') ? <span className="text-red-600">*</span> : null}
             </Label>
             <Input
               id="recipientEmail"
@@ -100,7 +120,7 @@ export function HandoverItemModal({
           </div>
           <div>
             <Label htmlFor="recipientNationalId" className="text-sm font-medium text-slate-950">
-              National ID / citizen ID
+              National ID / citizen ID {isRequired('NationalId') ? <span className="text-red-600">*</span> : null}
             </Label>
             <Input
               id="recipientNationalId"
@@ -113,7 +133,7 @@ export function HandoverItemModal({
           </div>
           <div>
             <Label htmlFor="recipientInternalId" className="text-sm font-medium text-slate-950">
-              Student / staff ID
+              Student / staff ID {isRequired('OrgMemberId') ? <span className="text-red-600">*</span> : null}
             </Label>
             <Input
               id="recipientInternalId"
@@ -128,7 +148,7 @@ export function HandoverItemModal({
 
         <div>
           <Label htmlFor="recipientPhone" className="text-sm font-medium text-slate-950">
-            Phone number
+            Phone number {isRequired('Phone') ? <span className="text-red-600">*</span> : null}
           </Label>
           <Input
             id="recipientPhone"

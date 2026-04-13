@@ -162,6 +162,10 @@ export function InventoryListFiltersBar({
             />
           </div>
 
+          {categoryFirst ? Category : DateRange}
+          {categoryFirst ? DateRange : Category}
+          {Author}
+
           {showClear ? (
             <button
               type="button"
@@ -171,10 +175,6 @@ export function InventoryListFiltersBar({
               Clear
             </button>
           ) : null}
-
-          {categoryFirst ? Category : DateRange}
-          {categoryFirst ? DateRange : Category}
-          {Author}
 
           {rightSlot}
         </div>

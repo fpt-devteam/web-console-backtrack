@@ -9,24 +9,19 @@ export function StaffProcessingHistoryPage() {
   return (
     <StaffLayout>
       <div className="p-4 sm:p-4 lg:p-6 min-h-screen sm:mx-4">
-        <div className="mb-6">
+        <div className="mb-4">
           <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">
             Processing History
           </h1>
-          <p className="text-gray-600 text-sm sm:text-base mt-2">
-            View items you have processed (Intake) or handed over (Return).
-          </p>
         </div>
 
         {/* Custom Tabs Navigation matches image exactly */}
-        <div className="border-b border-gray-200 mb-6">
+        <div className="border-b border-gray-200 mb-4">
           <div className="flex gap-8">
             <button
               onClick={() => setActiveTab('intake')}
-              className={`pb-3 text-lg font-medium transition-colors relative ${
-                activeTab === 'intake'
-                  ? 'text-blue-600'
-                  : 'text-gray-600 hover:text-gray-900'
+              className={`pb-1 text-base font-medium transition-all hover:scale-[1.03] hover:drop-shadow-sm relative ${
+                activeTab === 'intake' ? 'text-blue-600' : 'text-black'
               }`}
             >
               Intake
@@ -36,10 +31,8 @@ export function StaffProcessingHistoryPage() {
             </button>
             <button
               onClick={() => setActiveTab('handover')}
-              className={`pb-3 text-lg font-medium transition-colors relative ${
-                activeTab === 'handover'
-                  ? 'text-blue-600'
-                  : 'text-gray-600 hover:text-gray-900'
+              className={`pb-1 text-base font-medium transition-all hover:scale-[1.03] hover:drop-shadow-sm relative ${
+                activeTab === 'handover' ? 'text-blue-600' : 'text-black'
               }`}
             >
               Return

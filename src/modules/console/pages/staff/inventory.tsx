@@ -17,7 +17,7 @@ export function StaffInventoryPage() {
   const { currentOrgId } = useCurrentOrgId()
   const listState = useInventoryListState({
     pageSize,
-    defaultStatus: 'InStorage',
+    defaultStatus: 'All',
   })
 
   const { data, isLoading, isError } = useInventoryItems(currentOrgId, listState.listParams)
@@ -50,7 +50,11 @@ export function StaffInventoryPage() {
           </div>
         </div>
 
-        <InventoryStatusTabs value={listState.statusFilter} onChange={listState.setStatusFilter} />
+        <InventoryStatusTabs
+          value={listState.statusFilter}
+          onChange={listState.setStatusFilter}
+          className="mb-4"
+        />
 
         <InventoryListFiltersBar
           searchTerm={listState.searchTerm}

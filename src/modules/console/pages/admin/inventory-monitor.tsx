@@ -32,10 +32,12 @@ export function AdminInventoryMonitorPage() {
   const totalPages = Math.max(1, Math.ceil(totalCount / pageSize))
   const authorOptions = useMemo(
     () =>
-      members.map((m) => ({
-        value: m.userId,
-        label: m.displayName || m.email || m.userId,
-      })),
+      members
+        .filter((m) => m.role === 'OrgStaff')
+        .map((m) => ({
+          value: m.userId,
+          label: m.displayName || m.email || m.userId,
+        })),
     [members],
   )
 
@@ -56,7 +58,11 @@ export function AdminInventoryMonitorPage() {
           </div>
         </div>
 
-        <InventoryStatusTabs value={listState.statusFilter} onChange={listState.setStatusFilter} />
+        <InventoryStatusTabs
+          value={listState.statusFilter}
+          onChange={listState.setStatusFilter}
+          className="mb-4"
+        />
 
         <InventoryListFiltersBar
           searchTerm={listState.searchTerm}
