@@ -1,13 +1,15 @@
 import { StaffLayout } from '../../components/staff/layout'
 import { Trash2 } from 'lucide-react'
 import { useState } from 'react'
-import { Link, useParams, useNavigate } from '@tanstack/react-router'
+import { useParams, useNavigate } from '@tanstack/react-router'
 import { Button } from '@/components/ui/button'
 import { useInventoryItem, useDeleteInventoryItem } from '@/hooks/use-inventory'
 import { useCurrentOrgId } from '@/contexts/current-org.context'
 import { HandoverItemModal } from '@/modules/console/components/staff/handover-item-modal'
 import { useOrgReturnReports } from '@/hooks/use-return-report'
 import { InventoryItemDetailView } from '../../components/inventory/inventory-item-detail-view'
+import { useSubcategories } from '@/hooks/use-subcategories'
+import { getInventoryTitle } from '@/utils/inventory-view'
 
 export function ItemDetailPage() {
   const { slug, itemId } = useParams({ from: '/console/$slug/staff/item/$itemId' })
@@ -20,6 +22,11 @@ export function ItemDetailPage() {
   const { data: item, isLoading } = useInventoryItem(currentOrgId, itemId)
   const orgIdForHandover = item?.organization?.id ?? currentOrgId
   const { data: returnReports } = useOrgReturnReports(orgIdForHandover, 1, 50)
+  const { data: subcategories } = useSubcategories()
+  const subcategoryNameById = (subcategories ?? []).reduce<Record<string, string>>((acc, s) => {
+    acc[s.id] = s.name
+    return acc
+  }, {})
   const returnReportForPost =
     returnReports?.items?.find((r) => r.post?.id === item?.id) ?? null
 
@@ -34,6 +41,7 @@ export function ItemDetailPage() {
         mainImageIndex={mainImageIndex}
         onMainImageIndexChange={setMainImageIndex}
         returnReportForPost={returnReportForPost}
+        subcategoryNameById={subcategoryNameById}
         showAddThumbnailButton
         actions={
           item && item.status !== 'Returned' ? (
@@ -55,11 +63,6 @@ export function ItemDetailPage() {
                 <Trash2 className="w-3.5 h-3.5 mr-2" />
                 {deleteItem.isPending ? 'Deleting...' : 'Delete'}
               </Button>
-              <Link to="/console/$slug/staff/item-edit/$itemId" params={{ slug, itemId: item.id }}>
-                <Button size="sm" className="bg-blue-600 hover:bg-blue-700">
-                  Edit
-                </Button>
-              </Link>
               <Button size="sm" type="button" className="bg-blue-600 hover:bg-blue-700" onClick={() => setHandoverOpen(true)}>
                 Handover
               </Button>
@@ -70,7 +73,7 @@ export function ItemDetailPage() {
           item ? (
             <HandoverItemModal
               open={handoverOpen}
-              title={`Handover — ${item.item.itemName}`}
+              title={`Handover — ${getInventoryTitle(item, subcategoryNameById)}`}
               orgId={orgIdForHandover}
               postId={item.id}
               onClose={() => setHandoverOpen(false)}

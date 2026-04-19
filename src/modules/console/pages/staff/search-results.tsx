@@ -6,6 +6,8 @@ import { Pagination } from '@/components/ui/pagination'
 import { useInventoryItems } from '@/hooks/use-inventory'
 import { useCurrentOrgId } from '@/contexts/current-org.context'
 import { Spinner } from '@/components/ui/spinner'
+import { useSubcategories } from '@/hooks/use-subcategories'
+import { getInventoryDescription, getInventoryTitle } from '@/utils/inventory-view'
 
 export interface SearchResultsSearch {
   q?: string
@@ -27,6 +29,11 @@ export function SearchResultsPage() {
     page: currentPage,
     pageSize,
   })
+  const { data: subcategories } = useSubcategories()
+  const subcategoryNameById = (subcategories ?? []).reduce<Record<string, string>>((acc, s) => {
+    acc[s.id] = s.name
+    return acc
+  }, {})
 
   const items = data?.items ?? []
   const totalCount = data?.totalCount ?? 0
@@ -139,7 +146,7 @@ export function SearchResultsPage() {
                         {item.imageUrls?.[0] ? (
                           <img
                             src={item.imageUrls[0]}
-                            alt={item.item.itemName}
+                            alt={getInventoryTitle(item, subcategoryNameById)}
                             className="w-full h-full object-cover"
                           />
                         ) : (
@@ -158,14 +165,16 @@ export function SearchResultsPage() {
                             </span>
                           </div>
                         </div>
-                        <h3 className="text-xl font-semibold text-gray-900 mb-1">{item.item.itemName}</h3>
+                        <h3 className="text-xl font-semibold text-gray-900 mb-1">
+                          {getInventoryTitle(item, subcategoryNameById)}
+                        </h3>
                         <p className="text-sm text-gray-600 mb-3 line-clamp-2">
-                          {item.item.additionalDetails ?? '—'}
+                          {getInventoryDescription(item) ?? '—'}
                         </p>
                         <div className="space-y-2 text-sm text-gray-600 mb-4">
                           <div className="flex items-center gap-2">
                             <Archive className="w-4 h-4 flex-shrink-0" />
-                            <span>{item.item.category}</span>
+                            <span>{item.category}</span>
                           </div>
                           <div className="flex items-center gap-2">
                             <Clock className="w-4 h-4 flex-shrink-0" />

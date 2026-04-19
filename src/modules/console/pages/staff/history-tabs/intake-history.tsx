@@ -5,10 +5,11 @@ import { useUser } from '@/hooks/use-user'
 import { useInventoryItems } from '@/hooks/use-inventory'
 import { useDebouncedValue } from '@/hooks/use-debounce'
 import { Pagination } from '@/components/ui/pagination'
-import type { InventoryPost, PostStatus } from '@/services/inventory.service'
+import type { InventoryListItem, PostStatus } from '@/services/inventory.service'
 import { InventoryStatusTabs } from '@/modules/console/components/inventory/inventory-status-tabs'
 import { InventoryGridCards } from '@/modules/console/components/inventory/inventory-grid-cards'
 import { Search } from 'lucide-react'
+import { useSubcategories } from '@/hooks/use-subcategories'
 
 const ALL_STATUS = 'All' as const
 type StatusFilter = typeof ALL_STATUS | PostStatus
@@ -42,9 +43,14 @@ export function IntakeHistory() {
 
   const { data, isLoading, isError } = useInventoryItems(currentOrgId, listParams)
 
-  const items: InventoryPost[] = data?.items ?? []
+  const items: InventoryListItem[] = data?.items ?? []
   const totalCount = data?.totalCount ?? 0
   const totalPages = Math.max(1, Math.ceil(totalCount / pageSize))
+  const { data: subcategories } = useSubcategories()
+  const subcategoryNameById = (subcategories ?? []).reduce<Record<string, string>>((acc, s) => {
+    acc[s.id] = s.name
+    return acc
+  }, {})
 
   useEffect(() => {
     setCurrentPage(1)
@@ -113,10 +119,11 @@ export function IntakeHistory() {
         items={items}
         isLoading={isLoading}
         isError={isError}
+        subcategoryNameById={subcategoryNameById}
         emptyText="No intake history found matching your filters."
         detailLink={{
           to: '/console/$slug/staff/item/$itemId',
-          params: (item: InventoryPost) => ({ slug, itemId: item.id }),
+          params: (item: InventoryListItem) => ({ slug, itemId: item.id }),
         }}
       />
 

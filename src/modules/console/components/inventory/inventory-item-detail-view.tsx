@@ -1,9 +1,11 @@
 import type { ReactNode } from 'react'
-import { ChevronRight, Info, Building2, Camera, Tag, Calendar } from 'lucide-react'
+import { ChevronRight, Camera } from 'lucide-react'
 import { Link } from '@tanstack/react-router'
 import { Spinner } from '@/components/ui/spinner'
-import type { InventoryPost } from '@/services/inventory.service'
+import type { InventoryItem } from '@/services/inventory.service'
 import { inventoryStatusLabel, inventoryStatusPillClass } from './status'
+import { getInventorySubcategoryName, getInventoryTitle } from '@/utils/inventory-view'
+import { InventoryDetailAttributeGrid } from './inventory-detail-attribute-grid'
 
 function DetailRow({ label, value }: { label: string; value: string }) {
   return (
@@ -45,12 +47,13 @@ export function InventoryItemDetailView({
   storagePanelTitle = 'Storage',
   returnPanelTitle = 'Return to owner',
   returnReportForPost,
+  subcategoryNameById,
 }: {
   slug: string
   itemId: string
   backTo: { to: string; params: Record<string, string> }
   isLoading: boolean
-  item: InventoryPost | null | undefined
+  item: InventoryItem | null | undefined
   mainImageIndex: number
   onMainImageIndexChange: (idx: number) => void
   actions?: ReactNode
@@ -59,6 +62,7 @@ export function InventoryItemDetailView({
   storagePanelTitle?: string
   returnPanelTitle?: string
   returnReportForPost: any
+  subcategoryNameById?: Record<string, string>
 }) {
   if (isLoading) {
     return (
@@ -86,6 +90,10 @@ export function InventoryItemDetailView({
 
   const images = item.imageUrls?.length ? item.imageUrls : []
   const mainImg = images[mainImageIndex] ?? images[0]
+  const title = getInventoryTitle(item, subcategoryNameById)
+  const subName = getInventorySubcategoryName(item, subcategoryNameById)
+  const headerPrimary = title.trim() || subName.trim() || 'Inventory item'
+  const imgAlt = title.trim() || subName.trim() || 'Inventory item'
 
   return (
     <div className="p-6 h-full overflow-y-auto mx-6">
@@ -94,14 +102,14 @@ export function InventoryItemDetailView({
           Inventory
         </Link>
         <ChevronRight className="w-4 h-4" />
-        <span className="text-gray-900 font-medium">{item.item.itemName}</span>
+        <span className="text-gray-900 font-medium">{headerPrimary}</span>
       </div>
 
       <div className="bg-white rounded-xl shadow-sm">
         <div className="p-6 border-b border-gray-200 flex items-start justify-between">
           <div>
             <div className="flex items-center gap-3 mb-2">
-              <h1 className="text-2xl font-bold text-gray-900">{item.item.itemName}</h1>
+              <h1 className="text-2xl font-bold text-gray-900">{title}</h1>
               <span className={`px-3 py-1 rounded-md text-xs font-bold uppercase ${inventoryStatusPillClass(item.status)}`}>
                 {inventoryStatusLabel(item.status)}
               </span>
@@ -122,7 +130,7 @@ export function InventoryItemDetailView({
           <div className="lg:col-span-3 p-6 border-r border-gray-200">
             <div className="relative h-[350px] bg-gradient-to-br from-gray-100 to-gray-200 rounded-lg overflow-hidden mb-4 flex items-center justify-center">
               {mainImg ? (
-                <img src={mainImg} alt={item.item.itemName} className="w-full h-full object-cover" />
+                <img src={mainImg} alt={imgAlt} className="w-full h-full object-cover" />
               ) : (
                 <div className="text-gray-400">No image</div>
               )}
@@ -151,81 +159,7 @@ export function InventoryItemDetailView({
           </div>
 
           <div className="lg:col-span-4 py-6 px-8 space-y-6 text-sm">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div>
-                <div className="text-sm font-semibold uppercase mb-2">STATUS</div>
-                <div className="flex items-center gap-2 text-gray-900">
-                  <Info className="w-4 h-4 text-blue-600" />
-                  <span>{inventoryStatusLabel(item.status)}</span>
-                </div>
-              </div>
-
-              <div>
-                <div className="text-sm font-semibold uppercase mb-2">CATEGORY</div>
-                <div className="flex items-center gap-2 text-gray-900">
-                  <Building2 className="w-4 h-4 text-blue-600" />
-                  <span>{item.item.category || '—'}</span>
-                </div>
-              </div>
-
-              <div>
-                <div className="text-sm font-semibold uppercase mb-2">EVENT TIME</div>
-                <div className="flex items-center gap-2 text-gray-900">
-                  <Calendar className="w-4 h-4 text-blue-600" />
-                  <span>{item.eventTime ? new Date(item.eventTime).toLocaleString() : '—'}</span>
-                </div>
-              </div>
-
-              <div>
-                <div className="text-sm font-semibold uppercase mb-2">BRAND</div>
-                <div className="flex items-center gap-2 text-gray-900">
-                  <span>{item.item.brand || '—'}</span>
-                </div>
-              </div>
-
-              <div>
-                <div className="text-sm font-semibold uppercase mb-2">COLOR</div>
-                <div className="flex items-center gap-2 text-gray-900">
-                  <span>{item.item.color || '—'}</span>
-                </div>
-              </div>
-
-              <div>
-                <div className="text-sm font-semibold uppercase mb-2">CONDITION</div>
-                <div className="flex items-center gap-2 text-gray-900">
-                  <span>{item.item.condition || '—'}</span>
-                </div>
-              </div>
-
-              <div>
-                <div className="text-sm font-semibold uppercase mb-2">MATERIAL</div>
-                <div className="flex items-center gap-2 text-gray-900">
-                  <span>{item.item.material || '—'}</span>
-                </div>
-              </div>
-
-              <div>
-                <div className="text-sm font-semibold uppercase mb-2">SIZE</div>
-                <div className="flex items-center gap-2 text-gray-900">
-                  <span>{item.item.size || '—'}</span>
-                </div>
-              </div>
-
-              {item.item.distinctiveMarks ? (
-                <div className="md:col-span-2">
-                  <div className="text-sm font-semibold uppercase mb-2">DISTINCTIVE MARKS</div>
-                  <div className="flex items-center gap-2 text-gray-900">
-                    <Tag className="w-4 h-4 text-blue-600" />
-                    <span>{item.item.distinctiveMarks}</span>
-                  </div>
-                </div>
-              ) : null}
-            </div>
-
-            <div>
-              <div className="text-sm font-semibold uppercase mb-2">Description</div>
-              <p className="text-sm text-gray-700 leading-relaxed">{item.item.additionalDetails ?? '—'}</p>
-            </div>
+            <InventoryDetailAttributeGrid item={item} subcategoryNameById={subcategoryNameById} />
           </div>
         </div>
       </div>

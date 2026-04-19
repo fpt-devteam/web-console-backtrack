@@ -6,33 +6,46 @@ import { useCurrentOrgId } from '@/contexts/current-org.context'
 import { inventoryService } from '@/services/inventory.service'
 import type { ItemCategory } from '@/services/inventory.service'
 import { uploadInventoryImage } from '@/services/storage.service'
-import { useCreateInventoryItem, usePublishInventoryItem } from '@/hooks/use-inventory'
+import { useCreateInventoryItem } from '@/hooks/use-inventory'
 import { useUser } from '@/hooks/use-user'
 import { useOrganization } from '@/hooks/use-org'
 import type { FinderContactField } from '@/types/organization.types'
 import { Step1PhotosAndItem, type PhotoPreview } from './add-item/step1-photos-item'
 import { Step2Finder, type FinderInfo } from './add-item/step2-finder'
 import { Step3Preview, type StaffInfo } from './add-item/step3-preview'
+import { useSubcategories } from '@/hooks/use-subcategories'
+import { Step0PickSubcategory } from './add-item/step0-pick-subcategory'
 
-type StepId = 1 | 2 | 3
+type StepId = 0 | 1 | 2 | 3
 
 function cx(...classes: Array<string | false | null | undefined>) {
   return classes.filter(Boolean).join(' ')
 }
 
 type AddInventoryDraft = {
-  v: 1
+  v: 3
   step: StepId
   item: {
     itemName: string
     description: string
     distinctiveMarks: string
     category: ItemCategory
+    subcategoryCode: string
     color: string
     brand: string
     condition: string
     material: string
     size: string
+    holderName: string
+    cardNumber: string
+    issuingAuthority: string
+    model: string
+    hasCase: boolean
+    caseDescription: string
+    lockScreenDescription: string
+    dateOfBirth: string
+    issueDate: string
+    expiryDate: string
   }
   finder: FinderInfo
 }
@@ -45,6 +58,7 @@ function Stepper({
   onGo?: (step: StepId) => void
 }) {
   const steps: Array<{ id: StepId; title: string }> = [
+    { id: 0, title: 'Choose type' },
     { id: 1, title: 'Upload & item details' },
     { id: 2, title: 'Finder information' },
     { id: 3, title: 'Preview' },
@@ -117,11 +131,10 @@ export function AddFoundItemPage() {
   const { slug } = useParams({ strict: false }) as { slug: string }
   const { currentOrgId } = useCurrentOrgId()
   const createItem = useCreateInventoryItem(currentOrgId)
-  const publishItem = usePublishInventoryItem(currentOrgId)
   const { data: me } = useUser()
   const { data: org } = useOrganization(currentOrgId)
 
-  const [step, setStep] = useState<StepId>(1)
+  const [step, setStep] = useState<StepId>(0)
 
   const MAX_PHOTOS = 5
   // objectURL previews + File for upload
@@ -130,20 +143,32 @@ export function AddFoundItemPage() {
   const [itemName, setItemName] = useState<string>('')
   const [description, setDescription] = useState<string>('')
   const [distinctiveMarks, setDistinctiveMarks] = useState<string>('')
-  const [category, setCategory] = useState<ItemCategory>('Other')
+  const [category, setCategory] = useState<ItemCategory>('PersonalBelongings')
+  const { data: allSubcategories } = useSubcategories()
+  const { data: subcategories } = useSubcategories(category)
+  const [subcategoryCode, setSubcategoryCode] = useState<string>('') // required by BE
   const [color, setColor] = useState<string>('')
   const [brand, setBrand] = useState<string>('')
   const [condition, setCondition] = useState<string>('')
   const [material, setMaterial] = useState<string>('')
   const [size, setSize] = useState<string>('')
+  const [holderName, setHolderName] = useState<string>('')
+  const [cardNumber, setCardNumber] = useState<string>('')
+  const [issuingAuthority, setIssuingAuthority] = useState<string>('')
+  const [model, setModel] = useState<string>('')
+  const [hasCase, setHasCase] = useState(false)
+  const [caseDescription, setCaseDescription] = useState<string>('')
+  const [lockScreenDescription, setLockScreenDescription] = useState<string>('')
+  const [dateOfBirth, setDateOfBirth] = useState<string>('')
+  const [issueDate, setIssueDate] = useState<string>('')
+  const [expiryDate, setExpiryDate] = useState<string>('')
 
   const [isAnalyzing, setIsAnalyzing] = useState(false)
+  const [analysisWarnings, setAnalysisWarnings] = useState<string[] | null>(null)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [submittingAction, setSubmittingAction] = useState<'save' | 'addAnother' | null>(null)
   const [submitError, setSubmitError] = useState<string | null>(null)
 
-  const lastAnalyzedKeyRef = useRef<string | null>(null)
-  const analyzeTimerRef = useRef<number | null>(null)
   const photoPreviewsRef = useRef<PhotoPreview[]>([])
   const uploadedUrlByFileKeyRef = useRef<Map<string, string>>(new Map())
   const draftHydratedRef = useRef(false)
@@ -178,8 +203,8 @@ export function AddFoundItemPage() {
         draftHydratedRef.current = true
         return
       }
-      const parsed = JSON.parse(raw) as AddInventoryDraft
-      if (!parsed || parsed.v !== 1) {
+      const parsed = JSON.parse(raw) as AddInventoryDraft & { v?: number }
+      if (!parsed || (parsed.v !== 3 && parsed.v !== 2)) {
         draftHydratedRef.current = true
         return
       }
@@ -188,12 +213,23 @@ export function AddFoundItemPage() {
       setItemName(parsed.item?.itemName ?? '')
       setDescription(parsed.item?.description ?? '')
       setDistinctiveMarks(parsed.item?.distinctiveMarks ?? '')
-      setCategory(parsed.item?.category ?? 'Other')
+      setCategory(parsed.item?.category ?? 'PersonalBelongings')
+      setSubcategoryCode(parsed.item?.subcategoryCode ?? '')
       setColor(parsed.item?.color ?? '')
       setBrand(parsed.item?.brand ?? '')
       setCondition(parsed.item?.condition ?? '')
       setMaterial(parsed.item?.material ?? '')
       setSize(parsed.item?.size ?? '')
+      setHolderName(parsed.item?.holderName ?? '')
+      setCardNumber(parsed.item?.cardNumber ?? '')
+      setIssuingAuthority(parsed.item?.issuingAuthority ?? '')
+      setModel(parsed.item?.model ?? '')
+      setHasCase(Boolean(parsed.item?.hasCase))
+      setCaseDescription(parsed.item?.caseDescription ?? '')
+      setLockScreenDescription(parsed.item?.lockScreenDescription ?? '')
+      setDateOfBirth(parsed.item?.dateOfBirth ?? '')
+      setIssueDate(parsed.item?.issueDate ?? '')
+      setExpiryDate(parsed.item?.expiryDate ?? '')
       setFinder(parsed.finder ?? { fullName: '', email: '', nationalId: '', orgMemberId: '', phone: '' })
     } catch {
       // ignore draft parse errors
@@ -214,18 +250,29 @@ export function AddFoundItemPage() {
 
     draftSaveTimerRef.current = window.setTimeout(() => {
       const draft: AddInventoryDraft = {
-        v: 1,
+        v: 3,
         step,
         item: {
           itemName,
           description,
           distinctiveMarks,
           category,
+          subcategoryCode,
           color,
           brand,
           condition,
           material,
           size,
+          holderName,
+          cardNumber,
+          issuingAuthority,
+          model,
+          hasCase,
+          caseDescription,
+          lockScreenDescription,
+          dateOfBirth,
+          issueDate,
+          expiryDate,
         },
         finder,
       }
@@ -249,13 +296,31 @@ export function AddFoundItemPage() {
     description,
     distinctiveMarks,
     category,
+    subcategoryCode,
     color,
     brand,
     condition,
     material,
     size,
+    holderName,
+    cardNumber,
+    issuingAuthority,
+    model,
+    hasCase,
+    caseDescription,
+    lockScreenDescription,
+    dateOfBirth,
+    issueDate,
+    expiryDate,
     finder,
   ])
+
+  // Ensure we always have a valid subcategoryCode for the selected category.
+  useEffect(() => {
+    if (!subcategories || subcategories.length === 0) return
+    if (subcategoryCode && subcategories.some((s) => s.code === subcategoryCode)) return
+    setSubcategoryCode(subcategories[0]!.code)
+  }, [subcategories, subcategoryCode])
 
   useEffect(() => {
     if (!me) return
@@ -267,29 +332,69 @@ export function AddFoundItemPage() {
     }))
   }, [me])
 
-  const analyzeFromFile = async (file: File) => {
+  const applyAnalysisResult = (result: Awaited<ReturnType<typeof inventoryService.analyzeImage>>) => {
+    if (result.warnings?.length) setAnalysisWarnings(result.warnings)
+    else setAnalysisWarnings(null)
+
+    // BE analysis result is detail-specific based on selected subcategory.
+    if (result.personalBelonging) {
+      if (result.personalBelonging.color) setColor(result.personalBelonging.color)
+      if (result.personalBelonging.brand) setBrand(result.personalBelonging.brand)
+      if (result.personalBelonging.condition) setCondition(result.personalBelonging.condition)
+      if (result.personalBelonging.material) setMaterial(result.personalBelonging.material)
+      if (result.personalBelonging.size) setSize(result.personalBelonging.size)
+      if (result.personalBelonging.distinctiveMarks) setDistinctiveMarks(result.personalBelonging.distinctiveMarks)
+      if (result.personalBelonging.additionalDetails) setDescription(result.personalBelonging.additionalDetails)
+    }
+    if (result.electronic) {
+      if (result.electronic.brand) setBrand(result.electronic.brand)
+      if (result.electronic.color) setColor(result.electronic.color)
+      if (result.electronic.model) setModel(result.electronic.model)
+      if (result.electronic.hasCase != null) setHasCase(Boolean(result.electronic.hasCase))
+      if (result.electronic.caseDescription) setCaseDescription(result.electronic.caseDescription)
+      if (result.electronic.screenCondition) setCondition(result.electronic.screenCondition)
+      if (result.electronic.lockScreenDescription) setLockScreenDescription(result.electronic.lockScreenDescription)
+      if (result.electronic.distinguishingFeatures) setDistinctiveMarks(result.electronic.distinguishingFeatures)
+      if (result.electronic.additionalDetails) setDescription(result.electronic.additionalDetails)
+    }
+    if (result.other) {
+      if (result.other.itemIdentifier) setItemName(result.other.itemIdentifier)
+      if (result.other.primaryColor) setColor(result.other.primaryColor)
+      if (result.other.additionalDetails) setDescription(result.other.additionalDetails)
+    }
+    if (result.card) {
+      if (result.card.holderName) setHolderName(result.card.holderName)
+      if (result.card.cardNumber) setCardNumber(result.card.cardNumber)
+      if (result.card.issuingAuthority) setIssuingAuthority(result.card.issuingAuthority)
+      if (result.card.additionalDetails) setDescription(result.card.additionalDetails)
+    }
+  }
+
+  const analyzeSelectedPhotos = async () => {
     if (!currentOrgId) return
+    if (!subcategoryCode.trim()) return
+    if (photoPreviews.length === 0) return
 
     setIsAnalyzing(true)
     setSubmitError(null)
 
     try {
-      // Upload only the first image; we just need its public URL for analysis
-      const key = fileKey(file)
-      const cached = uploadedUrlByFileKeyRef.current.get(key)
-      const url = cached ?? (await uploadInventoryImage(currentOrgId, file))
-      if (!cached) uploadedUrlByFileKeyRef.current.set(key, url)
-      const result = await inventoryService.analyzeImage(url)
+      // Upload ALL selected photos and send as a batch to BE for analysis.
+      const urls: string[] = []
+      for (const p of photoPreviews) {
+        const key = fileKey(p.file)
+        const cached = uploadedUrlByFileKeyRef.current.get(key)
+        if (cached) {
+          urls.push(cached)
+          continue
+        }
+        const url = await uploadInventoryImage(currentOrgId, p.file)
+        uploadedUrlByFileKeyRef.current.set(key, url)
+        urls.push(url)
+      }
 
-      if (result.itemName) setItemName(result.itemName)
-      if (result.category) setCategory(result.category)
-      if (result.color) setColor(result.color)
-      if (result.brand) setBrand(result.brand)
-      if (result.condition) setCondition(result.condition)
-      if (result.material) setMaterial(result.material)
-      if (result.size) setSize(result.size)
-      if (result.distinctiveMarks) setDistinctiveMarks(result.distinctiveMarks)
-      if (result.additionalDetails) setDescription(result.additionalDetails)
+      const result = await inventoryService.analyzeImage(urls, subcategoryCode.trim())
+      applyAnalysisResult(result)
     } catch (err) {
       setSubmitError(err instanceof Error ? err.message : 'Image analysis failed. Please try again.')
     } finally {
@@ -298,41 +403,6 @@ export function AddFoundItemPage() {
   }
 
   const fileKey = (file: File) => `${file.name}:${file.size}:${file.lastModified}:${file.type}`
-
-  // Auto-analyze the photo in the "star" slot (index 0). Re-runs when user reorders or deletes
-  // so a different photo becomes index 0. Uses a small debounce + cache key to avoid spamming calls.
-  useEffect(() => {
-    if (!currentOrgId) return
-    const first = photoPreviews[0]
-    if (!first) return
-    if (isAnalyzing) return
-
-    const key = fileKey(first.file)
-    if (lastAnalyzedKeyRef.current === key) return
-
-    if (analyzeTimerRef.current) {
-      window.clearTimeout(analyzeTimerRef.current)
-      analyzeTimerRef.current = null
-    }
-
-    analyzeTimerRef.current = window.setTimeout(() => {
-      // Ensure the first photo didn't change during debounce.
-      const currentFirst = photoPreviews[0]
-      if (!currentFirst) return
-      const currentKey = fileKey(currentFirst.file)
-      if (currentKey !== key) return
-
-      lastAnalyzedKeyRef.current = key
-      void analyzeFromFile(currentFirst.file)
-    }, 450)
-
-    return () => {
-      if (analyzeTimerRef.current) {
-        window.clearTimeout(analyzeTimerRef.current)
-        analyzeTimerRef.current = null
-      }
-    }
-  }, [currentOrgId, photoPreviews, isAnalyzing])
 
   const handlePhotoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files
@@ -374,11 +444,22 @@ export function AddFoundItemPage() {
     description: description.trim(),
     distinctiveMarks: distinctiveMarks.trim() || undefined,
     category,
+    subcategoryCode: subcategoryCode,
     color: color.trim() || undefined,
     brand: brand.trim() || undefined,
     condition: condition.trim() || undefined,
     material: material.trim() || undefined,
     size: size.trim() || undefined,
+    holderName: holderName.trim() || undefined,
+    cardNumber: cardNumber.trim() || undefined,
+    issuingAuthority: issuingAuthority.trim() || undefined,
+    dateOfBirth: dateOfBirth.trim() || undefined,
+    issueDate: issueDate.trim() || undefined,
+    expiryDate: expiryDate.trim() || undefined,
+    model: model.trim() || undefined,
+    hasCase,
+    caseDescription: caseDescription.trim() || undefined,
+    lockScreenDescription: lockScreenDescription.trim() || undefined,
     imageUrls,
     finderInfo: {
       finderName: finder.fullName.trim() || undefined,
@@ -390,9 +471,10 @@ export function AddFoundItemPage() {
   })
 
   const validateStep1 = (): string | null => {
-    if (!itemName.trim()) return 'Item name is required.'
-    if (!description.trim()) return 'Description is required.'
+    if (category === 'Others' && !itemName.trim()) return 'Item identifier is required.'
+    if (!description.trim()) return 'Additional details are required.'
     if (photoPreviews.length === 0) return 'At least one photo is required.'
+    if (!subcategoryCode.trim()) return 'Subcategory is required.'
     return null
   }
 
@@ -431,16 +513,27 @@ export function AddFoundItemPage() {
       prev.forEach((p) => URL.revokeObjectURL(p.url))
       return []
     })
-    setCategory('Other')
+    setCategory('PersonalBelongings')
     setColor('')
     setBrand('')
     setCondition('')
     setMaterial('')
     setSize('')
+    setHolderName('')
+    setCardNumber('')
+    setIssuingAuthority('')
+    setModel('')
+    setHasCase(false)
+    setCaseDescription('')
+    setLockScreenDescription('')
+    setDateOfBirth('')
+    setIssueDate('')
+    setExpiryDate('')
+    setAnalysisWarnings(null)
     uploadedUrlByFileKeyRef.current.clear()
   }
 
-  const handleSave = async (addAnother: boolean, isPublic: boolean) => {
+  const handleSave = async (addAnother: boolean) => {
     if (!currentOrgId) {
       setSubmitError('No active organization. Please reload the page.')
       return
@@ -468,16 +561,7 @@ export function AddFoundItemPage() {
 
       await new Promise<void>((resolve, reject) => {
         createItem.mutate(buildPayload(imageUrls), {
-          onSuccess: (created) => {
-            if (isPublic) {
-              publishItem.mutate(created.id, {
-                onSuccess: () => resolve(),
-                onError: (err) => reject(err),
-              })
-            } else {
-              resolve()
-            }
-          },
+          onSuccess: () => resolve(),
           onError: (err) => reject(err),
         })
       })
@@ -537,6 +621,16 @@ export function AddFoundItemPage() {
     }
 
     // Forward navigation must satisfy the same validations as the arrow buttons.
+    if (step === 0) {
+      if (!subcategoryCode.trim()) {
+        setSubmitError('Please choose a subcategory to continue.')
+        return
+      }
+      setSubmitError(null)
+      setStep(target)
+      return
+    }
+
     if (step === 1) {
       const err1 = validateStep1()
       if (err1) {
@@ -621,7 +715,32 @@ export function AddFoundItemPage() {
             </div>
           )}
 
+          {step !== 3 && analysisWarnings && analysisWarnings.length > 0 ? (
+            <div className="mb-4 p-3 rounded-md bg-amber-50 text-amber-800 text-sm">
+              <div className="font-semibold mb-1">AI warnings</div>
+              <ul className="list-disc pl-5 space-y-1">
+                {analysisWarnings.map((w, idx) => (
+                  <li key={idx}>{w}</li>
+                ))}
+              </ul>
+            </div>
+          ) : null}
+
           {/* Step content */}
+          {step === 0 ? (
+            <Step0PickSubcategory
+              subcategories={allSubcategories ?? []}
+              onPick={({ category: pickedCategory, subcategory }) => {
+                setCategory(pickedCategory)
+                setSubcategoryCode(subcategory.code)
+                // Keep name empty until staff types it, or AI fills a specific identifier (e.g. Others.itemIdentifier).
+                setItemName('')
+                setSubmitError(null)
+                setStep(1)
+              }}
+            />
+          ) : null}
+
           {step === 1 ? (
             <Step1PhotosAndItem
               photoPreviews={photoPreviews}
@@ -630,10 +749,28 @@ export function AddFoundItemPage() {
               onRemovePhoto={removePhoto}
               onReorderPhotos={reorderPhotos}
               isAnalyzing={isAnalyzing}
+              onAnalyze={() => void analyzeSelectedPhotos()}
+              analyzeDisabled={!subcategoryCode.trim() || photoPreviews.length === 0}
+              analyzeHint={
+                !subcategoryCode.trim()
+                  ? 'Choose a subcategory first'
+                  : photoPreviews.length === 0
+                    ? 'Add at least one photo to analyze'
+                    : 'Analyze all selected photos'
+              }
               itemName={itemName}
               setItemName={setItemName}
               category={category}
               setCategory={setCategory}
+              subcategories={subcategories ?? []}
+              subcategoryCode={subcategoryCode}
+              setSubcategoryCode={setSubcategoryCode}
+              holderName={holderName}
+              setHolderName={setHolderName}
+              cardNumber={cardNumber}
+              setCardNumber={setCardNumber}
+              issuingAuthority={issuingAuthority}
+              setIssuingAuthority={setIssuingAuthority}
               brand={brand}
               setBrand={setBrand}
               color={color}
@@ -648,6 +785,20 @@ export function AddFoundItemPage() {
               setDistinctiveMarks={setDistinctiveMarks}
               description={description}
               setDescription={setDescription}
+              model={model}
+              setModel={setModel}
+              hasCase={hasCase}
+              setHasCase={setHasCase}
+              caseDescription={caseDescription}
+              setCaseDescription={setCaseDescription}
+              lockScreenDescription={lockScreenDescription}
+              setLockScreenDescription={setLockScreenDescription}
+              dateOfBirth={dateOfBirth}
+              setDateOfBirth={setDateOfBirth}
+              issueDate={issueDate}
+              setIssueDate={setIssueDate}
+              expiryDate={expiryDate}
+              setExpiryDate={setExpiryDate}
               onNext={nextFromStep1}
             />
           ) : null}
@@ -675,14 +826,24 @@ export function AddFoundItemPage() {
                 condition,
                 material,
                 size,
+                holderName,
+                cardNumber,
+                issuingAuthority,
+                model,
+                hasCase,
+                caseDescription,
+                lockScreenDescription,
+                dateOfBirth,
+                issueDate,
+                expiryDate,
               }}
               finder={finder}
               staff={staff}
               isSubmitting={isSubmitting}
               submittingAction={submittingAction}
               onBack={() => setStep(2)}
-              onSaveAndAddAnother={(isPublic) => void handleSave(true, isPublic)}
-              onSubmit={(isPublic) => void handleSave(false, isPublic)}
+              onSaveAndAddAnother={() => void handleSave(true)}
+              onSubmit={() => void handleSave(false)}
             />
           ) : null}
         </div>

@@ -12,28 +12,8 @@ export type PostStatus =
 
 export type PostType = 'Lost' | 'Found'
 
-export type ItemCategory =
-  | 'Electronics'
-  | 'Clothing'
-  | 'Accessories'
-  | 'Documents'
-  | 'Wallet'
-  | 'Suitcase'
-  | 'Bags'
-  | 'Keys'
-  | 'Other'
-
-export interface PostItem {
-  itemName: string
-  category: ItemCategory
-  color?: string | null
-  brand?: string | null
-  condition?: string | null
-  material?: string | null
-  size?: string | null
-  distinctiveMarks?: string | null
-  additionalDetails?: string | null
-}
+// Mirrors BE `Backtrack.Core.Domain.Constants.ItemCategory`
+export type ItemCategory = 'PersonalBelongings' | 'Cards' | 'Electronics' | 'Others'
 
 export interface PostAuthorResult {
   id: string
@@ -41,60 +21,129 @@ export interface PostAuthorResult {
   avatarUrl?: string | null
 }
 
-export interface InventoryPost {
+export interface GeoPoint {
+  latitude: number
+  longitude: number
+}
+
+export interface FinderInfo {
+  finderName?: string | null
+  email?: string | null
+  phone?: string | null
+  nationalId?: string | null
+  orgMemberId?: string | null
+}
+
+export interface OwnerInfo {
+  ownerName?: string | null
+  email?: string | null
+  phone?: string | null
+  nationalId?: string | null
+  orgMemberId?: string | null
+}
+
+export interface PersonalBelongingDetail {
+  color?: string | null
+  brand?: string | null
+  material?: string | null
+  size?: string | null
+  condition?: string | null
+  distinctiveMarks?: string | null
+  aiDescription?: string | null
+  additionalDetails?: string | null
+}
+
+export interface CardDetail {
+  cardNumberMasked?: string | null
+  holderName?: string | null
+  dateOfBirth?: string | null
+  issueDate?: string | null
+  expiryDate?: string | null
+  issuingAuthority?: string | null
+  ocrText?: string | null
+  additionalDetails?: string | null
+  aiDescription?: string | null
+}
+
+export interface ElectronicDetail {
+  brand?: string | null
+  model?: string | null
+  color?: string | null
+  hasCase?: boolean | null
+  caseDescription?: string | null
+  screenCondition?: string | null
+  lockScreenDescription?: string | null
+  distinguishingFeatures?: string | null
+  aiDescription?: string | null
+  additionalDetails?: string | null
+}
+
+export interface OtherDetail {
+  itemIdentifier: string
+  primaryColor?: string | null
+  additionalDetails?: string | null
+  aiDescription?: string | null
+}
+
+export interface InventoryItem {
   id: string
   postType: PostType
   status: PostStatus
-  item: PostItem
+  category: ItemCategory
+  subcategoryId: string
+  personalBelongingDetail?: PersonalBelongingDetail | null
+  cardDetail?: CardDetail | null
+  electronicDetail?: ElectronicDetail | null
+  otherDetail?: OtherDetail | null
   imageUrls: string[]
-  location?: { latitude: number; longitude: number } | null
+  location: GeoPoint
   displayAddress?: string | null
   externalPlaceId?: string | null
-  eventTime?: string | null
+  eventTime: string
   createdAt: string
   author?: PostAuthorResult | null
   organization?: { id: string; name: string; slug: string } | null
-  finderInfo?: {
-    finderName?: string | null
-    email?: string | null
-    phone?: string | null
-    nationalId?: string | null
-    orgMemberId?: string | null
-  } | null
+  finderInfo?: FinderInfo | null
+}
+
+export interface InventoryListItem extends InventoryItem {
+  ownerInfo?: OwnerInfo | null
+  returnReportExpiresAt?: string | null
+}
+
+export interface InventorySubcategory {
+  id: string
+  category: ItemCategory
+  code: string
+  name: string
+  displayOrder: number
 }
 
 export interface CreateInventoryPayload {
+  /** Maps to `OtherDetail.itemIdentifier` only; not a stored field for other categories. */
   itemName: string
   description: string
   distinctiveMarks?: string | null
   imageUrls?: string[]
-  category?: ItemCategory
+  category: ItemCategory
+  subcategoryCode: string
   color?: string | null
   brand?: string | null
   condition?: string | null
   material?: string | null
   size?: string | null
-  finderInfo?: {
-    finderName?: string | null
-    email?: string | null
-    phone?: string | null
-    nationalId?: string | null
-    orgMemberId?: string | null
-  } | null
-}
-
-export interface UpdateInventoryPayload {
-  itemName?: string
-  description?: string
-  distinctiveMarks?: string | null
-  imageUrls?: string[]
-  category?: ItemCategory
-  color?: string | null
-  brand?: string | null
-  condition?: string | null
-  material?: string | null
-  size?: string | null
-  status?: PostStatus
+  holderName?: string | null
+  cardNumber?: string | null
+  issuingAuthority?: string | null
+  /** `YYYY-MM-DD` for BE `DateOnly` */
+  dateOfBirth?: string | null
+  issueDate?: string | null
+  expiryDate?: string | null
+  model?: string | null
+  hasCase?: boolean | null
+  caseDescription?: string | null
+  lockScreenDescription?: string | null
+  finderInfo?: FinderInfo | null
 }
 
 export interface GetInventoryParams {
@@ -125,16 +174,13 @@ function buildInventoryTimeFilter(
 }
 
 /** Shape returned by BE POST /post-image/analyze */
-export interface AnalyzeImageResult {
-  itemName?: string | null
-  category?: ItemCategory | null
-  color?: string | null
-  brand?: string | null
-  condition?: string | null
-  material?: string | null
-  size?: string | null
-  distinctiveMarks?: string | null
-  additionalDetails?: string | null
+export type AnalyzeImageResult = {
+  category: ItemCategory
+  personalBelonging?: PersonalBelongingDetail | null
+  electronic?: ElectronicDetail | null
+  other?: { itemIdentifier: string; primaryColor?: string | null; additionalDetails?: string | null } | null
+  card?: { cardNumber?: string | null; holderName?: string | null; issuingAuthority?: string | null; additionalDetails?: string | null } | null
+  warnings?: string[] | null
 }
 
 type SearchInventoriesBody = {
@@ -150,32 +196,92 @@ type SearchInventoriesBody = {
 }
 
 export const inventoryService = {
-  async create(orgId: string, payload: CreateInventoryPayload): Promise<InventoryPost> {
-    const body = {
-      item: {
-        itemName: payload.itemName,
-        category: payload.category ?? 'Other',
-        distinctiveMarks: payload.distinctiveMarks ?? undefined,
-        color: payload.color ?? undefined,
-        brand: payload.brand ?? undefined,
-        condition: payload.condition ?? undefined,
-        material: payload.material ?? undefined,
-        size: payload.size ?? undefined,
-        additionalDetails: payload.description,
-      },
-      imageUrls: payload.imageUrls ?? [],
-      finderInfo: payload.finderInfo ?? undefined,
-    }
+  async create(orgId: string, payload: CreateInventoryPayload): Promise<InventoryItem> {
+    const body =
+      payload.category === 'PersonalBelongings'
+        ? {
+            postType: 'Found',
+            category: payload.category,
+            subcategoryCode: payload.subcategoryCode,
+            personalBelongingDetail: {
+              color: payload.color ?? undefined,
+              brand: payload.brand ?? undefined,
+              material: payload.material ?? undefined,
+              size: payload.size ?? undefined,
+              condition: payload.condition ?? undefined,
+              distinctiveMarks: payload.distinctiveMarks ?? undefined,
+              additionalDetails: payload.description,
+            },
+            imageUrls: payload.imageUrls ?? [],
+            finderInfo: payload.finderInfo ?? undefined,
+          }
+        : payload.category === 'Electronics'
+          ? {
+              postType: 'Found',
+              category: payload.category,
+              subcategoryCode: payload.subcategoryCode,
+              electronicDetail: {
+                brand: payload.brand ?? undefined,
+                model: payload.model ?? undefined,
+                color: payload.color ?? undefined,
+                hasCase: payload.hasCase ?? undefined,
+                caseDescription: payload.caseDescription ?? undefined,
+                screenCondition: payload.condition ?? undefined,
+                lockScreenDescription: payload.lockScreenDescription ?? undefined,
+                distinguishingFeatures: payload.distinctiveMarks ?? undefined,
+                additionalDetails: payload.description,
+              },
+              imageUrls: payload.imageUrls ?? [],
+              finderInfo: payload.finderInfo ?? undefined,
+            }
+        : payload.category === 'Cards'
+          ? {
+              postType: 'Found',
+              category: payload.category,
+              subcategoryCode: payload.subcategoryCode,
+              cardDetail: {
+                cardNumber: payload.cardNumber ?? undefined,
+                holderName: payload.holderName ?? undefined,
+                issuingAuthority: payload.issuingAuthority ?? undefined,
+                dateOfBirth: payload.dateOfBirth ?? undefined,
+                issueDate: payload.issueDate ?? undefined,
+                expiryDate: payload.expiryDate ?? undefined,
+                additionalDetails: payload.description,
+              },
+              imageUrls: payload.imageUrls ?? [],
+              finderInfo: payload.finderInfo ?? undefined,
+            }
+          : payload.category === 'Others'
+            ? {
+                postType: 'Found',
+                category: payload.category,
+                subcategoryCode: payload.subcategoryCode,
+                otherDetail: {
+                  itemIdentifier: payload.itemName.trim(),
+                  primaryColor: payload.color ?? undefined,
+                  additionalDetails: payload.description,
+                },
+                imageUrls: payload.imageUrls ?? [],
+                finderInfo: payload.finderInfo ?? undefined,
+              }
+            : {
+                postType: 'Found',
+                category: payload.category,
+                subcategoryCode: payload.subcategoryCode,
+                otherDetail: {
+                  itemIdentifier: payload.itemName.trim(),
+                  additionalDetails: payload.description,
+                },
+                imageUrls: payload.imageUrls ?? [],
+                finderInfo: payload.finderInfo ?? undefined,
+              }
 
-    const { data } = await privateClient.post<ApiResponse<InventoryPost>>(
-      `/api/core/orgs/${orgId}/inventory`,
-      body,
-    )
+    const { data } = await privateClient.post<ApiResponse<InventoryItem>>(`/api/core/orgs/${orgId}/inventory`, body)
     if (!data.success) throw new Error(data.error?.message ?? 'Failed to create inventory item')
     return data.data
   },
 
-  async search(orgId: string, params?: GetInventoryParams): Promise<PagedResponse<InventoryPost>> {
+  async search(orgId: string, params?: GetInventoryParams): Promise<PagedResponse<InventoryListItem>> {
     const time = buildInventoryTimeFilter(params?.fromDate, params?.toDate)
     const body: SearchInventoriesBody = {
       query: params?.query?.trim() || undefined,
@@ -199,7 +305,7 @@ export const inventoryService = {
       delete body.filters
     }
 
-    const { data } = await privateClient.post<ApiResponse<PagedResponse<InventoryPost>>>(
+    const { data } = await privateClient.post<ApiResponse<PagedResponse<InventoryListItem>>>(
       `/api/core/orgs/${orgId}/inventory/search`,
       body,
     )
@@ -207,47 +313,9 @@ export const inventoryService = {
     return data.data
   },
 
-  async getById(orgId: string, id: string): Promise<InventoryPost> {
-    const { data } = await privateClient.get<ApiResponse<InventoryPost>>(
-      `/api/core/orgs/${orgId}/inventory/${id}`,
-    )
+  async getById(orgId: string, id: string): Promise<InventoryItem> {
+    const { data } = await privateClient.get<ApiResponse<InventoryItem>>(`/api/core/orgs/${orgId}/inventory/${id}`)
     if (!data.success) throw new Error(data.error?.message ?? 'Failed to fetch inventory item')
-    return data.data
-  },
-
-  async update(orgId: string, id: string, payload: UpdateInventoryPayload): Promise<InventoryPost> {
-    const body = {
-      status: payload.status ?? undefined,
-      item:
-        payload.itemName ||
-        payload.description ||
-        payload.distinctiveMarks ||
-        payload.category ||
-        payload.color ||
-        payload.brand ||
-        payload.condition ||
-        payload.material ||
-        payload.size
-          ? {
-              itemName: payload.itemName,
-              category: payload.category,
-              distinctiveMarks: payload.distinctiveMarks ?? undefined,
-              color: payload.color ?? undefined,
-              brand: payload.brand ?? undefined,
-              condition: payload.condition ?? undefined,
-              material: payload.material ?? undefined,
-              size: payload.size ?? undefined,
-              additionalDetails: payload.description,
-            }
-          : undefined,
-      imageUrls: payload.imageUrls ?? undefined,
-    }
-
-    const { data } = await privateClient.put<ApiResponse<InventoryPost>>(
-      `/api/core/orgs/${orgId}/inventory/${id}`,
-      body,
-    )
-    if (!data.success) throw new Error(data.error?.message ?? 'Failed to update inventory item')
     return data.data
   },
 
@@ -255,23 +323,21 @@ export const inventoryService = {
     await privateClient.delete(`/api/core/orgs/${orgId}/inventory/${id}`)
   },
 
-  async publish(orgId: string, id: string): Promise<InventoryPost> {
-    const { data } = await privateClient.post<ApiResponse<InventoryPost>>(
-      `/api/core/orgs/${orgId}/inventory/${id}/publish`,
-    )
+  async publish(orgId: string, id: string): Promise<InventoryItem> {
+    const { data } = await privateClient.post<ApiResponse<InventoryItem>>(`/api/core/orgs/${orgId}/inventory/${id}/publish`)
     if (!data.success) throw new Error(data.error?.message ?? 'Failed to publish inventory item')
     return data.data
   },
 
   /**
-   * Ask BE to analyse an image URL and return suggested PostItem fields.
+   * Ask BE to analyse image URLs for a specific subcategory.
    * Endpoint: POST /api/core/post-image/analyze
-   * Body:     { imageUrl: string }
+   * Body:     { imageUrls: string[], subcategoryCode: string }
    */
-  async analyzeImage(imageUrl: string): Promise<AnalyzeImageResult> {
+  async analyzeImage(imageUrls: string[], subcategoryCode: string): Promise<AnalyzeImageResult> {
     const { data } = await privateClient.post<ApiResponse<AnalyzeImageResult>>(
       '/api/core/post-image/analyze',
-      { imageUrl },
+      { imageUrls, subcategoryCode },
     )
     if (!data.success) throw new Error(data.error?.message ?? 'Failed to analyze image')
     return data.data

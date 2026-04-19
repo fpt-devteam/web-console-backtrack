@@ -8,6 +8,8 @@ import { Spinner } from '@/components/ui/spinner'
 import { Pagination } from '@/components/ui/pagination'
 import type { OrgReturnReportResult } from '@/services/return-report.service'
 import { NoResultsEmptyState } from '@/modules/console/components/inventory/no-results-empty-state'
+import { useSubcategories } from '@/hooks/use-subcategories'
+import { getInventoryDescription, getInventoryTitle, getInventoryDistinctiveMarks } from '@/utils/inventory-view'
 
 const pageSize = 8
 /** Staff return history: BE caps page size; load one batch then filter client-side. */
@@ -66,12 +68,11 @@ function matchesSearch(report: OrgReturnReportResult, q: string): boolean {
   if (!q) return true
   const post = report.post
   if (!post) return false
-  const item = post.item
   const hay = [
-    item.itemName,
-    item.additionalDetails,
-    item.category,
-    item.distinctiveMarks,
+    getInventoryTitle(post),
+    getInventoryDescription(post),
+    post.category,
+    getInventoryDistinctiveMarks(post),
   ]
     .filter(Boolean)
     .join(' ')
@@ -86,6 +87,11 @@ export function HandoverHistory() {
   const [fromDate, setFromDate] = useState('')
   const [toDate, setToDate] = useState('')
   const [currentPage, setCurrentPage] = useState(1)
+  const { data: subcategories } = useSubcategories()
+  const subcategoryNameById = (subcategories ?? []).reduce<Record<string, string>>((acc, s) => {
+    acc[s.id] = s.name
+    return acc
+  }, {})
 
   const debouncedSearch = useDebouncedValue(searchTerm.trim(), 500)
 
@@ -191,7 +197,7 @@ export function HandoverHistory() {
                   {item.imageUrls?.[0] ? (
                     <img
                       src={item.imageUrls[0]}
-                      alt={item.item.itemName}
+                      alt={getInventoryTitle(item, subcategoryNameById)}
                       className="w-full h-full object-cover"
                     />
                   ) : (
@@ -204,11 +210,11 @@ export function HandoverHistory() {
                   </span>
                 </div>
                 <div className="p-4 flex flex-col flex-1">
-                  <h3 className="font-semibold text-gray-900 mb-3">{item.item.itemName}</h3>
+                  <h3 className="font-semibold text-gray-900 mb-3">{getInventoryTitle(item, subcategoryNameById)}</h3>
                   <div className="space-y-2 text-sm text-gray-600 mb-4 flex-1">
                     <div className="flex items-center gap-2">
                       <Archive className="w-4 h-4 flex-shrink-0" />
-                      <span>{item.item.category || '—'}</span>
+                      <span>{item.category || '—'}</span>
                     </div>
                     <div className="flex items-center gap-2">
                       <Calendar className="w-4 h-4 flex-shrink-0" />
