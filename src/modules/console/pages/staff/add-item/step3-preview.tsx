@@ -1,10 +1,6 @@
 import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import { Switch } from '@/components/ui/switch'
 import type { ItemCategory } from '@/services/inventory.service'
 import { ChevronLeft, Loader2 } from 'lucide-react'
-import { useState } from 'react'
 import type { FinderInfo } from './step2-finder'
 import type { PhotoPreview } from './step1-photos-item'
 
@@ -23,6 +19,28 @@ export type StaffInfo = {
   staffId: string
 }
 
+export type PreviewItem = {
+  itemName: string
+  description: string
+  distinctiveMarks: string
+  category: ItemCategory
+  color: string
+  brand: string
+  condition: string
+  material: string
+  size: string
+  holderName: string
+  cardNumber: string
+  issuingAuthority: string
+  model: string
+  hasCase: boolean
+  caseDescription: string
+  lockScreenDescription: string
+  dateOfBirth: string
+  issueDate: string
+  expiryDate: string
+}
+
 export function Step3Preview({
   photoPreviews,
   item,
@@ -30,33 +48,21 @@ export function Step3Preview({
   staff,
   isSubmitting,
   submittingAction,
-  defaultPublic = true,
   onBack,
   onSaveAndAddAnother,
   onSubmit,
 }: {
   photoPreviews: PhotoPreview[]
-  item: {
-    itemName: string
-    description: string
-    distinctiveMarks: string
-    category: ItemCategory
-    color: string
-    brand: string
-    condition: string
-    material: string
-    size: string
-  }
+  item: PreviewItem
   finder: FinderInfo
   staff: StaffInfo
   isSubmitting: boolean
   submittingAction: 'save' | 'addAnother' | null
-  defaultPublic?: boolean
   onBack: () => void
-  onSaveAndAddAnother: (isPublic: boolean) => void
-  onSubmit: (isPublic: boolean) => void
+  onSaveAndAddAnother: () => void
+  onSubmit: () => void
 }) {
-  const [isPublic, setIsPublic] = useState(defaultPublic)
+  const c = item.category
 
   return (
     <div className="space-y-4 mt-6">
@@ -65,22 +71,59 @@ export function Step3Preview({
         <div className="text-xs text-slate-800 ">Review everything before submitting.</div>
       </div>
 
-      {/* Item (large) */}
       <div className="rounded-xl border border-slate-200 overflow-hidden">
         <div className="py-3 ps-5 bg-slate-50">
           <div className="text-md font-semibold text-slate-950">Item</div>
           <div className="text-xs text-slate-800">What was found</div>
         </div>
         <div className="px-5 border-t border-slate-100">
-          <FieldRow label="Item name" value={item.itemName} />
           <FieldRow label="Category" value={item.category} />
-          <FieldRow label="Brand" value={item.brand} />
-          <FieldRow label="Color" value={item.color} />
-          <FieldRow label="Condition" value={item.condition} />
-          <FieldRow label="Material" value={item.material} />
-          <FieldRow label="Size" value={item.size} />
-          <FieldRow label="Distinctive marks" value={item.distinctiveMarks} />
-          <FieldRow label="Description" value={item.description} />
+
+          {c === 'PersonalBelongings' || c === 'Electronics' ? (
+            <FieldRow label="Item name (local only)" value={item.itemName} />
+          ) : null}
+          {c === 'Others' ? <FieldRow label="Item identifier" value={item.itemName} /> : null}
+
+          {c === 'Cards' ? (
+            <>
+              <FieldRow label="Holder name" value={item.holderName} />
+              <FieldRow label="Card number" value={item.cardNumber} />
+              <FieldRow label="Issuing authority" value={item.issuingAuthority} />
+              <FieldRow label="Date of birth" value={item.dateOfBirth} />
+              <FieldRow label="Issue date" value={item.issueDate} />
+              <FieldRow label="Expiry date" value={item.expiryDate} />
+            </>
+          ) : null}
+
+          {c === 'Others' ? <FieldRow label="Primary color" value={item.color} /> : null}
+
+          {c === 'PersonalBelongings' ? (
+            <>
+              <FieldRow label="Brand" value={item.brand} />
+              <FieldRow label="Color" value={item.color} />
+              <FieldRow label="Condition" value={item.condition} />
+              <FieldRow label="Material" value={item.material} />
+              <FieldRow label="Size" value={item.size} />
+            </>
+          ) : null}
+
+          {c === 'Electronics' ? (
+            <>
+              <FieldRow label="Brand" value={item.brand} />
+              <FieldRow label="Color" value={item.color} />
+              <FieldRow label="Model" value={item.model} />
+              <FieldRow label="Screen condition" value={item.condition} />
+              <FieldRow label="Has case" value={item.hasCase ? 'Yes' : 'No'} />
+              <FieldRow label="Case description" value={item.caseDescription} />
+              <FieldRow label="Lock screen description" value={item.lockScreenDescription} />
+            </>
+          ) : null}
+
+          {c === 'PersonalBelongings' || c === 'Electronics' ? (
+            <FieldRow label="Distinctive marks" value={item.distinctiveMarks} />
+          ) : null}
+
+          <FieldRow label="Additional details" value={item.description} />
         </div>
 
         {photoPreviews.length > 0 ? (
@@ -100,14 +143,13 @@ export function Step3Preview({
         ) : null}
       </div>
 
-      {/* Finder + Staff (two small cards) */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <div className="rounded-xl border border-slate-200 overflow-hidden">
           <div className="py-3 ps-5 bg-slate-50">
             <div className="text-md font-semibold text-slate-950">Finder</div>
             <div className="text-xs text-slate-800">Finder — who found or turned in the item</div>
           </div>
-          <div className="px-5 border-t border-slate-100">
+          <div className="p-5 space-y-2 text-sm">
             <FieldRow label="Full name" value={finder.fullName} />
             <FieldRow label="Email" value={finder.email} />
             <FieldRow label="Phone" value={finder.phone} />
@@ -118,84 +160,51 @@ export function Step3Preview({
 
         <div className="rounded-xl border border-slate-200 overflow-hidden">
           <div className="py-3 ps-5 bg-slate-50">
-            <div className="text-md font-semibold text-slate-950">Staff</div>
-            <div className="text-xs text-slate-800">Staff who logs this record</div>
+            <div className="text-md font-semibold text-slate-950">Receiving staff</div>
+            <div className="text-xs text-slate-800">Logged for this intake</div>
           </div>
-          <div className="p-5 space-y-4 border-t border-slate-100">
-            <div className="space-y-3">
-              <div>
-                <Label className="text-xs font-semibold text-slate-950">Full name</Label>
-                <Input
-                  value={staff.fullName}
-                  readOnly
-                  className="mt-1 h-9 py-1.5 bg-slate-50"
-                />
-              </div>
-              <div>
-                <Label className="text-xs font-semibold text-slate-950">Email</Label>
-                <Input
-                  value={staff.email}
-                  readOnly
-                  className="mt-1 h-9 py-1.5 bg-slate-50"
-                />
-              </div>
-              <div>
-                <Label className="text-xs font-semibold text-slate-950">Staff ID</Label>
-                <Input
-                  value={staff.staffId}
-                  readOnly
-                  className="mt-1 h-9 py-1.5 bg-slate-50"
-                />
-              </div>
-            </div>
+          <div className="p-5 space-y-2 text-sm">
+            <FieldRow label="Name" value={staff.fullName} />
+            <FieldRow label="Email" value={staff.email} />
+            <FieldRow label="Staff ID" value={staff.staffId} />
           </div>
         </div>
       </div>
 
-      <div className="px-1">
-        <div className="flex items-center justify-between gap-4">
-          <div>
-            <div className="text-sm font-semibold text-slate-950">Public</div>
-            <div className="text-xs text-slate-700 mt-0.5">
-              Note: If turned off, the item will be saved but won&apos;t be published until you publish it later.
-            </div>
-          </div>
-          <Switch checked={isPublic} onCheckedChange={setIsPublic} disabled={isSubmitting} />
-        </div>
-      </div>
-
-      <div className="flex items-center justify-between gap-3 pt-4 border-t border-slate-100">
-        <Button
-          type="button"
-          aria-label="Back"
-          className="mb-2 h-8 w-8 rounded-full bg-slate-950 text-white hover:bg-slate-800"
-          onClick={onBack}
-          disabled={isSubmitting}
-        >
-          <ChevronLeft className="h-5 w-5 mx-auto" />
+      <div className="flex flex-col-reverse sm:flex-row sm:justify-between gap-3 pt-2">
+        <Button type="button" variant="outline" onClick={onBack} disabled={isSubmitting}>
+          <ChevronLeft className="w-4 h-4 mr-2" />
+          Back
         </Button>
-        <div className="flex items-center gap-3">
+        <div className="flex flex-col sm:flex-row gap-2 sm:justify-end">
           <Button
             type="button"
-            onClick={() => onSaveAndAddAnother(isPublic)}
+            variant="outline"
+            onClick={onSaveAndAddAnother}
             disabled={isSubmitting}
-            className="border border-slate-200 bg-slate-50 text-slate-950 hover:bg-slate-950 hover:text-white transition-colors"
+            className="border-slate-300"
           >
-            {submittingAction === 'addAnother' ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
-            Save & add another
+            {submittingAction === 'addAnother' ? (
+              <>
+                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                Saving…
+              </>
+            ) : (
+              'Save & add another'
+            )}
           </Button>
-          <Button
-            type="button"
-            onClick={() => onSubmit(isPublic)}
-            disabled={isSubmitting}
-            className="border border-slate-200 bg-slate-50 text-slate-950 hover:bg-slate-950 hover:text-white transition-colors"
-          >
-            {submittingAction === 'save' ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
-            Save
+          <Button type="button" onClick={onSubmit} disabled={isSubmitting} className="bg-slate-950 hover:bg-slate-800">
+            {submittingAction === 'save' ? (
+              <>
+                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                Saving…
+              </>
+            ) : (
+              'Submit'
+            )}
           </Button>
         </div>
       </div>
     </div>
   )
 }
-

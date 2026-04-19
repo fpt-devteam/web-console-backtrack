@@ -107,15 +107,10 @@ export function InventoryListFiltersBar({
         }
       >
         <option value="All">All</option>
+        <option value="PersonalBelongings">Personal belongings</option>
+        <option value="Cards">Cards</option>
         <option value="Electronics">Electronics</option>
-        <option value="Clothing">Clothing</option>
-        <option value="Accessories">Accessories</option>
-        <option value="Documents">Documents</option>
-        <option value="Wallet">Wallet</option>
-        <option value="Suitcase">Suitcase</option>
-        <option value="Bags">Bags</option>
-        <option value="Keys">Keys</option>
-        <option value="Other">Other</option>
+        <option value="Others">Others</option>
       </select>
     </div>
   )

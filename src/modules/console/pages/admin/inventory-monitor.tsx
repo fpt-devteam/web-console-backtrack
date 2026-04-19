@@ -6,11 +6,12 @@ import { useParams } from '@tanstack/react-router'
 import { useInventoryItems } from '@/hooks/use-inventory'
 import { useCurrentOrgId } from '@/contexts/current-org.context'
 import { useOrgMembers } from '@/hooks/use-org'
-import type { InventoryPost } from '@/services/inventory.service'
+import type { InventoryListItem } from '@/services/inventory.service'
 import { useInventoryListState } from '../../components/inventory/use-inventory-list-state'
 import { InventoryListFiltersBar } from '../../components/inventory/inventory-list-filters-bar'
 import { InventoryGridCards } from '../../components/inventory/inventory-grid-cards'
 import { InventoryStatusTabs } from '../../components/inventory/inventory-status-tabs'
+import { useSubcategories } from '@/hooks/use-subcategories'
 
 const pageSize = 8
 
@@ -26,8 +27,13 @@ export function AdminInventoryMonitorPage() {
   })
 
   const { data, isLoading, isError } = useInventoryItems(currentOrgId, listState.listParams)
+  const { data: subcategories } = useSubcategories()
+  const subcategoryNameById = (subcategories ?? []).reduce<Record<string, string>>((acc, s) => {
+    acc[s.id] = s.name
+    return acc
+  }, {})
 
-  const items: InventoryPost[] = data?.items ?? []
+  const items: InventoryListItem[] = data?.items ?? []
   const totalCount = data?.totalCount ?? 0
   const totalPages = Math.max(1, Math.ceil(totalCount / pageSize))
   const authorOptions = useMemo(
@@ -99,6 +105,7 @@ export function AdminInventoryMonitorPage() {
           items={items}
           isLoading={isLoading}
           isError={isError}
+          subcategoryNameById={subcategoryNameById}
           detailLink={{
             to: '/console/$slug/admin/inventory/$itemId',
             params: (item) => ({ slug, itemId: item.id }),

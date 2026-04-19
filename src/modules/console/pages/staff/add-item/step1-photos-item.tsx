@@ -2,8 +2,8 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
-import type { ItemCategory } from '@/services/inventory.service'
-import { Camera, ChevronRight, Sparkles, Star, X } from 'lucide-react'
+import type { InventorySubcategory, ItemCategory } from '@/services/inventory.service'
+import { Camera, ChevronRight, Loader2, Sparkles, X } from 'lucide-react'
 
 export type PhotoPreview = { file: File; url: string }
 
@@ -14,10 +14,22 @@ export type Step1PhotosAndItemProps = {
   onRemovePhoto: (index: number) => void
   onReorderPhotos: (fromIndex: number, toIndex: number) => void
   isAnalyzing: boolean
+  onAnalyze: () => void
+  analyzeDisabled?: boolean
+  analyzeHint?: string
   itemName: string
   setItemName: (v: string) => void
   category: ItemCategory
   setCategory: (v: ItemCategory) => void
+  subcategories: InventorySubcategory[]
+  subcategoryCode: string
+  setSubcategoryCode: (v: string) => void
+  holderName: string
+  setHolderName: (v: string) => void
+  cardNumber: string
+  setCardNumber: (v: string) => void
+  issuingAuthority: string
+  setIssuingAuthority: (v: string) => void
   brand: string
   setBrand: (v: string) => void
   color: string
@@ -32,6 +44,20 @@ export type Step1PhotosAndItemProps = {
   setDistinctiveMarks: (v: string) => void
   description: string
   setDescription: (v: string) => void
+  model: string
+  setModel: (v: string) => void
+  hasCase: boolean
+  setHasCase: (v: boolean) => void
+  caseDescription: string
+  setCaseDescription: (v: string) => void
+  lockScreenDescription: string
+  setLockScreenDescription: (v: string) => void
+  dateOfBirth: string
+  setDateOfBirth: (v: string) => void
+  issueDate: string
+  setIssueDate: (v: string) => void
+  expiryDate: string
+  setExpiryDate: (v: string) => void
   onNext: () => void
 }
 
@@ -42,10 +68,22 @@ export function Step1PhotosAndItem({
   onRemovePhoto,
   onReorderPhotos,
   isAnalyzing,
+  onAnalyze,
+  analyzeDisabled,
+  analyzeHint,
   itemName,
   setItemName,
   category,
   setCategory,
+  subcategories,
+  subcategoryCode,
+  setSubcategoryCode,
+  holderName,
+  setHolderName,
+  cardNumber,
+  setCardNumber,
+  issuingAuthority,
+  setIssuingAuthority,
   brand,
   setBrand,
   color,
@@ -60,6 +98,20 @@ export function Step1PhotosAndItem({
   setDistinctiveMarks,
   description,
   setDescription,
+  model,
+  setModel,
+  hasCase,
+  setHasCase,
+  caseDescription,
+  setCaseDescription,
+  lockScreenDescription,
+  setLockScreenDescription,
+  dateOfBirth,
+  setDateOfBirth,
+  issueDate,
+  setIssueDate,
+  expiryDate,
+  setExpiryDate,
   onNext,
 }: Step1PhotosAndItemProps) {
   return (
@@ -92,29 +144,10 @@ export function Step1PhotosAndItem({
                 if (!Number.isFinite(from)) return
                 onReorderPhotos(from, index)
               }}
-              aria-label={index === 0 ? 'Analyzed photo (star slot)' : `Photo ${index + 1}`}
-              title={index === 0 ? 'This photo is used for auto-analyze' : 'Drag to reorder'}
+              aria-label={`Photo ${index + 1}`}
+              title="Drag to reorder"
             >
               <img src={p.url} alt={`Upload ${index + 1}`} className="w-full h-full object-cover" />
-
-              {index === 0 && (
-                <>
-                  <div className="absolute top-1 right-1 rounded-full bg-white/90 p-0.5 shadow-sm">
-                    <Star className="h-3.5 w-3.5 text-amber-500" fill="currentColor" />
-                  </div>
-
-                  {isAnalyzing && (
-                    <div className="absolute inset-0 bg-black/25 flex items-center justify-center">
-                      <div className="relative w-12 h-12">
-                        <div className="absolute inset-0 rounded-full border-2 border-white/60 border-t-white animate-spin" />
-                        <div className="absolute inset-0 flex items-center justify-center">
-                          <Sparkles className="h-5 w-5 text-white drop-shadow" />
-                        </div>
-                      </div>
-                    </div>
-                  )}
-                </>
-              )}
               <button
                 type="button"
                 onClick={() => onRemovePhoto(index)}
@@ -142,12 +175,17 @@ export function Step1PhotosAndItem({
           )}
         </div>
 
-        <div className="mt-3 text-xs text-slate-600">
-          Drag and drop photos. The photo with the{' '}
-          <span className="inline-flex items-center">
-            <Star className="relative top-[1px] h-3.5 w-3.5 text-amber-500" fill="currentColor" />
-          </span>{' '}
-          is automatically analyzed.
+        <div className="mt-4">
+          <button
+            type="button"
+            onClick={onAnalyze}
+            disabled={Boolean(analyzeDisabled) || isAnalyzing}
+            title={analyzeHint}
+            className="flex w-full sm:w-auto items-center justify-center gap-2 px-4 py-1.5 border border-gray-300 rounded-lg text-black transition-all font-medium text-sm hover:bg-gray-50 hover:scale-[1.03] hover:drop-shadow-sm disabled:opacity-50 disabled:pointer-events-none disabled:hover:scale-100 disabled:hover:shadow-none"
+          >
+            {isAnalyzing ? <Loader2 className="h-4 w-4 animate-spin shrink-0" /> : <Sparkles className="h-4 w-4 shrink-0" />}
+            Analyze
+          </button>
         </div>
       </div>
 
@@ -156,19 +194,37 @@ export function Step1PhotosAndItem({
         <div className="text-base font-semibold text-slate-950">Item information</div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div className="md:col-span-2">
-            <Label htmlFor="itemName" className="text-sm font-semibold text-slate-950">
-              Item name <span className="text-red-600">*</span>
-            </Label>
-            <Input
-              id="itemName"
-              type="text"
-              placeholder="e.g. Blue Umbrella"
-              value={itemName}
-              onChange={(e) => setItemName(e.target.value)}
-              className="mt-1"
-            />
-          </div>
+          {category === 'PersonalBelongings' || category === 'Electronics' ? (
+            <div className="md:col-span-2">
+              <Label htmlFor="itemName" className="text-sm font-semibold text-slate-950">
+                Item name <span className="text-xs font-normal text-slate-500">(optional, not stored by server)</span>
+              </Label>
+              <Input
+                id="itemName"
+                type="text"
+                placeholder="Local label only"
+                value={itemName}
+                onChange={(e) => setItemName(e.target.value)}
+                className="mt-1"
+              />
+            </div>
+          ) : null}
+
+          {category === 'Others' ? (
+            <div className="md:col-span-2">
+              <Label htmlFor="itemIdentifier" className="text-sm font-semibold text-slate-950">
+                Item identifier <span className="text-red-600">*</span>
+              </Label>
+              <Input
+                id="itemIdentifier"
+                type="text"
+                placeholder="Short label to identify this item"
+                value={itemName}
+                onChange={(e) => setItemName(e.target.value)}
+                className="mt-1"
+              />
+            </div>
+          ) : null}
 
           <div>
             <Label htmlFor="category" className="text-sm font-semibold text-slate-950">
@@ -180,19 +236,7 @@ export function Step1PhotosAndItem({
               onChange={(e) => setCategory(e.target.value as ItemCategory)}
               className="mt-1 w-full px-3 py-2 border border-slate-200 rounded-lg bg-white text-slate-950 font-medium text-sm"
             >
-              {(
-                [
-                  'Electronics',
-                  'Clothing',
-                  'Accessories',
-                  'Documents',
-                  'Wallet',
-                  'Suitcase',
-                  'Bags',
-                  'Keys',
-                  'Other',
-                ] as ItemCategory[]
-              ).map((c) => (
+              {(['PersonalBelongings', 'Cards', 'Electronics', 'Others'] as ItemCategory[]).map((c) => (
                 <option key={c} value={c}>
                   {c}
                 </option>
@@ -201,62 +245,234 @@ export function Step1PhotosAndItem({
           </div>
 
           <div>
-            <Label htmlFor="brand" className="text-sm font-semibold text-slate-950">
-              Brand
+            <Label htmlFor="subcategory" className="text-sm font-semibold text-slate-950">
+              Subcategory <span className="text-red-600">*</span>
             </Label>
-            <Input id="brand" value={brand} onChange={(e) => setBrand(e.target.value)} className="mt-1" />
-          </div>
-          <div>
-            <Label htmlFor="color" className="text-sm font-semibold text-slate-950">
-              Color
-            </Label>
-            <Input id="color" value={color} onChange={(e) => setColor(e.target.value)} className="mt-1" />
-          </div>
-          <div>
-            <Label htmlFor="condition" className="text-sm font-semibold text-slate-950">
-              Condition
-            </Label>
-            <Input
-              id="condition"
-              value={condition}
-              onChange={(e) => setCondition(e.target.value)}
-              className="mt-1"
-            />
-          </div>
-          <div>
-            <Label htmlFor="material" className="text-sm font-semibold text-slate-950">
-              Material
-            </Label>
-            <Input
-              id="material"
-              value={material}
-              onChange={(e) => setMaterial(e.target.value)}
-              className="mt-1"
-            />
-          </div>
-          <div>
-            <Label htmlFor="size" className="text-sm font-semibold text-slate-950">
-              Size
-            </Label>
-            <Input id="size" value={size} onChange={(e) => setSize(e.target.value)} className="mt-1" />
+            <select
+              id="subcategory"
+              value={subcategoryCode}
+              onChange={(e) => setSubcategoryCode(e.target.value)}
+              className="mt-1 w-full px-3 py-2 border border-slate-200 rounded-lg bg-white text-slate-950 font-medium text-sm"
+              disabled={!subcategories || subcategories.length === 0}
+            >
+              {(subcategories ?? []).map((s) => (
+                <option key={s.code} value={s.code}>
+                  {s.name}
+                </option>
+              ))}
+            </select>
+            {!subcategories || subcategories.length === 0 ? (
+              <div className="mt-1 text-xs text-slate-600">No subcategories available for this category.</div>
+            ) : null}
           </div>
 
-          <div className="md:col-span-2">
-            <Label htmlFor="distinctiveMarks" className="text-sm font-semibold text-slate-950">
-              Distinctive marks
-            </Label>
-            <Input
-              id="distinctiveMarks"
-              placeholder="e.g. serial number, scratches, stickers"
-              value={distinctiveMarks}
-              onChange={(e) => setDistinctiveMarks(e.target.value)}
-              className="mt-1"
-            />
-          </div>
+          {category === 'Cards' ? (
+            <>
+              <div className="md:col-span-2">
+                <Label htmlFor="holderName" className="text-sm font-semibold text-slate-950">
+                  Holder name
+                </Label>
+                <Input
+                  id="holderName"
+                  value={holderName}
+                  onChange={(e) => setHolderName(e.target.value)}
+                  className="mt-1"
+                />
+              </div>
+              <div>
+                <Label htmlFor="cardNumber" className="text-sm font-semibold text-slate-950">
+                  Card number
+                </Label>
+                <Input
+                  id="cardNumber"
+                  value={cardNumber}
+                  onChange={(e) => setCardNumber(e.target.value)}
+                  className="mt-1"
+                />
+              </div>
+              <div>
+                <Label htmlFor="issuingAuthority" className="text-sm font-semibold text-slate-950">
+                  Issuing authority
+                </Label>
+                <Input
+                  id="issuingAuthority"
+                  value={issuingAuthority}
+                  onChange={(e) => setIssuingAuthority(e.target.value)}
+                  className="mt-1"
+                />
+              </div>
+              <div>
+                <Label htmlFor="dob" className="text-sm font-semibold text-slate-950">
+                  Date of birth
+                </Label>
+                <Input
+                  id="dob"
+                  type="date"
+                  value={dateOfBirth}
+                  onChange={(e) => setDateOfBirth(e.target.value)}
+                  className="mt-1"
+                />
+              </div>
+              <div>
+                <Label htmlFor="issueDate" className="text-sm font-semibold text-slate-950">
+                  Issue date
+                </Label>
+                <Input
+                  id="issueDate"
+                  type="date"
+                  value={issueDate}
+                  onChange={(e) => setIssueDate(e.target.value)}
+                  className="mt-1"
+                />
+              </div>
+              <div>
+                <Label htmlFor="expiryDate" className="text-sm font-semibold text-slate-950">
+                  Expiry date
+                </Label>
+                <Input
+                  id="expiryDate"
+                  type="date"
+                  value={expiryDate}
+                  onChange={(e) => setExpiryDate(e.target.value)}
+                  className="mt-1"
+                />
+              </div>
+            </>
+          ) : null}
+
+          {category === 'Others' ? (
+            <div className="md:col-span-2">
+              <Label htmlFor="primaryColor" className="text-sm font-semibold text-slate-950">
+                Primary color
+              </Label>
+              <Input
+                id="primaryColor"
+                value={color}
+                onChange={(e) => setColor(e.target.value)}
+                placeholder="e.g. Moss green"
+                className="mt-1"
+              />
+            </div>
+          ) : null}
+
+          {category === 'PersonalBelongings' ? (
+            <>
+              <div>
+                <Label htmlFor="brand" className="text-sm font-semibold text-slate-950">
+                  Brand
+                </Label>
+                <Input id="brand" value={brand} onChange={(e) => setBrand(e.target.value)} className="mt-1" />
+              </div>
+              <div>
+                <Label htmlFor="color" className="text-sm font-semibold text-slate-950">
+                  Color
+                </Label>
+                <Input id="color" value={color} onChange={(e) => setColor(e.target.value)} className="mt-1" />
+              </div>
+              <div>
+                <Label htmlFor="condition" className="text-sm font-semibold text-slate-950">
+                  Condition
+                </Label>
+                <Input id="condition" value={condition} onChange={(e) => setCondition(e.target.value)} className="mt-1" />
+              </div>
+              <div>
+                <Label htmlFor="material" className="text-sm font-semibold text-slate-950">
+                  Material
+                </Label>
+                <Input id="material" value={material} onChange={(e) => setMaterial(e.target.value)} className="mt-1" />
+              </div>
+              <div>
+                <Label htmlFor="size" className="text-sm font-semibold text-slate-950">
+                  Size
+                </Label>
+                <Input id="size" value={size} onChange={(e) => setSize(e.target.value)} className="mt-1" />
+              </div>
+            </>
+          ) : null}
+
+          {category === 'Electronics' ? (
+            <>
+              <div>
+                <Label htmlFor="brand" className="text-sm font-semibold text-slate-950">
+                  Brand
+                </Label>
+                <Input id="brand" value={brand} onChange={(e) => setBrand(e.target.value)} className="mt-1" />
+              </div>
+              <div>
+                <Label htmlFor="color" className="text-sm font-semibold text-slate-950">
+                  Color
+                </Label>
+                <Input id="color" value={color} onChange={(e) => setColor(e.target.value)} className="mt-1" />
+              </div>
+              <div className="md:col-span-2">
+                <Label htmlFor="model" className="text-sm font-semibold text-slate-950">
+                  Model
+                </Label>
+                <Input id="model" value={model} onChange={(e) => setModel(e.target.value)} className="mt-1" />
+              </div>
+              <div className="md:col-span-2">
+                <Label htmlFor="condition" className="text-sm font-semibold text-slate-950">
+                  Screen condition
+                </Label>
+                <Input id="condition" value={condition} onChange={(e) => setCondition(e.target.value)} className="mt-1" />
+              </div>
+              <div className="md:col-span-2 flex items-center gap-3 pt-1">
+                <input
+                  id="hasCase"
+                  type="checkbox"
+                  checked={hasCase}
+                  onChange={(e) => setHasCase(e.target.checked)}
+                  className="h-4 w-4 rounded border-slate-300"
+                />
+                <Label htmlFor="hasCase" className="text-sm font-semibold text-slate-950 cursor-pointer">
+                  Has case / accessories
+                </Label>
+              </div>
+              <div className="md:col-span-2">
+                <Label htmlFor="caseDescription" className="text-sm font-semibold text-slate-950">
+                  Case description
+                </Label>
+                <Input
+                  id="caseDescription"
+                  value={caseDescription}
+                  onChange={(e) => setCaseDescription(e.target.value)}
+                  placeholder="Case, strap, charger in photo…"
+                  className="mt-1"
+                />
+              </div>
+              <div className="md:col-span-2">
+                <Label htmlFor="lockScreenDescription" className="text-sm font-semibold text-slate-950">
+                  Lock screen description
+                </Label>
+                <Input
+                  id="lockScreenDescription"
+                  value={lockScreenDescription}
+                  onChange={(e) => setLockScreenDescription(e.target.value)}
+                  placeholder="If visible on screen"
+                  className="mt-1"
+                />
+              </div>
+            </>
+          ) : null}
+
+          {category === 'PersonalBelongings' || category === 'Electronics' ? (
+            <div className="md:col-span-2">
+              <Label htmlFor="distinctiveMarks" className="text-sm font-semibold text-slate-950">
+                Distinctive marks
+              </Label>
+              <Input
+                id="distinctiveMarks"
+                placeholder="e.g. serial number, scratches, stickers"
+                value={distinctiveMarks}
+                onChange={(e) => setDistinctiveMarks(e.target.value)}
+                className="mt-1"
+              />
+            </div>
+          ) : null}
 
           <div className="md:col-span-2">
             <Label htmlFor="description" className="text-sm font-semibold text-slate-950">
-              Description <span className="text-red-600">*</span>
+              Additional details <span className="text-red-600">*</span>
             </Label>
             <Textarea
               id="description"

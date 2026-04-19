@@ -4,7 +4,8 @@ import { Pagination } from '@/components/ui/pagination'
 import { Link,  useParams } from '@tanstack/react-router'
 import { useInventoryItems } from '@/hooks/use-inventory'
 import { useCurrentOrgId } from '@/contexts/current-org.context'
-import type { InventoryPost } from '@/services/inventory.service'
+import { useSubcategories } from '@/hooks/use-subcategories'
+import type { InventoryListItem } from '@/services/inventory.service'
 import { useInventoryListState } from '../../components/inventory/use-inventory-list-state'
 import { InventoryListFiltersBar } from '../../components/inventory/inventory-list-filters-bar'
 import { InventoryGridCards } from '../../components/inventory/inventory-grid-cards'
@@ -21,8 +22,13 @@ export function StaffInventoryPage() {
   })
 
   const { data, isLoading, isError } = useInventoryItems(currentOrgId, listState.listParams)
+  const { data: subcategories } = useSubcategories()
+  const subcategoryNameById = (subcategories ?? []).reduce<Record<string, string>>((acc, s) => {
+    acc[s.id] = s.name
+    return acc
+  }, {})
 
-  const items: InventoryPost[] = data?.items ?? []
+  const items: InventoryListItem[] = data?.items ?? []
   const totalCount = data?.totalCount ?? 0
   const totalPages = Math.max(1, Math.ceil(totalCount / pageSize))
 
@@ -89,6 +95,7 @@ export function StaffInventoryPage() {
           items={items}
           isLoading={isLoading}
           isError={isError}
+          subcategoryNameById={subcategoryNameById}
           detailLink={{
             to: '/console/$slug/staff/item/$itemId',
             params: (item) => ({ slug, itemId: item.id }),

@@ -1,10 +1,10 @@
 import { Archive, Calendar } from 'lucide-react'
-import { useMemo } from 'react'
 import { Link } from '@tanstack/react-router'
 import { Spinner } from '@/components/ui/spinner'
-import type { InventoryPost } from '@/services/inventory.service'
+import type { InventoryListItem } from '@/services/inventory.service'
 import { inventoryStatusBadgeClass, inventoryStatusLabel } from './status'
 import { NoResultsEmptyState } from './no-results-empty-state'
+import { getInventoryDescription, getInventorySubcategoryName, getInventoryTitle } from '@/utils/inventory-view'
 
 export function InventoryGridCards({
   items,
@@ -12,27 +12,18 @@ export function InventoryGridCards({
   isError,
   emptyText = 'No items found matching your filters.',
   detailLink,
+  subcategoryNameById,
 }: {
-  items: InventoryPost[]
+  items: InventoryListItem[]
   isLoading: boolean
   isError: boolean
   emptyText?: string
   detailLink: {
     to: string
-    params: (item: InventoryPost) => Record<string, string>
+    params: (item: InventoryListItem) => Record<string, string>
   }
+  subcategoryNameById?: Record<string, string>
 }) {
-  const formatPosted = useMemo(() => {
-    return (iso: string) => {
-      try {
-        const d = new Date(iso)
-        return d.toLocaleDateString('vi-VN', { year: 'numeric', month: '2-digit', day: '2-digit' })
-      } catch {
-        return iso
-      }
-    }
-  }, [])
-
   if (isError) {
     return (
       <div className="text-center py-12">
@@ -52,14 +43,23 @@ export function InventoryGridCards({
           <NoResultsEmptyState title={emptyText} />
         </div>
       ) : (
-        items.map((item) => (
+        items.map((item) => {
+          const displayTitle = getInventoryTitle(item, subcategoryNameById)
+          const subName = getInventorySubcategoryName(item, subcategoryNameById)
+          const imgAlt = displayTitle.trim() || subName.trim() || 'Inventory item'
+
+          return (
           <div
             key={item.id}
             className="bg-white rounded-xl shadow-sm overflow-hidden hover:shadow-md transition-shadow flex flex-col"
           >
             <div className="relative h-48 bg-gradient-to-br from-gray-100 to-gray-200 shrink-0">
               {item.imageUrls?.[0] ? (
-                <img src={item.imageUrls[0]} alt={item.item.itemName} className="w-full h-full object-cover" />
+                <img
+                  src={item.imageUrls[0]}
+                  alt={imgAlt}
+                  className="w-full h-full object-cover"
+                />
               ) : (
                 <div className="w-full h-full flex items-center justify-center text-gray-400">No image</div>
               )}
@@ -72,29 +72,23 @@ export function InventoryGridCards({
               </span>
             </div>
             <div className="p-4 flex flex-col flex-1">
-              <h3 className="font-semibold text-gray-900 mb-3">{item.item.itemName}</h3>
+              <h3 className="font-semibold text-gray-900 mb-3 min-h-[24px]">{displayTitle}</h3>
               <p className="text-sm text-gray-600 mb-3 line-clamp-2 leading-5 min-h-[40px]">
-                {(() => {
-                  const d = item.item.additionalDetails?.trim()
-                  if (!d || d === '—' || d === '-') return ''
-                  return d
-                })()}
+                {getInventoryDescription(item) ?? ''}
               </p>
               <div className="space-y-2 text-sm text-gray-600 mb-4 flex-1">
                 <div className="flex items-center gap-2">
                   <Archive className="w-4 h-4 flex-shrink-0" />
-                  <span>{item.item.category || '—'}</span>
+                  <span>{subName.trim() ? subName : '—'}</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <Calendar className="w-4 h-4 flex-shrink-0" />
                   <span>
-                    {item.eventTime
-                      ? new Date(item.eventTime).toLocaleDateString('vi-VN', {
-                          year: 'numeric',
-                          month: '2-digit',
-                          day: '2-digit',
-                        })
-                      : formatPosted(item.createdAt)}
+                    {new Date(item.eventTime).toLocaleDateString('vi-VN', {
+                      year: 'numeric',
+                      month: '2-digit',
+                      day: '2-digit',
+                    })}
                   </span>
                 </div>
               </div>
@@ -105,7 +99,8 @@ export function InventoryGridCards({
               </Link>
             </div>
           </div>
-        ))
+          )
+        })
       )}
     </div>
   )

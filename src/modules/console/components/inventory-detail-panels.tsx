@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react'
 import { MapPin, Package, User } from 'lucide-react'
-import type { InventoryPost } from '@/services/inventory.service'
+import type { InventoryItem } from '@/services/inventory.service'
+import { getInventoryDescription, getInventoryDistinctiveMarks, getInventoryTitle } from '@/utils/inventory-view'
 
 type TableRow =
   | { kind: 'section'; title: string; hint?: string }
@@ -49,16 +50,16 @@ function vOrUnderscore(value: string | null | undefined): ReactNode {
   return v ? v : '_'
 }
 
-export function InventoryDetailPanels({ item }: { item: InventoryPost }) {
+export function InventoryDetailPanels({ item }: { item: InventoryItem }) {
   const rows: TableRow[] = [
     { kind: 'section', title: 'Item' },
-    { kind: 'field', label: 'Name', value: vOrUnderscore(item.item?.itemName) },
-    { kind: 'field', label: 'Category', value: vOrUnderscore(item.item?.category) },
-    { kind: 'field', label: 'Distinctive marks', value: vOrUnderscore(item.item?.distinctiveMarks ?? undefined) },
-    { kind: 'field', label: 'Details', value: vOrUnderscore(item.item?.additionalDetails ?? undefined) },
+    { kind: 'field', label: 'Name', value: vOrUnderscore(getInventoryTitle(item)) },
+    { kind: 'field', label: 'Category', value: vOrUnderscore(item.category) },
+    { kind: 'field', label: 'Distinctive marks', value: vOrUnderscore(getInventoryDistinctiveMarks(item) ?? undefined) },
+    { kind: 'field', label: 'Details', value: vOrUnderscore(getInventoryDescription(item) ?? undefined) },
     { kind: 'section', title: 'Status & timing' },
     { kind: 'field', label: 'Status', value: vOrUnderscore(item.status) },
-    { kind: 'field', label: 'Event time', value: fmtDateTime(item.eventTime ?? undefined) },
+    { kind: 'field', label: 'Event time', value: fmtDateTime(item.eventTime) },
     { kind: 'field', label: 'Created at', value: fmtDateTime(item.createdAt) },
     { kind: 'section', title: 'Author / organization' },
     {
