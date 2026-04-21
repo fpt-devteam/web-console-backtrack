@@ -7,10 +7,26 @@ import {
   useRef,
   useState,
 } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
 import type { Socket } from 'socket.io-client';
 import { getChatSocket, destroyChatSocket } from '@/lib/chat-socket';
 import { auth } from '@/lib/firebase';
-import type { WSTypingEvent, WSMessageSeenEvent } from '@/types/chat.types';
+import type { IConversation, WSTypingEvent, WSMessageSeenEvent } from '@/types/chat.types';
+import { chatKeys } from '@/hooks/use-chat';
+
+// ── Cache helper ─────────────────────────────────────────
+function patchConvUnread(
+  queryClient: ReturnType<typeof useQueryClient>,
+  conversationId: string,
+  unreadCount: number,
+) {
+  for (const key of [chatKeys.queue(), chatKeys.assigned()] as const) {
+    queryClient.setQueryData<IConversation[]>(key, (old) => {
+      if (!Array.isArray(old)) return old;
+      return old.map((c) => (c.id !== conversationId ? c : { ...c, unreadCount }));
+    });
+  }
+}
 
 // ── Types ───────────────────────────────────────────────
 
@@ -42,6 +58,7 @@ const ChatContext = createContext<ChatContextValue | null>(null);
 // ── Provider ─────────────────────────────────────────────
 
 export function ChatProvider({ children }: { children: React.ReactNode }) {
+  const queryClient = useQueryClient();
   const [socket, setSocket] = useState<Socket | null>(null);
   const [isConnected, setIsConnected] = useState(false);
   const [activeConversationId, setActiveConversationIdState] = useState<string | null>(null);
@@ -50,6 +67,10 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
 
   // Track the currently joined room so we can leave on switch
   const joinedRoomRef = useRef<string | null>(null);
+  // Mirror activeConversationId as ref — event handlers read this without stale closures
+  const activeConvRef = useRef<string | null>(null);
+  // Stable ref to socket so setActiveConversationId doesn't go stale
+  const socketRef = useRef<Socket | null>(null);
   // Typing timeout handles keyed by userId
   const typingTimers = useRef<Record<string, ReturnType<typeof setTimeout>>>({});
 
@@ -71,6 +92,7 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
       const s = await getChatSocket();
       if (!mounted) return;
 
+      socketRef.current = s;
       setSocket(s);
 
       // ── System events ──
@@ -82,6 +104,15 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
         if (mounted) {
           setIsConnected(false);
           joinedRoomRef.current = null;
+        }
+      });
+
+      // ── message:new — auto-read if message lands in active conversation ──
+      s.on('message:new', (msg: { conversationId: string }) => {
+        if (!mounted) return;
+        if (msg.conversationId === activeConvRef.current) {
+          patchConvUnread(queryClient, msg.conversationId, 0);
+          s.emit('conversation:read', { conversationId: msg.conversationId });
         }
       });
 
@@ -98,7 +129,7 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
               conversationId: event.conversationId,
             },
           }));
-          // Auto-clear after 4 seconds (same as ws-test.html)
+          // Auto-clear after 4 seconds
           clearTimeout(typingTimers.current[key]);
           typingTimers.current[key] = setTimeout(() => {
             setTypingUsers((prev) => {
@@ -131,28 +162,35 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
       // Cleanup typing timers
       Object.values(typingTimers.current).forEach(clearTimeout);
     };
-  }, []);
+  }, [queryClient]);
 
   // ── Active conversation room management ─────────────────
   const setActiveConversationId = useCallback(
     (id: string | null) => {
       if (id === activeConversationId) return;
 
+      const s = socketRef.current;
+
       // Leave previous room
-      if (socket && joinedRoomRef.current) {
-        socket.emit('leave:conversation', joinedRoomRef.current);
+      if (s && joinedRoomRef.current) {
+        s.emit('leave:conversation', joinedRoomRef.current);
         joinedRoomRef.current = null;
       }
 
+      // Update ref first so the message:new handler reads the correct value
+      activeConvRef.current = id;
       setActiveConversationIdState(id);
 
-      // Join new room
-      if (socket && id) {
-        socket.emit('join:conversation', id);
+      // Join new room + optimistically zero unread + emit read
+      if (s && id) {
+        s.emit('join:conversation', id);
         joinedRoomRef.current = id;
+        // Optimistic: clear badge immediately so UI feels instant
+        patchConvUnread(queryClient, id, 0);
+        s.emit('conversation:read', { conversationId: id });
       }
     },
-    [socket, activeConversationId]
+    [activeConversationId, queryClient]
   );
 
   // ── Context value ───────────────────────────────────────

@@ -23,12 +23,12 @@ export const chatKeys = {
  * Fetch all conversations currently in the org queue (not yet assigned).
  * Refetches every 15 seconds to catch new tickets.
  */
-export function useChatQueue(orgId?: string) {
+export function useChatQueue(orgId?: string, options?: { poll?: boolean }) {
   return useQuery({
     queryKey: [...chatKeys.queue(), { orgId }],
     queryFn: () => chatService.listQueue(orgId),
     staleTime: 1000 * 15,
-    refetchInterval: 1000 * 15,
+    refetchInterval: (options?.poll ?? false) ? 1000 * 15 : false,
   });
 }
 
