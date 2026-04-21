@@ -83,7 +83,7 @@ export function SearchResultsPage() {
 
   return (
     <StaffLayout>
-      <div className="p-8 min-h-screen">
+      <div className="h-full overflow-y-auto p-8 min-h-screen">
         <div className="max-w-6xl mx-auto">
           {/* Breadcrumb */}
           <div className="mb-6 flex items-center gap-2 text-sm text-gray-600">

@@ -76,7 +76,7 @@ export function useSendMessage(options?: {
 
       queryClient.setQueryData(
         chatKeys.messages(conversationId),
-        (old: { pages: Array<{ messages: Array<IMessage> }>; pageParams: unknown[] } | undefined) => {
+        (old: { pages: Array<{ messages: Array<IMessage> }>; pageParams: Array<unknown> } | undefined) => {
           if (!old) {
             return {
               pages: [{ messages: [message], nextCursor: null }],
@@ -202,44 +202,58 @@ export function useMarkSeen() {
  * Mount once at the chat page level.
  */
 export function useConversationUpdates() {
-  const { socket } = useChatContext();
+  const { socket, activeConversationId } = useChatContext();
   const queryClient = useQueryClient();
+  const activeConvIdRef = useRef(activeConversationId);
+  activeConvIdRef.current = activeConversationId;
 
   useEffect(() => {
     if (!socket) return;
 
+    type ConvEntry = { id?: string; unreadCount?: number; lastMessage?: unknown; lastMessageAt?: string; lastMessageContent?: string };
+
     function handleConversationUpdated(event: WSConversationUpdatedEvent) {
       const { conversationId, unreadCount, lastMessage } = event;
+      const effectiveUnread =
+        conversationId === activeConvIdRef.current ? 0 : unreadCount;
 
-      type ConvEntry = { id?: string; unreadCount?: number; lastMessage?: unknown; lastMessageAt?: string; lastMessageContent?: string };
+      const patchOrInvalidate = (queryKey: ReadonlyArray<unknown>) => {
+        const cached = queryClient.getQueryData<Array<ConvEntry>>(queryKey);
 
-      // Patch both queue and assigned caches in-place
-      const patchList = (queryKey: ReadonlyArray<unknown>) => {
-        queryClient.setQueryData(
-          queryKey,
-          (old: Array<ConvEntry> | undefined) => {
-            if (!Array.isArray(old)) return old;
-            return old.map((conv) => {
-              if (conv.id !== conversationId) return conv;
-              return {
-                ...conv,
-                unreadCount,
-                ...(lastMessage != null && {
-                  lastMessage,
-                  lastMessageAt: lastMessage.timestamp,
-                  lastMessageContent: lastMessage.content,
-                }),
-              };
-            });
-          }
-        );
+        // Cache miss or conversation not in list yet → refetch from server
+        if (!Array.isArray(cached) || !cached.some((c) => c.id === conversationId)) {
+          void queryClient.invalidateQueries({ queryKey });
+          return;
+        }
+
+        queryClient.setQueryData(queryKey, cached.map((conv) => {
+          if (conv.id !== conversationId) return conv;
+          return {
+            ...conv,
+            unreadCount: effectiveUnread,
+            ...(lastMessage != null && {
+              lastMessage,
+              lastMessageAt: lastMessage.timestamp,
+              lastMessageContent: lastMessage.content,
+            }),
+          };
+        }));
       };
 
-      patchList(chatKeys.queue());
-      patchList(chatKeys.assigned());
+      patchOrInvalidate(chatKeys.queue());
+      patchOrInvalidate(chatKeys.assigned());
+    }
+
+    // New conversation created by a customer → appears in queue immediately
+    function handleConversationNew() {
+      void queryClient.invalidateQueries({ queryKey: chatKeys.queue() });
     }
 
     socket.on('conversation:updated', handleConversationUpdated);
-    return () => { socket.off('conversation:updated', handleConversationUpdated); };
+    socket.on('conversation:new', handleConversationNew);
+    return () => {
+      socket.off('conversation:updated', handleConversationUpdated);
+      socket.off('conversation:new', handleConversationNew);
+    };
   }, [socket, queryClient]);
 }
