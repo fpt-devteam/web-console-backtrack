@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react'
 import { useRouter } from '@tanstack/react-router'
 import { Button } from '@/components/ui/button'
 import { getInvitationCode, clearInvitationCode } from '@/lib/auth-storage'
+import { persistActiveOrgIdForSession } from '@/lib/route-guards'
 import { invitationService } from '@/services/invitation.service'
 import { orgService } from '@/services/org.service'
 import { auth } from '@/lib/firebase'
@@ -33,6 +34,13 @@ export function JoinInvitationPage() {
         const joinResult = await invitationService.join({ token: code })
         clearInvitationCode()
         setState({ status: 'success' })
+
+        // Joining an org often updates auth claims/permissions.
+        // Force-refresh the Firebase token before navigating so route guards/API calls see new membership.
+        await user.getIdToken(true)
+
+        // Persist org selection early so nested route guards + Axios can scope correctly on first load.
+        persistActiveOrgIdForSession(joinResult.organizationId)
 
         const org = await orgService.getById(joinResult.organizationId)
         setTimeout(() => {
