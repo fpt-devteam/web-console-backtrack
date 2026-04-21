@@ -91,8 +91,8 @@ export function StaffNotificationPage() {
 
   return (
     <StaffLayout>
-      <div className="p-4  h-screen overflow-hidden sm:mx-4 flex flex-col">
-        <div className="mb-4">
+      <div className="h-full overflow-y-auto p-8">
+        <div className="mb-8">
           <h1 className="text-3xl font-bold text-gray-900">Notifications</h1>
         </div>
 

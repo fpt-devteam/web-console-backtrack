@@ -7,14 +7,14 @@ interface LayoutProps {
   mainScroll?: boolean
 }
 
-export function StaffLayout({ children, mainScroll = true }: LayoutProps) {
+export function StaffLayout({ children = true }: LayoutProps) {
   const [sidebarOpen, setSidebarOpen] = useState(true)
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="h-screen overflow-hidden flex flex-col bg-gray-50">
       <StaffSidebar isOpen={sidebarOpen} onToggle={() => setSidebarOpen(!sidebarOpen)} />
       <main
-        className={`transition-all duration-300 ${mainScroll ? 'overflow-y-auto' : 'overflow-hidden'} ${
+        className={`flex-1 min-h-0 overflow-hidden transition-all duration-300 ${
           sidebarOpen ? 'ml-64' : 'ml-20'
         }`}
       >
