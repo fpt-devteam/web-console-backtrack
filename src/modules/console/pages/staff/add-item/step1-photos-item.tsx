@@ -3,7 +3,8 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import type { InventorySubcategory, ItemCategory } from '@/services/inventory.service'
-import { Camera, ChevronRight, Loader2, Sparkles, X } from 'lucide-react'
+import { ChevronRight } from 'lucide-react'
+import { InventoryPhotosPicker } from '@/modules/console/components/inventory/inventory-photos-picker'
 
 export type PhotoPreview = { file: File; url: string }
 
@@ -17,6 +18,10 @@ export type Step1PhotosAndItemProps = {
   onAnalyze: () => void
   analyzeDisabled?: boolean
   analyzeHint?: string
+  postTitle: string
+  setPostTitle: (v: string) => void
+  detailItemName: string
+  setDetailItemName: (v: string) => void
   itemName: string
   setItemName: (v: string) => void
   category: ItemCategory
@@ -71,6 +76,10 @@ export function Step1PhotosAndItem({
   onAnalyze,
   analyzeDisabled,
   analyzeHint,
+  postTitle,
+  setPostTitle,
+  detailItemName,
+  setDetailItemName,
   itemName,
   setItemName,
   category,
@@ -117,94 +126,48 @@ export function Step1PhotosAndItem({
   return (
     <div className="space-y-6 mt-3">
       {/* Photos Section */}
-      <div>
-        <div className="flex items-center justify-between mb-4">
-          <div className="text-base font-semibold text-gray-900">Photos</div>
-          <span className="text-sm text-slate-700">Max {maxPhotos} photos</span>
-        </div>
-
-        <div className="flex gap-4 flex-wrap">
-          {photoPreviews.map((p, index) => (
-            <div
-              key={p.url}
-              className="relative w-32 h-32 rounded-lg overflow-hidden group"
-              draggable
-              onDragStart={(e) => {
-                e.dataTransfer.setData('text/plain', String(index))
-                e.dataTransfer.effectAllowed = 'move'
-              }}
-              onDragOver={(e) => {
-                e.preventDefault()
-                e.dataTransfer.dropEffect = 'move'
-              }}
-              onDrop={(e) => {
-                e.preventDefault()
-                const raw = e.dataTransfer.getData('text/plain')
-                const from = Number(raw)
-                if (!Number.isFinite(from)) return
-                onReorderPhotos(from, index)
-              }}
-              aria-label={`Photo ${index + 1}`}
-              title="Drag to reorder"
-            >
-              <img src={p.url} alt={`Upload ${index + 1}`} className="w-full h-full object-cover" />
-              <button
-                type="button"
-                onClick={() => onRemovePhoto(index)}
-                className="absolute top-1 right-1 p-0.5 bg-red-600 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
-                aria-label="Remove photo"
-              >
-                <X className="w-3 h-3" />
-              </button>
-            </div>
-          ))}
-
-          {photoPreviews.length < maxPhotos && (
-            <label className="w-32 h-32 border-2 border-dashed border-slate-300 rounded-lg flex flex-col items-center justify-center cursor-pointer hover:border-sky-500 hover:bg-sky-50 transition-colors">
-              <input
-                type="file"
-                accept="image/*"
-                multiple
-                onChange={onPickPhotos}
-                className="hidden"
-                disabled={photoPreviews.length >= maxPhotos}
-              />
-              <Camera className="w-6 h-6 text-slate-700 mb-2" />
-              <span className="text-xs text-slate-800 text-center px-2">Add photos</span>
-            </label>
-          )}
-        </div>
-
-        <div className="mt-4">
-          <button
-            type="button"
-            onClick={onAnalyze}
-            disabled={Boolean(analyzeDisabled) || isAnalyzing}
-            title={analyzeHint}
-            className="flex w-full sm:w-auto items-center justify-center gap-2 px-4 py-1.5 border border-gray-300 rounded-lg text-black transition-all font-medium text-sm hover:bg-gray-50 hover:scale-[1.03] hover:drop-shadow-sm disabled:opacity-50 disabled:pointer-events-none disabled:hover:scale-100 disabled:hover:shadow-none"
-          >
-            {isAnalyzing ? <Loader2 className="h-4 w-4 animate-spin shrink-0" /> : <Sparkles className="h-4 w-4 shrink-0" />}
-            Analyze
-          </button>
-        </div>
-      </div>
+      <InventoryPhotosPicker
+        photoPreviews={photoPreviews}
+        maxPhotos={maxPhotos}
+        onPickPhotos={onPickPhotos}
+        onRemovePhoto={onRemovePhoto}
+        onReorderPhotos={onReorderPhotos}
+        isAnalyzing={isAnalyzing}
+        onAnalyze={onAnalyze}
+        analyzeDisabled={analyzeDisabled}
+        analyzeHint={analyzeHint}
+      />
 
       {/* Item fields */}
       <div className="rounded-xl border border-slate-200 p-5 space-y-6">
         <div className="text-base font-semibold text-slate-950">Item information</div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {category === 'PersonalBelongings' || category === 'Electronics' ? (
+          <div className="md:col-span-2">
+            <Label htmlFor="postTitle" className="text-sm font-semibold text-slate-950">
+              Post title <span className="text-red-600">*</span>
+            </Label>
+            <Input
+              id="postTitle"
+              type="text"
+              placeholder="Short title to identify this post"
+              value={postTitle}
+              onChange={(e) => setPostTitle(e.target.value)}
+              className="mt-1"
+            />
+          </div>
+
+          {category !== 'Others' ? (
             <div className="md:col-span-2">
-              <Label htmlFor="itemName" className="text-sm font-semibold text-slate-950">
-                Item name <span className="text-xs font-normal text-slate-500">(optional, not stored by server)</span>
+              <Label htmlFor="detailItemName" className="text-sm font-semibold text-slate-950">
+                Item name 
               </Label>
               <Input
-                id="itemName"
+                id="detailItemName"
                 type="text"
-                placeholder="Local label only"
-                value={itemName}
-                onChange={(e) => setItemName(e.target.value)}
+                placeholder="e.g. Apple Watch, Student ID card, Backpack"
+                value={detailItemName}
+                onChange={(e) => setDetailItemName(e.target.value)}
                 className="mt-1"
               />
             </div>
@@ -472,7 +435,7 @@ export function Step1PhotosAndItem({
 
           <div className="md:col-span-2">
             <Label htmlFor="description" className="text-sm font-semibold text-slate-950">
-              Additional details <span className="text-red-600">*</span>
+              Additional details
             </Label>
             <Textarea
               id="description"

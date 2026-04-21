@@ -54,6 +54,7 @@ import { Route as ConsoleSlugAccountSecurityRouteImport } from './routes/console
 import { Route as ConsoleSlugAdminSettingIndexRouteImport } from './routes/console/$slug/admin/setting/index'
 import { Route as ConsoleSlugAdminInventoryIndexRouteImport } from './routes/console/$slug/admin/inventory/index'
 import { Route as ConsoleSlugStaffItemItemIdRouteImport } from './routes/console/$slug/staff/item/$itemId'
+import { Route as ConsoleSlugStaffItemEditItemIdRouteImport } from './routes/console/$slug/staff/item-edit/$itemId'
 import { Route as ConsoleSlugAdminSettingOrganizationRouteImport } from './routes/console/$slug/admin/setting/organization'
 import { Route as ConsoleSlugAdminInventoryItemIdRouteImport } from './routes/console/$slug/admin/inventory/$itemId'
 import { Route as ConsoleSlugAdminSettingOrganizationIndexRouteImport } from './routes/console/$slug/admin/setting/organization/index'
@@ -298,6 +299,12 @@ const ConsoleSlugStaffItemItemIdRoute =
     path: '/item/$itemId',
     getParentRoute: () => ConsoleSlugStaffRoute,
   } as any)
+const ConsoleSlugStaffItemEditItemIdRoute =
+  ConsoleSlugStaffItemEditItemIdRouteImport.update({
+    id: '/item-edit/$itemId',
+    path: '/item-edit/$itemId',
+    getParentRoute: () => ConsoleSlugStaffRoute,
+  } as any)
 const ConsoleSlugAdminSettingOrganizationRoute =
   ConsoleSlugAdminSettingOrganizationRouteImport.update({
     id: '/organization',
@@ -367,6 +374,7 @@ export interface FileRoutesByFullPath {
   '/console/$slug/staff/notification': typeof ConsoleSlugStaffNotificationRoute
   '/console/$slug/admin/inventory/$itemId': typeof ConsoleSlugAdminInventoryItemIdRoute
   '/console/$slug/admin/setting/organization': typeof ConsoleSlugAdminSettingOrganizationRouteWithChildren
+  '/console/$slug/staff/item-edit/$itemId': typeof ConsoleSlugStaffItemEditItemIdRoute
   '/console/$slug/staff/item/$itemId': typeof ConsoleSlugStaffItemItemIdRoute
   '/console/$slug/admin/inventory/': typeof ConsoleSlugAdminInventoryIndexRoute
   '/console/$slug/admin/setting/': typeof ConsoleSlugAdminSettingIndexRoute
@@ -414,6 +422,7 @@ export interface FileRoutesByTo {
   '/console/$slug/staff/inventory-search': typeof ConsoleSlugStaffInventorySearchRoute
   '/console/$slug/staff/notification': typeof ConsoleSlugStaffNotificationRoute
   '/console/$slug/admin/inventory/$itemId': typeof ConsoleSlugAdminInventoryItemIdRoute
+  '/console/$slug/staff/item-edit/$itemId': typeof ConsoleSlugStaffItemEditItemIdRoute
   '/console/$slug/staff/item/$itemId': typeof ConsoleSlugStaffItemItemIdRoute
   '/console/$slug/admin/inventory': typeof ConsoleSlugAdminInventoryIndexRoute
   '/console/$slug/admin/setting': typeof ConsoleSlugAdminSettingIndexRoute
@@ -466,6 +475,7 @@ export interface FileRoutesById {
   '/console/$slug/staff/notification': typeof ConsoleSlugStaffNotificationRoute
   '/console/$slug/admin/inventory/$itemId': typeof ConsoleSlugAdminInventoryItemIdRoute
   '/console/$slug/admin/setting/organization': typeof ConsoleSlugAdminSettingOrganizationRouteWithChildren
+  '/console/$slug/staff/item-edit/$itemId': typeof ConsoleSlugStaffItemEditItemIdRoute
   '/console/$slug/staff/item/$itemId': typeof ConsoleSlugStaffItemItemIdRoute
   '/console/$slug/admin/inventory/': typeof ConsoleSlugAdminInventoryIndexRoute
   '/console/$slug/admin/setting/': typeof ConsoleSlugAdminSettingIndexRoute
@@ -518,6 +528,7 @@ export interface FileRouteTypes {
     | '/console/$slug/staff/notification'
     | '/console/$slug/admin/inventory/$itemId'
     | '/console/$slug/admin/setting/organization'
+    | '/console/$slug/staff/item-edit/$itemId'
     | '/console/$slug/staff/item/$itemId'
     | '/console/$slug/admin/inventory/'
     | '/console/$slug/admin/setting/'
@@ -565,6 +576,7 @@ export interface FileRouteTypes {
     | '/console/$slug/staff/inventory-search'
     | '/console/$slug/staff/notification'
     | '/console/$slug/admin/inventory/$itemId'
+    | '/console/$slug/staff/item-edit/$itemId'
     | '/console/$slug/staff/item/$itemId'
     | '/console/$slug/admin/inventory'
     | '/console/$slug/admin/setting'
@@ -616,6 +628,7 @@ export interface FileRouteTypes {
     | '/console/$slug/staff/notification'
     | '/console/$slug/admin/inventory/$itemId'
     | '/console/$slug/admin/setting/organization'
+    | '/console/$slug/staff/item-edit/$itemId'
     | '/console/$slug/staff/item/$itemId'
     | '/console/$slug/admin/inventory/'
     | '/console/$slug/admin/setting/'
@@ -957,6 +970,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ConsoleSlugStaffItemItemIdRouteImport
       parentRoute: typeof ConsoleSlugStaffRoute
     }
+    '/console/$slug/staff/item-edit/$itemId': {
+      id: '/console/$slug/staff/item-edit/$itemId'
+      path: '/item-edit/$itemId'
+      fullPath: '/console/$slug/staff/item-edit/$itemId'
+      preLoaderRoute: typeof ConsoleSlugStaffItemEditItemIdRouteImport
+      parentRoute: typeof ConsoleSlugStaffRoute
+    }
     '/console/$slug/admin/setting/organization': {
       id: '/console/$slug/admin/setting/organization'
       path: '/organization'
@@ -1135,6 +1155,7 @@ interface ConsoleSlugStaffRouteChildren {
   ConsoleSlugStaffInventoryAddItemRoute: typeof ConsoleSlugStaffInventoryAddItemRoute
   ConsoleSlugStaffInventorySearchRoute: typeof ConsoleSlugStaffInventorySearchRoute
   ConsoleSlugStaffNotificationRoute: typeof ConsoleSlugStaffNotificationRoute
+  ConsoleSlugStaffItemEditItemIdRoute: typeof ConsoleSlugStaffItemEditItemIdRoute
   ConsoleSlugStaffItemItemIdRoute: typeof ConsoleSlugStaffItemItemIdRoute
 }
 
@@ -1145,6 +1166,7 @@ const ConsoleSlugStaffRouteChildren: ConsoleSlugStaffRouteChildren = {
   ConsoleSlugStaffInventoryAddItemRoute: ConsoleSlugStaffInventoryAddItemRoute,
   ConsoleSlugStaffInventorySearchRoute: ConsoleSlugStaffInventorySearchRoute,
   ConsoleSlugStaffNotificationRoute: ConsoleSlugStaffNotificationRoute,
+  ConsoleSlugStaffItemEditItemIdRoute: ConsoleSlugStaffItemEditItemIdRoute,
   ConsoleSlugStaffItemItemIdRoute: ConsoleSlugStaffItemItemIdRoute,
 }
 

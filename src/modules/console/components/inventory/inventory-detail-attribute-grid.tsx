@@ -54,17 +54,27 @@ export function InventoryDetailAttributeGrid({
   const subName = getInventorySubcategoryName(item, subcategoryNameById)
   const cat = item.category
   const aiDesc = getInventoryAiDescription(item)
+  const detailItemName =
+    item.personalBelongingDetail?.itemName ??
+    item.electronicDetail?.itemName ??
+    item.cardDetail?.itemName ??
+    null
+  const itemNameLabel = cat === 'Others' ? 'ITEM IDENTIFIER' : 'ITEM NAME'
+  const itemNameValue = cat === 'Others' ? item.otherDetail?.itemName : detailItemName
 
   return (
     <>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div className="md:col-span-2">
-          <div className="text-sm font-semibold uppercase mb-2">STATUS</div>
-          <div className="flex items-center gap-2 text-gray-900">
-            <Info className="w-4 h-4 text-blue-600" />
+        <Cell label="STATUS">
+          <>
+            <Info className="w-4 h-4 text-blue-600 shrink-0" />
             <span>{inventoryStatusLabel(item.status)}</span>
-          </div>
-        </div>
+          </>
+        </Cell>
+
+        <Cell label={itemNameLabel}>
+          <TextValue v={itemNameValue} />
+        </Cell>
 
         <Cell label="CATEGORY">
           <>
@@ -185,7 +195,7 @@ export function InventoryDetailAttributeGrid({
               </>
             </Cell>
             <Cell label="ITEM IDENTIFIER">
-              <TextValue v={item.otherDetail?.itemIdentifier} />
+              <TextValue v={item.otherDetail?.itemName} />
             </Cell>
             <Cell label="PRIMARY COLOR" fullWidth>
               <TextValue v={item.otherDetail?.primaryColor} />

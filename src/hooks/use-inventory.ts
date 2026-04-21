@@ -3,6 +3,7 @@ import {
   inventoryService,
   type CreateInventoryPayload,
   type GetInventoryParams,
+  type UpdateInventoryPayload,
 } from '@/services/inventory.service'
 
 export const INVENTORY_KEYS = {
@@ -53,6 +54,17 @@ export function usePublishInventoryItem(orgId: string | null) {
     mutationFn: (id: string) => inventoryService.publish(orgId!, id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: INVENTORY_KEYS.all(orgId) })
+    },
+  })
+}
+
+export function useUpdateInventoryItem(orgId: string | null) {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: ({ id, payload }: { id: string; payload: UpdateInventoryPayload }) => inventoryService.update(orgId!, id, payload),
+    onSuccess: (_data, vars) => {
+      queryClient.invalidateQueries({ queryKey: INVENTORY_KEYS.all(orgId) })
+      queryClient.invalidateQueries({ queryKey: INVENTORY_KEYS.detail(orgId, vars.id) })
     },
   })
 }

@@ -35,7 +35,9 @@ export function getInventorySubcategoryName(item: AnyInventory, subcategoryNameB
  * so we derive a short label from subcategory + brand/model when present.
  */
 export function getInventoryTitle(item: AnyInventory, subcategoryNameById?: Record<string, string>): string {
-  if (item.otherDetail?.itemIdentifier?.trim()) return item.otherDetail.itemIdentifier.trim()
+  if (item.postTitle?.trim()) return item.postTitle.trim()
+
+  if (item.otherDetail?.itemName?.trim()) return item.otherDetail.itemName.trim()
   if (item.cardDetail?.holderName?.trim()) return item.cardDetail.holderName.trim()
 
   const sub = getInventorySubcategoryName(item, subcategoryNameById).trim()
