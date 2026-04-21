@@ -6,6 +6,19 @@ import type { InventorySubcategory, ItemCategory } from '@/services/inventory.se
 import { ChevronRight } from 'lucide-react'
 import { InventoryPhotosPicker } from '@/modules/console/components/inventory/inventory-photos-picker'
 
+function categoryLabel(c: ItemCategory): string {
+  switch (c) {
+    case 'PersonalBelongings':
+      return 'Personal belongings'
+    case 'Cards':
+      return 'Cards'
+    case 'Electronics':
+      return 'Electronics'
+    case 'Others':
+      return 'Others'
+  }
+}
+
 export type PhotoPreview = { file: File; url: string }
 
 export type Step1PhotosAndItemProps = {
@@ -201,7 +214,7 @@ export function Step1PhotosAndItem({
             >
               {(['PersonalBelongings', 'Cards', 'Electronics', 'Others'] as ItemCategory[]).map((c) => (
                 <option key={c} value={c}>
-                  {c}
+                  {categoryLabel(c)}
                 </option>
               ))}
             </select>

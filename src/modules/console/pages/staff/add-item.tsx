@@ -682,8 +682,8 @@ export function AddFoundItemPage() {
 
   return (
     <StaffLayout>
-      <div className="p-8">
-        <div className="max-w-5xl mx-auto">
+      <div className="px-4 py-6 sm:px-4 sm:py-6 lg:px-6 lg:py-8 min-h-screen flex flex-col">
+        <div className="max-w-6xl mx-auto w-full">
           {/* Breadcrumb */}
           <div className="mb-6 flex items-center gap-2 text-sm text-gray-600">
             <Link
@@ -704,12 +704,12 @@ export function AddFoundItemPage() {
         </div>
 
         {/* Stepper (outside data card) */}
-        <div className="max-w-5xl mx-auto mb-6">
+        <div className="max-w-6xl mx-auto w-full mb-6">
           <Stepper current={step} onGo={(s) => goToStep(s)} />
         </div>
 
         {/* Form Container */}
-        <div className="max-w-5xl mx-auto bg-white rounded-xl shadow-lg px-8 py-4">
+        <div className="max-w-6xl mx-auto w-full bg-white rounded-xl shadow-lg px-4 sm:px-6 lg:px-7 py-4 flex-1 min-h-0">
 
           {submitError && (
             <div className="mb-4 p-3 rounded-md bg-red-50 text-red-700 text-sm">
