@@ -20,6 +20,8 @@ export type StaffInfo = {
 }
 
 export type PreviewItem = {
+  postTitle: string
+  detailItemName: string
   itemName: string
   description: string
   distinctiveMarks: string
@@ -78,10 +80,8 @@ export function Step3Preview({
         </div>
         <div className="px-5 border-t border-slate-100">
           <FieldRow label="Category" value={item.category} />
-
-          {c === 'PersonalBelongings' || c === 'Electronics' ? (
-            <FieldRow label="Item name (local only)" value={item.itemName} />
-          ) : null}
+          <FieldRow label="Post title" value={item.postTitle} />
+          {c !== 'Others' ? <FieldRow label="Item name " value={item.detailItemName} /> : null}
           {c === 'Others' ? <FieldRow label="Item identifier" value={item.itemName} /> : null}
 
           {c === 'Cards' ? (

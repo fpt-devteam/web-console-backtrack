@@ -1,5 +1,4 @@
 import { StaffLayout } from '../../components/staff/layout'
-import { Trash2 } from 'lucide-react'
 import { useState } from 'react'
 import { useParams, useNavigate } from '@tanstack/react-router'
 import { Button } from '@/components/ui/button'
@@ -49,7 +48,25 @@ export function ItemDetailPage() {
               <Button
                 variant="outline"
                 size="sm"
-                className="text-red-600 border-red-300 hover:bg-red-50"
+                type="button"
+                className="border-blue-600 text-blue-600 hover:bg-blue-600 hover:text-white transition-all hover:scale-[1.03] hover:drop-shadow-sm"
+                onClick={() => setHandoverOpen(true)}
+              >
+                Handover
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                type="button"
+                className="border-blue-600 text-blue-600 hover:bg-blue-600 hover:text-white transition-all hover:scale-[1.03] hover:drop-shadow-sm"
+                onClick={() => navigate({ to: `/console/${slug}/staff/item-edit/${item.id}` })}
+              >
+                Edit
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                className="text-red-600 border-red-300 hover:bg-red-600 hover:text-white transition-all hover:scale-[1.03] hover:drop-shadow-sm"
                 disabled={deleteItem.isPending}
                 onClick={() => {
                   if (window.confirm('Are you sure you want to delete this item? This cannot be undone.')) {
@@ -60,11 +77,7 @@ export function ItemDetailPage() {
                   }
                 }}
               >
-                <Trash2 className="w-3.5 h-3.5 mr-2" />
                 {deleteItem.isPending ? 'Deleting...' : 'Delete'}
-              </Button>
-              <Button size="sm" type="button" className="bg-blue-600 hover:bg-blue-700" onClick={() => setHandoverOpen(true)}>
-                Handover
               </Button>
             </>
           ) : null

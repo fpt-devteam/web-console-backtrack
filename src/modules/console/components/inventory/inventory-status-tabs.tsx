@@ -3,8 +3,8 @@ import { inventoryStatusLabel } from './status'
 
 const TABS: StatusFilter[] = [
   'All',
-  'InStorage',
   'Active',
+  'InStorage',
   'ReturnScheduled',
   'Returned',
   'Archived',

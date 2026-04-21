@@ -10,6 +10,7 @@ import { useCreateInventoryItem } from '@/hooks/use-inventory'
 import { useUser } from '@/hooks/use-user'
 import { useOrganization } from '@/hooks/use-org'
 import type { FinderContactField } from '@/types/organization.types'
+import { collectInventoryImageUrls, revokeObjectUrls } from '@/utils/inventory-photos'
 import { Step1PhotosAndItem, type PhotoPreview } from './add-item/step1-photos-item'
 import { Step2Finder, type FinderInfo } from './add-item/step2-finder'
 import { Step3Preview, type StaffInfo } from './add-item/step3-preview'
@@ -26,6 +27,8 @@ type AddInventoryDraft = {
   v: 3
   step: StepId
   item: {
+    postTitle: string
+    detailItemName: string
     itemName: string
     description: string
     distinctiveMarks: string
@@ -140,6 +143,8 @@ export function AddFoundItemPage() {
   // objectURL previews + File for upload
   const [photoPreviews, setPhotoPreviews] = useState<PhotoPreview[]>([])
 
+  const [postTitle, setPostTitle] = useState<string>('')
+  const [detailItemName, setDetailItemName] = useState<string>('')
   const [itemName, setItemName] = useState<string>('')
   const [description, setDescription] = useState<string>('')
   const [distinctiveMarks, setDistinctiveMarks] = useState<string>('')
@@ -210,6 +215,8 @@ export function AddFoundItemPage() {
       }
 
       setStep(parsed.step ?? 1)
+      setPostTitle(parsed.item?.postTitle ?? '')
+      setDetailItemName(parsed.item?.detailItemName ?? '')
       setItemName(parsed.item?.itemName ?? '')
       setDescription(parsed.item?.description ?? '')
       setDistinctiveMarks(parsed.item?.distinctiveMarks ?? '')
@@ -253,6 +260,8 @@ export function AddFoundItemPage() {
         v: 3,
         step,
         item: {
+          postTitle,
+          detailItemName,
           itemName,
           description,
           distinctiveMarks,
@@ -292,6 +301,8 @@ export function AddFoundItemPage() {
   }, [
     draftKey,
     step,
+    postTitle,
+    detailItemName,
     itemName,
     description,
     distinctiveMarks,
@@ -338,6 +349,7 @@ export function AddFoundItemPage() {
 
     // BE analysis result is detail-specific based on selected subcategory.
     if (result.personalBelonging) {
+      if (result.personalBelonging.itemName) setDetailItemName(result.personalBelonging.itemName)
       if (result.personalBelonging.color) setColor(result.personalBelonging.color)
       if (result.personalBelonging.brand) setBrand(result.personalBelonging.brand)
       if (result.personalBelonging.condition) setCondition(result.personalBelonging.condition)
@@ -347,6 +359,7 @@ export function AddFoundItemPage() {
       if (result.personalBelonging.additionalDetails) setDescription(result.personalBelonging.additionalDetails)
     }
     if (result.electronic) {
+      if (result.electronic.itemName) setDetailItemName(result.electronic.itemName)
       if (result.electronic.brand) setBrand(result.electronic.brand)
       if (result.electronic.color) setColor(result.electronic.color)
       if (result.electronic.model) setModel(result.electronic.model)
@@ -358,11 +371,12 @@ export function AddFoundItemPage() {
       if (result.electronic.additionalDetails) setDescription(result.electronic.additionalDetails)
     }
     if (result.other) {
-      if (result.other.itemIdentifier) setItemName(result.other.itemIdentifier)
+      if (result.other.itemName) setItemName(result.other.itemName)
       if (result.other.primaryColor) setColor(result.other.primaryColor)
       if (result.other.additionalDetails) setDescription(result.other.additionalDetails)
     }
     if (result.card) {
+      if (result.card.itemName) setDetailItemName(result.card.itemName)
       if (result.card.holderName) setHolderName(result.card.holderName)
       if (result.card.cardNumber) setCardNumber(result.card.cardNumber)
       if (result.card.issuingAuthority) setIssuingAuthority(result.card.issuingAuthority)
@@ -379,19 +393,11 @@ export function AddFoundItemPage() {
     setSubmitError(null)
 
     try {
-      // Upload ALL selected photos and send as a batch to BE for analysis.
-      const urls: string[] = []
-      for (const p of photoPreviews) {
-        const key = fileKey(p.file)
-        const cached = uploadedUrlByFileKeyRef.current.get(key)
-        if (cached) {
-          urls.push(cached)
-          continue
-        }
-        const url = await uploadInventoryImage(currentOrgId, p.file)
-        uploadedUrlByFileKeyRef.current.set(key, url)
-        urls.push(url)
-      }
+      const urls = await collectInventoryImageUrls({
+        previews: photoPreviews.map((p) => ({ file: p.file, url: p.url, isExisting: false })),
+        cacheByFileKey: uploadedUrlByFileKeyRef.current,
+        upload: (file) => uploadInventoryImage(currentOrgId, file),
+      })
 
       const result = await inventoryService.analyzeImage(urls, subcategoryCode.trim())
       applyAnalysisResult(result)
@@ -402,7 +408,6 @@ export function AddFoundItemPage() {
     }
   }
 
-  const fileKey = (file: File) => `${file.name}:${file.size}:${file.lastModified}:${file.type}`
 
   const handlePhotoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files
@@ -440,6 +445,8 @@ export function AddFoundItemPage() {
   }
 
   const buildPayload = (imageUrls: string[]) => ({
+    postTitle: postTitle.trim(),
+    detailItemName: detailItemName.trim() || undefined,
     itemName: itemName.trim(),
     description: description.trim(),
     distinctiveMarks: distinctiveMarks.trim() || undefined,
@@ -471,8 +478,8 @@ export function AddFoundItemPage() {
   })
 
   const validateStep1 = (): string | null => {
+    if (!postTitle.trim()) return 'Post title is required.'
     if (category === 'Others' && !itemName.trim()) return 'Item identifier is required.'
-    if (!description.trim()) return 'Additional details are required.'
     if (photoPreviews.length === 0) return 'At least one photo is required.'
     if (!subcategoryCode.trim()) return 'Subcategory is required.'
     return null
@@ -506,11 +513,13 @@ export function AddFoundItemPage() {
   }
 
   const resetItemForm = () => {
+    setPostTitle('')
+    setDetailItemName('')
     setItemName('')
     setDescription('')
     setDistinctiveMarks('')
     setPhotoPreviews((prev) => {
-      prev.forEach((p) => URL.revokeObjectURL(p.url))
+      revokeObjectUrls(prev.map((p) => ({ file: p.file, url: p.url, isExisting: false })))
       return []
     })
     setCategory('PersonalBelongings')
@@ -546,18 +555,11 @@ export function AddFoundItemPage() {
     try {
       // Upload photos to Firebase Storage and collect their public URLs.
       // Reuse any URLs already uploaded during auto-analyze to avoid double uploads.
-      const imageUrls: string[] = []
-      for (const p of photoPreviews) {
-        const key = fileKey(p.file)
-        const cached = uploadedUrlByFileKeyRef.current.get(key)
-        if (cached) {
-          imageUrls.push(cached)
-          continue
-        }
-        const url = await uploadInventoryImage(currentOrgId, p.file)
-        uploadedUrlByFileKeyRef.current.set(key, url)
-        imageUrls.push(url)
-      }
+      const imageUrls = await collectInventoryImageUrls({
+        previews: photoPreviews.map((p) => ({ file: p.file, url: p.url, isExisting: false })),
+        cacheByFileKey: uploadedUrlByFileKeyRef.current,
+        upload: (file) => uploadInventoryImage(currentOrgId, file),
+      })
 
       await new Promise<void>((resolve, reject) => {
         createItem.mutate(buildPayload(imageUrls), {
@@ -673,7 +675,7 @@ export function AddFoundItemPage() {
   // Revoke any remaining objectURLs when leaving the page.
   useEffect(() => {
     return () => {
-      photoPreviewsRef.current.forEach((p) => URL.revokeObjectURL(p.url))
+      revokeObjectUrls(photoPreviewsRef.current.map((p) => ({ file: p.file, url: p.url, isExisting: false })))
     }
   }, [])
 
@@ -733,6 +735,8 @@ export function AddFoundItemPage() {
               onPick={({ category: pickedCategory, subcategory }) => {
                 setCategory(pickedCategory)
                 setSubcategoryCode(subcategory.code)
+                setPostTitle('')
+                setDetailItemName('')
                 // Keep name empty until staff types it, or AI fills a specific identifier (e.g. Others.itemIdentifier).
                 setItemName('')
                 setSubmitError(null)
@@ -758,6 +762,10 @@ export function AddFoundItemPage() {
                     ? 'Add at least one photo to analyze'
                     : 'Analyze all selected photos'
               }
+              postTitle={postTitle}
+              setPostTitle={setPostTitle}
+              detailItemName={detailItemName}
+              setDetailItemName={setDetailItemName}
               itemName={itemName}
               setItemName={setItemName}
               category={category}
@@ -817,6 +825,8 @@ export function AddFoundItemPage() {
             <Step3Preview
               photoPreviews={photoPreviews}
               item={{
+                postTitle,
+                detailItemName,
                 itemName,
                 description,
                 distinctiveMarks,

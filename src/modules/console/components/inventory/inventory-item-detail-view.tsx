@@ -123,14 +123,14 @@ export function InventoryItemDetailView({
               })}
             </p>
           </div>
-          <div className="flex gap-3">{actions}</div>
+          <div className="flex gap-2">{actions}</div>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-7">
           <div className="lg:col-span-3 p-6 border-r border-gray-200">
             <div className="relative h-[350px] bg-gradient-to-br from-gray-100 to-gray-200 rounded-lg overflow-hidden mb-4 flex items-center justify-center">
               {mainImg ? (
-                <img src={mainImg} alt={imgAlt} className="w-full h-full object-cover" />
+                <img src={mainImg} alt={imgAlt} className="w-full h-full object-contain bg-white" />
               ) : (
                 <div className="text-gray-400">No image</div>
               )}
@@ -146,7 +146,7 @@ export function InventoryItemDetailView({
                       mainImageIndex === idx ? 'border-blue-600 ring-2 ring-blue-200' : 'border-gray-300 hover:border-gray-400'
                     }`}
                   >
-                    <img src={img} alt={`View ${idx + 1}`} className="w-full h-full object-cover" />
+                    <img src={img} alt={`View ${idx + 1}`} className="w-full h-full object-contain bg-white" />
                   </button>
                 ))}
                 {showAddThumbnailButton ? (

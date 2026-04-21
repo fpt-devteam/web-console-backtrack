@@ -43,6 +43,7 @@ export interface OwnerInfo {
 }
 
 export interface PersonalBelongingDetail {
+  itemName?: string | null
   color?: string | null
   brand?: string | null
   material?: string | null
@@ -54,6 +55,7 @@ export interface PersonalBelongingDetail {
 }
 
 export interface CardDetail {
+  itemName?: string | null
   cardNumberMasked?: string | null
   holderName?: string | null
   dateOfBirth?: string | null
@@ -66,6 +68,7 @@ export interface CardDetail {
 }
 
 export interface ElectronicDetail {
+  itemName?: string | null
   brand?: string | null
   model?: string | null
   color?: string | null
@@ -79,7 +82,7 @@ export interface ElectronicDetail {
 }
 
 export interface OtherDetail {
-  itemIdentifier: string
+  itemName: string
   primaryColor?: string | null
   additionalDetails?: string | null
   aiDescription?: string | null
@@ -88,6 +91,7 @@ export interface OtherDetail {
 export interface InventoryItem {
   id: string
   postType: PostType
+  postTitle: string
   status: PostStatus
   category: ItemCategory
   subcategoryId: string
@@ -120,6 +124,9 @@ export interface InventorySubcategory {
 }
 
 export interface CreateInventoryPayload {
+  postTitle: string
+  /** Maps to BE `*DetailInput.ItemName` (Personal/Cards/Electronics). */
+  detailItemName?: string
   /** Maps to `OtherDetail.itemIdentifier` only; not a stored field for other categories. */
   itemName: string
   description: string
@@ -144,6 +151,64 @@ export interface CreateInventoryPayload {
   caseDescription?: string | null
   lockScreenDescription?: string | null
   finderInfo?: FinderInfo | null
+}
+
+export interface UpdateInventoryPayload {
+  /** UpdatePostCommand.PostType */
+  postType?: PostType
+  /** UpdatePostCommand.Status */
+  status?: PostStatus
+  /** UpdatePostCommand.EventTime (ISO DateTimeOffset) */
+  eventTime?: string
+  /** UpdatePostCommand.ImageUrls */
+  imageUrls?: string[]
+  /** UpdatePostCommand.DisplayAddress */
+  displayAddress?: string | null
+  /** UpdatePostCommand.ExternalPlaceId */
+  externalPlaceId?: string | null
+  /** UpdatePostCommand.Location */
+  location?: GeoPoint | null
+
+  personalBelongingDetail?: {
+    itemName: string
+    color?: string | null
+    brand?: string | null
+    material?: string | null
+    size?: string | null
+    condition?: string | null
+    distinctiveMarks?: string | null
+    additionalDetails?: string | null
+  } | null
+
+  electronicDetail?: {
+    itemName: string
+    brand?: string | null
+    model?: string | null
+    color?: string | null
+    hasCase?: boolean | null
+    caseDescription?: string | null
+    screenCondition?: string | null
+    lockScreenDescription?: string | null
+    distinguishingFeatures?: string | null
+    additionalDetails?: string | null
+  } | null
+
+  cardDetail?: {
+    itemName: string
+    cardNumber?: string | null
+    holderName?: string | null
+    issuingAuthority?: string | null
+    dateOfBirth?: string | null
+    issueDate?: string | null
+    expiryDate?: string | null
+    additionalDetails?: string | null
+  } | null
+
+  otherDetail?: {
+    itemName: string
+    primaryColor?: string | null
+    additionalDetails?: string | null
+  } | null
 }
 
 export interface GetInventoryParams {
@@ -178,8 +243,14 @@ export type AnalyzeImageResult = {
   category: ItemCategory
   personalBelonging?: PersonalBelongingDetail | null
   electronic?: ElectronicDetail | null
-  other?: { itemIdentifier: string; primaryColor?: string | null; additionalDetails?: string | null } | null
-  card?: { cardNumber?: string | null; holderName?: string | null; issuingAuthority?: string | null; additionalDetails?: string | null } | null
+  other?: { itemName: string; primaryColor?: string | null; additionalDetails?: string | null } | null
+  card?: {
+    itemName?: string | null
+    cardNumber?: string | null
+    holderName?: string | null
+    issuingAuthority?: string | null
+    additionalDetails?: string | null
+  } | null
   warnings?: string[] | null
 }
 
@@ -197,13 +268,17 @@ type SearchInventoriesBody = {
 
 export const inventoryService = {
   async create(orgId: string, payload: CreateInventoryPayload): Promise<InventoryItem> {
+    const postTitle = payload.postTitle.trim()
+    const detailItemName = payload.detailItemName?.trim() || postTitle
     const body =
       payload.category === 'PersonalBelongings'
         ? {
             postType: 'Found',
+            postTitle,
             category: payload.category,
             subcategoryCode: payload.subcategoryCode,
             personalBelongingDetail: {
+              itemName: detailItemName,
               color: payload.color ?? undefined,
               brand: payload.brand ?? undefined,
               material: payload.material ?? undefined,
@@ -218,9 +293,11 @@ export const inventoryService = {
         : payload.category === 'Electronics'
           ? {
               postType: 'Found',
+              postTitle,
               category: payload.category,
               subcategoryCode: payload.subcategoryCode,
               electronicDetail: {
+                itemName: detailItemName,
                 brand: payload.brand ?? undefined,
                 model: payload.model ?? undefined,
                 color: payload.color ?? undefined,
@@ -237,9 +314,11 @@ export const inventoryService = {
         : payload.category === 'Cards'
           ? {
               postType: 'Found',
+              postTitle,
               category: payload.category,
               subcategoryCode: payload.subcategoryCode,
               cardDetail: {
+                itemName: detailItemName,
                 cardNumber: payload.cardNumber ?? undefined,
                 holderName: payload.holderName ?? undefined,
                 issuingAuthority: payload.issuingAuthority ?? undefined,
@@ -254,10 +333,11 @@ export const inventoryService = {
           : payload.category === 'Others'
             ? {
                 postType: 'Found',
+                postTitle,
                 category: payload.category,
                 subcategoryCode: payload.subcategoryCode,
                 otherDetail: {
-                  itemIdentifier: payload.itemName.trim(),
+                  itemName: payload.itemName.trim(),
                   primaryColor: payload.color ?? undefined,
                   additionalDetails: payload.description,
                 },
@@ -266,10 +346,11 @@ export const inventoryService = {
               }
             : {
                 postType: 'Found',
+                postTitle,
                 category: payload.category,
                 subcategoryCode: payload.subcategoryCode,
                 otherDetail: {
-                  itemIdentifier: payload.itemName.trim(),
+                  itemName: payload.itemName.trim(),
                   additionalDetails: payload.description,
                 },
                 imageUrls: payload.imageUrls ?? [],
@@ -326,6 +407,12 @@ export const inventoryService = {
   async publish(orgId: string, id: string): Promise<InventoryItem> {
     const { data } = await privateClient.post<ApiResponse<InventoryItem>>(`/api/core/orgs/${orgId}/inventory/${id}/publish`)
     if (!data.success) throw new Error(data.error?.message ?? 'Failed to publish inventory item')
+    return data.data
+  },
+
+  async update(orgId: string, id: string, payload: UpdateInventoryPayload): Promise<InventoryItem> {
+    const { data } = await privateClient.put<ApiResponse<InventoryItem>>(`/api/core/orgs/${orgId}/inventory/${id}`, payload)
+    if (!data.success) throw new Error(data.error?.message ?? 'Failed to update inventory item')
     return data.data
   },
 

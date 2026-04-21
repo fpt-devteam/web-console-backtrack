@@ -58,7 +58,7 @@ export function InventoryGridCards({
                 <img
                   src={item.imageUrls[0]}
                   alt={imgAlt}
-                  className="w-full h-full object-cover"
+                  className="w-full h-full object-contain bg-white"
                 />
               ) : (
                 <div className="w-full h-full flex items-center justify-center text-gray-400">No image</div>
@@ -71,8 +71,11 @@ export function InventoryGridCards({
                 {inventoryStatusLabel(item.status)}
               </span>
             </div>
-            <div className="p-4 flex flex-col flex-1">
-              <h3 className="font-semibold text-gray-900 mb-3 min-h-[24px]">{displayTitle}</h3>
+            <div className="mt-1 h-px w-full bg-gray-200" />
+            <div className="p-4 pt-3 flex flex-col flex-1">
+              <h3 className="font-semibold text-gray-900 mb-3 line-clamp-2 leading-5 min-h-[40px]">
+                {displayTitle}
+              </h3>
               <p className="text-sm text-gray-600 mb-3 line-clamp-2 leading-5 min-h-[40px]">
                 {getInventoryDescription(item) ?? ''}
               </p>
