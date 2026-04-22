@@ -682,8 +682,8 @@ export function AddFoundItemPage() {
 
   return (
     <StaffLayout>
-      <div className="px-4 py-6 sm:px-4 sm:py-6 lg:px-6 lg:py-8 min-h-screen flex flex-col">
-        <div className="max-w-6xl mx-auto w-full">
+      <div className="h-full overflow-y-auto p-8">
+        <div className="max-w-5xl mx-auto">
           {/* Breadcrumb */}
           <div className="mb-6 flex items-center gap-2 text-sm text-gray-600">
             <Link
