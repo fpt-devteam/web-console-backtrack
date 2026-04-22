@@ -1,14 +1,7 @@
-import { createFileRoute } from '@tanstack/react-router';
-import { MarketingLayout, HomePage } from '@/modules/marketing';
+import { createFileRoute, redirect } from '@tanstack/react-router';
 
 export const Route = createFileRoute('/')({
-  component: HomeRoute,
+  beforeLoad: () => {
+    throw redirect({ to: '/auth/signin-or-signup' });
+  },
 });
-
-function HomeRoute() {
-  return (
-    <MarketingLayout>
-      <HomePage />
-    </MarketingLayout>
-  );
-}

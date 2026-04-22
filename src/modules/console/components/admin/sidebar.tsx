@@ -5,6 +5,7 @@ import { useState, useEffect, useMemo } from 'react';
 import { useCurrentOrgId } from '@/contexts/current-org.context';
 import { useOrganization } from '@/hooks/use-org';
 import { useCurrentUser } from '@/hooks/use-auth';
+import { LogoutPill } from '@/modules/auth/components/logout-pill';
 
 function getInitials(name: string | null | undefined): string {
   if (!name?.trim()) return 'U';
@@ -232,12 +233,8 @@ export function Sidebar({ isOpen, onToggle }: SidebarProps) {
       </div>
 
       {/* Footer */}
-      <div
-        className={`px-6 py-4 border-t border-gray-200 text-xs text-gray-400 transition-all duration-300 whitespace-nowrap overflow-hidden ${
-          isOpen ? 'w-auto opacity-100' : 'w-0 opacity-0'
-        }`}
-      >
-        © 2025 Backtrack
+      <div className="px-4 py-2 border-t border-gray-200 flex items-center justify-center">
+        <LogoutPill isOpen={isOpen} />
       </div>
     </aside>
   );
