@@ -13,6 +13,7 @@ export const chatKeys = {
   all: ['chat'] as const,
   queue: () => [...chatKeys.all, 'queue'] as const,
   assigned: () => [...chatKeys.all, 'assigned'] as const,
+  resolved: () => [...chatKeys.all, 'resolved'] as const,
   conversation: (id: string) => [...chatKeys.all, 'conversation', id] as const,
   messages: (conversationId: string) => [...chatKeys.all, 'messages', conversationId] as const,
 };
@@ -29,6 +30,7 @@ export function useChatQueue(orgId?: string, options?: { poll?: boolean }) {
     queryFn: () => chatService.listQueue(orgId),
     staleTime: 1000 * 15,
     refetchInterval: (options?.poll ?? false) ? 1000 * 15 : false,
+    retry: false,
   });
 }
 
@@ -40,6 +42,17 @@ export function useChatAssigned() {
     queryKey: chatKeys.assigned(),
     queryFn: () => chatService.listAssigned(),
     staleTime: 1000 * 30,
+    retry: false,
+  });
+}
+
+/** Fetch resolved (closed) conversations handled by the authenticated staff member. */
+export function useChatResolved() {
+  return useQuery({
+    queryKey: chatKeys.resolved(),
+    queryFn: () => chatService.listResolved(),
+    staleTime: 1000 * 30,
+    retry: false,
   });
 }
 
@@ -86,6 +99,19 @@ export function useAssignConversation() {
       // Refresh both lists after assignment
       queryClient.invalidateQueries({ queryKey: chatKeys.queue() });
       queryClient.invalidateQueries({ queryKey: chatKeys.assigned() });
+    },
+  });
+}
+
+/** Staff member resolves (closes) a conversation */
+export function useResolveConversation() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (conversationId: string) => chatService.resolveConversation(conversationId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: chatKeys.assigned() });
+      queryClient.invalidateQueries({ queryKey: chatKeys.resolved() });
     },
   });
 }
