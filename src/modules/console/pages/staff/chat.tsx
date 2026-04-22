@@ -218,8 +218,17 @@ function MessagePanel({ conversationId, partner, readOnly = false }: {
                       </div>
                     )}
 
-                    <div className={`px-3.5 py-2 text-sm ${bubbleClass(isOwn, pos)}`}>
-                      <p className="leading-relaxed">{msg.content}</p>
+                    <div className={`text-sm ${msg.type === MessageType.IMAGE ? '' : `px-3.5 py-2 ${bubbleClass(isOwn, pos)}`}`}>
+                      {msg.type === MessageType.IMAGE ? (
+                        <img
+                          src={msg.content}
+                          alt="image"
+                          className="max-w-[260px] max-h-[300px] rounded-2xl object-cover cursor-pointer"
+                          onClick={() => window.open(msg.content, '_blank')}
+                        />
+                      ) : (
+                        <p className="leading-relaxed">{msg.content}</p>
+                      )}
                       {isLast && (
                         <p className={`text-[10px] mt-0.5 ${isOwn ? 'text-blue-100 text-right' : 'text-gray-400'}`}>
                           {formatTime(msg.createdAt)}
