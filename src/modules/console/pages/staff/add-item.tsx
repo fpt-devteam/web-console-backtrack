@@ -32,7 +32,7 @@ type AddInventoryDraft = {
     itemName: string
     description: string
     distinctiveMarks: string
-    category: ItemCategory
+    category: ItemCategory | null
     subcategoryCode: string
     color: string
     brand: string
@@ -148,9 +148,9 @@ export function AddFoundItemPage() {
   const [itemName, setItemName] = useState<string>('')
   const [description, setDescription] = useState<string>('')
   const [distinctiveMarks, setDistinctiveMarks] = useState<string>('')
-  const [category, setCategory] = useState<ItemCategory>('PersonalBelongings')
+  const [category, setCategory] = useState<ItemCategory | null>(null)
   const { data: allSubcategories } = useSubcategories()
-  const { data: subcategories } = useSubcategories(category)
+  const { data: subcategories } = useSubcategories(category ?? undefined)
   const [subcategoryCode, setSubcategoryCode] = useState<string>('') // required by BE
   const [color, setColor] = useState<string>('')
   const [brand, setBrand] = useState<string>('')
@@ -198,46 +198,13 @@ export function AddFoundItemPage() {
     staffId: '',
   })
 
-  // Hydrate draft on first load (text fields only; photos can't survive reload).
+  // Always start from step 0 with no preselected category.
+  // (Ignore any saved draft so users make an explicit choice first.)
   useEffect(() => {
     if (!draftKey) return
     if (draftHydratedRef.current) return
     try {
-      const raw = window.localStorage.getItem(draftKey)
-      if (!raw) {
-        draftHydratedRef.current = true
-        return
-      }
-      const parsed = JSON.parse(raw) as AddInventoryDraft & { v?: number }
-      if (!parsed || (parsed.v !== 3 && parsed.v !== 2)) {
-        draftHydratedRef.current = true
-        return
-      }
-
-      setStep(parsed.step ?? 1)
-      setPostTitle(parsed.item?.postTitle ?? '')
-      setDetailItemName(parsed.item?.detailItemName ?? '')
-      setItemName(parsed.item?.itemName ?? '')
-      setDescription(parsed.item?.description ?? '')
-      setDistinctiveMarks(parsed.item?.distinctiveMarks ?? '')
-      setCategory(parsed.item?.category ?? 'PersonalBelongings')
-      setSubcategoryCode(parsed.item?.subcategoryCode ?? '')
-      setColor(parsed.item?.color ?? '')
-      setBrand(parsed.item?.brand ?? '')
-      setCondition(parsed.item?.condition ?? '')
-      setMaterial(parsed.item?.material ?? '')
-      setSize(parsed.item?.size ?? '')
-      setHolderName(parsed.item?.holderName ?? '')
-      setCardNumber(parsed.item?.cardNumber ?? '')
-      setIssuingAuthority(parsed.item?.issuingAuthority ?? '')
-      setModel(parsed.item?.model ?? '')
-      setHasCase(Boolean(parsed.item?.hasCase))
-      setCaseDescription(parsed.item?.caseDescription ?? '')
-      setLockScreenDescription(parsed.item?.lockScreenDescription ?? '')
-      setDateOfBirth(parsed.item?.dateOfBirth ?? '')
-      setIssueDate(parsed.item?.issueDate ?? '')
-      setExpiryDate(parsed.item?.expiryDate ?? '')
-      setFinder(parsed.finder ?? { fullName: '', email: '', nationalId: '', orgMemberId: '', phone: '' })
+      window.localStorage.removeItem(draftKey)
     } catch {
       // ignore draft parse errors
     } finally {
@@ -328,10 +295,12 @@ export function AddFoundItemPage() {
 
   // Ensure we always have a valid subcategoryCode for the selected category.
   useEffect(() => {
+    // Step 0 is a deliberate choice screen — don't auto-default.
+    if (step === 0) return
     if (!subcategories || subcategories.length === 0) return
     if (subcategoryCode && subcategories.some((s) => s.code === subcategoryCode)) return
     setSubcategoryCode(subcategories[0]!.code)
-  }, [subcategories, subcategoryCode])
+  }, [step, subcategories, subcategoryCode])
 
   useEffect(() => {
     if (!me) return
@@ -444,7 +413,11 @@ export function AddFoundItemPage() {
     })
   }
 
-  const buildPayload = (imageUrls: string[]) => ({
+  const buildPayload = (imageUrls: string[]) => {
+    if (!category) {
+      throw new Error('Category is required.')
+    }
+    return {
     postTitle: postTitle.trim(),
     detailItemName: detailItemName.trim() || undefined,
     itemName: itemName.trim(),
@@ -475,9 +448,11 @@ export function AddFoundItemPage() {
       nationalId: finder.nationalId.trim() || undefined,
       orgMemberId: finder.orgMemberId.trim() || undefined,
     },
-  })
+    }
+  }
 
   const validateStep1 = (): string | null => {
+    if (!category) return 'Category is required.'
     if (!postTitle.trim()) return 'Post title is required.'
     if (category === 'Others' && !itemName.trim()) return 'Item identifier is required.'
     if (photoPreviews.length === 0) return 'At least one photo is required.'
@@ -522,7 +497,8 @@ export function AddFoundItemPage() {
       revokeObjectUrls(prev.map((p) => ({ file: p.file, url: p.url, isExisting: false })))
       return []
     })
-    setCategory('PersonalBelongings')
+    setCategory(null)
+    setSubcategoryCode('')
     setColor('')
     setBrand('')
     setCondition('')
@@ -624,8 +600,8 @@ export function AddFoundItemPage() {
 
     // Forward navigation must satisfy the same validations as the arrow buttons.
     if (step === 0) {
-      if (!subcategoryCode.trim()) {
-        setSubmitError('Please choose a subcategory to continue.')
+      if (!category || !subcategoryCode.trim()) {
+        setSubmitError('Please choose a category and subcategory to continue.')
         return
       }
       setSubmitError(null)
@@ -745,7 +721,7 @@ export function AddFoundItemPage() {
             />
           ) : null}
 
-          {step === 1 ? (
+          {step === 1 && category ? (
             <Step1PhotosAndItem
               photoPreviews={photoPreviews}
               maxPhotos={MAX_PHOTOS}
@@ -821,7 +797,7 @@ export function AddFoundItemPage() {
             />
           ) : null}
 
-          {step === 3 ? (
+          {step === 3 && category ? (
             <Step3Preview
               photoPreviews={photoPreviews}
               item={{

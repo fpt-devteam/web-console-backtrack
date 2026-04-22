@@ -1,4 +1,4 @@
-import type { ReactNode } from 'react'
+import { useEffect, useMemo, useState, type ReactNode } from 'react'
 import { ChevronRight, Camera } from 'lucide-react'
 import { Link } from '@tanstack/react-router'
 import { Spinner } from '@/components/ui/spinner'
@@ -19,7 +19,7 @@ function DetailRow({ label, value }: { label: string; value: string }) {
 function SectionTitle({ title }: { title: string }) {
   return (
     <div className="pt-3 first:pt-0">
-      <div className="text-sm font-bold tracking-wide text-slate-900 uppercase">{title}</div>
+      <div className="text-sm font-semibold tracking-wide text-slate-900 uppercase">{title}</div>
     </div>
   )
 }
@@ -35,6 +35,48 @@ function formatDateTimeOrDash(iso: string | null | undefined) {
   return d.toLocaleString()
 }
 
+function StepperDot({
+  state,
+  label,
+  date,
+  showDate = true,
+  disabled = false,
+  onClick,
+}: {
+  state: 'done' | 'active' | 'todo'
+  label: string
+  date: string
+  showDate?: boolean
+  disabled?: boolean
+  onClick?: () => void
+}) {
+  const dotClass =
+    state === 'active'
+      ? 'bg-blue-600 ring-4 ring-blue-100 scale-[1.225] shadow-md'
+      : state === 'done'
+        ? 'bg-blue-600'
+        : 'bg-slate-300'
+
+  const textClass = state === 'active' ? 'text-slate-900' : state === 'done' ? 'text-slate-800' : 'text-slate-500'
+
+  return (
+    <button
+      type="button"
+      onClick={disabled ? undefined : onClick}
+      disabled={disabled}
+      className={[
+        'group flex flex-col items-center gap-1 min-w-0',
+        disabled ? 'cursor-default' : 'cursor-pointer',
+      ].join(' ')}
+      aria-current={state === 'active' ? 'step' : undefined}
+    >
+      <span className={`h-3 w-3 rounded-full transition-all duration-200 ${dotClass}`} />
+      <span className={`text-xs font-semibold whitespace-nowrap ${textClass}`}>{label}</span>
+      {showDate ? <span className="text-[11px] text-slate-500 whitespace-nowrap">{date}</span> : null}
+    </button>
+  )
+}
+
 export function InventoryItemDetailView({
   backTo,
   isLoading,
@@ -44,8 +86,6 @@ export function InventoryItemDetailView({
   actions,
   extra,
   showAddThumbnailButton = false,
-  storagePanelTitle = 'Storage',
-  returnPanelTitle = 'Return to owner',
   returnReportForPost,
   subcategoryNameById,
 }: {
@@ -59,8 +99,6 @@ export function InventoryItemDetailView({
   actions?: ReactNode
   extra?: ReactNode
   showAddThumbnailButton?: boolean
-  storagePanelTitle?: string
-  returnPanelTitle?: string
   returnReportForPost: any
   subcategoryNameById?: Record<string, string>
 }) {
@@ -95,6 +133,37 @@ export function InventoryItemDetailView({
   const headerPrimary = title.trim() || subName.trim() || 'Inventory item'
   const imgAlt = title.trim() || subName.trim() || 'Inventory item'
 
+  // Always open the first step (detail) when entering the view.
+  const [activeStep, setActiveStep] = useState<number>(0)
+
+  // Reset to detail when switching items.
+  useEffect(() => {
+    setActiveStep(0)
+  }, [item.id])
+
+  // Visual progress (completed steps) depends on current status.
+  const progressStep = useMemo(() => {
+    if (item.status === 'Returned' || item.status === 'Archived' || item.status === 'Expired') return 2
+    if (item.status === 'InStorage') return 1
+    return 0
+  }, [item.status])
+
+  const addedAt = useMemo(() => {
+    return new Date(item.createdAt).toLocaleDateString('vi-VN', { year: 'numeric', month: '2-digit', day: '2-digit' })
+  }, [item.createdAt])
+
+  const intakeAt = useMemo(() => formatDateTimeOrDash(item.createdAt), [item.createdAt])
+  const handoverAt = useMemo(() => formatDateTimeOrDash(returnReportForPost?.createdAt), [returnReportForPost?.createdAt])
+  const terminalAt = useMemo(
+    () => formatDateTimeOrDash((item as any).updatedAt ?? item.createdAt),
+    [item],
+  )
+
+  const isTerminal = item.status === 'Archived' || item.status === 'Expired'
+  const isHandoverDone = item.status === 'Returned'
+  const step3Label = isHandoverDone ? 'Handover' : isTerminal ? inventoryStatusLabel(item.status) : 'Handover'
+  const step3Date = isHandoverDone ? handoverAt : isTerminal ? terminalAt : '—'
+
   return (
     <div className="p-6 h-full overflow-y-auto mx-6">
       <div className="mb-6 flex items-center gap-2 text-xs text-gray-600">
@@ -105,25 +174,54 @@ export function InventoryItemDetailView({
         <span className="text-gray-900 font-medium">{headerPrimary}</span>
       </div>
 
-      <div className="bg-white rounded-xl shadow-sm">
-        <div className="p-6 border-b border-gray-200 flex items-start justify-between">
-          <div>
-            <div className="flex items-center gap-3 mb-2">
-              <h1 className="text-2xl font-bold text-gray-900">{title}</h1>
-              <span className={`px-3 py-1 rounded-md text-xs font-bold uppercase ${inventoryStatusPillClass(item.status)}`}>
-                {inventoryStatusLabel(item.status)}
-              </span>
-            </div>
-            <p className="text-xs text-gray-600">
-              Added{' '}
-              {new Date(item.createdAt).toLocaleDateString('vi-VN', {
-                year: 'numeric',
-                month: '2-digit',
-                day: '2-digit',
-              })}
-            </p>
+      {/* Title outside the card */}
+      <div className="mb-4 flex items-start justify-between">
+        <div className="min-w-0">
+          <div className="flex items-center gap-3 mb-1">
+            <h1 className="text-2xl font-bold text-gray-900 truncate">{title}</h1>
+            <span className={`px-3 py-1 rounded-md text-xs font-bold uppercase ${inventoryStatusPillClass(item.status)}`}>
+              {inventoryStatusLabel(item.status)}
+            </span>
           </div>
-          <div className="flex gap-2">{actions}</div>
+          <p className="text-xs text-gray-600">Added {addedAt}</p>
+        </div>
+        <div className="flex gap-2">{actions}</div>
+      </div>
+
+      <div className="bg-white rounded-xl shadow-sm">
+        <div className="px-6 py-4 border-b border-gray-200">
+          <div className="flex items-center justify-between gap-3">
+            <div className="min-w-0">
+              <div className="text-xs font-semibold text-slate-700">Progress</div>
+              <div className="text-[11px] text-slate-500">Status timeline (click to view details)</div>
+            </div>
+            <div className="flex items-center gap-3 sm:gap-6">
+              <StepperDot
+                state={activeStep === 0 ? 'active' : progressStep >= 0 ? 'done' : 'todo'}
+                label="Detail"
+                date={addedAt}
+                showDate={false}
+                disabled={isTerminal}
+                onClick={() => setActiveStep(0)}
+              />
+              <div className={`h-px w-10 sm:w-14 ${progressStep >= 1 ? 'bg-blue-600' : 'bg-slate-200'}`} />
+              <StepperDot
+                state={activeStep === 1 ? 'active' : progressStep >= 1 ? 'done' : 'todo'}
+                label="In Storage"
+                date={intakeAt}
+                disabled={isTerminal}
+                onClick={() => setActiveStep(1)}
+              />
+              <div className={`h-px w-10 sm:w-14 ${progressStep >= 2 ? 'bg-blue-600' : 'bg-slate-200'}`} />
+              <StepperDot
+                state={activeStep === 2 ? 'active' : progressStep >= 2 ? 'done' : 'todo'}
+                label={step3Label}
+                date={step3Date}
+                disabled={isTerminal || !isHandoverDone}
+                onClick={() => setActiveStep(2)}
+              />
+            </div>
+          </div>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-7">
@@ -159,65 +257,66 @@ export function InventoryItemDetailView({
           </div>
 
           <div className="lg:col-span-4 py-6 px-8 space-y-6 text-sm">
-            <InventoryDetailAttributeGrid item={item} subcategoryNameById={subcategoryNameById} />
-          </div>
-        </div>
-      </div>
+            {activeStep === 0 ? <InventoryDetailAttributeGrid item={item} subcategoryNameById={subcategoryNameById} /> : null}
+            {activeStep === 1 ? (
+              <div className="space-y-5">
+                <SectionTitle title="Finder — contact & ID" />
+                <div className="mt-2">
+                  <DetailRow label="Full name" value={formatOrDash(item.finderInfo?.finderName)} />
+                  <DetailRow label="Email" value={formatOrDash(item.finderInfo?.email)} />
+                </div>
 
-      <div className="mt-6 grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div className="rounded-xl overflow-hidden border border-slate-200 bg-slate-50/60">
-          <div className="px-5 py-3 bg-slate-100/70 border-b border-slate-200">
-            <div className="text-sm font-bold text-slate-950">{storagePanelTitle}</div>
-          </div>
+                <SectionTitle title="Finder — identification" />
+                <div className="mt-2">
+                  <DetailRow label="National ID / citizen ID" value={formatOrDash(item.finderInfo?.nationalId)} />
+                  <DetailRow label="Student / staff ID" value={formatOrDash(item.finderInfo?.orgMemberId)} />
+                  <DetailRow label="Phone number" value={formatOrDash(item.finderInfo?.phone)} />
+                </div>
 
-          <div className="p-5 bg-white">
-            <SectionTitle title="Finder — contact & ID" />
-            <div className="mt-2">
-              <DetailRow label="Full name" value={formatOrDash(item.finderInfo?.finderName)} />
-              <DetailRow label="Email" value={formatOrDash(item.finderInfo?.email)} />
-            </div>
+                <SectionTitle title="Intake" />
+                <div className="mt-2">
+                  <DetailRow label="Created at" value={formatDateTimeOrDash(item.createdAt)} />
+                  <DetailRow label="Receiving staff" value={formatOrDash(item.author?.displayName)} />
+                  <DetailRow label="Receiving staff ID" value={formatOrDash(item.author?.id)} />
+                </div>
+              </div>
+            ) : null}
 
-            <SectionTitle title="Finder — identification" />
-            <div className="mt-2">
-              <DetailRow label="National ID / citizen ID" value={formatOrDash(item.finderInfo?.nationalId)} />
-              <DetailRow label="Student / staff ID" value={formatOrDash(item.finderInfo?.orgMemberId)} />
-              <DetailRow label="Phone number" value={formatOrDash(item.finderInfo?.phone)} />
-            </div>
+            {activeStep === 2 && isHandoverDone ? (
+              <div className="space-y-5">
+                {item.status === 'Returned' ? (
+                  <>
+                    <SectionTitle title="Recipient — contact & ID" />
+                    <div className="mt-2">
+                      <DetailRow label="Full name" value={formatOrDash(returnReportForPost?.ownerInfo?.ownerName)} />
+                      <DetailRow label="Email" value={formatOrDash(returnReportForPost?.ownerInfo?.email)} />
+                    </div>
 
-            <SectionTitle title="Intake" />
-            <div className="mt-2">
-              <DetailRow label="Crea" value={formatDateTimeOrDash(item.createdAt)} />
-              <DetailRow label="Receiving staff" value={formatOrDash(item.author?.displayName)} />
-              <DetailRow label="Receiving staff ID" value={formatOrDash(item.author?.id)} />
-            </div>
-          </div>
-        </div>
+                    <SectionTitle title="Recipient — identification" />
+                    <div className="mt-2">
+                      <DetailRow label="National ID / citizen ID" value={formatOrDash(returnReportForPost?.ownerInfo?.nationalId)} />
+                      <DetailRow label="Student / staff ID" value={formatOrDash(returnReportForPost?.ownerInfo?.orgMemberId)} />
+                      <DetailRow label="Phone number" value={formatOrDash(returnReportForPost?.ownerInfo?.phone)} />
+                    </div>
 
-        <div className="rounded-xl overflow-hidden border border-slate-200 bg-slate-50/60">
-          <div className="px-5 py-3 bg-slate-100/70 border-b border-slate-200">
-            <div className="text-sm font-bold text-slate-950">{returnPanelTitle}</div>
-          </div>
-
-          <div className="p-5 bg-white">
-            <SectionTitle title="Recipient — contact & ID" />
-            <div className="mt-2">
-              <DetailRow label="Full name" value={formatOrDash(returnReportForPost?.ownerInfo?.ownerName)} />
-              <DetailRow label="Email " value={formatOrDash(returnReportForPost?.ownerInfo?.email)} />
-            </div>
-
-            <SectionTitle title="Recipient — identification " />
-            <div className="mt-2">
-              <DetailRow label="National ID / citizen ID" value={formatOrDash(returnReportForPost?.ownerInfo?.nationalId)} />
-              <DetailRow label="Student / staff ID" value={formatOrDash(returnReportForPost?.ownerInfo?.orgMemberId)} />
-              <DetailRow label="Phone number" value={formatOrDash(returnReportForPost?.ownerInfo?.phone)} />
-            </div>
-
-            <SectionTitle title="Return release" />
-            <div className="mt-2">
-              <DetailRow label="Created at" value={formatDateTimeOrDash(returnReportForPost?.createdAt)} />
-              <DetailRow label="Releasing staff" value={formatOrDash(returnReportForPost?.staff?.displayName)} />
-              <DetailRow label="Releasing staff ID" value={formatOrDash(returnReportForPost?.staff?.id)} />
-            </div>
+                    <SectionTitle title="Return release" />
+                    <div className="mt-2">
+                      <DetailRow label="Created at" value={formatDateTimeOrDash(returnReportForPost?.createdAt)} />
+                      <DetailRow label="Releasing staff" value={formatOrDash(returnReportForPost?.staff?.displayName)} />
+                      <DetailRow label="Releasing staff ID" value={formatOrDash(returnReportForPost?.staff?.id)} />
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    <SectionTitle title="Status update" />
+                    <div className="mt-2">
+                      <DetailRow label="Status" value={inventoryStatusLabel(item.status)} />
+                      <DetailRow label="Updated at" value={terminalAt} />
+                    </div>
+                  </>
+                )}
+              </div>
+            ) : null}
           </div>
         </div>
       </div>

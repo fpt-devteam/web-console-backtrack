@@ -53,9 +53,12 @@ export function CreateOrganizationPage() {
   const [externalPlaceId, setExternalPlaceId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
-  const slugNormalized = normalizeSlug(form.slug);
-  const slugOk = slugNormalized.length > 0 && SLUG_PATTERN.test(slugNormalized) && slugNormalized.length <= 255;
-  const debouncedSlug = useDebouncedValue(slugNormalized, 500);
+  const slugInput = form.slug.trim();
+  // Validate the *raw input* strictly so uppercase / diacritics won't pass.
+  // We still normalize for submission.
+  const slugOk = slugInput.length > 0 && SLUG_PATTERN.test(slugInput) && slugInput.length <= 255;
+  const slugNormalized = normalizeSlug(slugInput);
+  const debouncedSlug = useDebouncedValue(slugOk ? slugInput : '', 500);
   const [isSlugChecking, setIsSlugChecking] = useState(false);
   const [slugExistsError, setSlugExistsError] = useState<string | null>(null);
 
@@ -331,39 +334,42 @@ export function CreateOrganizationPage() {
 
             <div>
               <Label htmlFor="workspaceUrl" className="text-sm font-semibold mb-2 block">Workspace URL <span className="text-red-500">*</span></Label>
-              <div className="relative">
+              <div className="relative flex items-center">
+                <div className="h-10 px-3 flex items-center rounded-l-md border border-gray-300 bg-gray-50 text-sm text-gray-600 whitespace-nowrap">
+                  https://thebacktrack.vercel.app/organizations/
+                </div>
                 <Input
                   id="workspaceUrl"
                   value={form.slug}
                   onChange={update('slug')}
-                  placeholder="acme-corp"
-                  className="w-full pr-32"
+                  placeholder="fptu-hcm"
+                  className="w-full rounded-l-none pr-10"
                   required
                 />
-                <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
-                  <span className="text-sm text-gray-500">.backtrack.com</span>
-                </div>
-                {slugOk && form.slug && (
-                  <div className="absolute inset-y-0 right-36 flex items-center pr-2">
+                {slugOk && form.slug && !isSlugChecking && !slugExistsError && (
+                  <div className="absolute inset-y-0 right-3 flex items-center">
                     <Check className="h-5 w-5 text-green-500" />
                   </div>
                 )}
               </div>
+
+              {!slugOk && form.slug.trim() ? (
+                <p className="mt-1 text-xs text-red-600">
+                  Invalid workspace URL. Use only <span className="font-mono">a-z</span>, <span className="font-mono">0-9</span>, and hyphens (<span className="font-mono">-</span>).
+                </p>
+              ) : null}
+
+              {slugExistsError && (
+                <p className="mt-1 text-xs text-red-600">
+                  {slugExistsError}
+                </p>
+              )}
+
               <div className="flex items-center justify-between mt-2">
                 <p className="text-xs text-gray-500">Lowercase letters, numbers, and hyphens only.</p>
                 {slugOk && form.slug && !isSlugChecking && !slugExistsError && <p className="text-xs text-green-600 font-medium">Looks good</p>}
                 {isSlugChecking && <p className="text-xs text-blue-600 font-medium">Checking...</p>}
               </div>
-              {!slugOk && form.slug.trim() && (
-                <p className="mt-1 text-xs text-red-600">
-                  Example: <span className="font-mono">fpt-hcm</span>
-                </p>
-              )}
-              {slugExistsError && (
-                <p className="mt-1 text-xs text-red-600 border border-red-200 bg-red-50 px-2 py-1 rounded inline-block">
-                  {slugExistsError}
-                </p>
-              )}
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -374,7 +380,7 @@ export function CreateOrganizationPage() {
                   type="tel"
                   value={form.phone}
                   onChange={update('phone')}
-                  placeholder="+1 (555) 000-0000"
+                  placeholder="+84 000 000 000"
                   required
                 />
               </div>

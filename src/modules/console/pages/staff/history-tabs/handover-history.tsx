@@ -1,57 +1,19 @@
 import { useState, useMemo, useEffect } from 'react'
-import { useParams, Link } from '@tanstack/react-router'
+import { useParams } from '@tanstack/react-router'
 import { useCurrentOrgId } from '@/contexts/current-org.context'
 import { useOrgReturnReports } from '@/hooks/use-return-report'
 import { useDebouncedValue } from '@/hooks/use-debounce'
-import { Search, Calendar, Archive } from 'lucide-react'
-import { Spinner } from '@/components/ui/spinner'
+import { Search } from 'lucide-react'
 import { Pagination } from '@/components/ui/pagination'
 import type { OrgReturnReportResult } from '@/services/return-report.service'
-import { NoResultsEmptyState } from '@/modules/console/components/inventory/no-results-empty-state'
 import { useSubcategories } from '@/hooks/use-subcategories'
 import { getInventoryDescription, getInventoryTitle, getInventoryDistinctiveMarks } from '@/utils/inventory-view'
+import type { InventoryListItem } from '@/services/inventory.service'
+import { InventoryGridCards } from '@/modules/console/components/inventory/inventory-grid-cards'
 
 const pageSize = 8
 /** Staff return history: BE caps page size; load one batch then filter client-side. */
 const FETCH_PAGE_SIZE = 200
-
-function statusBadgeClass(s: string) {
-  switch (s) {
-    case 'InStorage':
-      return 'bg-indigo-500 text-white'
-    case 'Active':
-      return 'bg-blue-600 text-white'
-    case 'ReturnScheduled':
-      return 'bg-amber-500 text-white'
-    case 'Returned':
-      return 'bg-green-500 text-white'
-    case 'Archived':
-      return 'bg-slate-600 text-white'
-    case 'Expired':
-      return 'bg-gray-600 text-white'
-    default:
-      return 'bg-gray-600 text-white'
-  }
-}
-
-function statusLabel(s: string) {
-  switch (s) {
-    case 'Active':
-      return 'Active'
-    case 'InStorage':
-      return 'In Storage'
-    case 'ReturnScheduled':
-      return 'Return Scheduled'
-    case 'Returned':
-      return 'Returned'
-    case 'Archived':
-      return 'Archived'
-    case 'Expired':
-      return 'Expired'
-    default:
-      return s
-  }
-}
 
 function reportCreatedDateKey(iso: string): string {
   return iso.slice(0, 10)
@@ -113,6 +75,18 @@ export function HandoverHistory() {
     const start = (currentPage - 1) * pageSize
     return filteredReports.slice(start, start + pageSize)
   }, [filteredReports, currentPage])
+
+  const handoverDateByPostId = useMemo(() => {
+    const map: Record<string, string> = {}
+    for (const r of filteredReports) {
+      if (r.post?.id) map[r.post.id] = r.createdAt
+    }
+    return map
+  }, [filteredReports])
+
+  const items: InventoryListItem[] = useMemo(() => {
+    return pageItems.map((r) => r.post!).filter(Boolean) as unknown as InventoryListItem[]
+  }, [pageItems])
 
   useEffect(() => {
     setCurrentPage(1)
@@ -176,71 +150,18 @@ export function HandoverHistory() {
         </div>
       )}
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        {isLoading ? (
-          <div className="col-span-full py-12">
-            <Spinner className="mx-auto" />
-          </div>
-        ) : pageItems.length === 0 ? (
-          <div className="col-span-full">
-            <NoResultsEmptyState title="No matching returns found" />
-          </div>
-        ) : (
-          pageItems.map((report) => {
-            const item = report.post!
-            return (
-              <div
-                key={report.id}
-                className="bg-white rounded-xl shadow-sm overflow-hidden hover:shadow-md transition-shadow flex flex-col"
-              >
-                <div className="relative h-48 bg-gradient-to-br from-gray-100 to-gray-200 shrink-0">
-                  {item.imageUrls?.[0] ? (
-                    <img
-                      src={item.imageUrls[0]}
-                      alt={getInventoryTitle(item, subcategoryNameById)}
-                      className="w-full h-full object-cover"
-                    />
-                  ) : (
-                    <div className="w-full h-full flex items-center justify-center text-gray-400">No image</div>
-                  )}
-                  <span
-                    className={`absolute top-3 right-3 px-3 py-1 rounded-full text-xs font-semibold ${statusBadgeClass(item.status)}`}
-                  >
-                    {statusLabel(item.status)}
-                  </span>
-                </div>
-                <div className="p-4 flex flex-col flex-1">
-                  <h3 className="font-semibold text-gray-900 mb-3">{getInventoryTitle(item, subcategoryNameById)}</h3>
-                  <div className="space-y-2 text-sm text-gray-600 mb-4 flex-1">
-                    <div className="flex items-center gap-2">
-                      <Archive className="w-4 h-4 flex-shrink-0" />
-                      <span>{item.category || '—'}</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <Calendar className="w-4 h-4 flex-shrink-0" />
-                      <span title="Handover recorded">
-                        {new Date(report.createdAt).toLocaleDateString()}
-                      </span>
-                    </div>
-                  </div>
-                  <Link
-                    to="/console/$slug/staff/item/$itemId"
-                    params={{ slug, itemId: item.id }}
-                    className="mt-auto block"
-                  >
-                    <button
-                      type="button"
-                      className="w-full py-1.5 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-all font-medium text-sm"
-                    >
-                      View Details
-                    </button>
-                  </Link>
-                </div>
-              </div>
-            )
-          })
-        )}
-      </div>
+      <InventoryGridCards
+        items={items}
+        isLoading={isLoading}
+        isError={isError}
+        emptyText="No matching returns found"
+        subcategoryNameById={subcategoryNameById}
+        getDate={(item) => handoverDateByPostId[item.id]}
+        detailLink={{
+          to: '/console/$slug/staff/item/$itemId',
+          params: (item) => ({ slug, itemId: item.id }),
+        }}
+      />
 
       {!isLoading && totalCount > pageSize && (
         <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={setCurrentPage} />

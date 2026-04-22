@@ -11,7 +11,7 @@ export function StaffProcessingHistoryPage() {
       <div className="h-full overflow-y-auto p-4 sm:p-4 lg:p-6 min-h-screen sm:mx-4">
         <div className="mb-4">
           <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">
-            Processing History
+            Handling History
           </h1>
         </div>
 
