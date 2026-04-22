@@ -195,7 +195,7 @@ export function UsersPage() {
                     return (
                       <tr key={user.id} className="hover:bg-gray-50 transition-colors">
                         <td className="px-6 py-4 whitespace-nowrap">
-                          <span className="text-gray-600">{user.email ?? '—'}</span>
+                          <span className="text-gray-600">{user.email ?? '———————————————'}</span>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
                           <span className="text-gray-600">{roleLabel(user)}</span>

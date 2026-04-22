@@ -1,5 +1,32 @@
 import type { ApiResponse } from '@/types/api-response.type';
+import type { PagedResponse } from '@/types/pagination.type';
 import { privateClient } from '@/lib/api-client';
+
+export type OrgStatus = 'Active' | 'Inactive' | 'Pending';
+
+export interface SuperAdminOrg {
+  id: string;
+  name: string;
+  logoUrl: string;
+  adminEmail: string;
+  status: OrgStatus;
+  capacity: { current: number; limit: number };
+  performance: number;
+  totalRevenue: number;
+  successRate: number;
+  createdAt: string;
+}
+
+export interface OrgListParams {
+  page?: number;
+  pageSize?: number;
+  search?: string;
+  status?: string;
+  sortBy?: string;
+  sortOrder?: 'asc' | 'desc';
+}
+
+export type OrgListResponse = PagedResponse<SuperAdminOrg> & { totalPages: number };
 
 export interface KpiMetric {
   value: number;
@@ -66,12 +93,21 @@ export const superAdminService = {
     return data.data;
   },
 
-  async getRecentActivity(params?: { status?: string; limit?: number }): Promise<Array<RecentActivityItem>> {
-    const { data } = await privateClient.get<ApiResponse<{ data: Array<RecentActivityItem>; total: number }>>(
+  async getOrganizations(params?: OrgListParams): Promise<OrgListResponse> {
+    const { data } = await privateClient.get<ApiResponse<OrgListResponse>>(
+      '/api/core/super-admin/organizations',
+      { params },
+    );
+    if (!data.success) throw new Error('Failed to fetch organizations');
+    return data.data;
+  },
+
+  async getRecentActivity(params?: { status?: string; page?: number; pageSize?: number }): Promise<{ data: Array<RecentActivityItem>; total: number }> {
+    const { data } = await privateClient.get<ApiResponse<{ items: Array<RecentActivityItem>; total: number }>>(
       '/api/core/super-admin/dashboard/recent-activity',
       { params }
     );
     if (!data.success) throw new Error('Failed to fetch recent activity');
-    return data.data.data;
+    return { data: data.data.items, total: data.data.total };
   },
 };
