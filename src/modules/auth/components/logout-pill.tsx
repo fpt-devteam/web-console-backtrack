@@ -1,18 +1,15 @@
 import { LogOut } from 'lucide-react'
-import { useAppSignOut } from '@/modules/auth/hooks/use-app-signout'
+import { appSignOut } from '@/modules/auth/lib/app-signout'
 
 export function LogoutPill({ isOpen }: { isOpen: boolean }) {
-  const signOut = useAppSignOut()
-
   return (
     <button
       type="button"
       title="Logout"
-      disabled={signOut.isPending}
-      onClick={() => void signOut.signOut()}
+      onClick={() => void appSignOut()}
       className={`group inline-flex items-center gap-2 rounded-full border border-gray-200 bg-white shadow-sm hover:shadow-md transition-all ${
         isOpen ? 'px-3 py-1.5 min-w-[150px] justify-center' : 'p-2'
-      } ${signOut.isPending ? 'opacity-60 cursor-not-allowed' : 'cursor-pointer'}`}
+      } cursor-pointer`}
     >
       <LogOut className="w-3.5 h-3.5 text-gray-400 group-hover:text-gray-600 transition-colors" />
       <span
