@@ -18,7 +18,7 @@ export function StaffInventoryPage() {
   const { currentOrgId } = useCurrentOrgId()
   const listState = useInventoryListState({
     pageSize,
-    defaultStatus: 'All',
+    defaultStatus: 'InStorage',
   })
 
   const { data, isLoading, isError } = useInventoryItems(currentOrgId, listState.listParams)
