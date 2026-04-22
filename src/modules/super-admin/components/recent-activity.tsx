@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 
-import { MapPin } from 'lucide-react';
+import { ChevronLeft, ChevronRight, MapPin } from 'lucide-react';
 
 import type { RecentActivityItem } from '@/services/super-admin.service';
 import { superAdminService } from '@/services/super-admin.service';
@@ -27,15 +27,25 @@ const STATUS_FILTERS = [
   { label: 'Expired',  value: 'Expired'  },
 ] as const;
 
+const PAGE_SIZE = 3;
+
 export function RecentActivity() {
   const [items, setItems] = useState<Array<RecentActivityItem>>([]);
+  const [total, setTotal] = useState(0);
   const [statusFilter, setStatusFilter] = useState<string | undefined>(undefined);
+  const [page, setPage] = useState(1);
+
+  const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
 
   useEffect(() => {
-    superAdminService.getRecentActivity({ status: statusFilter })
-      .then(setItems)
-      .catch(console.error);
+    setPage(1);
   }, [statusFilter]);
+
+  useEffect(() => {
+    superAdminService.getRecentActivity({ status: statusFilter, page, pageSize: PAGE_SIZE })
+      .then(res => { setItems(res.data); setTotal(res.total); })
+      .catch(console.error);
+  }, [statusFilter, page]);
 
   return (
     <div className="bg-white rounded-xl border border-gray-100 p-5 shadow-sm">
@@ -76,6 +86,30 @@ export function RecentActivity() {
           </div>
         ))}
       </div>
+
+      {totalPages > 1 && (
+        <div className="mt-4 flex items-center justify-between">
+          <p className="text-xs text-gray-400">
+            Page {page} of {totalPages}
+          </p>
+          <div className="flex items-center gap-1">
+            <button
+              onClick={() => setPage(p => Math.max(1, p - 1))}
+              disabled={page === 1}
+              className="flex h-7 w-7 items-center justify-center rounded-md text-gray-500 hover:bg-gray-100 disabled:opacity-30 disabled:cursor-not-allowed"
+            >
+              <ChevronLeft className="h-4 w-4" />
+            </button>
+            <button
+              onClick={() => setPage(p => Math.min(totalPages, p + 1))}
+              disabled={page === totalPages}
+              className="flex h-7 w-7 items-center justify-center rounded-md text-gray-500 hover:bg-gray-100 disabled:opacity-30 disabled:cursor-not-allowed"
+            >
+              <ChevronRight className="h-4 w-4" />
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
