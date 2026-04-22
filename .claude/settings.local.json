@@ -9,7 +9,9 @@
       "FileOp(write:*)",
       "FileOp(read:*)",
       "FileOp(delete:*)",
-      "FileOp(create:*)"
+      "FileOp(create:*)",
+      "Bash(npx eslint *)",
+      "Bash(python3 -c \"import json,sys; cfg=json.load\\(sys.stdin\\); rules=cfg.get\\('rules',{}\\); [print\\(k,':',json.dumps\\(v\\)\\) for k,v in rules.items\\(\\) if 'import' in k.lower\\(\\)]\")"
     ]
   }
 }

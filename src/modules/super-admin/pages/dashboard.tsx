@@ -1,284 +1,199 @@
-import { Layout } from '../components/layout';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+
+import { Clock } from 'lucide-react';
 import {
-  Building2,
-  AlertCircle,
-  CheckCircle2,
-  Activity,
-  TrendingUp,
-  ChevronDown,
-} from 'lucide-react';
-import {
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
+  Area,
+  AreaChart,
   CartesianGrid,
   ResponsiveContainer,
   Tooltip,
+  XAxis,
+  YAxis,
 } from 'recharts';
+import { KpiCards, Layout, LightTooltip, LostFoundTrend, RecentActivity } from '../components';
+import type { DashboardKpi } from '@/services/super-admin.service';
+import { superAdminService } from '@/services/super-admin.service';
 
-/**
- * Super Admin Dashboard Page
- * 
- * Main dashboard page for super admin with overview statistics,
- * charts, recent activity, and quick actions.
- */
+
+// ── mock data (charts without API yet) ───────────────────────────────────────
+
+const revenueData = [
+  { month: 'May', org: 12.4, user: 3.2 },
+  { month: 'Jun', org: 14.2, user: 3.8 },
+  { month: 'Jul', org: 15.8, user: 4.1 },
+  { month: 'Aug', org: 17.2, user: 4.6 },
+  { month: 'Sep', org: 16.8, user: 4.4 },
+  { month: 'Oct', org: 19.1, user: 5.2 },
+  { month: 'Nov', org: 21.3, user: 5.8 },
+  { month: 'Dec', org: 23.6, user: 6.3 },
+  { month: 'Jan', org: 25.2, user: 6.9 },
+  { month: 'Feb', org: 24.1, user: 6.6 },
+  { month: 'Mar', org: 27.4, user: 7.4 },
+  { month: 'Apr', org: 29.8, user: 8.1 },
+];
+
+
+const hotspots = [
+  { x: 50, y: 19, r: 26, label: 'Hanoi',     count: 445, color: '#F59E0B' },
+  { x: 58, y: 16, r: 14, label: 'Hai Phong', count: 187, color: '#10B981' },
+  { x: 67, y: 46, r: 19, label: 'Da Nang',   count: 298, color: '#F59E0B' },
+  { x: 67, y: 62, r: 11, label: 'Nha Trang', count: 98,  color: '#10B981' },
+  { x: 64, y: 76, r: 30, label: 'HCMC',      count: 612, color: '#EF4444' },
+  { x: 61, y: 84, r: 13, label: 'Can Tho',   count: 143, color: '#F59E0B' },
+];
+
+
+// ── main page ────────────────────────────────────────────────────────────────
+
 export function DashboardPage() {
-  const [timeFilter, setTimeFilter] = useState<'12months' | '6months' | '3months' | '1month'>('12months');
+  const card = 'bg-white rounded-xl border border-gray-100 p-5 shadow-sm';
+  const [kpi, setKpi] = useState<DashboardKpi | null>(null);
 
-  // Mock data for New Organizations chart - 12 months
-  const chartData12Months = [
-    { month: 'Jan', value: 120 },
-    { month: 'Feb', value: 135 },
-    { month: 'Mar', value: 145 },
-    { month: 'Apr', value: 160 },
-    { month: 'May', value: 150 },
-    { month: 'Jun', value: 170 },
-    { month: 'Jul', value: 165 },
-    { month: 'Aug', value: 175 },
-    { month: 'Sep', value: 180 },
-    { month: 'Oct', value: 185 },
-    { month: 'Nov', value: 175 },
-    { month: 'Dec', value: 190 },
-  ];
-
-  // Mock data for 6 months
-  const chartData6Months = chartData12Months.slice(6);
-
-  // Mock data for 3 months
-  const chartData3Months = chartData12Months.slice(9);
-
-  // Mock data for 1 month
-  const chartData1Month = [chartData12Months[11]];
-
-  const getChartData = () => {
-    switch (timeFilter) {
-      case '12months':
-        return chartData12Months;
-      case '6months':
-        return chartData6Months;
-      case '3months':
-        return chartData3Months;
-      case '1month':
-        return chartData1Month;
-      default:
-        return chartData12Months;
-    }
-  };
-
-  const getChartSubtitle = () => {
-    switch (timeFilter) {
-      case '12months':
-        return 'Growth over the last 12 months';
-      case '6months':
-        return 'Growth over the last 6 months';
-      case '3months':
-        return 'Growth over the last 3 months';
-      case '1month':
-        return 'Growth in the last month';
-      default:
-        return 'Growth over the last 12 months';
-    }
-  };
-
-  // Mock recent activity data
-  const recentActivities = [
-    {
-      type: 'organization',
-      title: 'New Organization Created',
-      description: 'Stark Industries joined the platform.',
-      time: '2 minutes ago',
-    },
-    {
-      type: 'alert',
-      title: 'System Alert',
-      description: 'High latency detected in us-east-1 region.',
-      time: '45 minutes ago',
-    },
-    {
-      type: 'upgrade',
-      title: 'Plan Upgrade',
-      description: 'Acme Corp upgraded to Enterprise.',
-      time: '3 hours ago',
-    },
-  ];
+  useEffect(() => {
+    superAdminService.getDashboardKpi().then(setKpi).catch(console.error);
+  }, []);
 
   return (
     <Layout>
-      <div className="p-8 bg-gray-50 min-h-screen">
-        {/* Dashboard Header */}
-        <div className="flex items-start justify-between mb-8">
+      <div className="min-h-screen bg-gray-50 p-6" style={{ fontFamily: 'system-ui, sans-serif' }}>
+
+        {/* ── topbar ── */}
+        <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900 mb-2">Dashboard</h1>
-            <p className="text-gray-600">Overview of system performance, tenants, and alerts.</p>
+            <h1 className="text-2xl font-bold text-gray-900">Backtrack Dashboard</h1>
+            <p className="mt-0.5 text-sm text-gray-500">
+              Super Admin · Lost &amp; Found Platform Overview
+            </p>
           </div>
-          <div className="text-sm text-gray-500">
-            Last updated: <span className="font-medium text-gray-700">Just now</span>
-          </div>
-        </div>
-
-        {/* Key Metrics Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-          {/* Active Organizations */}
-          <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-200">
-            <div className="flex items-center justify-between mb-4">
-              <div className="p-3 bg-blue-100 rounded-lg">
-                <Building2 className="w-6 h-6 text-blue-600" />
-              </div>
-              <div className="flex items-center gap-1 text-green-600 text-sm font-semibold">
-                <TrendingUp className="w-4 h-4" />
-                +12.5%
-              </div>
-            </div>
-            <h3 className="text-sm text-gray-600 mb-1">Active Organizations</h3>
-            <p className="text-3xl font-bold text-gray-900">1,248</p>
-          </div>
-
-          {/* Pending Requests */}
-          <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-200">
-            <div className="flex items-center justify-between mb-4">
-              <div className="p-3 bg-yellow-100 rounded-lg">
-                <AlertCircle className="w-6 h-6 text-yellow-600" />
-              </div>
-              <button className="text-sm text-blue-600 hover:text-blue-700 font-medium">
-                Review All
-              </button>
-            </div>
-            <h3 className="text-sm text-gray-600 mb-1">Pending Requests</h3>
-            <p className="text-3xl font-bold text-gray-900">15</p>
-          </div>
-
-          {/* System Uptime */}
-          <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-200">
-            <div className="flex items-center justify-between mb-4">
-              <div className="p-3 bg-green-100 rounded-lg">
-                <CheckCircle2 className="w-6 h-6 text-green-600" />
-              </div>
-              <div className="flex items-center gap-1 text-green-600 text-sm font-semibold">
-                <CheckCircle2 className="w-4 h-4" />
-                Operational
-              </div>
-            </div>
-            <h3 className="text-sm text-gray-600 mb-1">System Uptime</h3>
-            <p className="text-3xl font-bold text-gray-900">99.98%</p>
-          </div>
-
-          {/* API Performance */}
-          <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-200">
-            <div className="flex items-center justify-between mb-4">
-              <div className="p-3 bg-purple-100 rounded-lg">
-                <Activity className="w-6 h-6 text-purple-600" />
-              </div>
-              <div className="text-sm text-gray-500">Avg Latency</div>
-            </div>
-            <h3 className="text-sm text-gray-600 mb-1">API Performance</h3>
-            <p className="text-3xl font-bold text-gray-900">42ms</p>
+          <div className="flex items-center gap-2 rounded-xl border border-gray-100 bg-white px-4 py-2 text-sm text-gray-500 shadow-sm">
+            <span className="relative flex h-2 w-2">
+              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-green-400 opacity-75" />
+              <span className="relative inline-flex h-2 w-2 rounded-full bg-green-500" />
+            </span>
+            <Clock className="h-3.5 w-3.5" />
+            Last synced:{' '}
+            <span className="ml-1 font-medium text-gray-700">just now</span>
           </div>
         </div>
 
-        {/* Main Content Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
-          {/* New Organizations Chart */}
-          <div className="lg:col-span-2 bg-white rounded-xl shadow-sm p-6 border border-gray-200">
-            <div className="flex items-center justify-between mb-6">
-              <div>
-                <h2 className="text-lg font-bold text-gray-900 mb-1">New Organizations</h2>
-                <p className="text-sm text-gray-500">{getChartSubtitle()}</p>
-              </div>
-              <div className="relative">
-                <select
-                  value={timeFilter}
-                  onChange={(e) => setTimeFilter(e.target.value as typeof timeFilter)}
-                  className="appearance-none bg-white border border-gray-300 rounded-lg px-4 py-1.5 pr-8 text-sm font-medium text-gray-700 hover:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 cursor-pointer"
-                >
-                  <option value="12months">12 Months</option>
-                  <option value="6months">6 Months</option>
-                  <option value="3months">3 Months</option>
-                  <option value="1month">1 Month</option>
-                </select>
-                <ChevronDown className="absolute right-2 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500 pointer-events-none" />
-              </div>
-            </div>
-            
-            <div className="h-64 w-full">
-              <ResponsiveContainer width="100%" height="100%">
-                <BarChart
-                  data={getChartData()}
-                  margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
-                >
-                  <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-                  <XAxis
-                    dataKey="month"
-                    tick={{ fill: '#6b7280', fontSize: 12 }}
-                    axisLine={{ stroke: '#e5e7eb' }}
-                  />
-                  <YAxis
-                    tick={{ fill: '#6b7280', fontSize: 12 }}
-                    axisLine={{ stroke: '#e5e7eb' }}
-                    domain={[0, 200]}
-                    ticks={[0, 50, 100, 150, 200]}
-                  />
-                  <Tooltip
-                    contentStyle={{
-                      backgroundColor: '#fff',
-                      border: '1px solid #e5e7eb',
-                      borderRadius: '8px',
-                    }}
-                  />
-                  <Bar
-                    dataKey="value"
-                    fill="#3b82f6"
-                    radius={[8, 8, 0, 0]}
-                    animationDuration={800}
-                  />
-                </BarChart>
-              </ResponsiveContainer>
-            </div>
-          </div>
+        {/* ── KPI cards ── */}
+        <KpiCards kpi={kpi} />
+
+        {/* ── mid section ── */}
+        <div className="mb-5 grid grid-cols-1 gap-4 lg:grid-cols-2">
+
+          {/* Lost vs Found Trend */}
+          <LostFoundTrend />
 
           {/* Recent Activity */}
-          <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-200">
-            <div className="flex items-center justify-between mb-6">
-              <h2 className="text-lg font-bold text-gray-900">Recent Activity</h2>
-              <button className="text-sm text-blue-600 hover:text-blue-700 font-medium">
-                View All
-              </button>
+          <RecentActivity />
+        </div>
+
+        {/* ── bottom section ── */}
+        <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
+
+          {/* City Heatmap */}
+          <div className={card}>
+            <div className="mb-3 flex items-center justify-between">
+              <div>
+                <h2 className="font-semibold text-gray-900">City Heatmap</h2>
+                <p className="text-xs text-gray-400">Lost item density by district</p>
+              </div>
+              <div className="flex items-center gap-3 text-xs text-gray-500">
+                <span className="flex items-center gap-1"><span className="inline-block h-2 w-3 rounded-sm bg-red-400" />High</span>
+                <span className="flex items-center gap-1"><span className="inline-block h-2 w-3 rounded-sm bg-amber-400" />Med</span>
+                <span className="flex items-center gap-1"><span className="inline-block h-2 w-3 rounded-sm bg-green-400" />Low</span>
+              </div>
             </div>
-            
-            <div className="space-y-4">
-              {recentActivities.map((activity, index) => (
-                <div key={index} className="pb-4 border-b border-gray-100 last:border-0 last:pb-0">
-                  <div className="flex items-start gap-3">
-                    <div className={`p-2 rounded-lg ${
-                      activity.type === 'organization' ? 'bg-blue-100' :
-                      activity.type === 'alert' ? 'bg-yellow-100' :
-                      'bg-green-100'
-                    }`}>
-                      {activity.type === 'organization' && (
-                        <Building2 className={`w-4 h-4 ${
-                          activity.type === 'organization' ? 'text-blue-600' :
-                          activity.type === 'alert' ? 'text-yellow-600' :
-                          'text-green-600'
-                        }`} />
-                      )}
-                      {activity.type === 'alert' && (
-                        <AlertCircle className="w-4 h-4 text-yellow-600" />
-                      )}
-                      {activity.type === 'upgrade' && (
-                        <TrendingUp className="w-4 h-4 text-green-600" />
-                      )}
+            <div className="relative h-64 w-full overflow-hidden rounded-xl border border-gray-100 bg-[#EFF6FF]">
+              <svg viewBox="0 0 100 100" className="absolute inset-0 h-full w-full" preserveAspectRatio="xMidYMid meet">
+                {[20, 30, 40, 50, 60, 70, 80].map((y) => (
+                  <line key={`gy${y}`} x1="0" y1={y} x2="100" y2={y} stroke="#BFDBFE" strokeWidth="0.4" />
+                ))}
+                {[30, 40, 50, 60, 70].map((x) => (
+                  <line key={`gx${x}`} x1={x} y1="0" x2={x} y2="100" stroke="#BFDBFE" strokeWidth="0.4" />
+                ))}
+                <path
+                  d="M48 5 L53 7 L57 11 L59 15 L58 20 L61 25 L65 30 L68 36 L70 42
+                     L70 48 L68 54 L67 60 L68 66 L70 73 L69 79 L66 84 L61 88 L56 90
+                     L52 88 L49 83 L51 78 L53 73 L51 68 L49 62 L47 55 L45 48 L43 41
+                     L44 34 L45 27 L44 20 L45 13 L47 8 Z"
+                  fill="#BFDBFE"
+                  stroke="#93C5FD"
+                  strokeWidth="0.7"
+                />
+              </svg>
+              {hotspots.map((h, i) => {
+                const diameter = h.r * 1.5;
+                return (
+                  <div key={i}>
+                    <div
+                      className="absolute flex items-center justify-center rounded-full font-bold"
+                      style={{
+                        left: `${h.x}%`, top: `${h.y}%`,
+                        width: `${diameter}px`, height: `${diameter}px`,
+                        transform: 'translate(-50%, -50%)',
+                        background: `${h.color}28`,
+                        border: `2px solid ${h.color}80`,
+                        boxShadow: `0 0 ${h.r * 0.5}px ${h.color}30`,
+                        fontSize: '8px', color: h.color,
+                      }}
+                    >
+                      {h.count}
                     </div>
-                    <div className="flex-1">
-                      <p className="font-medium text-gray-900 text-sm mb-1">
-                        {activity.title}: {activity.description}
-                      </p>
-                      <p className="text-xs text-gray-500">{activity.time}</p>
-                    </div>
+                    <span
+                      className="absolute text-[8px] font-semibold text-gray-600"
+                      style={{
+                        left: `${h.x}%`,
+                        top: `calc(${h.y}% + ${diameter / 2 + 3}px)`,
+                        transform: 'translateX(-50%)',
+                        whiteSpace: 'nowrap',
+                      }}
+                    >
+                      {h.label}
+                    </span>
                   </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
+          </div>
+
+          {/* Revenue Flow */}
+          <div className={card}>
+            <div className="mb-4 flex items-center justify-between">
+              <div>
+                <h2 className="font-semibold text-gray-900">Revenue Flow</h2>
+                <p className="text-xs text-gray-400">Org subscriptions vs User fees (K USD)</p>
+              </div>
+              <div className="flex items-center gap-4 text-xs text-gray-600">
+                <span className="flex items-center gap-1.5">
+                  <span className="inline-block h-2.5 w-2.5 rounded-full bg-[#3B82F6]" />Org
+                </span>
+                <span className="flex items-center gap-1.5">
+                  <span className="inline-block h-2.5 w-2.5 rounded-full bg-[#8B5CF6]" />Users
+                </span>
+              </div>
+            </div>
+            <ResponsiveContainer width="100%" height={230}>
+              <AreaChart data={revenueData} margin={{ top: 10, right: 10, left: -10, bottom: 0 }}>
+                <defs>
+                  <linearGradient id="revOrg" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%"  stopColor="#3B82F6" stopOpacity={0.15} />
+                    <stop offset="95%" stopColor="#3B82F6" stopOpacity={0} />
+                  </linearGradient>
+                  <linearGradient id="revUser" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%"  stopColor="#8B5CF6" stopOpacity={0.15} />
+                    <stop offset="95%" stopColor="#8B5CF6" stopOpacity={0} />
+                  </linearGradient>
+                </defs>
+                <CartesianGrid strokeDasharray="3 3" stroke="#F3F4F6" vertical={false} />
+                <XAxis dataKey="month" tick={{ fill: '#9CA3AF', fontSize: 10 }} axisLine={false} tickLine={false} />
+                <YAxis tick={{ fill: '#9CA3AF', fontSize: 10 }} axisLine={false} tickLine={false} />
+                <Tooltip content={<LightTooltip />} />
+                <Area type="monotone" dataKey="org"  name="Org Revenue" stroke="#3B82F6" fill="url(#revOrg)"  strokeWidth={2} dot={false} />
+                <Area type="monotone" dataKey="user" name="User Fees"   stroke="#8B5CF6" fill="url(#revUser)" strokeWidth={2} dot={false} />
+              </AreaChart>
+            </ResponsiveContainer>
           </div>
         </div>
 
