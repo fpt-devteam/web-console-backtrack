@@ -178,4 +178,21 @@ export const chatService = {
     );
     if (!data.success) throw new Error(data.error?.message ?? 'Failed to return conversation to queue');
   },
+
+  /** Resolve (close) a conversation. */
+  async resolveConversation(conversationId: string): Promise<void> {
+    const { data } = await privateClient.post<ApiResponse<void>>(
+      `${BASE}/conversations/${conversationId}/resolve`
+    );
+    if (!data.success) throw new Error(data.error?.message ?? 'Failed to resolve conversation');
+  },
+
+  /** List resolved conversations assigned to the authenticated staff member. */
+  async listResolved(): Promise<Array<IConversation>> {
+    const { data } = await privateClient.get<ApiResponse<unknown>>(
+      `${BASE}/conversations/organization/resolved`
+    );
+    if (!data.success) throw new Error(data.error?.message ?? 'Failed to fetch resolved conversations');
+    return toList(data.data).conversations;
+  },
 };
