@@ -75,10 +75,8 @@ export function DashboardPage() {
             <span className="ml-1 font-medium text-gray-700">just now</span>
           </div>
         </div>
-
         {/* ── KPI cards ── */}
         <KpiCards kpi={kpi} />
-
         {/* ── mid section ── */}
         <div className="mb-5 grid grid-cols-1 gap-4 lg:grid-cols-2">
 
