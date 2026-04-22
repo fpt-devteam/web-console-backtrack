@@ -20,6 +20,8 @@ import {
   useChatAssigned,
   useChatMessages,
   useChatQueue,
+  useChatResolved,
+  useResolveConversation,
 } from '@/hooks/use-chat'
 import {
   useConversationUpdates,
@@ -115,9 +117,10 @@ function bubbleClass(isOwn: boolean, pos: 'only' | 'first' | 'middle' | 'last') 
 // ── Message panel ────────────────────────────────────────
 
 
-function MessagePanel({ conversationId, partner }: {
+function MessagePanel({ conversationId, partner, readOnly = false }: {
   conversationId: string
   partner?: { avatarUrl?: string | null; displayName?: string | null; email?: string | null } | null
+  readOnly?: boolean
 }) {
   const { data, isLoading, fetchNextPage, hasNextPage, isFetchingNextPage } =
     useChatMessages(conversationId)
@@ -235,40 +238,46 @@ function MessagePanel({ conversationId, partner }: {
 
       {/* Typing + Input — auto row, always visible at bottom */}
       <div>
-        <TypingIndicator conversationId={conversationId} />
-        <div className="px-4 py-3 border-t border-gray-100">
-        <div className="flex items-center gap-2">
-          <button className="p-2 text-gray-400 hover:text-gray-600 transition-colors rounded-full hover:bg-gray-100">
-            <Smile className="w-5 h-5" />
-          </button>
-          <button className="p-2 text-gray-400 hover:text-gray-600 transition-colors rounded-full hover:bg-gray-100">
-            <ImageIcon className="w-5 h-5" />
-          </button>
-          <button className="p-2 text-gray-400 hover:text-gray-600 transition-colors rounded-full hover:bg-gray-100">
-            <Paperclip className="w-5 h-5" />
-          </button>
-
-          <div className="flex-1 flex items-center bg-gray-100 rounded-full px-4 py-2 gap-2">
-            <input
-              ref={inputRef}
-              type="text"
-              placeholder="Type your message…"
-              value={text}
-              onChange={e => { setText(e.target.value); startTyping() }}
-              onKeyDown={handleKeyDown}
-              className="flex-1 bg-transparent text-sm text-gray-900 placeholder-gray-400 focus:outline-none"
-            />
+        {!readOnly && <TypingIndicator conversationId={conversationId} />}
+        {readOnly ? (
+          <div className="px-4 py-3 border-t border-gray-100 text-center text-xs text-gray-400">
+            This conversation has been resolved.
           </div>
+        ) : (
+          <div className="px-4 py-3 border-t border-gray-100">
+          <div className="flex items-center gap-2">
+            <button className="p-2 text-gray-400 hover:text-gray-600 transition-colors rounded-full hover:bg-gray-100">
+              <Smile className="w-5 h-5" />
+            </button>
+            <button className="p-2 text-gray-400 hover:text-gray-600 transition-colors rounded-full hover:bg-gray-100">
+              <ImageIcon className="w-5 h-5" />
+            </button>
+            <button className="p-2 text-gray-400 hover:text-gray-600 transition-colors rounded-full hover:bg-gray-100">
+              <Paperclip className="w-5 h-5" />
+            </button>
 
-          <button
-            onClick={handleSend}
-            disabled={!text.trim()}
-            className="w-9 h-9 flex items-center justify-center rounded-full bg-blue-500 text-white hover:bg-blue-600 transition-colors disabled:opacity-40 disabled:cursor-not-allowed flex-shrink-0"
-          >
-            <Send className="w-4 h-4" />
-          </button>
-        </div>
-        </div>
+            <div className="flex-1 flex items-center bg-gray-100 rounded-full px-4 py-2 gap-2">
+              <input
+                ref={inputRef}
+                type="text"
+                placeholder="Type your message…"
+                value={text}
+                onChange={e => { setText(e.target.value); startTyping() }}
+                onKeyDown={handleKeyDown}
+                className="flex-1 bg-transparent text-sm text-gray-900 placeholder-gray-400 focus:outline-none"
+              />
+            </div>
+
+            <button
+              onClick={handleSend}
+              disabled={!text.trim()}
+              className="w-9 h-9 flex items-center justify-center rounded-full bg-blue-500 text-white hover:bg-blue-600 transition-colors disabled:opacity-40 disabled:cursor-not-allowed flex-shrink-0"
+            >
+              <Send className="w-4 h-4" />
+            </button>
+          </div>
+          </div>
+        )}
       </div>
     </div>
   )
@@ -418,21 +427,24 @@ export function StaffChatPage() {
   const { currentOrgId } = useCurrentOrgId()
   const { activeConversationId, setActiveConversationId } = useChatContext()
 
-  const [tab, setTab] = useState<'queue' | 'assigned'>('assigned')
+  const [tab, setTab] = useState<'queue' | 'assigned' | 'resolved'>('assigned')
   const [searchTerm, setSearchTerm] = useState('')
   const [assignConfirmConv, setAssignConfirmConv] = useState<IConversation | null>(null)
 
-  const queueQuery = useChatQueue(currentOrgId ?? undefined, { poll: tab === 'queue' })
+  const queueQuery    = useChatQueue(currentOrgId ?? undefined, { poll: tab === 'queue' })
   const assignedQuery = useChatAssigned()
-  const assignMutation = useAssignConversation()
+  const resolvedQuery = useChatResolved()
+  const assignMutation  = useAssignConversation()
+  const resolveMutation = useResolveConversation()
 
   useConversationUpdates()
 
   const queueList: Array<IConversation>    = Array.isArray(queueQuery.data)    ? queueQuery.data    : []
   const assignedList: Array<IConversation> = Array.isArray(assignedQuery.data) ? assignedQuery.data : []
+  const resolvedList: Array<IConversation> = Array.isArray(resolvedQuery.data) ? resolvedQuery.data : []
 
-  const conversations   = tab === 'queue' ? queueList : assignedList
-  const isLoadingList   = tab === 'queue' ? queueQuery.isLoading : assignedQuery.isLoading
+  const conversations = tab === 'queue' ? queueList : tab === 'assigned' ? assignedList : resolvedList
+  const isLoadingList = tab === 'queue' ? queueQuery.isLoading : tab === 'assigned' ? assignedQuery.isLoading : resolvedQuery.isLoading
 
   const filtered = conversations.filter(c => {
     if (!searchTerm) return true
@@ -444,7 +456,8 @@ export function StaffChatPage() {
     )
   })
 
-  const activeConv  = assignedList.find(c => c.id === activeConversationId) ?? null
+  const activeConv  = [...assignedList, ...resolvedList].find(c => c.id === activeConversationId) ?? null
+  const isResolved  = resolvedList.some(c => c.id === activeConversationId)
   const partnerName = activeConv?.partner?.displayName ?? activeConv?.partner?.email ?? (activeConversationId?.slice(0, 8) ?? '')
 
   function handleSelect(conv: IConversation) {
@@ -463,6 +476,16 @@ export function StaffChatPage() {
     })
   }
 
+  function handleResolve() {
+    if (!activeConversationId) return
+    resolveMutation.mutate(activeConversationId, {
+      onSuccess: () => {
+        setActiveConversationId(null)
+        setTab('assigned')
+      },
+    })
+  }
+
   return (
     <StaffLayout>
       {assignConfirmConv && (
@@ -477,16 +500,12 @@ export function StaffChatPage() {
       <div className="h-full overflow-hidden flex bg-gray-50">
 
         {/* ── Left pane ── */}
-        <div className="w-80 border-r border-gray-200 bg-white flex flex-col min-h-0">
+        <div className="w-110 border-r border-gray-200 bg-white flex flex-col min-h-0">
 
           {/* Header */}
           <div className="px-4 pt-5 pb-3 border-b border-gray-100">
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-lg font-bold text-gray-900">Messages</h2>
-              {/* <div className="flex items-center gap-1.5">
-                <div className={`w-2 h-2 rounded-full ${isConnected ? 'bg-green-500' : 'bg-gray-300'}`} />
-                <span className="text-xs text-gray-400">{isConnected ? 'Live' : 'Connecting…'}</span>
-              </div> */}
             </div>
 
             {/* Search */}
@@ -502,29 +521,38 @@ export function StaffChatPage() {
             </div>
 
             {/* Tabs */}
-            <div className="flex bg-gray-100 rounded-xl p-1 gap-1">
-              {(['assigned', 'queue'] as const).map(t => (
-                <button
-                  key={t}
-                  onClick={() => setTab(t)}
-                  className={`flex-1 py-1.5 rounded-lg text-xs font-semibold transition-all ${
-                    tab === t
-                      ? 'bg-white text-blue-600 shadow-sm'
-                      : 'text-gray-500 hover:text-gray-700'
-                  }`}
-                >
-                  {t === 'assigned' ? 'My Chats' : (
-                    <span className="flex items-center justify-center gap-1">
-                      Queue
-                      {queueList.length > 0 && (
-                        <span className="bg-amber-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full leading-none">
-                          {queueList.length}
-                        </span>
-                      )}
+            <div className="flex bg-gray-100 rounded-xl p-1 gap-2 w-full">
+              <button
+                onClick={() => setTab('assigned')}
+                className={`flex-1 py-1.5 rounded-lg text-sm font-semibold transition-all ${
+                  tab === 'assigned' ? 'bg-white text-blue-600 shadow-sm' : 'text-gray-500 hover:text-gray-700'
+                }`}
+              >
+                My Chats
+              </button>
+              <button
+                onClick={() => setTab('queue')}
+                className={`flex-1 py-1.5 rounded-lg text-sm font-semibold transition-all ${
+                  tab === 'queue' ? 'bg-white text-blue-600 shadow-sm' : 'text-gray-500 hover:text-gray-700'
+                }`}
+              >
+                <span className="flex items-center justify-center gap-1">
+                  Queue
+                  {queueList.length > 0 && (
+                    <span className="bg-amber-500 text-white text-xs font-bold px-1.5 py-0.5 rounded-full leading-none">
+                      {queueList.length}
                     </span>
                   )}
-                </button>
-              ))}
+                </span>
+              </button>
+              <button
+                onClick={() => setTab('resolved')}
+                className={`flex-1 py-1.5 rounded-lg text-sm font-semibold transition-all ${
+                  tab === 'resolved' ? 'bg-white text-blue-600 shadow-sm' : 'text-gray-500 hover:text-gray-700'
+                }`}
+              >
+                Resolved
+              </button>
             </div>
           </div>
 
@@ -538,7 +566,7 @@ export function StaffChatPage() {
               <div className="flex flex-col items-center justify-center py-16 text-center px-4 gap-2">
                 <RefreshCw className="w-8 h-8 text-gray-200" />
                 <p className="text-sm text-gray-400">
-                  {tab === 'queue' ? 'No conversations in queue' : 'No assigned conversations'}
+                  {tab === 'queue' ? 'No conversations in queue' : tab === 'assigned' ? 'No assigned conversations' : 'No resolved conversations'}
                 </p>
               </div>
             ) : (
@@ -556,28 +584,42 @@ export function StaffChatPage() {
 
         {/* ── Right pane ── */}
         <div className="flex-1 flex flex-col bg-white min-h-0">
-          {activeConversationId && assignedList.some(c => c.id === activeConversationId) ? (
+          {activeConversationId && activeConv ? (
             <>
               {/* Chat header */}
               <div className="flex-shrink-0 px-5 py-3 border-b border-gray-100 flex items-center justify-between bg-white">
                 <div className="flex items-center gap-3">
                   <div className="relative">
                     <Avatar url={activeConv?.partner?.avatarUrl} name={partnerName} className="w-10 h-10 rounded-full" />
-                    <span className="absolute bottom-0 right-0 w-2.5 h-2.5 bg-green-500 border-2 border-white rounded-full" />
+                    {!isResolved && (
+                      <span className="absolute bottom-0 right-0 w-2.5 h-2.5 bg-green-500 border-2 border-white rounded-full" />
+                    )}
                   </div>
                   <div>
                     <h3 className="font-semibold text-gray-900 text-sm leading-tight">{partnerName}</h3>
-                    <p className="text-xs text-green-500 font-medium">Active now</p>
+                    <p className={`text-xs font-medium ${isResolved ? 'text-gray-400' : 'text-green-500'}`}>
+                      {isResolved ? 'Resolved' : 'Active now'}
+                    </p>
                   </div>
                 </div>
-                <button className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-white bg-green-500 rounded-full hover:bg-green-600 transition-colors">
-                  <CheckCircle2 className="w-3.5 h-3.5" />
-                  Resolve
-                </button>
+                {!isResolved && (
+                  <button
+                    onClick={handleResolve}
+                    disabled={resolveMutation.isPending}
+                    className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-white bg-green-500 rounded-full hover:bg-green-600 transition-colors disabled:opacity-60"
+                  >
+                    {resolveMutation.isPending ? (
+                      <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                    ) : (
+                      <CheckCircle2 className="w-3.5 h-3.5" />
+                    )}
+                    Resolve
+                  </button>
+                )}
               </div>
 
-              {/* Messages + input */}
-              <MessagePanel conversationId={activeConversationId} partner={activeConv?.partner} />
+              {/* Messages (read-only for resolved) */}
+              <MessagePanel conversationId={activeConversationId} partner={activeConv?.partner} readOnly={isResolved} />
             </>
           ) : (
             <div className="flex-1 flex flex-col items-center justify-center gap-3 text-center px-8">
