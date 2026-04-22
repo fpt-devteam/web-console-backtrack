@@ -408,12 +408,13 @@ export function EditItemPage() {
                     onChange={(e) => setStatus(e.target.value as PostStatus)}
                     className="mt-1 w-full px-3 py-2 border border-slate-200 rounded-lg bg-white text-sm"
                   >
-                    <option value="Active">Active</option>
-                    <option value="InStorage">InStorage</option>
-                    <option value="ReturnScheduled">ReturnScheduled</option>
-                    <option value="Returned">Returned</option>
-                    <option value="Archived">Archived</option>
-                    <option value="Expired">Expired</option>
+                    {/* Only allow changing status to Archived */}
+                    <option value={status}>
+                      {status === 'InStorage'
+                        ? 'In Storage'
+                          : status}
+                    </option>
+                    {status !== 'Archived' ? <option value="Archived">Archived</option> : null}
                   </select>
                 </div>
                 <div>

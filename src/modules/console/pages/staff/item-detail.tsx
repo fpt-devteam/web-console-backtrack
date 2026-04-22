@@ -43,7 +43,7 @@ export function ItemDetailPage() {
         subcategoryNameById={subcategoryNameById}
         showAddThumbnailButton
         actions={
-          item && item.status !== 'Returned' ? (
+          item && item.status !== 'Returned' && item.status !== 'Archived' && item.status !== 'Expired' ? (
             <>
               <Button
                 variant="outline"

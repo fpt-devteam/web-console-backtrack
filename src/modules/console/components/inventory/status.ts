@@ -1,7 +1,6 @@
 export type InventoryStatus =
-  | 'Active'
+  | 'All'
   | 'InStorage'
-  | 'ReturnScheduled'
   | 'Returned'
   | 'Archived'
   | 'Expired'
@@ -11,10 +10,6 @@ export function inventoryStatusBadgeClass(s: InventoryStatus) {
   switch (s) {
     case 'InStorage':
       return 'bg-indigo-500 text-white'
-    case 'Active':
-      return 'bg-blue-600 text-white'
-    case 'ReturnScheduled':
-      return 'bg-amber-500 text-white'
     case 'Returned':
       return 'bg-green-500 text-white'
     case 'Archived':
@@ -28,12 +23,10 @@ export function inventoryStatusBadgeClass(s: InventoryStatus) {
 
 export function inventoryStatusLabel(s: InventoryStatus) {
   switch (s) {
-    case 'Active':
-      return 'Active'
+    case 'All':
+      return 'All'
     case 'InStorage':
       return 'In Storage'
-    case 'ReturnScheduled':
-      return 'Return Scheduled'
     case 'Returned':
       return 'Returned'
     case 'Archived':
@@ -47,12 +40,8 @@ export function inventoryStatusLabel(s: InventoryStatus) {
 
 export function inventoryStatusPillClass(s: InventoryStatus) {
   switch (s) {
-    case 'Active':
-      return 'bg-blue-600 text-white'
     case 'InStorage':
       return 'bg-indigo-500 text-white'
-    case 'ReturnScheduled':
-      return 'bg-amber-500 text-white'
     case 'Returned':
       return 'bg-green-500 text-white'
     case 'Archived':
