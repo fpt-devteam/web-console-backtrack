@@ -1,6 +1,43 @@
 import type { InventorySubcategory, ItemCategory } from '@/services/inventory.service'
-import { ChevronDown, CreditCard, Cpu, Package, UserRound } from 'lucide-react'
-import { useMemo, useState } from 'react'
+import { ChevronDown } from 'lucide-react'
+import { useEffect, useMemo, useState } from 'react'
+
+import iconCards from '@/assets/icons/cards/card_icon.png'
+import iconElectronics from '@/assets/icons/electronics/electronics_icon.png'
+import iconOthers from '@/assets/icons/others/others_icon.png'
+import iconPersonal from '@/assets/icons/personal_belongings/personal_belonging_icon.png'
+
+const subcategoryIconLoaders = import.meta.glob('@/assets/icons/**/*.png', {
+  import: 'default',
+}) as Record<string, () => Promise<string>>
+
+const subcategoryFileNameOverrides: Record<string, string> = {
+  smartwatch: 'smart_watch',
+}
+
+function categoryFolder(c: ItemCategory): string {
+  switch (c) {
+    case 'PersonalBelongings':
+      return 'personal_belongings'
+    case 'Cards':
+      return 'cards'
+    case 'Electronics':
+      return 'electronics'
+    case 'Others':
+      return 'others'
+  }
+}
+
+function getSubcategoryIconKey(category: ItemCategory, code: string): string | null {
+  const folder = categoryFolder(category)
+  const fileBase = (subcategoryFileNameOverrides[code] ?? code).trim()
+  if (!fileBase) return null
+
+  const key = Object.keys(subcategoryIconLoaders).find(
+    (k) => k.includes(`/assets/icons/${folder}/`) && k.endsWith(`/${fileBase}.png`),
+  )
+  return key ?? null
+}
 
 function categoryLabel(c: ItemCategory) {
   switch (c) {
@@ -16,16 +53,15 @@ function categoryLabel(c: ItemCategory) {
 }
 
 function CategoryIcon({ category }: { category: ItemCategory }) {
-  const cls = 'h-5 w-5 text-slate-700'
   switch (category) {
     case 'PersonalBelongings':
-      return <UserRound className={cls} />
+      return <img src={iconPersonal} alt="" className="h-7 w-7 object-contain" aria-hidden loading="lazy" decoding="async" />
     case 'Cards':
-      return <CreditCard className={cls} />
+      return <img src={iconCards} alt="" className="h-7 w-7 object-contain" aria-hidden loading="lazy" decoding="async" />
     case 'Electronics':
-      return <Cpu className={cls} />
+      return <img src={iconElectronics} alt="" className="h-7 w-7 object-contain" aria-hidden loading="lazy" decoding="async" />
     case 'Others':
-      return <Package className={cls} />
+      return <img src={iconOthers} alt="" className="h-7 w-7 object-contain" aria-hidden loading="lazy" decoding="async" />
   }
 }
 
@@ -53,6 +89,30 @@ export function Step0PickSubcategory({
     Electronics: false,
     Others: false,
   }))
+
+  // Lazy-load subcategory icons on demand (avoid bundling all icons eagerly).
+  const [subcategoryIconSrcByKey, setSubcategoryIconSrcByKey] = useState<Record<string, string>>({})
+
+  useEffect(() => {
+    const keys = new Set<string>()
+    for (const { category, items } of byCategory) {
+      if (!openByCategory[category]) continue
+      for (const s of items) {
+        const k = getSubcategoryIconKey(category, s.code)
+        if (k) keys.add(k)
+      }
+    }
+
+    keys.forEach((k) => {
+      if (subcategoryIconSrcByKey[k]) return
+      const loader = subcategoryIconLoaders[k]
+      if (!loader) return
+      void loader().then((src) => {
+        setSubcategoryIconSrcByKey((prev) => (prev[k] ? prev : { ...prev, [k]: src }))
+      })
+    })
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [byCategory, openByCategory])
 
   return (
     <div className="space-y-6 mt-4">
@@ -105,7 +165,22 @@ export function Step0PickSubcategory({
                     >
                       <div className="flex items-start gap-3">
                         <div className="mt-0.5 h-10 w-10 rounded-lg bg-slate-50 border border-slate-200 flex items-center justify-center">
-                          <CategoryIcon category={category} />
+                          {(() => {
+                            const k = getSubcategoryIconKey(category, s.code)
+                            const src = k ? subcategoryIconSrcByKey[k] : null
+                            return src ? (
+                            <img
+                              src={src}
+                              alt=""
+                              className="h-8 w-8 object-contain"
+                              aria-hidden
+                              loading="lazy"
+                              decoding="async"
+                            />
+                            ) : (
+                            <CategoryIcon category={category} />
+                            )
+                          })()}
                         </div>
                         <div className="min-w-0">
                           <div className="text-sm font-semibold text-slate-950 truncate">{s.name}</div>

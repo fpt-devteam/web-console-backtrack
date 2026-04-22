@@ -140,6 +140,8 @@ export function Step3Preview({
                   src={p.url}
                   alt="Preview"
                   className="h-16 w-16 rounded-md object-cover border border-slate-200"
+                  loading="lazy"
+                  decoding="async"
                 />
               ))}
             </div>

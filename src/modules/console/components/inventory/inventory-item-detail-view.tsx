@@ -244,7 +244,7 @@ export function InventoryItemDetailView({
                       mainImageIndex === idx ? 'border-blue-600 ring-2 ring-blue-200' : 'border-gray-300 hover:border-gray-400'
                     }`}
                   >
-                    <img src={img} alt={`View ${idx + 1}`} className="w-full h-full object-contain bg-white" />
+                    <img src={img} alt={`View ${idx + 1}`} className="w-full h-full object-contain bg-white" loading="lazy" decoding="async" />
                   </button>
                 ))}
                 {showAddThumbnailButton ? (

@@ -68,6 +68,8 @@ export function InventoryGridCards({
                   src={item.imageUrls[0]}
                   alt={imgAlt}
                   className="w-full h-full object-contain bg-white"
+                  loading="lazy"
+                  decoding="async"
                 />
               ) : (
                 <div className="w-full h-full flex items-center justify-center text-gray-400">No image</div>
