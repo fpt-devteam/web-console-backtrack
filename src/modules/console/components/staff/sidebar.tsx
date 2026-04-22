@@ -1,4 +1,4 @@
-import { Package, MessageCircle, Bell, ChevronLeft, ChevronRight, ArrowLeftRight, History } from 'lucide-react';
+import { Package, MessageCircle, Bell, ChevronLeft, ChevronRight, ArrowLeftRight, ClipboardList } from 'lucide-react';
 import { OrgLogo } from '@/components/org-logo';
 import { Link, useLocation, useParams } from '@tanstack/react-router';
 import { useCurrentOrgId } from '@/contexts/current-org.context';
@@ -32,7 +32,7 @@ export function StaffSidebar({ isOpen, onToggle }: StaffSidebarProps) {
   const menuItems = [
     { name: 'Inventory', icon: Package, path: `${base}/staff/inventory` },
     { name: 'Chat', icon: MessageCircle, path: `${base}/staff/chat` },
-    { name: 'History', icon: History, path: `${base}/staff/history` },
+    { name: 'Handling History', icon: ClipboardList, path: `${base}/staff/history` },
     { name: 'Notification', icon: Bell, path: `${base}/staff/notification` },
   ];
 
@@ -85,7 +85,7 @@ export function StaffSidebar({ isOpen, onToggle }: StaffSidebarProps) {
                   to={item.path}
                   className={`flex items-center gap-4 px-6 py-2 rounded-lg font-medium transition-all duration-300 ${
                     active
-                      ? 'bg-gradient-to-r from-blue-600 to-blue-400 text-white shadow-lg'
+                      ? 'bg-blue-500 text-white shadow-lg'
                       : 'hover:bg-blue-50 hover:text-blue-600'
                   }`}
                 >
@@ -111,7 +111,7 @@ export function StaffSidebar({ isOpen, onToggle }: StaffSidebarProps) {
         }`}
       >
         <div
-          className="w-9 h-9 rounded-full bg-gradient-to-br from-blue-400 to-indigo-500 flex items-center justify-center text-white font-semibold text-sm flex-shrink-0"
+          className="w-9 h-9 rounded-full bg-blue-500 flex items-center justify-center text-white font-semibold text-sm flex-shrink-0"
           title={userDisplayName}
         >
           {userInitials}

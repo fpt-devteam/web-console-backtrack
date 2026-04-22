@@ -129,7 +129,7 @@ export function Sidebar({ isOpen, onToggle }: SidebarProps) {
                       to={firstChildPath}
                       className={`flex items-center gap-4 px-6 py-2 rounded-lg font-medium transition-all duration-300 ${
                         active
-                          ? 'bg-gradient-to-r from-blue-600 to-blue-400 text-white shadow-lg'
+                          ? 'bg-blue-500 text-white shadow-lg'
                           : 'hover:bg-blue-50 hover:text-blue-600'
                       }`}
                     >
@@ -145,7 +145,7 @@ export function Sidebar({ isOpen, onToggle }: SidebarProps) {
                     onClick={() => setSettingExpanded((prev) => !prev)}
                     className={`flex items-center justify-between gap-2 w-full px-6 py-2 rounded-lg font-medium transition-all duration-300 text-left ${
                       active
-                        ? 'bg-gradient-to-r from-blue-600 to-blue-400 text-white shadow-lg'
+                        ? 'bg-blue-500 text-white shadow-lg'
                         : 'hover:bg-blue-50 hover:text-blue-600'
                     }`}
                   >
@@ -186,7 +186,7 @@ export function Sidebar({ isOpen, onToggle }: SidebarProps) {
                   to={item.path!}
                   className={`flex items-center gap-4 px-6 py-2 rounded-lg font-medium transition-all duration-300 ${
                     active
-                      ? 'bg-gradient-to-r from-blue-600 to-blue-400 text-white shadow-lg'
+                      ? 'bg-blue-500 text-white shadow-lg'
                       : 'hover:bg-blue-50 hover:text-blue-600'
                   }`}
                 >
@@ -212,7 +212,7 @@ export function Sidebar({ isOpen, onToggle }: SidebarProps) {
         }`}
       >
         <div
-          className="w-9 h-9 rounded-full bg-gradient-to-br from-blue-400 to-indigo-500 flex items-center justify-center text-white font-semibold text-sm flex-shrink-0"
+          className="w-9 h-9 rounded-full bg-blue-500 flex items-center justify-center text-white font-semibold text-sm flex-shrink-0"
           title={userDisplayName}
         >
           {userInitials}

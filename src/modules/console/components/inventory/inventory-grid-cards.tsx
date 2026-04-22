@@ -13,6 +13,7 @@ export function InventoryGridCards({
   emptyText = 'No items found matching your filters.',
   detailLink,
   subcategoryNameById,
+  getDate,
 }: {
   items: InventoryListItem[]
   isLoading: boolean
@@ -23,6 +24,7 @@ export function InventoryGridCards({
     params: (item: InventoryListItem) => Record<string, string>
   }
   subcategoryNameById?: Record<string, string>
+  getDate?: (item: InventoryListItem) => string | Date | null | undefined
 }) {
   if (isError) {
     return (
@@ -47,6 +49,12 @@ export function InventoryGridCards({
           const displayTitle = getInventoryTitle(item, subcategoryNameById)
           const subName = getInventorySubcategoryName(item, subcategoryNameById)
           const imgAlt = displayTitle.trim() || subName.trim() || 'Inventory item'
+          const dateValue = getDate ? getDate(item) : item.eventTime
+          const dateObj = typeof dateValue === 'string' || dateValue instanceof Date ? new Date(dateValue) : null
+          const dateText =
+            dateObj && !Number.isNaN(dateObj.getTime())
+              ? dateObj.toLocaleDateString('vi-VN', { year: 'numeric', month: '2-digit', day: '2-digit' })
+              : '—'
 
           return (
           <div
@@ -86,13 +94,7 @@ export function InventoryGridCards({
                 </div>
                 <div className="flex items-center gap-2">
                   <Calendar className="w-4 h-4 flex-shrink-0" />
-                  <span>
-                    {new Date(item.eventTime).toLocaleDateString('vi-VN', {
-                      year: 'numeric',
-                      month: '2-digit',
-                      day: '2-digit',
-                    })}
-                  </span>
+                  <span>{dateText}</span>
                 </div>
               </div>
               <Link to={detailLink.to} params={detailLink.params(item)} className="mt-auto block">

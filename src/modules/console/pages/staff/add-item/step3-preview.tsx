@@ -171,11 +171,17 @@ export function Step3Preview({
         </div>
       </div>
 
-      <div className="flex flex-col-reverse sm:flex-row sm:justify-between gap-3 pt-2">
-        <Button type="button" variant="outline" onClick={onBack} disabled={isSubmitting}>
-          <ChevronLeft className="w-4 h-4 mr-2" />
-          Back
+      <div className="flex items-center justify-between gap-3 pt-4 border-t border-slate-100">
+        <Button
+          type="button"
+          aria-label="Back"
+          className="h-8 w-8 rounded-full bg-slate-950 text-white hover:bg-slate-800"
+          onClick={onBack}
+          disabled={isSubmitting}
+        >
+          <ChevronLeft className="h-5 w-5 mx-auto" />
         </Button>
+
         <div className="flex flex-col sm:flex-row gap-2 sm:justify-end">
           <Button
             type="button"
@@ -200,7 +206,7 @@ export function Step3Preview({
                 Saving…
               </>
             ) : (
-              'Submit'
+              'Save'
             )}
           </Button>
         </div>

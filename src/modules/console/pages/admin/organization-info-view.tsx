@@ -10,7 +10,7 @@ import {
   MapPin,
 } from 'lucide-react'
 import { useRouter, useParams } from '@tanstack/react-router'
-import { useEffect, useMemo } from 'react'
+import { useEffect, useMemo, useRef } from 'react'
 import { OrgLogo } from '@/components/org-logo'
 import {
   isValidOrgMapLocation,
@@ -20,6 +20,7 @@ import { Spinner } from '@/components/ui/spinner'
 import { useCurrentOrgId } from '@/contexts/current-org.context'
 import { useOrganization } from '@/hooks/use-org'
 import type { DailySchedule, OrgWeekDay } from '@/types/organization.types'
+import QRCode from 'react-qr-code'
 
 const DAY_ORDER: OrgWeekDay[] = [
   'Monday',
@@ -97,6 +98,28 @@ export function OrganizationInfoViewPage() {
     if (!org?.slug) return ''
     return `https://thebacktrack.vercel.app/organizations/${org.slug}`
   }, [org?.slug])
+
+  const qrWrapRef = useRef<HTMLDivElement | null>(null)
+
+  const downloadQrSvg = () => {
+    if (!publicOrgUrl) return
+    const svg = qrWrapRef.current?.querySelector('svg')
+    if (!svg) return
+
+    const serializer = new XMLSerializer()
+    const raw = serializer.serializeToString(svg)
+    const withNs = raw.includes('xmlns=') ? raw : raw.replace('<svg', '<svg xmlns="http://www.w3.org/2000/svg"')
+    const blob = new Blob([withNs], { type: 'image/svg+xml;charset=utf-8' })
+    const url = URL.createObjectURL(blob)
+
+    const a = document.createElement('a')
+    a.href = url
+    a.download = `backtrack-qr-${org?.slug ?? 'workspace'}.svg`
+    document.body.appendChild(a)
+    a.click()
+    a.remove()
+    URL.revokeObjectURL(url)
+  }
 
   if (!currentOrgId) {
     return (
@@ -269,29 +292,46 @@ export function OrganizationInfoViewPage() {
                 </div>
               </div>
 
-              <div className="mt-6 rounded-xl border border-slate-200 bg-slate-50 px-4 py-3">
-                <div className="mb-2 flex items-center gap-2 text-xs font-semibold text-slate-700">
-                  <Link2 className="h-3 w-3 text-blue-600" />
-                  Shareable Link (Workspace)
+              <div className="mt-6 grid grid-cols-1 gap-3 sm:grid-cols-[1fr_auto] sm:items-stretch">
+                {/* Link card */}
+                <div className="rounded-xl border border-slate-200 bg-slate-50 px-4 py-3">
+                  <div className="mb-2 flex items-center gap-2 text-xs font-semibold text-slate-700">
+                    <Link2 className="h-3 w-3 text-blue-600" />
+                    Shareable Link (Workspace)
+                  </div>
+                  <div className="flex items-start justify-between gap-3 min-w-0">
+                    <a
+                      href={publicOrgUrl || '#'}
+                      className="min-w-0 flex-1 break-all text-xs text-blue-600 hover:text-blue-700"
+                      target="_blank"
+                      rel="noreferrer"
+                    >
+                      {publicOrgUrl || '—'}
+                    </a>
+                    <button
+                      type="button"
+                      className="shrink-0 rounded-md text-blue-600 hover:bg-slate-200 disabled:opacity-40 p-2"
+                      disabled={!publicOrgUrl}
+                      onClick={() => publicOrgUrl && void navigator.clipboard.writeText(publicOrgUrl)}
+                      title="Copy link"
+                    >
+                      <Copy className="h-4 w-4" />
+                    </button>
+                  </div>
                 </div>
-                <div className="flex items-start justify-between gap-3 min-w-0">
-                  <a
-                    href={publicOrgUrl || '#'}
-                    className="min-w-0 flex-1 break-all text-xs text-blue-600 hover:text-blue-700"
-                    target="_blank"
-                    rel="noreferrer"
-                  >
-                    {publicOrgUrl || '—'}
-                  </a>
+
+                {/* QR card */}
+                <div className="rounded-xl border border-slate-200 bg-white p-3 flex flex-col items-center justify-center gap-2">
+                  <div ref={qrWrapRef}>
+                    {publicOrgUrl ? <QRCode value={publicOrgUrl} size={88} /> : <span className="text-xs text-slate-400">—</span>}
+                  </div>
                   <button
                     type="button"
-                    className="shrink-0 rounded-md text-blue-600 hover:bg-slate-200 disabled:opacity-40"
+                    className="text-xs font-medium text-blue-600 hover:text-blue-700 disabled:opacity-40"
                     disabled={!publicOrgUrl}
-                    onClick={() =>
-                      publicOrgUrl && void navigator.clipboard.writeText(publicOrgUrl)
-                    }
+                    onClick={downloadQrSvg}
                   >
-                    <Copy className="h-4 w-4" />
+                    Download QR
                   </button>
                 </div>
               </div>
