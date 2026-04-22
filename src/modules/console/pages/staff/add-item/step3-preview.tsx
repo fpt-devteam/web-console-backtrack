@@ -26,6 +26,8 @@ export type PreviewItem = {
   description: string
   distinctiveMarks: string
   category: ItemCategory
+  internalLocation: string
+  eventTime: string
   color: string
   brand: string
   condition: string
@@ -81,6 +83,8 @@ export function Step3Preview({
         <div className="px-5 border-t border-slate-100">
           <FieldRow label="Category" value={item.category} />
           <FieldRow label="Post title" value={item.postTitle} />
+          <FieldRow label="Internal location" value={item.internalLocation} />
+          <FieldRow label="Found time" value={item.eventTime} />
           {c !== 'Others' ? <FieldRow label="Item name " value={item.detailItemName} /> : null}
           {c === 'Others' ? <FieldRow label="Item identifier" value={item.itemName} /> : null}
 

@@ -103,6 +103,8 @@ export interface InventoryItem {
   location: GeoPoint
   displayAddress?: string | null
   externalPlaceId?: string | null
+  /** Storage / intake location inside the organization (if provided by BE). */
+  internalLocation?: string | null
   eventTime: string
   createdAt: string
   author?: PostAuthorResult | null
@@ -134,6 +136,10 @@ export interface CreateInventoryPayload {
   imageUrls?: string[]
   category: ItemCategory
   subcategoryCode: string
+  /** Required by BE for org inventory items. */
+  internalLocation: string
+  /** ISO-8601 timestamp (DateTimeOffset) */
+  eventTime: string
   color?: string | null
   brand?: string | null
   condition?: string | null
@@ -277,6 +283,8 @@ export const inventoryService = {
             postTitle,
             category: payload.category,
             subcategoryCode: payload.subcategoryCode,
+            internalLocation: payload.internalLocation,
+            eventTime: payload.eventTime,
             personalBelongingDetail: {
               itemName: detailItemName,
               color: payload.color ?? undefined,
@@ -296,6 +304,8 @@ export const inventoryService = {
               postTitle,
               category: payload.category,
               subcategoryCode: payload.subcategoryCode,
+              internalLocation: payload.internalLocation,
+              eventTime: payload.eventTime,
               electronicDetail: {
                 itemName: detailItemName,
                 brand: payload.brand ?? undefined,
@@ -317,6 +327,8 @@ export const inventoryService = {
               postTitle,
               category: payload.category,
               subcategoryCode: payload.subcategoryCode,
+              internalLocation: payload.internalLocation,
+              eventTime: payload.eventTime,
               cardDetail: {
                 itemName: detailItemName,
                 cardNumber: payload.cardNumber ?? undefined,
@@ -336,6 +348,8 @@ export const inventoryService = {
                 postTitle,
                 category: payload.category,
                 subcategoryCode: payload.subcategoryCode,
+                internalLocation: payload.internalLocation,
+                eventTime: payload.eventTime,
                 otherDetail: {
                   itemName: payload.itemName.trim(),
                   primaryColor: payload.color ?? undefined,
@@ -349,6 +363,8 @@ export const inventoryService = {
                 postTitle,
                 category: payload.category,
                 subcategoryCode: payload.subcategoryCode,
+                internalLocation: payload.internalLocation,
+                eventTime: payload.eventTime,
                 otherDetail: {
                   itemName: payload.itemName.trim(),
                   additionalDetails: payload.description,

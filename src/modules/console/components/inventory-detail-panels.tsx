@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react'
-import { MapPin, Package, User } from 'lucide-react'
+import { Package, User } from 'lucide-react'
 import type { InventoryItem } from '@/services/inventory.service'
 import { getInventoryDescription, getInventoryDistinctiveMarks, getInventoryTitle } from '@/utils/inventory-view'
 
@@ -59,8 +59,9 @@ export function InventoryDetailPanels({ item }: { item: InventoryItem }) {
     { kind: 'field', label: 'Details', value: vOrUnderscore(getInventoryDescription(item) ?? undefined) },
     { kind: 'section', title: 'Status & timing' },
     { kind: 'field', label: 'Status', value: vOrUnderscore(item.status) },
-    { kind: 'field', label: 'Event time', value: fmtDateTime(item.eventTime) },
+    { kind: 'field', label: 'Found time', value: fmtDateTime(item.eventTime) },
     { kind: 'field', label: 'Created at', value: fmtDateTime(item.createdAt) },
+    { kind: 'field', label: 'Internal location', value: vOrUnderscore(item.internalLocation ?? undefined) },
     { kind: 'section', title: 'Author / organization' },
     {
       kind: 'field',
@@ -85,18 +86,6 @@ export function InventoryDetailPanels({ item }: { item: InventoryItem }) {
           <Package className="w-4 h-4 text-gray-700 shrink-0" />
           <span className="font-medium">{item.organization.name}</span>
           {item.organization.id ? <span className="text-gray-600">(<Mono>{item.organization.id}</Mono>)</span> : null}
-        </span>
-      ) : (
-        '_'
-      ),
-    },
-    {
-      kind: 'field',
-      label: 'Display address',
-      value: item.displayAddress ? (
-        <span className="inline-flex items-center gap-2">
-          <MapPin className="w-4 h-4 text-gray-700 shrink-0" />
-          <span>{item.displayAddress}</span>
         </span>
       ) : (
         '_'

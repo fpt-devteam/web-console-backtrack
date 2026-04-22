@@ -34,6 +34,8 @@ type AddInventoryDraft = {
     distinctiveMarks: string
     category: ItemCategory | null
     subcategoryCode: string
+    internalLocation: string
+    eventTime: string
     color: string
     brand: string
     condition: string
@@ -152,6 +154,8 @@ export function AddFoundItemPage() {
   const { data: allSubcategories } = useSubcategories()
   const { data: subcategories } = useSubcategories(category ?? undefined)
   const [subcategoryCode, setSubcategoryCode] = useState<string>('') // required by BE
+  const [internalLocation, setInternalLocation] = useState<string>('')
+  const [eventTime, setEventTime] = useState<string>('')
   const [color, setColor] = useState<string>('')
   const [brand, setBrand] = useState<string>('')
   const [condition, setCondition] = useState<string>('')
@@ -234,6 +238,8 @@ export function AddFoundItemPage() {
           distinctiveMarks,
           category,
           subcategoryCode,
+          internalLocation,
+          eventTime,
           color,
           brand,
           condition,
@@ -425,6 +431,8 @@ export function AddFoundItemPage() {
     distinctiveMarks: distinctiveMarks.trim() || undefined,
     category,
     subcategoryCode: subcategoryCode,
+    internalLocation: internalLocation.trim(),
+    eventTime,
     color: color.trim() || undefined,
     brand: brand.trim() || undefined,
     condition: condition.trim() || undefined,
@@ -457,6 +465,8 @@ export function AddFoundItemPage() {
     if (category === 'Others' && !itemName.trim()) return 'Item identifier is required.'
     if (photoPreviews.length === 0) return 'At least one photo is required.'
     if (!subcategoryCode.trim()) return 'Subcategory is required.'
+    if (!internalLocation.trim()) return 'Internal location is required.'
+    if (!eventTime.trim()) return 'Event time is required.'
     return null
   }
 
@@ -499,6 +509,8 @@ export function AddFoundItemPage() {
     })
     setCategory(null)
     setSubcategoryCode('')
+    setInternalLocation('')
+    setEventTime('')
     setColor('')
     setBrand('')
     setCondition('')
@@ -749,6 +761,10 @@ export function AddFoundItemPage() {
               subcategories={subcategories ?? []}
               subcategoryCode={subcategoryCode}
               setSubcategoryCode={setSubcategoryCode}
+              internalLocation={internalLocation}
+              setInternalLocation={setInternalLocation}
+              eventTime={eventTime}
+              setEventTime={setEventTime}
               holderName={holderName}
               setHolderName={setHolderName}
               cardNumber={cardNumber}
@@ -807,6 +823,8 @@ export function AddFoundItemPage() {
                 description,
                 distinctiveMarks,
                 category,
+                internalLocation,
+                eventTime,
                 color,
                 brand,
                 condition,

@@ -1,10 +1,10 @@
-import { Archive, Calendar } from 'lucide-react'
+import { Archive, Calendar, MapPin } from 'lucide-react'
 import { Link } from '@tanstack/react-router'
 import { Spinner } from '@/components/ui/spinner'
 import type { InventoryListItem } from '@/services/inventory.service'
 import { inventoryStatusBadgeClass, inventoryStatusLabel } from './status'
 import { NoResultsEmptyState } from './no-results-empty-state'
-import { getInventoryDescription, getInventorySubcategoryName, getInventoryTitle } from '@/utils/inventory-view'
+import { getInventorySubcategoryName, getInventoryTitle } from '@/utils/inventory-view'
 
 export function InventoryGridCards({
   items,
@@ -55,6 +55,7 @@ export function InventoryGridCards({
             dateObj && !Number.isNaN(dateObj.getTime())
               ? dateObj.toLocaleDateString('vi-VN', { year: 'numeric', month: '2-digit', day: '2-digit' })
               : '—'
+          const foundLocation = item.internalLocation?.trim() || '—'
 
           return (
           <div
@@ -84,9 +85,10 @@ export function InventoryGridCards({
               <h3 className="font-semibold text-gray-900 mb-3 line-clamp-2 leading-5 min-h-[40px]">
                 {displayTitle}
               </h3>
-              <p className="text-sm text-gray-600 mb-3 line-clamp-2 leading-5 min-h-[40px]">
-                {getInventoryDescription(item) ?? ''}
-              </p>
+              <div className="text-sm text-gray-600 mb-3 flex items-start gap-2 min-h-[40px]">
+                <MapPin className="w-4 h-4 flex-shrink-0 mt-0.5" />
+                <p className="line-clamp-2 leading-5">{foundLocation}</p>
+              </div>
               <div className="space-y-2 text-sm text-gray-600 mb-4 flex-1">
                 <div className="flex items-center gap-2">
                   <Archive className="w-4 h-4 flex-shrink-0" />

@@ -37,7 +37,7 @@ export function EditItemPage() {
 
   const [status, setStatus] = useState<PostStatus>('Active')
   const [eventTimeLocal, setEventTimeLocal] = useState<string>('') // datetime-local
-  const [displayAddress, setDisplayAddress] = useState<string>('')
+  const [internalLocation, setInternalLocation] = useState<string>('')
 
   const [detailItemName, setDetailItemName] = useState<string>('') // required for non-Others
   const [description, setDescription] = useState<string>('')
@@ -93,7 +93,7 @@ export function EditItemPage() {
     initRef.current = true
 
     setStatus(item.status)
-    setDisplayAddress(item.displayAddress ?? '')
+    setInternalLocation(item.internalLocation ?? '')
     setPhotoPreviews((item.imageUrls ?? []).map((url) => ({ url, isExisting: true })))
     if (item.eventTime) setEventTimeLocal(item.eventTime.slice(0, 16))
 
@@ -393,15 +393,7 @@ export function EditItemPage() {
             {/* Info form (no section titles) */}
             <section className="space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 lg:gap-5 xl:gap-6 2xl:gap-7">
-                <div>
-                  <Label className="text-sm font-semibold">Category</Label>
-                  <Input value={item?.category ?? ''} readOnly className="mt-1 bg-slate-50" />
-                </div>
-                <div>
-                  <Label className="text-sm font-semibold">Subcategory</Label>
-                  <Input value={subcategory?.name || item?.subcategoryId || ''} readOnly className="mt-1 bg-slate-50" />
-                </div>
-                <div>
+                <div className="md:col-span-2">
                   <Label className="text-sm font-semibold">Status</Label>
                   <select
                     value={status}
@@ -412,18 +404,30 @@ export function EditItemPage() {
                     <option value={status}>
                       {status === 'InStorage'
                         ? 'In Storage'
-                          : status}
+                        : status}
                     </option>
                     {status !== 'Archived' ? <option value="Archived">Archived</option> : null}
                   </select>
                 </div>
                 <div>
-                  <Label className="text-sm font-semibold">Event time</Label>
+                  <Label className="text-sm font-semibold">Category</Label>
+                  <Input value={item?.category ?? ''} readOnly className="mt-1 bg-slate-50" />
+                </div>
+                <div>
+                  <Label className="text-sm font-semibold">Subcategory</Label>
+                  <Input value={subcategory?.name || item?.subcategoryId || ''} readOnly className="mt-1 bg-slate-50" />
+                </div>
+                <div>
+                  <Label className="text-sm font-semibold">Found time</Label>
                   <Input type="datetime-local" value={eventTimeLocal} onChange={(e) => setEventTimeLocal(e.target.value)} className="mt-1" />
                 </div>
+                <div>
+                  <Label className="text-sm font-semibold">Created at</Label>
+                  <Input value={item?.createdAt ? new Date(item.createdAt).toLocaleString() : '—'} readOnly className="mt-1 bg-slate-50" />
+                </div>
                 <div className="md:col-span-2">
-                  <Label className="text-sm font-semibold">Display address</Label>
-                  <Input value={displayAddress} readOnly className="mt-1 bg-slate-50" />
+                  <Label className="text-sm font-semibold">Internal location</Label>
+                  <Input value={internalLocation} readOnly className="mt-1 bg-slate-50" />
                 </div>
               </div>
             </section>

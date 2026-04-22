@@ -90,23 +90,31 @@ export function InventoryDetailAttributeGrid({
           </>
         </Cell>
 
-        <Cell label="DISPLAY ADDRESS" fullWidth>
+        <Cell label="INTERNAL LOCATION" fullWidth>
           <>
             <MapPin className="w-4 h-4 text-blue-600 shrink-0 mt-0.5" aria-hidden />
             <span className="min-w-0 flex-1">
-              <TextValue v={item.displayAddress} />
+              <TextValue v={item.internalLocation} />
             </span>
+          </>
+        </Cell>
+
+        <Cell label="FOUND TIME">
+          <>
+            <Calendar className="w-4 h-4 text-blue-600 shrink-0" />
+            <TextValue v={item.eventTime ? new Date(item.eventTime).toLocaleString() : null} />
+          </>
+        </Cell>
+
+        <Cell label="CREATED AT">
+          <>
+            <Calendar className="w-4 h-4 text-blue-600 shrink-0" />
+            <TextValue v={item.createdAt ? new Date(item.createdAt).toLocaleString() : null} />
           </>
         </Cell>
 
         {cat === 'PersonalBelongings' ? (
           <>
-            <Cell label="EVENT TIME">
-              <>
-                <Calendar className="w-4 h-4 text-blue-600 shrink-0" />
-                <TextValue v={item.eventTime ? new Date(item.eventTime).toLocaleString() : null} />
-              </>
-            </Cell>
             <Cell label="BRAND">
               <TextValue v={getInventoryBrand(item)} />
             </Cell>
@@ -127,12 +135,6 @@ export function InventoryDetailAttributeGrid({
 
         {cat === 'Electronics' ? (
           <>
-            <Cell label="EVENT TIME">
-              <>
-                <Calendar className="w-4 h-4 text-blue-600 shrink-0" />
-                <TextValue v={item.eventTime ? new Date(item.eventTime).toLocaleString() : null} />
-              </>
-            </Cell>
             <Cell label="BRAND">
               <TextValue v={getInventoryBrand(item)} />
             </Cell>
@@ -156,12 +158,6 @@ export function InventoryDetailAttributeGrid({
 
         {cat === 'Cards' ? (
           <>
-            <Cell label="EVENT TIME">
-              <>
-                <Calendar className="w-4 h-4 text-blue-600 shrink-0" />
-                <TextValue v={item.eventTime ? new Date(item.eventTime).toLocaleString() : null} />
-              </>
-            </Cell>
             <Cell label="HOLDER NAME">
               <TextValue v={item.cardDetail?.holderName} />
             </Cell>
@@ -188,12 +184,6 @@ export function InventoryDetailAttributeGrid({
 
         {cat === 'Others' ? (
           <>
-            <Cell label="EVENT TIME">
-              <>
-                <Calendar className="w-4 h-4 text-blue-600 shrink-0" />
-                <TextValue v={item.eventTime ? new Date(item.eventTime).toLocaleString() : null} />
-              </>
-            </Cell>
             <Cell label="ITEM IDENTIFIER">
               <TextValue v={item.otherDetail?.itemName} />
             </Cell>

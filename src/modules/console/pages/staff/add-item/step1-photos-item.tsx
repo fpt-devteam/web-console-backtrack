@@ -42,6 +42,10 @@ export type Step1PhotosAndItemProps = {
   subcategories: InventorySubcategory[]
   subcategoryCode: string
   setSubcategoryCode: (v: string) => void
+  internalLocation: string
+  setInternalLocation: (v: string) => void
+  eventTime: string
+  setEventTime: (v: string) => void
   holderName: string
   setHolderName: (v: string) => void
   cardNumber: string
@@ -100,6 +104,10 @@ export function Step1PhotosAndItem({
   subcategories,
   subcategoryCode,
   setSubcategoryCode,
+  internalLocation,
+  setInternalLocation,
+  eventTime,
+  setEventTime,
   holderName,
   setHolderName,
   cardNumber,
@@ -170,38 +178,6 @@ export function Step1PhotosAndItem({
             />
           </div>
 
-          {category !== 'Others' ? (
-            <div className="md:col-span-2">
-              <Label htmlFor="detailItemName" className="text-sm font-semibold text-slate-950">
-                Item name 
-              </Label>
-              <Input
-                id="detailItemName"
-                type="text"
-                placeholder="e.g. Apple Watch, Student ID card, Backpack"
-                value={detailItemName}
-                onChange={(e) => setDetailItemName(e.target.value)}
-                className="mt-1"
-              />
-            </div>
-          ) : null}
-
-          {category === 'Others' ? (
-            <div className="md:col-span-2">
-              <Label htmlFor="itemIdentifier" className="text-sm font-semibold text-slate-950">
-                Item identifier <span className="text-red-600">*</span>
-              </Label>
-              <Input
-                id="itemIdentifier"
-                type="text"
-                placeholder="Short label to identify this item"
-                value={itemName}
-                onChange={(e) => setItemName(e.target.value)}
-                className="mt-1"
-              />
-            </div>
-          ) : null}
-
           <div>
             <Label htmlFor="category" className="text-sm font-semibold text-slate-950">
               Category <span className="text-red-600">*</span>
@@ -241,6 +217,74 @@ export function Step1PhotosAndItem({
               <div className="mt-1 text-xs text-slate-600">No subcategories available for this category.</div>
             ) : null}
           </div>
+
+          <div className="md:col-span-2">
+            <Label htmlFor="internalLocation" className="text-sm font-semibold text-slate-950">
+              Internal location <span className="text-red-600">*</span>
+            </Label>
+            <Input
+              id="internalLocation"
+              value={internalLocation}
+              onChange={(e) => setInternalLocation(e.target.value)}
+              placeholder="e.g. Front desk shelf A, Security office locker 3"
+              className="mt-1"
+            />
+          </div>
+
+          <div className="md:col-span-2">
+            <Label htmlFor="eventTime" className="text-sm font-semibold text-slate-950">
+              Found time <span className="text-red-600">*</span>
+            </Label>
+            <Input
+              id="eventTime"
+              type="datetime-local"
+              value={eventTime ? new Date(eventTime).toISOString().slice(0, 16) : ''}
+              onChange={(e) => {
+                const v = e.target.value
+                if (!v) {
+                  setEventTime('')
+                  return
+                }
+                // `datetime-local` is local time without timezone; convert to ISO
+                const iso = new Date(v).toISOString()
+                setEventTime(iso)
+              }}
+              className="mt-1"
+            />
+            <div className="mt-1 text-xs text-slate-600">When the item was found or handed to staff.</div>
+          </div>
+
+          {category !== 'Others' ? (
+            <div className="md:col-span-2">
+              <Label htmlFor="detailItemName" className="text-sm font-semibold text-slate-950">
+                Item name
+              </Label>
+              <Input
+                id="detailItemName"
+                type="text"
+                placeholder="e.g. Apple Watch, Student ID card, Backpack"
+                value={detailItemName}
+                onChange={(e) => setDetailItemName(e.target.value)}
+                className="mt-1"
+              />
+            </div>
+          ) : null}
+
+          {category === 'Others' ? (
+            <div className="md:col-span-2">
+              <Label htmlFor="itemIdentifier" className="text-sm font-semibold text-slate-950">
+                Item identifier <span className="text-red-600">*</span>
+              </Label>
+              <Input
+                id="itemIdentifier"
+                type="text"
+                placeholder="Short label to identify this item"
+                value={itemName}
+                onChange={(e) => setItemName(e.target.value)}
+                className="mt-1"
+              />
+            </div>
+          ) : null}
 
           {category === 'Cards' ? (
             <>
