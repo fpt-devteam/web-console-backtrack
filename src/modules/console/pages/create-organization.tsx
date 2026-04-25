@@ -190,16 +190,16 @@ export function CreateOrganizationPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-[#E5F4FF] to-white flex items-center justify-center px-4 py-12">
+    <div className="min-h-screen bg-[#f7f7f7] flex items-center justify-center px-4 py-12">
       <div className="w-full max-w-5xl">
         {/* Main Card */}
-        <div className="bg-white rounded-xl shadow-lg p-10">
+        <div className="bg-white rounded-[14px] border border-[#dddddd] p-10">
           {/* Header */}
           <div className="text-center mb-8">
             <h1 className="text-3xl font-bold mb-2">
               Create Your Organization Account
             </h1>
-            <p className="text-sm text-gray-600">
+            <p className="text-sm text-[#6a6a6a]">
               Get started with Backtrack for your organization.
             </p>
           </div>
@@ -207,15 +207,15 @@ export function CreateOrganizationPage() {
           {/* Form */}
           <form className="space-y-6" onSubmit={handleSubmit}>
             {error && (
-              <p className="text-sm text-red-600 bg-red-50 px-3 py-2 rounded-md">{error}</p>
+              <p className="text-sm text-[#c13515] bg-[#fff0f2] px-3 py-2 rounded-md">{error}</p>
             )}
             {/* Logo — layout aligned with staff Add Found Item → Photos */}
             <div>
               <div className="flex items-center justify-between mb-4">
-                <Label className="text-base font-semibold text-gray-900">
-                  Organization logo <span className="text-red-500">*</span>
+                <Label className="text-base font-semibold text-[#222222]">
+                  Organization logo <span className="text-[#c13515]">*</span>
                 </Label>
-                <span className="text-sm text-gray-500">1 image</span>
+                <span className="text-sm text-[#929292]">1 image</span>
               </div>
               <div className="flex gap-4 flex-wrap">
                 {logoUrl ? (
@@ -237,10 +237,10 @@ export function CreateOrganizationPage() {
                 ) : null}
                 {!logoUrl ? (
                   <label
-                    className={`w-32 h-32 border-2 border-dashed border-gray-300 rounded-lg flex flex-col items-center justify-center transition-colors ${
+                    className={`w-32 h-32 border-2 border-dashed border-[#dddddd] rounded-lg flex flex-col items-center justify-center transition-colors ${
                       createOrg.isPending || isUploadingLogo
                         ? 'cursor-not-allowed opacity-60'
-                        : 'cursor-pointer hover:border-blue-500 hover:bg-blue-50'
+                        : 'cursor-pointer hover:border-[#ff385c] hover:bg-[#fff0f2]'
                     }`}
                   >
                     <input
@@ -251,17 +251,17 @@ export function CreateOrganizationPage() {
                       className="hidden"
                       disabled={createOrg.isPending || isUploadingLogo}
                     />
-                    <Camera className="w-6 h-6 text-gray-400 mb-2" />
-                    <span className="text-xs text-gray-500 text-center px-2">
+                    <Camera className="w-6 h-6 text-[#929292] mb-2" />
+                    <span className="text-xs text-[#929292] text-center px-2">
                       {isUploadingLogo ? 'Uploading...' : 'Add logo'}
                     </span>
                   </label>
                 ) : (
                   <label
-                    className={`w-32 h-32 border-2 border-dashed border-gray-300 rounded-lg flex flex-col items-center justify-center transition-colors ${
+                    className={`w-32 h-32 border-2 border-dashed border-[#dddddd] rounded-lg flex flex-col items-center justify-center transition-colors ${
                       createOrg.isPending || isUploadingLogo
                         ? 'cursor-not-allowed opacity-60'
-                        : 'cursor-pointer hover:border-blue-500 hover:bg-blue-50'
+                        : 'cursor-pointer hover:border-[#ff385c] hover:bg-[#fff0f2]'
                     }`}
                   >
                     <input
@@ -271,8 +271,8 @@ export function CreateOrganizationPage() {
                       className="hidden"
                       disabled={createOrg.isPending || isUploadingLogo}
                     />
-                    <Camera className="w-6 h-6 text-gray-400 mb-2" />
-                    <span className="text-xs text-gray-500 text-center px-2">
+                    <Camera className="w-6 h-6 text-[#929292] mb-2" />
+                    <span className="text-xs text-[#929292] text-center px-2">
                        {isUploadingLogo ? 'Uploading...' : 'Change'}
                     </span>
                   </label>
@@ -281,7 +281,7 @@ export function CreateOrganizationPage() {
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
-                <Label htmlFor="companyName" className="text-sm font-semibold mb-2 block">Company Name <span className="text-red-500">*</span></Label>
+                <Label htmlFor="companyName" className="text-sm font-semibold mb-2 block">Company Name <span className="text-[#c13515]">*</span></Label>
                 <Input
                   id="companyName"
                   value={form.name}
@@ -291,12 +291,12 @@ export function CreateOrganizationPage() {
                 />
               </div>
               <div>
-                <Label htmlFor="industryType" className="text-sm font-semibold mb-2 block">Industry Type <span className="text-red-500">*</span></Label>
+                <Label htmlFor="industryType" className="text-sm font-semibold mb-2 block">Industry Type <span className="text-[#c13515]">*</span></Label>
                 <select
                   id="industryType"
                   value={form.industryType}
                   onChange={update('industryType')}
-                  className="w-full h-10 px-3 border border-gray-300 rounded-md text-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full h-10 px-3 border border-[#dddddd] rounded-md text-sm bg-white focus:outline-none focus:border-[#222222]"
                   required
                 >
                   <option value="">Select industry</option>
@@ -309,7 +309,7 @@ export function CreateOrganizationPage() {
 
             <div>
               <Label htmlFor="companyAddress" className="text-sm font-semibold mb-2 block">
-                Company Address <span className="text-red-500">*</span>
+                Company Address <span className="text-[#c13515]">*</span>
               </Label>
               <PlaceSearchInput
                 id="companyAddress"
@@ -326,16 +326,16 @@ export function CreateOrganizationPage() {
                 placeholder="Type address or place name, then select a result for coordinates (OpenStreetMap)"
               />
               {location && (
-                <p className="text-xs text-green-600 mt-1">
+                <p className="text-xs text-[#06c167] mt-1">
                   Selected coordinates: {location.latitude.toFixed(5)}, {location.longitude.toFixed(5)}
                 </p>
               )}
             </div>
 
             <div>
-              <Label htmlFor="workspaceUrl" className="text-sm font-semibold mb-2 block">Workspace URL <span className="text-red-500">*</span></Label>
+              <Label htmlFor="workspaceUrl" className="text-sm font-semibold mb-2 block">Workspace URL <span className="text-[#c13515]">*</span></Label>
               <div className="relative flex items-center">
-                <div className="h-10 px-3 flex items-center rounded-l-md border border-gray-300 bg-gray-50 text-sm text-gray-600 whitespace-nowrap">
+                <div className="h-10 px-3 flex items-center rounded-l-md border border-[#dddddd] bg-[#f7f7f7] text-sm text-[#6a6a6a] whitespace-nowrap">
                   https://thebacktrack.vercel.app/organizations/
                 </div>
                 <Input
@@ -354,27 +354,27 @@ export function CreateOrganizationPage() {
               </div>
 
               {!slugOk && form.slug.trim() ? (
-                <p className="mt-1 text-xs text-red-600">
+                <p className="mt-1 text-xs text-[#c13515]">
                   Invalid workspace URL. Use only <span className="font-mono">a-z</span>, <span className="font-mono">0-9</span>, and hyphens (<span className="font-mono">-</span>).
                 </p>
               ) : null}
 
               {slugExistsError && (
-                <p className="mt-1 text-xs text-red-600">
+                <p className="mt-1 text-xs text-[#c13515]">
                   {slugExistsError}
                 </p>
               )}
 
               <div className="flex items-center justify-between mt-2">
-                <p className="text-xs text-gray-500">Lowercase letters, numbers, and hyphens only.</p>
-                {slugOk && form.slug && !isSlugChecking && !slugExistsError && <p className="text-xs text-green-600 font-medium">Looks good</p>}
-                {isSlugChecking && <p className="text-xs text-blue-600 font-medium">Checking...</p>}
+                <p className="text-xs text-[#929292]">Lowercase letters, numbers, and hyphens only.</p>
+                {slugOk && form.slug && !isSlugChecking && !slugExistsError && <p className="text-xs text-[#06c167] font-medium">Looks good</p>}
+                {isSlugChecking && <p className="text-xs text-[#929292] font-medium">Checking...</p>}
               </div>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
-                <Label htmlFor="phoneNumber" className="text-sm font-semibold mb-2 block">Phone Number <span className="text-red-500">*</span></Label>
+                <Label htmlFor="phoneNumber" className="text-sm font-semibold mb-2 block">Phone Number <span className="text-[#c13515]">*</span></Label>
                 <Input
                   id="phoneNumber"
                   type="tel"
@@ -386,7 +386,7 @@ export function CreateOrganizationPage() {
               </div>
               <div>
                 <Label htmlFor="contactEmail" className="text-sm font-semibold mb-2 block">
-                  Contact email <span className="text-gray-400 font-normal">(optional)</span>
+                  Contact email <span className="text-[#929292] font-normal">(optional)</span>
                 </Label>
                 <Input
                   id="contactEmail"
@@ -398,7 +398,7 @@ export function CreateOrganizationPage() {
                 />
               </div>
               <div className="md:col-span-2">
-                <Label htmlFor="taxId" className="text-sm font-semibold mb-2 block">Tax Identification Number <span className="text-red-500">*</span></Label>
+                <Label htmlFor="taxId" className="text-sm font-semibold mb-2 block">Tax Identification Number <span className="text-[#c13515]">*</span></Label>
                 <Input
                   id="taxId"
                   value={form.taxIdentificationNumber}
@@ -413,33 +413,33 @@ export function CreateOrganizationPage() {
               <input
                 type="checkbox"
                 id="terms"
-                className="mt-1 h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                className="mt-1 h-4 w-4 rounded border-[#dddddd] text-[#ff385c] focus:ring-[#ff385c]"
                 required
               />
               <label htmlFor="terms" className="text-sm">
                 I agree to the{' '}
-                <a href="#" className="text-blue-600 hover:underline">Terms of Service</a>
+                <a href="#" className="text-[#ff385c] hover:underline">Terms of Service</a>
                 {' '}and{' '}
-                <a href="#" className="text-blue-600 hover:underline">Privacy Policy</a>.
+                <a href="#" className="text-[#ff385c] hover:underline">Privacy Policy</a>.
               </label>
             </div>
 
             <Button
               type="submit"
               disabled={createOrg.isPending}
-              className="w-full bg-blue-500 hover:bg-blue-600 text-white py-6 text-base font-medium mt-6"
+              className="w-full bg-[#ff385c] hover:bg-[#e00b41] text-white py-6 text-base font-medium mt-6"
             >
               {createOrg.isPending ? 'Creating…' : 'Create Account'}
             </Button>
           </form>
 
           {/* Footer Links */}
-          <div className="mt-8 pt-6 border-t border-gray-200">
-            <div className="flex justify-center gap-6 text-sm text-gray-600">
+          <div className="mt-8 pt-6 border-t border-[#dddddd]">
+            <div className="flex justify-center gap-6 text-sm text-[#6a6a6a]">
               <a href="#" className="transition-colors">
                 Help Center
               </a>
-              <span className="text-gray-300">|</span>
+              <span className="text-[#dddddd]">|</span>
               <a href="#" className="transition-colors">
                 Contact Support
               </a>

@@ -9,6 +9,9 @@ import { usePendingInvitations } from '@/hooks/use-invitation';
 import { useDebouncedValue, SEARCH_DEBOUNCE_MS } from '@/hooks/use-debounce';
 import { showToast } from '@/lib/toast';
 import { Spinner } from '@/components/ui/spinner';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Pagination } from '@/components/ui/pagination';
 import { AdminModal } from '@/modules/console/components/admin/AdminModal';
 import { InviteEmployeeModal } from '@/modules/console/components/admin/InviteEmployeeModal';
 import { EditEmployeeModal } from '@/modules/console/components/admin/EditEmployeeModal';
@@ -33,11 +36,11 @@ function formatJoinedAt(iso: string) {
 function getStatusColor(status: string) {
   switch (status) {
     case 'Active':
-      return 'bg-green-100 text-green-800';
+      return 'bg-[#e8f9f0] text-[#06c167]';
     case 'Suspended':
-      return 'bg-amber-100 text-amber-800';
+      return 'bg-[#fff8e6] text-[#c97a00]';
     default:
-      return 'bg-gray-100 text-gray-800';
+      return 'bg-[#f7f7f7] text-[#6a6a6a]';
   }
 }
 
@@ -173,8 +176,8 @@ export function EmployeePage() {
   if (!orgId && !isLoading) {
     return (
       <Layout>
-        <div className="p-8 bg-gray-50 min-h-screen">
-          <p className="text-gray-600">No organization found.</p>
+        <div className="p-8 min-h-screen">
+          <p className="text-[#6a6a6a]">No organization found.</p>
         </div>
       </Layout>
     );
@@ -182,29 +185,31 @@ export function EmployeePage() {
 
   return (
     <Layout>
-      <div className="p-8 bg-gray-50 min-h-screen">
+      <div className="p-8 min-h-screen">
+        {/* Page header */}
         <div className="flex items-start justify-between mb-8">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900 mb-2">Employee Management</h1>
-            <p className="text-gray-600">Manage your team members and their account permissions.</p>
+            <h1 className="text-2xl font-semibold text-[#222222] tracking-tight mb-1">Employee Management</h1>
+            <p className="text-[#6a6a6a] text-sm">Manage your team members and their account permissions.</p>
           </div>
-          <button
+          <Button
             onClick={openInvite}
-            className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-1.5 rounded-lg font-semibold text-sm flex items-center gap-2 transition-colors"
+            className="bg-[#ff385c] hover:bg-[#e00b41] active:scale-[0.92] text-white px-5 py-2 rounded-lg font-medium text-sm transition-all"
           >
             <Plus className="w-4 h-4" />
             Invite Employee
-          </button>
+          </Button>
         </div>
 
-        <div className="flex gap-1 border-b border-gray-200 mb-6">
+        {/* Airbnb-style tabs — 2px bottom-border indicator */}
+        <div className="flex gap-1 border-b border-[#dddddd] mb-6">
           <button
             type="button"
             onClick={() => setActiveTab('employee')}
-            className={`px-6 py-3 font-medium text-sm border-b-2 transition-colors -mb-px ${
+            className={`px-5 py-3 font-medium text-sm border-b-2 transition-colors -mb-px ${
               activeTab === 'employee'
-                ? 'border-blue-600 text-blue-600'
-                : 'border-transparent text-gray-600 hover:text-gray-900'
+                ? 'border-[#222222] text-[#222222]'
+                : 'border-transparent text-[#6a6a6a] hover:text-[#222222]'
             }`}
           >
             Employee
@@ -212,15 +217,15 @@ export function EmployeePage() {
           <button
             type="button"
             onClick={() => setActiveTab('invitation')}
-            className={`px-6 py-3 font-medium text-sm border-b-2 transition-colors -mb-px ${
+            className={`px-5 py-3 font-medium text-sm border-b-2 transition-colors -mb-px flex items-center gap-2 ${
               activeTab === 'invitation'
-                ? 'border-blue-600 text-blue-600'
-                : 'border-transparent text-gray-600 hover:text-gray-900'
+                ? 'border-[#222222] text-[#222222]'
+                : 'border-transparent text-[#6a6a6a] hover:text-[#222222]'
             }`}
           >
             Invitation
             {pendingInvitations.length > 0 && (
-              <span className="ml-2 px-2 py-0.5 rounded-full bg-amber-100 text-amber-800 text-xs">
+              <span className="px-2 py-0.5 rounded-full bg-[#fff0f2] text-[#ff385c] text-xs font-medium">
                 {pendingInvitations.length}
               </span>
             )}
@@ -229,14 +234,14 @@ export function EmployeePage() {
 
         {activeTab === 'employee' && (
         <>
-        <div className="mb-6">
-          <div className="flex items-center gap-4">
+        <div className="mb-5">
+          <div className="flex items-center gap-3">
             <div className="flex-1 relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-              <input
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#929292] pointer-events-none" />
+              <Input
                 type="text"
                 placeholder="Search by email"
-                className="w-full pl-9 pr-4 py-1.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="pl-9 border-[#dddddd] bg-white text-[#222222] placeholder:text-[#929292] focus-visible:ring-0 focus-visible:border-[#222222]"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
               />
@@ -244,90 +249,78 @@ export function EmployeePage() {
             <div className="relative">
               <button
                 onClick={() => setShowFilterDropdown(!showFilterDropdown)}
-                className="flex items-center gap-2 px-3 py-1.5 text-sm border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+                className="flex items-center gap-2 px-3 py-2 text-sm border border-[#dddddd] rounded-lg bg-white hover:border-[#222222] transition-colors"
               >
-                <Filter className="w-4 h-4 text-gray-600" />
-                <span className="text-gray-700 font-medium">{statusFilter}</span>
-                <ChevronDown className="w-4 h-4 text-gray-600" />
+                <Filter className="w-4 h-4 text-[#6a6a6a]" />
+                <span className="text-[#222222] font-medium">{statusFilter}</span>
+                <ChevronDown className="w-4 h-4 text-[#6a6a6a]" />
               </button>
               {showFilterDropdown && (
-                <div className="absolute right-0 mt-2 w-48 bg-white border border-gray-300 rounded-lg shadow-lg z-10">
-                  <div className="py-2">
-                    {['All', 'Active', 'Suspended'].map((status) => (
-                      <button
-                        key={status}
-                        onClick={() => {
-                          setStatusFilter(status);
-                          setShowFilterDropdown(false);
-                          setCurrentPage(1);
-                        }}
-                        className={`w-full px-4 py-2 text-left text-sm hover:bg-gray-50 transition-colors ${
-                          statusFilter === status ? 'bg-blue-50 text-blue-600 font-semibold' : 'text-gray-700'
-                        }`}
-                      >
-                        {status}
-                      </button>
-                    ))}
-                  </div>
+                <div className="absolute right-0 mt-1.5 w-44 bg-white border border-[#dddddd] rounded-xl shadow-[0_2px_16px_rgba(0,0,0,0.12)] z-10 py-1.5">
+                  {['All', 'Active', 'Suspended'].map((status) => (
+                    <button
+                      key={status}
+                      onClick={() => {
+                        setStatusFilter(status);
+                        setShowFilterDropdown(false);
+                        setCurrentPage(1);
+                      }}
+                      className={`w-full px-4 py-2 text-left text-sm transition-colors ${
+                        statusFilter === status
+                          ? 'text-[#ff385c] font-semibold bg-[#fff0f2]'
+                          : 'text-[#222222] hover:bg-[#f7f7f7]'
+                      }`}
+                    >
+                      {status}
+                    </button>
+                  ))}
                 </div>
               )}
             </div>
           </div>
         </div>
 
-        <div className="bg-white rounded-xl shadow-sm overflow-hidden">
+        <div className="bg-white rounded-[14px] border border-[#dddddd] overflow-hidden">
           <div className="overflow-x-auto">
-            <table className="w-full text-sm text-black">
-              <thead className="bg-gray-50 border-b border-gray-300">
+            <table className="w-full text-sm">
+              <thead className="bg-[#f7f7f7] border-b border-[#dddddd]">
                 <tr>
-                  <th className="px-6 py-2 text-left text-xs font-semibold text-black uppercase tracking-wider">
-                    Email
-                  </th>
-                  <th className="px-6 py-2 text-left text-xs font-semibold text-black uppercase tracking-wider">
-                    Role
-                  </th>
-                  <th className="px-6 py-2 text-left text-xs font-semibold text-black uppercase tracking-wider">
-                    Status
-                  </th>
-                  <th className="px-6 py-2 text-left text-xs font-semibold text-black uppercase tracking-wider">
-                    Joined
-                  </th>
-                  <th className="px-6 py-2 text-left text-xs font-semibold text-black uppercase tracking-wider">
-                    Actions
-                  </th>
+                  {['Email', 'Role', 'Status', 'Joined', 'Actions'].map((h) => (
+                    <th key={h} className="px-6 py-3 text-left text-xs font-semibold text-[#6a6a6a] uppercase tracking-wider">
+                      {h}
+                    </th>
+                  ))}
                 </tr>
               </thead>
-              <tbody className="divide-y divide-gray-300">
+              <tbody className="divide-y divide-[#f0f0f0]">
                 {isLoading ? (
                   <tr>
-                    <td colSpan={5} className="px-6 py-12 text-center text-black font-normal">
+                    <td colSpan={5} className="px-6 py-12 text-center">
                       <Spinner className="mx-auto" />
                     </td>
                   </tr>
                 ) : (
                   searchFiltered.map((member) => (
-                    <tr key={member.membershipId} className="hover:bg-gray-50 transition-colors">
-                      <td className="px-6 py-4 whitespace-nowrap text-black font-normal">
+                    <tr key={member.membershipId} className="hover:bg-[#f7f7f7] transition-colors">
+                      <td className="px-6 py-4 whitespace-nowrap text-[#222222]">
                         {member.email || '-'}
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-black font-normal">
+                      <td className="px-6 py-4 whitespace-nowrap text-[#6a6a6a]">
                         {ROLE_LABEL[member.role] ?? member.role}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
-                        <span
-                          className={`px-3 py-1 rounded-full text-xs font-normal ${getStatusColor(member.status)}`}
-                        >
+                        <span className={`px-2.5 py-1 rounded-full text-xs font-medium ${getStatusColor(member.status)}`}>
                           {member.status}
                         </span>
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-black font-normal">
+                      <td className="px-6 py-4 whitespace-nowrap text-[#6a6a6a]">
                         {formatJoinedAt(member.joinedAt)}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="flex items-center gap-1">
                           <button
                             onClick={() => handleEditEmployee(member.membershipId)}
-                            className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                            className="p-2 text-[#929292] hover:text-[#ff385c] hover:bg-[#fff0f2] rounded-lg transition-colors"
                             title="Edit"
                           >
                             <Edit className="w-4 h-4" />
@@ -335,7 +328,7 @@ export function EmployeePage() {
                           <button
                             onClick={() => handleDeleteEmployee(member)}
                             disabled={removeMember.isPending}
-                            className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors disabled:opacity-50"
+                            className="p-2 text-[#929292] hover:text-[#c13515] hover:bg-red-50 rounded-lg transition-colors disabled:opacity-40"
                             title="Remove"
                           >
                             <Trash2 className="w-4 h-4" />
@@ -350,27 +343,16 @@ export function EmployeePage() {
           </div>
 
           {!isLoading && totalCount > 0 && totalCount > PAGE_SIZE && (
-            <div className="px-6 py-4 border-t border-gray-300 flex items-center justify-between">
-              <div className="text-sm text-gray-600">
+            <div className="px-6 py-4 border-t border-[#dddddd] flex items-center justify-between">
+              <div className="text-sm text-[#6a6a6a]">
                 Showing {(currentPage - 1) * PAGE_SIZE + 1} to{' '}
                 {Math.min(currentPage * PAGE_SIZE, totalCount)} of {totalCount} results
               </div>
-              <div className="flex items-center gap-2">
-                <button
-                  onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
-                  disabled={currentPage === 1}
-                  className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  Previous
-                </button>
-                <button
-                  onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
-                  disabled={currentPage >= totalPages}
-                  className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  Next
-                </button>
-              </div>
+              <Pagination
+                currentPage={currentPage}
+                totalPages={totalPages}
+                onPageChange={setCurrentPage}
+              />
             </div>
           )}
         </div>
@@ -380,79 +362,69 @@ export function EmployeePage() {
         {activeTab === 'invitation' && (
           <>
             {!pendingLoading && pendingInvitations.length > 0 && (
-              <div className="bg-white rounded-xl shadow-sm p-4 mb-6">
+              <div className="bg-white rounded-[14px] border border-[#dddddd] p-4 mb-5">
                 <div className="relative">
-                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-                  <input
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#929292] pointer-events-none" />
+                  <Input
                     type="text"
                     placeholder="Search by email"
-                    className="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="pl-10 border-[#dddddd] bg-white text-[#222222] placeholder:text-[#929292] focus-visible:ring-0 focus-visible:border-[#222222]"
                     value={invitationSearchTerm}
                     onChange={(e) => setInvitationSearchTerm(e.target.value)}
                   />
                 </div>
               </div>
             )}
-            <div className="bg-white rounded-xl shadow-sm overflow-hidden">
+            <div className="bg-white rounded-[14px] border border-[#dddddd] overflow-hidden">
               {pendingLoading ? (
                 <div className="py-12 flex justify-center">
                   <Spinner className="mx-auto" />
                 </div>
               ) : pendingInvitations.length === 0 ? (
-                <div className="py-14 text-center">
-                  <div className="mx-auto w-16 h-16 rounded-full bg-gray-50 flex items-center justify-center mb-4">
-                    <Mail className="w-10 h-10 text-gray-500" />
+                <div className="py-16 text-center">
+                  <div className="mx-auto w-14 h-14 rounded-full bg-[#f7f7f7] flex items-center justify-center mb-4">
+                    <Mail className="w-7 h-7 text-[#929292]" />
                   </div>
-                  <p className="text-base font-semibold text-gray-900">Manage pending invitations.</p>
-                  <p className="mt-1 text-sm text-gray-600">
+                  <p className="text-sm font-semibold text-[#222222]">No pending invitations</p>
+                  <p className="mt-1 text-sm text-[#6a6a6a]">
                     There are currently no active employee invitations.
                   </p>
                 </div>
               ) : invitationFiltered.length === 0 ? (
-                <div className="py-12 text-center text-gray-500">
+                <div className="py-12 text-center text-[#6a6a6a] text-sm">
                   <p>No invitations match your search.</p>
                 </div>
               ) : (
                 <>
                   <div className="overflow-x-auto">
-                  <table className="w-full">
-                    <thead className="bg-gray-50 border-b border-gray-200">
+                  <table className="w-full text-sm">
+                    <thead className="bg-[#f7f7f7] border-b border-[#dddddd]">
                       <tr>
-                        <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                          Email
-                        </th>
-                        <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                          Role
-                        </th>
-                        <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                          Status
-                        </th>
-                        <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                          Expires
-                        </th>
-                        <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                          Sent
-                        </th>
+                        {['Email', 'Role', 'Status', 'Expires', 'Sent'].map((h) => (
+                          <th key={h} className="px-6 py-3 text-left text-xs font-semibold text-[#6a6a6a] uppercase tracking-wider">
+                            {h}
+                          </th>
+                        ))}
                       </tr>
                     </thead>
-                    <tbody className="divide-y divide-gray-200">
+                    <tbody className="divide-y divide-[#f0f0f0]">
                       {invitationPaged.map((inv) => (
-                        <tr key={inv.id} className="hover:bg-gray-50">
-                          <td className="px-6 py-4 whitespace-nowrap text-gray-900 font-medium">
+                        <tr key={inv.id} className="hover:bg-[#f7f7f7]">
+                          <td className="px-6 py-4 whitespace-nowrap text-[#222222] font-medium">
                             {inv.email}
                           </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-gray-600">
+                          <td className="px-6 py-4 whitespace-nowrap text-[#6a6a6a]">
                             {ROLE_LABEL[inv.role] ?? inv.role}
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap">
-                            <span className="px-3 py-1 rounded-full text-xs font-semibold bg-amber-100 text-amber-800">
+                             <span className="px-2.5 py-1 rounded-full text-xs font-medium bg-[#fff8e6] text-[#c97a00]">
                               {inv.status}
                             </span>
                           </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-gray-600">
+                          <td className="px-6 py-4 whitespace-nowrap text-[#6a6a6a]">
                             {formatJoinedAt(inv.expiredTime)}
                           </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-gray-600">
+                          <td className="px-6 py-4 whitespace-nowrap text-[#6a6a6a]">
                             {formatJoinedAt(inv.createdAt)}
                           </td>
                         </tr>
@@ -461,32 +433,19 @@ export function EmployeePage() {
                   </table>
                 </div>
                 {invitationTotalCount > PAGE_SIZE && (
-                  <div className="px-6 py-4 border-t border-gray-200 flex items-center justify-between">
-                    <div className="text-sm text-gray-600">
-                      Showing {(invitationPage - 1) * PAGE_SIZE + 1} to{' '}
-                      {Math.min(invitationPage * PAGE_SIZE, invitationTotalCount)} of{' '}
-                      {invitationTotalCount} results
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <button
-                        onClick={() => setInvitationPage((p) => Math.max(1, p - 1))}
-                        disabled={invitationPage === 1}
-                        className="px-4 py-2 border border-gray-200 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
-                      >
-                        Previous
-                      </button>
-                      <button
-                        onClick={() =>
-                          setInvitationPage((p) => Math.min(invitationTotalPages, p + 1))
-                        }
-                        disabled={invitationPage >= invitationTotalPages}
-                        className="px-4 py-2 border border-gray-200 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
-                      >
-                        Next
-                      </button>
-                    </div>
-                  </div>
-                )}
+                   <div className="px-6 py-4 border-t border-[#dddddd] flex items-center justify-between">
+                     <div className="text-sm text-[#6a6a6a]">
+                       Showing {(invitationPage - 1) * PAGE_SIZE + 1} to{' '}
+                       {Math.min(invitationPage * PAGE_SIZE, invitationTotalCount)} of{' '}
+                       {invitationTotalCount} results
+                     </div>
+                     <Pagination
+                       currentPage={invitationPage}
+                       totalPages={invitationTotalPages}
+                       onPageChange={setInvitationPage}
+                     />
+                   </div>
+                 )}
                 </>
               )}
             </div>

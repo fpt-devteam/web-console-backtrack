@@ -1,26 +1,17 @@
-import { useState } from 'react'
+import { SidebarProvider, SidebarInset } from '@/components/ui/sidebar'
 import { StaffSidebar } from './sidebar'
 
 interface LayoutProps {
   children: React.ReactNode
-  /** Defaults to true: allow page scroll within main. Set false to lock main scrolling (page can manage its own scroll areas). */
-  mainScroll?: boolean
 }
 
-export function StaffLayout({ children = true }: LayoutProps) {
-  const [sidebarOpen, setSidebarOpen] = useState(true)
-
+export function StaffLayout({ children }: LayoutProps) {
   return (
-    <div className="h-screen overflow-hidden flex flex-col bg-gray-50">
-      <StaffSidebar isOpen={sidebarOpen} onToggle={() => setSidebarOpen(!sidebarOpen)} />
-      <main
-        className={`flex-1 min-h-0 overflow-hidden transition-all duration-300 ${
-          sidebarOpen ? 'ml-64' : 'ml-20'
-        }`}
-      >
+    <SidebarProvider>
+      <StaffSidebar />
+      <SidebarInset className="bg-[#f7f7f7] min-h-screen">
         {children}
-      </main>
-    </div>
+      </SidebarInset>
+    </SidebarProvider>
   )
 }
-

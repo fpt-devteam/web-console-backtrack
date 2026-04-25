@@ -4,6 +4,9 @@
 
 @custom-variant dark (&:is(.dark *));
 
+/* Airbnb-inspired design tokens */
+/* Rausch #ff385c | Ink Black #222222 | Hairline Gray #dddddd | Canvas White #ffffff | Soft Cloud #f7f7f7 */
+
 html,
 body,
 #app {
@@ -17,79 +20,57 @@ code {
 }
 
 :root {
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.141 0.005 285.823);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.141 0.005 285.823);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.141 0.005 285.823);
-  --primary: oklch(0.21 0.006 285.885);
-  --primary-foreground: oklch(0.985 0 0);
-  --secondary: oklch(0.967 0.001 286.375);
-  --secondary-foreground: oklch(0.21 0.006 285.885);
-  --muted: oklch(0.967 0.001 286.375);
-  --muted-foreground: oklch(0.552 0.016 285.938);
-  --accent: oklch(0.967 0.001 286.375);
-  --accent-foreground: oklch(0.21 0.006 285.885);
-  --destructive: oklch(0.577 0.245 27.325);
-  --destructive-foreground: oklch(0.577 0.245 27.325);
-  --border: oklch(0.92 0.004 286.32);
-  --input: oklch(0.92 0.004 286.32);
-  --ring: oklch(0.871 0.006 286.286);
-  --chart-1: oklch(0.646 0.222 41.116);
-  --chart-2: oklch(0.6 0.118 184.704);
-  --chart-3: oklch(0.398 0.07 227.392);
-  --chart-4: oklch(0.828 0.189 84.429);
-  --chart-5: oklch(0.769 0.188 70.08);
-  --radius: 0.625rem;
-  --sidebar: oklch(0.985 0 0);
-  --sidebar-foreground: oklch(0.141 0.005 285.823);
-  --sidebar-primary: oklch(0.21 0.006 285.885);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.967 0.001 286.375);
-  --sidebar-accent-foreground: oklch(0.21 0.006 285.885);
-  --sidebar-border: oklch(0.92 0.004 286.32);
-  --sidebar-ring: oklch(0.871 0.006 286.286);
-}
+  /* Airbnb palette */
+  --airbnb-rausch: #ff385c;
+  --airbnb-rausch-deep: #e00b41;
+  --airbnb-ink: #222222;
+  --airbnb-charcoal: #3f3f3f;
+  --airbnb-ash: #6a6a6a;
+  --airbnb-mute: #929292;
+  --airbnb-stone: #c1c1c1;
+  --airbnb-hairline: #dddddd;
+  --airbnb-cloud: #f7f7f7;
+  --airbnb-canvas: #ffffff;
+  --airbnb-error: #c13515;
 
-.dark {
-  --background: oklch(0.141 0.005 285.823);
-  --foreground: oklch(0.985 0 0);
-  --card: oklch(0.141 0.005 285.823);
-  --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.141 0.005 285.823);
-  --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.985 0 0);
-  --primary-foreground: oklch(0.21 0.006 285.885);
-  --secondary: oklch(0.274 0.006 286.033);
-  --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.274 0.006 286.033);
-  --muted-foreground: oklch(0.705 0.015 286.067);
-  --accent: oklch(0.274 0.006 286.033);
-  --accent-foreground: oklch(0.985 0 0);
-  --destructive: oklch(0.396 0.141 25.723);
-  --destructive-foreground: oklch(0.637 0.237 25.331);
-  --border: oklch(0.274 0.006 286.033);
-  --input: oklch(0.274 0.006 286.033);
-  --ring: oklch(0.442 0.017 285.786);
-  --chart-1: oklch(0.488 0.243 264.376);
-  --chart-2: oklch(0.696 0.17 162.48);
-  --chart-3: oklch(0.769 0.188 70.08);
-  --chart-4: oklch(0.627 0.265 303.9);
-  --chart-5: oklch(0.645 0.246 16.439);
-  --sidebar: oklch(0.21 0.006 285.885);
-  --sidebar-foreground: oklch(0.985 0 0);
-  --sidebar-primary: oklch(0.488 0.243 264.376);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.274 0.006 286.033);
-  --sidebar-accent-foreground: oklch(0.985 0 0);
-  --sidebar-border: oklch(0.274 0.006 286.033);
-  --sidebar-ring: oklch(0.442 0.017 285.786);
+  /* shadcn/ui tokens remapped to Airbnb palette */
+  --background: 0 0% 100%;           /* Canvas White */
+  --foreground: 0 0% 13.3%;          /* Ink Black #222222 */
+  --card: 0 0% 100%;
+  --card-foreground: 0 0% 13.3%;
+  --popover: 0 0% 100%;
+  --popover-foreground: 0 0% 13.3%;
+  --primary: 349 100% 60%;           /* Rausch #ff385c */
+  --primary-foreground: 0 0% 100%;
+  --secondary: 0 0% 96.9%;           /* Soft Cloud #f7f7f7 */
+  --secondary-foreground: 0 0% 13.3%;
+  --muted: 0 0% 96.9%;
+  --muted-foreground: 0 0% 41.6%;    /* Ash Gray #6a6a6a */
+  --accent: 0 0% 96.9%;
+  --accent-foreground: 0 0% 13.3%;
+  --destructive: 15 78% 42%;         /* Error Red #c13515 */
+  --destructive-foreground: 0 0% 100%;
+  --border: 0 0% 86.7%;              /* Hairline Gray #dddddd */
+  --input: 0 0% 86.7%;
+  --ring: 349 100% 60%;              /* Rausch for focus rings */
+  --chart-1: 349 100% 60%;
+  --chart-2: 142 71% 45%;
+  --chart-3: 217 91% 60%;
+  --chart-4: 43 96% 56%;
+  --chart-5: 271 81% 56%;
+  --radius: 0.5rem;                  /* 8px base — Airbnb default button radius */
+  --sidebar: 0 0% 100%;
+  --sidebar-foreground: 0 0% 13.3%;
+  --sidebar-primary: 349 100% 60%;
+  --sidebar-primary-foreground: 0 0% 100%;
+  --sidebar-accent: 0 0% 96.9%;
+  --sidebar-accent-foreground: 0 0% 13.3%;
+  --sidebar-border: 0 0% 86.7%;
+  --sidebar-ring: 349 100% 60%;
 }
 
 @theme inline {
-  --font-sans: 'Inter', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
-    'Segoe UI Symbol';
+  --font-sans: 'Inter', 'Circular', -apple-system, system-ui, 'Roboto', 'Helvetica Neue', sans-serif;
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-card: var(--card);
@@ -114,10 +95,11 @@ code {
   --color-chart-3: var(--chart-3);
   --color-chart-4: var(--chart-4);
   --color-chart-5: var(--chart-5);
-  --radius-sm: calc(var(--radius) - 4px);
-  --radius-md: calc(var(--radius) - 2px);
-  --radius-lg: var(--radius);
-  --radius-xl: calc(var(--radius) + 4px);
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 14px;
+  --radius-xl: 20px;
+  --radius-2xl: 32px;
   --color-sidebar: var(--sidebar);
   --color-sidebar-foreground: var(--sidebar-foreground);
   --color-sidebar-primary: var(--sidebar-primary);
@@ -134,7 +116,43 @@ code {
   }
   body {
     @apply bg-background font-sans text-foreground antialiased;
+    color: var(--airbnb-ink);
+    font-weight: 500; /* Airbnb Cereal — 500 is their "regular" */
   }
+}
+
+/* Airbnb utility classes */
+.airbnb-rausch { color: var(--airbnb-rausch); }
+.airbnb-bg-rausch { background-color: var(--airbnb-rausch); }
+.airbnb-border-hairline { border-color: var(--airbnb-hairline); }
+
+/* Airbnb focus ring — 2px Ink Black */
+.airbnb-focus:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 2px var(--airbnb-ink);
+}
+
+/* Airbnb booking-panel elevation — 3-layer shadow */
+.airbnb-elevation {
+  box-shadow:
+    rgba(0, 0, 0, 0.02) 0 0 0 1px,
+    rgba(0, 0, 0, 0.04) 0 2px 6px 0,
+    rgba(0, 0, 0, 0.1) 0 4px 8px 0;
+}
+
+/* Active pressed scale */
+.airbnb-press:active {
+  transform: scale(0.92);
+}
+
+/* Hide scrollbars (keep scroll interaction) */
+.scrollbar-none {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.scrollbar-none::-webkit-scrollbar {
+  width: 0;
+  height: 0;
 }
 
 /* Hide scrollbars (keep scroll interaction) */
@@ -145,4 +163,15 @@ code {
 .scrollbar-none::-webkit-scrollbar {
   width: 0;
   height: 0;
+}
+
+.dark {
+  --sidebar: hsl(240 5.9% 10%);
+  --sidebar-foreground: hsl(240 4.8% 95.9%);
+  --sidebar-primary: hsl(224.3 76.3% 48%);
+  --sidebar-primary-foreground: hsl(0 0% 100%);
+  --sidebar-accent: hsl(240 3.7% 15.9%);
+  --sidebar-accent-foreground: hsl(240 4.8% 95.9%);
+  --sidebar-border: hsl(240 3.7% 15.9%);
+  --sidebar-ring: hsl(217.2 91.2% 59.8%);
 }

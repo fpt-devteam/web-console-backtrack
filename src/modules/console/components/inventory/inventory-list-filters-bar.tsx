@@ -68,11 +68,11 @@ export function InventoryListFiltersBar({
         max={toDate || undefined}
         className={
           layout === 'oneRow'
-            ? 'w-[140px] rounded-md border border-gray-300 bg-white px-2 py-1 text-gray-900 focus:outline-none focus:ring-1 focus:ring-blue-500'
-            : 'w-full rounded-md border border-gray-300 bg-white px-3 py-1.5 text-gray-900 focus:outline-none focus:ring-1 focus:ring-blue-500'
+            ? 'w-[140px] rounded-md border border-[#dddddd] bg-white px-2 py-1 text-[#222222] focus:outline-none focus:border-[#222222]'
+            : 'w-full rounded-md border border-[#dddddd] bg-white px-3 py-1.5 text-[#222222] focus:outline-none focus:border-[#222222]'
         }
       />
-      <span className="text-gray-400 px-1">to</span>
+      <span className="text-[#929292] px-1">to</span>
       <input
         type="date"
         lang="vi-VN"
@@ -81,8 +81,8 @@ export function InventoryListFiltersBar({
         min={fromDate || undefined}
         className={
           layout === 'oneRow'
-            ? 'w-[140px] rounded-md border border-gray-300 bg-white px-2 py-1 text-gray-900 focus:outline-none focus:ring-1 focus:ring-blue-500'
-            : 'w-full rounded-md border border-gray-300 bg-white px-3 py-1.5 text-gray-900 focus:outline-none focus:ring-1 focus:ring-blue-500'
+            ? 'w-[140px] rounded-md border border-[#dddddd] bg-white px-2 py-1 text-[#222222] focus:outline-none focus:border-[#222222]'
+            : 'w-full rounded-md border border-[#dddddd] bg-white px-3 py-1.5 text-[#222222] focus:outline-none focus:border-[#222222]'
         }
       />
     </div>
@@ -96,14 +96,14 @@ export function InventoryListFiltersBar({
           : `w-full ${categoryWidth} flex items-center gap-2`
       }
     >
-      <span className="text-black font-medium whitespace-nowrap">Category</span>
+      <span className="text-[#222222] font-medium whitespace-nowrap">Category</span>
       <select
         value={categoryFilter}
         onChange={(e) => onCategoryChange(e.target.value as CategoryFilter)}
         className={
           layout === 'oneRow'
-            ? 'w-[160px] pl-2 pr-6 py-1 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500 bg-white text-gray-900 text-ellipsis'
-            : 'w-full pl-2 pr-6 py-1.5 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500 bg-white text-gray-900 text-ellipsis'
+            ? 'w-[160px] pl-2 pr-6 py-1 border border-[#dddddd] rounded-md focus:outline-none focus:border-[#222222] bg-white text-[#222222] text-ellipsis'
+            : 'w-full pl-2 pr-6 py-1.5 border border-[#dddddd] rounded-md focus:outline-none focus:border-[#222222] bg-white text-[#222222] text-ellipsis'
         }
       >
         <option value="All">All</option>
@@ -123,14 +123,14 @@ export function InventoryListFiltersBar({
           : 'w-full md:w-1/4 flex items-center gap-2'
       }
     >
-      <span className="text-black font-medium whitespace-nowrap">Author</span>
+      <span className="text-[#222222] font-medium whitespace-nowrap">Author</span>
       <select
         value={authorValue ?? ''}
         onChange={(e) => onAuthorChange?.(e.target.value)}
         className={
           layout === 'oneRow'
-            ? 'w-[180px] pl-2 pr-6 py-1 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500 text-gray-900 bg-white text-ellipsis'
-            : 'w-full pl-2 pr-6 py-1.5 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500 text-gray-900 bg-white text-ellipsis'
+            ? 'w-[180px] pl-2 pr-6 py-1 border border-[#dddddd] rounded-md focus:outline-none focus:border-[#222222] text-[#222222] bg-white text-ellipsis'
+            : 'w-full pl-2 pr-6 py-1.5 border border-[#dddddd] rounded-md focus:outline-none focus:border-[#222222] text-[#222222] bg-white text-ellipsis'
         }
       >
         <option value="">All</option>
@@ -148,12 +148,12 @@ export function InventoryListFiltersBar({
       {layout === 'oneRow' ? (
         <div className="flex items-center gap-5 flex-nowrap">
           <div className="relative flex-1 min-w-0">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#929292]" />
             <input
               value={searchTerm}
               onChange={(e) => onSearchTermChange(e.target.value)}
               placeholder="Search by name/details..."
-              className="w-full bg-white pl-9 pr-3 py-1 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500 text-gray-900"
+              className="w-full bg-white pl-9 pr-3 py-1 border border-[#dddddd] rounded-md focus:outline-none focus:border-[#222222] text-[#222222]"
             />
           </div>
 
@@ -165,7 +165,7 @@ export function InventoryListFiltersBar({
             <button
               type="button"
               onClick={onClear}
-              className="shrink-0 text-red-600 font-medium transition-all hover:scale-[1.03] hover:drop-shadow-sm"
+              className="shrink-0 text-[#c13515] font-medium transition-all hover:scale-[1.03] hover:drop-shadow-sm"
             >
               Clear
             </button>
@@ -176,12 +176,12 @@ export function InventoryListFiltersBar({
       ) : (
         <div className="flex items-center gap-4">
           <div className="relative w-full md:w-2/3">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#929292]" />
             <input
               value={searchTerm}
               onChange={(e) => onSearchTermChange(e.target.value)}
               placeholder="Search by name/details..."
-              className="w-full bg-white pl-9 pr-3 py-1.5 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500 text-gray-900"
+              className="w-full bg-white pl-9 pr-3 py-1.5 border border-[#dddddd] rounded-md focus:outline-none focus:border-[#222222] text-[#222222]"
             />
           </div>
 
@@ -189,7 +189,7 @@ export function InventoryListFiltersBar({
             <button
               type="button"
               onClick={onClear}
-              className="text-red-600 font-medium transition-all hover:scale-[1.03] hover:drop-shadow-sm"
+              className="text-[#c13515] font-medium transition-all hover:scale-[1.03] hover:drop-shadow-sm"
             >
               Clear
             </button>
@@ -208,11 +208,11 @@ export function InventoryListFiltersBar({
 
         {showStatusFilter ? (
           <div className={`w-full ${categoryWidth} flex items-center gap-2`}>
-            <span className="text-black font-medium whitespace-nowrap">Status</span>
+            <span className="text-[#222222] font-medium whitespace-nowrap">Status</span>
             <select
               value={statusFilter}
               onChange={(e) => onStatusChange(e.target.value as StatusFilter)}
-              className="w-full pl-2 pr-6 py-1.5 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500 bg-white text-gray-900 text-ellipsis"
+              className="w-full pl-2 pr-6 py-1.5 border border-[#dddddd] rounded-md focus:outline-none focus:border-[#222222] bg-white text-[#222222] text-ellipsis"
             >
               <option value="All">All</option>
               <option value="Active">Active</option>

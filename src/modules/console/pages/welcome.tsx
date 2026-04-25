@@ -22,58 +22,62 @@ export function WelcomePage() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-[#E5F4FF] to-white flex items-center justify-center">
+      <div className="min-h-screen bg-[#f7f7f7] flex items-center justify-center">
         <Spinner />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-[#E5F4FF] to-white flex items-center justify-center px-4 py-12">
-      <div className="w-full max-w-2xl">
-        <div className="bg-white rounded-xl shadow-lg p-12">
+    // Airbnb welcome: white canvas, max-width centered, zero decoration
+    <div className="min-h-screen bg-[#f7f7f7] flex items-center justify-center px-4 py-12">
+      <div className="w-full max-w-md">
+        {/* Card: white, 14px radius, 1px Hairline Gray border */}
+        <div className="bg-white rounded-[14px] border border-[#dddddd] p-10">
+          {/* Header */}
           <div className="text-center mb-8">
-            <h1 className="text-4xl font-bold mb-3">
+            <h1 className="text-2xl font-semibold text-[#222222] tracking-tight mb-2">
               Welcome back, {user?.name || 'User'}
             </h1>
-            <p className="text-base text-gray-600">
+            <p className="text-sm text-[#6a6a6a]">
               Select an organization to continue or create a new one.
             </p>
           </div>
 
-          <div className="mt-10">
-            <h2 className="text-xs font-semibold uppercase tracking-wide mb-4">
-              YOUR ORGANIZATIONS
-            </h2>
+          {/* Org list */}
+          <div>
+            <p className="text-xs font-semibold text-[#6a6a6a] uppercase tracking-wider mb-3">
+              Your Organizations
+            </p>
 
             {orgs.length === 0 ? (
-              <p className="text-sm text-gray-500 py-4">
-                You don&apos;t have any organization yet. Create one to get started.
+              <p className="text-sm text-[#6a6a6a] py-4">
+                You don't have any organization yet. Create one to get started.
               </p>
             ) : (
-              <div className="space-y-3">
+              <div className="space-y-2">
                 {orgs.map((org) => (
                   <button
                     key={org.orgId}
                     type="button"
                     onClick={() => handleOrganizationClick(org)}
-                    className="w-full bg-white border border-gray-200 rounded-lg p-5 hover:border-gray-300 shadow-md hover:shadow-lg transition-all group text-left"
+                    className="w-full bg-white border border-[#dddddd] rounded-xl p-4 hover:border-[#222222] active:scale-[0.98] transition-all group text-left"
                   >
                     <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-4">
+                      <div className="flex items-center gap-3">
                         <OrgLogo
                           logoUrl={org.logoUrl}
                           alt={org.name}
-                          className="h-12 w-12"
-                          iconClassName="h-7 w-7"
+                          className="h-10 w-10"
+                          iconClassName="h-5 w-5"
                           rounded="lg"
                         />
                         <div>
-                          <h3 className="text-base font-semibold mb-0.5">{org.name}</h3>
-                          <p className="text-sm text-gray-500">{org.slug}.backtrack.com</p>
+                          <h3 className="text-sm font-semibold text-[#222222] leading-tight">{org.name}</h3>
+                          <p className="text-xs text-[#6a6a6a] mt-0.5">{org.slug}.backtrack.com</p>
                         </div>
                       </div>
-                      <ChevronRight className="w-5 h-5 text-gray-400 group-hover:text-gray-600 shrink-0" />
+                      <ChevronRight className="w-4 h-4 text-[#929292] group-hover:text-[#222222] transition-colors shrink-0" />
                     </div>
                   </button>
                 ))}
@@ -81,27 +85,22 @@ export function WelcomePage() {
             )}
           </div>
 
-          {/* Create New Organization Button */}
+          {/* Create New Organization — Rausch primary CTA */}
           <div className="mt-6">
             <Link
               to="/console/create-organization"
-              className="w-full bg-blue-500 hover:bg-blue-600 text-white py-2 text-base font-medium transition-all rounded-md flex items-center justify-center"
+              className="w-full bg-[#ff385c] hover:bg-[#e00b41] active:scale-[0.97] text-white py-3 text-sm font-medium transition-all rounded-lg flex items-center justify-center gap-2"
             >
-              <span className="flex items-center gap-2">
-                <span className="text-xl">+</span>
-                Create New Organization
-              </span>
+              <span className="text-base leading-none">+</span>
+              Create New Organization
             </Link>
           </div>
 
-          {/* Support Link */}
-          <div className="mt-8 text-center">
-            <p className="text-sm text-gray-600">
+          {/* Support link */}
+          <div className="mt-6 text-center">
+            <p className="text-xs text-[#6a6a6a]">
               Need help finding your workspace?{' '}
-              <a
-                href="#"
-                className="text-blue-600 hover:text-blue-700 font-medium hover:underline"
-              >
+              <a href="#" className="text-[#222222] font-medium underline hover:text-[#ff385c] transition-colors">
                 Contact Support
               </a>
             </p>
@@ -111,4 +110,3 @@ export function WelcomePage() {
     </div>
   );
 }
-

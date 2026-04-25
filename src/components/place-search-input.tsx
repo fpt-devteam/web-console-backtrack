@@ -117,7 +117,7 @@ export function PlaceSearchInput({
   return (
     <div ref={wrapperRef} className={`relative ${className}`}>
       <div className="relative">
-        <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
+        <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#929292] pointer-events-none" />
         <Input
           id={id}
           type="text"
@@ -134,12 +134,12 @@ export function PlaceSearchInput({
           className="pl-10 pr-10"
         />
         {isSearching && (
-          <Loader2 className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 animate-spin pointer-events-none" />
+          <Loader2 className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#929292] animate-spin pointer-events-none" />
         )}
       </div>
       {isOpen && results.length > 0 && (
         <ul
-          className="absolute z-50 w-full mt-1 py-1 bg-white border border-gray-200 rounded-lg shadow-lg max-h-60 overflow-auto"
+          className="absolute z-50 w-full mt-1 py-1 bg-white border border-[#dddddd] rounded-lg shadow-lg max-h-60 overflow-auto"
           role="listbox"
         >
           {results.map((place, index) => (
@@ -148,7 +148,7 @@ export function PlaceSearchInput({
               role="option"
               aria-selected={index === selectedIndex}
               className={`px-3 py-2 text-sm cursor-pointer truncate ${
-                index === selectedIndex ? 'bg-blue-50 text-blue-900' : 'hover:bg-gray-50'
+                index === selectedIndex ? 'bg-[#fff0f2] text-[#ff385c]' : 'hover:bg-[#f7f7f7]'
               }`}
               onMouseEnter={() => setSelectedIndex(index)}
               onClick={() => handleSelect(place)}
@@ -158,7 +158,7 @@ export function PlaceSearchInput({
           ))}
         </ul>
       )}
-      <p className="text-xs text-gray-500 mt-1">Powered by OpenStreetMap Nominatim. Select a result to get coordinates.</p>
+      <p className="text-xs text-[#929292] mt-1">Powered by OpenStreetMap Nominatim. Select a result to get coordinates.</p>
     </div>
   )
 }

@@ -46,8 +46,8 @@ export function Step2Finder({
   return (
     <div className="space-y-4 mt-6">
       <div>
-        <div className="text-xl font-bold text-slate-950">Finder information</div>
-        <div className="text-xs text-slate-800 mt-1">
+        <div className="text-xl font-bold text-[#222222]">Finder information</div>
+        <div className="text-xs text-[#6a6a6a] mt-1">
           Full name is required.{' '}
           {required
             ? `Required by this organization: ${required.map(requiredLabel).join(', ')}.`
@@ -55,14 +55,14 @@ export function Step2Finder({
         </div>
       </div>
 
-      <div className="rounded-xl border border-slate-200 overflow-hidden">
+      <div className="rounded-[14px] border border-[#dddddd] overflow-hidden">
         <div className="p-5 space-y-6">
           <div>
-            <div className="text-sm text-slate-900">Finder — who found or turned in the item</div>
+            <div className="text-sm text-[#222222]">Finder — who found or turned in the item</div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-3">
               <div className="md:col-span-2">
-                <Label className="text-sm font-semibold text-slate-950">
-                  Full name <span className="text-red-600">*</span>
+                <Label className="text-sm font-semibold text-[#222222]">
+                  Full name <span className="text-[#c13515]">*</span>
                 </Label>
                 <Input
                   value={finder.fullName}
@@ -72,8 +72,8 @@ export function Step2Finder({
               </div>
 
               <div>
-                <Label className="text-sm font-semibold text-slate-950">
-                  Email {isRequired('Email') ? <span className="text-red-600">*</span> : null}
+                <Label className="text-sm font-semibold text-[#222222]">
+                  Email {isRequired('Email') ? <span className="text-[#c13515]">*</span> : null}
                 </Label>
                 <Input
                   value={finder.email}
@@ -83,8 +83,8 @@ export function Step2Finder({
               </div>
 
               <div>
-                <Label className="text-sm font-semibold text-slate-950">
-                  Phone {isRequired('Phone') ? <span className="text-red-600">*</span> : null}
+                <Label className="text-sm font-semibold text-[#222222]">
+                  Phone {isRequired('Phone') ? <span className="text-[#c13515]">*</span> : null}
                 </Label>
                 <Input
                   value={finder.phone}
@@ -94,8 +94,8 @@ export function Step2Finder({
               </div>
 
               <div>
-                <Label className="text-sm font-semibold text-slate-950">
-                  National ID {isRequired('NationalId') ? <span className="text-red-600">*</span> : null}
+                <Label className="text-sm font-semibold text-[#222222]">
+                  National ID {isRequired('NationalId') ? <span className="text-[#c13515]">*</span> : null}
                 </Label>
                 <Input
                   value={finder.nationalId}
@@ -105,8 +105,8 @@ export function Step2Finder({
               </div>
 
               <div>
-                <Label className="text-sm font-semibold text-slate-950">
-                  Student / staff ID {isRequired('OrgMemberId') ? <span className="text-red-600">*</span> : null}
+                <Label className="text-sm font-semibold text-[#222222]">
+                  Student / staff ID {isRequired('OrgMemberId') ? <span className="text-[#c13515]">*</span> : null}
                 </Label>
                 <Input
                   value={finder.orgMemberId}
@@ -119,11 +119,11 @@ export function Step2Finder({
         </div>
       </div>
 
-      <div className="flex items-center justify-between gap-3 pt-4 border-t border-slate-100">
+      <div className="flex items-center justify-between gap-3 pt-4 border-t border-[#ebebeb]">
         <Button
           type="button"
           aria-label="Back"
-          className="mb-2 h-8 w-8 rounded-full bg-slate-950 text-white hover:bg-slate-800"
+          className="mb-2 h-8 w-8 rounded-full bg-[#222222] text-white hover:bg-[#444444]"
           onClick={onBack}
         >
           <ChevronLeft className="h-5 w-5 mx-auto" />
@@ -131,7 +131,7 @@ export function Step2Finder({
         <Button
           type="button"
           aria-label="Next"
-          className="mb-2 h-8 w-8 rounded-full bg-slate-950 text-white hover:bg-slate-800"
+          className="mb-2 h-8 w-8 rounded-full bg-[#222222] text-white hover:bg-[#444444]"
           onClick={onNext}
         >
           <ChevronRight className="h-5 w-5 mx-auto" />

@@ -1,4 +1,4 @@
-export { Sidebar } from './sidebar';
+export { SuperAdminSidebar } from './sidebar';
 export { Layout } from './layout';
 export { Sparkline } from './sparkline';
 export { RadialRing } from './radial-ring';

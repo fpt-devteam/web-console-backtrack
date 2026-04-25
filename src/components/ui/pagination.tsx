@@ -18,22 +18,17 @@ export function Pagination({
     const showEllipsis = totalPages > 7
 
     if (!showEllipsis) {
-      // Show all pages if total is 7 or less
       for (let i = 1; i <= totalPages; i++) {
         pages.push(i)
       }
     } else {
-      // Always show first page
       pages.push(1)
 
       if (currentPage <= 3) {
-        // Near start
         pages.push(2, 3, 4, '...', totalPages)
       } else if (currentPage >= totalPages - 2) {
-        // Near end
         pages.push('...', totalPages - 3, totalPages - 2, totalPages - 1, totalPages)
       } else {
-        // Middle
         pages.push('...', currentPage - 1, currentPage, currentPage + 1, '...', totalPages)
       }
     }
@@ -43,16 +38,15 @@ export function Pagination({
 
   return (
     <div className="flex items-center justify-center px-4 py-3">
-      {/* Page numbers */}
       <div className="flex items-center gap-1">
-        {/* Previous button */}
+        {/* Previous */}
         <button
           onClick={() => onPageChange(currentPage - 1)}
           disabled={currentPage === 1}
-          className="p-2 rounded-lg hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+          className="p-2 rounded-lg text-[#222222] hover:bg-[#f7f7f7] disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
           aria-label="Previous page"
         >
-          <ChevronLeft className="w-5 h-5 text-black" />
+          <ChevronLeft className="w-4 h-4" />
         </button>
 
         {/* Page numbers */}
@@ -61,9 +55,9 @@ export function Pagination({
             return (
               <span
                 key={`ellipsis-${index}`}
-                className="px-3 py-2 text-black"
+                className="px-3 py-2 text-sm text-[#929292]"
               >
-                ...
+                …
               </span>
             )
           }
@@ -75,10 +69,10 @@ export function Pagination({
             <button
               key={pageNum}
               onClick={() => onPageChange(pageNum)}
-              className={`min-w-[40px] px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+              className={`min-w-[36px] px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
                 isActive
-                  ? 'bg-blue-600 text-white'
-                  : 'text-black hover:bg-gray-100'
+                  ? 'bg-[#222222] text-white'
+                  : 'text-[#222222] hover:bg-[#f7f7f7]'
               }`}
             >
               {pageNum}
@@ -86,14 +80,14 @@ export function Pagination({
           )
         })}
 
-        {/* Next button */}
+        {/* Next */}
         <button
           onClick={() => onPageChange(currentPage + 1)}
           disabled={currentPage === totalPages}
-          className="p-2 rounded-lg hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+          className="p-2 rounded-lg text-[#222222] hover:bg-[#f7f7f7] disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
           aria-label="Next page"
         >
-          <ChevronRight className="w-5 h-5 text-black" />
+          <ChevronRight className="w-4 h-4" />
         </button>
       </div>
     </div>

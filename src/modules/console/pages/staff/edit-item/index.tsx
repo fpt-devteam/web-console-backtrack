@@ -336,7 +336,7 @@ export function EditItemPage() {
     return (
       <StaffLayout>
         <div className="p-8 flex justify-center">
-          <Loader2 className="animate-spin w-8 h-8 text-gray-500" />
+          <Loader2 className="animate-spin w-8 h-8 text-[#929292]" />
         </div>
       </StaffLayout>
     )
@@ -346,27 +346,27 @@ export function EditItemPage() {
     <StaffLayout>
       <div className="p-4 sm:p-6 lg:p-8">
         <div className="max-w-5xl xl:max-w-6xl 2xl:max-w-7xl mx-auto">
-          <div className="mb-6 flex items-center gap-2 text-sm text-gray-600">
-            <Link to="/console/$slug/staff/inventory" params={{ slug }} className="hover:text-gray-900 transition-colors">
+          <div className="mb-6 flex items-center gap-2 text-sm text-[#6a6a6a]">
+            <Link to="/console/$slug/staff/inventory" params={{ slug }} className="hover:text-[#222222] transition-colors">
               Inventory
             </Link>
             <ChevronRight className="w-4 h-4" />
-            <Link to="/console/$slug/staff/item/$itemId" params={{ slug, itemId }} className="hover:text-gray-900 transition-colors">
+            <Link to="/console/$slug/staff/item/$itemId" params={{ slug, itemId }} className="hover:text-[#222222] transition-colors">
               {item?.postTitle || 'Item Detail'}
             </Link>
             <ChevronRight className="w-4 h-4" />
-            <span className="text-gray-900 font-medium">Edit Item</span>
+            <span className="text-[#222222] font-medium">Edit Item</span>
           </div>
 
           <div className="mb-6">
-            <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">{item?.postTitle ?? '—'}</h1>
+            <h1 className="text-2xl sm:text-3xl font-bold text-[#222222]">{item?.postTitle ?? '—'}</h1>
           </div>
 
-          <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-4 sm:p-6 lg:p-8 space-y-6 lg:space-y-8">
-            {submitError ? <div className="p-3 rounded-md bg-red-50 text-red-700 text-sm">{submitError}</div> : null}
+          <div className="bg-white rounded-[14px] border border-[#dddddd] p-4 sm:p-6 lg:p-8 space-y-6 lg:space-y-8">
+            {submitError ? <div className="p-3 rounded-md bg-[#fff0f2] text-[#c13515] text-sm">{submitError}</div> : null}
 
             {analysisWarnings && analysisWarnings.length > 0 ? (
-              <div className="p-3 rounded-md bg-amber-50 text-amber-800 text-sm">
+              <div className="p-3 rounded-md bg-[#fff8e6] text-[#c97a00] text-sm">
                 <div className="font-semibold mb-1">AI warnings</div>
                 <ul className="list-disc pl-5 space-y-1">
                   {analysisWarnings.map((w, idx) => (
@@ -398,7 +398,7 @@ export function EditItemPage() {
                   <select
                     value={status}
                     onChange={(e) => setStatus(e.target.value as PostStatus)}
-                    className="mt-1 w-full px-3 py-2 border border-slate-200 rounded-lg bg-white text-sm"
+                    className="mt-1 w-full px-3 py-2 border border-[#dddddd] rounded-lg bg-white text-sm"
                   >
                     {/* Only allow changing status to Archived */}
                     <option value={status}>
@@ -411,11 +411,11 @@ export function EditItemPage() {
                 </div>
                 <div>
                   <Label className="text-sm font-semibold">Category</Label>
-                  <Input value={item?.category ?? ''} readOnly className="mt-1 bg-slate-50" />
+                  <Input value={item?.category ?? ''} readOnly className="mt-1 bg-[#f7f7f7]" />
                 </div>
                 <div>
                   <Label className="text-sm font-semibold">Subcategory</Label>
-                  <Input value={subcategory?.name || item?.subcategoryId || ''} readOnly className="mt-1 bg-slate-50" />
+                  <Input value={subcategory?.name || item?.subcategoryId || ''} readOnly className="mt-1 bg-[#f7f7f7]" />
                 </div>
                 <div>
                   <Label className="text-sm font-semibold">Found time</Label>
@@ -423,11 +423,11 @@ export function EditItemPage() {
                 </div>
                 <div>
                   <Label className="text-sm font-semibold">Created at</Label>
-                  <Input value={item?.createdAt ? new Date(item.createdAt).toLocaleString() : '—'} readOnly className="mt-1 bg-slate-50" />
+                  <Input value={item?.createdAt ? new Date(item.createdAt).toLocaleString() : '—'} readOnly className="mt-1 bg-[#f7f7f7]" />
                 </div>
                 <div className="md:col-span-2">
                   <Label className="text-sm font-semibold">Internal location</Label>
-                  <Input value={internalLocation} readOnly className="mt-1 bg-slate-50" />
+                  <Input value={internalLocation} readOnly className="mt-1 bg-[#f7f7f7]" />
                 </div>
               </div>
             </section>
@@ -436,7 +436,7 @@ export function EditItemPage() {
               {category !== 'Others' ? (
                 <div>
                   <Label className="text-sm font-semibold">
-                    Item name <span className="text-red-500">*</span>
+                     Item name <span className="text-[#c13515]">*</span>
                   </Label>
                   <Input value={detailItemName} onChange={(e) => setDetailItemName(e.target.value)} className="mt-1" />
                 </div>
@@ -444,7 +444,7 @@ export function EditItemPage() {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
                     <Label className="text-sm font-semibold">
-                      Item identifier <span className="text-red-500">*</span>
+                      Item identifier <span className="text-[#c13515]">*</span>
                     </Label>
                     <Input value={otherIdentifier} onChange={(e) => setOtherIdentifier(e.target.value)} className="mt-1" />
                   </div>
@@ -508,7 +508,7 @@ export function EditItemPage() {
                       type="checkbox"
                       checked={hasCase}
                       onChange={(e) => setHasCase(e.target.checked)}
-                      className="h-4 w-4 rounded border-slate-300"
+                      className="h-4 w-4 rounded border-[#dddddd]"
                     />
                     <Label htmlFor="hasCaseEdit" className="text-sm font-semibold cursor-pointer">
                       Has case / accessories
@@ -567,7 +567,7 @@ export function EditItemPage() {
             </section>
 
             <div className="pt-2 flex justify-end">
-              <Button onClick={handleSave} disabled={updateItem.isPending || !item} className="bg-slate-900 text-white hover:bg-slate-800">
+              <Button onClick={handleSave} disabled={updateItem.isPending || !item} className="bg-[#222222] text-white hover:bg-[#444444]">
                 {updateItem.isPending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
                 Save
               </Button>

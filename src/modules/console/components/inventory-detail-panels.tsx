@@ -8,7 +8,7 @@ type TableRow =
   | { kind: 'field'; label: string; value: ReactNode }
 
 function Mono({ children }: { children: ReactNode }) {
-  return <span className="font-mono text-gray-900 tabular-nums">{children}</span>
+  return <span className="font-mono text-[#222222] tabular-nums">{children}</span>
 }
 
 function TableBody({ rows }: { rows: TableRow[] }) {
@@ -17,18 +17,18 @@ function TableBody({ rows }: { rows: TableRow[] }) {
       {rows.map((row, i) => {
         if (row.kind === 'section') {
           return (
-            <tr key={`s-${i}-${row.title}`} className="bg-slate-50/95 border-y border-slate-100">
+            <tr key={`s-${i}-${row.title}`} className="bg-[#f7f7f7] border-y border-[#ebebeb]">
               <td colSpan={2} className="py-2.5 px-4">
-                <div className="text-xs font-bold uppercase tracking-wide text-gray-900">{row.title}</div>
-                {row.hint ? <div className="text-[11px] text-gray-700 mt-0.5">{row.hint}</div> : null}
+                <div className="text-xs font-bold uppercase tracking-wide text-[#222222]">{row.title}</div>
+                {row.hint ? <div className="text-[11px] text-[#6a6a6a] mt-0.5">{row.hint}</div> : null}
               </td>
             </tr>
           )
         }
         return (
-          <tr key={`f-${i}-${row.label}`} className="border-b border-gray-100 last:border-0">
-            <td className="py-3 px-4 text-gray-700 align-top w-[40%]">{row.label}</td>
-            <td className="py-3 px-4 text-gray-900 align-top">{row.value}</td>
+          <tr key={`f-${i}-${row.label}`} className="border-b border-[#ebebeb] last:border-0">
+            <td className="py-3 px-4 text-[#6a6a6a] align-top w-[40%]">{row.label}</td>
+            <td className="py-3 px-4 text-[#222222] align-top">{row.value}</td>
           </tr>
         )
       })}
@@ -68,9 +68,9 @@ export function InventoryDetailPanels({ item }: { item: InventoryItem }) {
       label: 'Author',
       value: item.author?.displayName ? (
         <span className="inline-flex items-center gap-2">
-          <User className="w-4 h-4 text-gray-700 shrink-0" />
+          <User className="w-4 h-4 text-[#6a6a6a] shrink-0" />
           <span className="font-medium">{item.author.displayName}</span>
-          <span className="text-gray-600">(<Mono>{item.author.id}</Mono>)</span>
+          <span className="text-[#929292]">(<Mono>{item.author.id}</Mono>)</span>
         </span>
       ) : item.author?.id ? (
         <Mono>{item.author.id}</Mono>
@@ -83,9 +83,9 @@ export function InventoryDetailPanels({ item }: { item: InventoryItem }) {
       label: 'Organization',
       value: item.organization?.name ? (
         <span className="inline-flex items-center gap-2">
-          <Package className="w-4 h-4 text-gray-700 shrink-0" />
+          <Package className="w-4 h-4 text-[#6a6a6a] shrink-0" />
           <span className="font-medium">{item.organization.name}</span>
-          {item.organization.id ? <span className="text-gray-600">(<Mono>{item.organization.id}</Mono>)</span> : null}
+          {item.organization.id ? <span className="text-[#929292]">(<Mono>{item.organization.id}</Mono>)</span> : null}
         </span>
       ) : (
         '_'
@@ -97,11 +97,11 @@ export function InventoryDetailPanels({ item }: { item: InventoryItem }) {
 
   return (
     <div className="mt-8 w-full">
-      <section className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden min-w-0">
-        <div className="px-4 sm:px-5 py-3 border-b border-blue-100 bg-blue-100">
-          <div className="text-gray-900">
+      <section className="bg-white rounded-[14px] border border-[#dddddd] overflow-hidden min-w-0">
+        <div className="px-4 sm:px-5 py-3 border-b border-[#ebebeb] bg-[#f7f7f7]">
+          <div className="text-[#222222]">
             <h2 className="text-base font-semibold">Record details</h2>
-            <p className="text-xs text-gray-800 mt-0.5">This view reflects the current backend fields for inventory.</p>
+            <p className="text-xs text-[#929292] mt-0.5">This view reflects the current backend fields for inventory.</p>
           </div>
         </div>
         <div className="overflow-x-auto">
@@ -113,4 +113,3 @@ export function InventoryDetailPanels({ item }: { item: InventoryItem }) {
     </div>
   )
 }
-

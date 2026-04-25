@@ -33,11 +33,10 @@ export function CheckEmail() {
     try {
       await authService.sendVerificationEmail();
       showToast.success('Verification email sent!');
-      
-      // Set cooldown 60 seconds
+
       setCanResend(false);
       setCountdown(60);
-      
+
       const timer = setInterval(() => {
         setCountdown(prev => {
           if (prev <= 1) {
@@ -60,7 +59,6 @@ export function CheckEmail() {
     router.navigate({ to: '/auth/signin' });
   };
 
-  // Mask email for privacy
   const maskEmail = (email: string): string => {
     const [name, domain] = email.split('@');
     if (name.length <= 2) {
@@ -70,37 +68,33 @@ export function CheckEmail() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-[#E5F4FF] to-white flex items-center justify-center px-4 py-12">
+    <div className="min-h-screen bg-[#f7f7f7] flex items-center justify-center px-4 py-12">
       <div className="w-full max-w-xl">
-        {/* Card */}
-        <div className="bg-white rounded-xl shadow-lg p-8 text-center">
+        <div className="bg-white rounded-[14px] border border-[#dddddd] p-8 text-center">
           {/* Icon */}
           <div className="flex justify-center mb-6">
-            <div className="w-16 h-16 bg-[#E5F4FF] rounded-full flex items-center justify-center">
-              <Mail className="w-8 h-8 text-blue-500" />
+            <div className="w-16 h-16 bg-[#fff0f2] rounded-full flex items-center justify-center">
+              <Mail className="w-8 h-8 text-[#ff385c]" />
             </div>
           </div>
 
-          {/* Title */}
-          <h1 className="text-2xl font-bold  mb-2">
+          <h1 className="text-2xl font-bold text-[#222222] mb-2">
             Check your email
           </h1>
 
-          {/* Description */}
-          <p className="text-sm text-gray-600 mb-8">
+          <p className="text-sm text-[#6a6a6a] mb-8">
             A verification link has been sent to{' '}
-            <span className="font-medium text-black">
+            <span className="font-medium text-[#222222]">
               {email ? maskEmail(email) : 'your email'}
             </span>
             . <br />
             <strong>Click the link in your email to verify your account before continuing.</strong>
           </p>
 
-          {/* Buttons */}
           <div className="space-y-3">
             <Button
               onClick={handleContinue}
-              className="w-full bg-blue-500 hover:bg-blue-600 text-white py-5 text-base font-medium"
+              className="w-full bg-[#ff385c] hover:bg-[#e0324f] text-white py-5 text-base font-medium"
             >
               Continue to login →
             </Button>
@@ -111,27 +105,24 @@ export function CheckEmail() {
               variant="outline"
               className="w-full py-5 text-base font-medium"
             >
-              {resending ? 'Sending...' : 
-               !canResend ? `Resend in ${countdown}s` : 
+              {resending ? 'Sending...' :
+               !canResend ? `Resend in ${countdown}s` :
                'Resend verification email'}
             </Button>
           </div>
 
-          {/* Help Text */}
-          <div className="mt-6 p-4 bg-gray-50 rounded-lg">
-            <p className="text-xs text-gray-600 text-center">
+          <div className="mt-6 p-4 bg-[#f7f7f7] rounded-[8px]">
+            <p className="text-xs text-[#6a6a6a] text-center">
               <strong>Important:</strong> Verify your email first, then click "Continue to login" to sign in.
             </p>
           </div>
 
-          {/* Support */}
-          <p className="text-sm text-gray-600 mt-6 text-center">
+          <p className="text-sm text-[#6a6a6a] mt-6 text-center">
             Check your spam folder if you don&apos;t see the email.
           </p>
         </div>
 
-        {/* Footer */}
-        <p className="text-xs text-gray-400 text-center mt-6">
+        <p className="text-xs text-[#929292] text-center mt-6">
           © 2023 Enterprise Corp. All rights reserved.
         </p>
       </div>

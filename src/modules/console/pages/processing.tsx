@@ -28,14 +28,14 @@ export function ProcessingPage({ slug }: { slug?: string }) {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-[#E5F4FF] to-white flex items-center justify-center px-4 py-12">
+    <div className="min-h-screen bg-[#f7f7f7] flex items-center justify-center px-4 py-12">
       <div className="w-full max-w-xl">
         {/* Main Card */}
         <div className="bg-white rounded-xl shadow-lg p-12">
           {/* Loading Spinner */}
           <div className="flex justify-center mb-8">
             <div className="relative">
-              <Loader2 className="w-16 h-16 text-blue-500 animate-spin" />
+              <Loader2 className="w-16 h-16 text-[#ff385c] animate-spin" />
             </div>
           </div>
 
@@ -70,10 +70,10 @@ export function ProcessingPage({ slug }: { slug?: string }) {
                       </div>
                     )}
                     {isCurrent && (
-                      <Loader2 className="w-6 h-6 text-blue-500 animate-spin" />
+                      <Loader2 className="w-6 h-6 text-[#ff385c] animate-spin" />
                     )}
                     {isPending && (
-                      <div className="w-6 h-6 border-2 border-gray-300 rounded-full" />
+                      <div className="w-6 h-6 border-2 border-[#dddddd] rounded-full" />
                     )}
                   </div>
 
@@ -82,7 +82,7 @@ export function ProcessingPage({ slug }: { slug?: string }) {
                     className={`text-sm font-medium ${
                       isCompleted || isCurrent
                         ? ''
-                        : 'text-gray-400'
+                        : 'text-[#929292]'
                     }`}
                   >
                     {step.label}
@@ -95,7 +95,7 @@ export function ProcessingPage({ slug }: { slug?: string }) {
 
         {/* Warning - Outside Card */}
         <div className="mt-6 text-center">
-          <p className="text-sm text-gray-500">
+          <p className="text-sm text-[#929292]">
             Do not close this window.
           </p>
         </div>

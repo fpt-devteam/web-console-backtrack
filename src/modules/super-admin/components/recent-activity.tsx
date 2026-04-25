@@ -6,17 +6,17 @@ import type { RecentActivityItem } from '@/services/super-admin.service';
 import { superAdminService } from '@/services/super-admin.service';
 
 const STATUS_STYLE: Record<string, string> = {
-  Found:    'bg-green-100 text-green-700',
-  Returned: 'bg-purple-100 text-purple-700',
-  Lost:     'bg-red-100 text-red-700',
-  Active:   'bg-blue-100 text-blue-700',
+  Found:    'bg-[#e8f9f0] text-[#06c167]',
+  Returned: 'bg-[#f7f7f7] text-[#6a6a6a]',
+  Lost:     'bg-[#fff0f2] text-[#c13515]',
+  Active:   'bg-[#f7f7f7] text-[#222222]',
 };
 
 const AVATAR_BG: Record<string, string> = {
-  Found:    'bg-green-50 text-green-600',
-  Returned: 'bg-purple-50 text-purple-600',
-  Lost:     'bg-red-50 text-red-600',
-  Active:   'bg-blue-50 text-blue-600',
+  Found:    'bg-[#e8f9f0] text-[#06c167]',
+  Returned: 'bg-[#f7f7f7] text-[#6a6a6a]',
+  Lost:     'bg-[#fff0f2] text-[#c13515]',
+  Active:   'bg-[#f7f7f7] text-[#222222]',
 };
 
 const STATUS_FILTERS = [
@@ -27,7 +27,7 @@ const STATUS_FILTERS = [
   { label: 'Expired',  value: 'Expired'  },
 ] as const;
 
-const PAGE_SIZE = 3;
+const PAGE_SIZE = 5;
 
 export function RecentActivity() {
   const [items, setItems] = useState<Array<RecentActivityItem>>([]);
@@ -48,19 +48,19 @@ export function RecentActivity() {
   }, [statusFilter, page]);
 
   return (
-    <div className="bg-white rounded-xl border border-gray-100 p-5 shadow-sm">
+    <div className="bg-white rounded-[14px] border border-[#dddddd] p-5">
       <div className="mb-4 flex items-center justify-between">
-        <h2 className="font-semibold text-gray-900">Recent Activity</h2>
+        <h2 className="font-semibold text-[#222222]">Recent Activity</h2>
       </div>
       <div className="mb-3 flex flex-wrap items-center gap-1.5">
         {STATUS_FILTERS.map(s => (
           <button
             key={s.label}
             onClick={() => setStatusFilter(s.value)}
-            className={`rounded-full px-2.5 py-1 text-xs font-medium transition-all ${
+            className={`rounded-full px-2.5 py-1 text-xs font-medium transition-all active:scale-[0.92] ${
               statusFilter === s.value
-                ? 'bg-blue-600 text-white'
-                : 'bg-gray-100 text-gray-500 hover:bg-gray-200'
+                ? 'bg-[#222222] text-white'
+                : 'bg-[#f7f7f7] text-[#6a6a6a] hover:bg-[#ebebeb]'
             }`}
           >
             {s.label}
@@ -69,18 +69,18 @@ export function RecentActivity() {
       </div>
       <div className="space-y-2">
         {items.map((a) => (
-          <div key={a.postId} className="flex items-center gap-3 rounded-lg bg-gray-50 px-3 py-2.5">
-            <div className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-xs font-bold ${AVATAR_BG[a.status] ?? 'bg-gray-100 text-gray-600'}`}>
+          <div key={a.postId} className="flex items-center gap-3 rounded-lg bg-[#f7f7f7] px-3 py-2.5">
+            <div className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-xs font-bold ${AVATAR_BG[a.status] ?? 'bg-[#f7f7f7] text-[#6a6a6a]'}`}>
               {a.initials}
             </div>
             <div className="min-w-0 flex-1">
-              <p className="truncate text-sm font-medium text-gray-800">{a.title}</p>
-              <p className="flex items-center gap-1 truncate text-xs text-gray-400">
+              <p className="truncate text-sm font-medium text-[#222222]">{a.title}</p>
+              <p className="flex items-center gap-1 truncate text-xs text-[#929292]">
                 <MapPin className="h-3 w-3 shrink-0" />
                 {a.location} · {a.timeAgo}
               </p>
             </div>
-            <span className={`shrink-0 rounded-full px-2.5 py-1 text-xs font-semibold ${STATUS_STYLE[a.status] ?? 'bg-gray-100 text-gray-600'}`}>
+            <span className={`shrink-0 rounded-full px-2.5 py-1 text-xs font-semibold ${STATUS_STYLE[a.status] ?? 'bg-[#f7f7f7] text-[#6a6a6a]'}`}>
               {a.status}
             </span>
           </div>
@@ -89,21 +89,21 @@ export function RecentActivity() {
 
       {totalPages > 1 && (
         <div className="mt-4 flex items-center justify-between">
-          <p className="text-xs text-gray-400">
+          <p className="text-xs text-[#929292]">
             Page {page} of {totalPages}
           </p>
           <div className="flex items-center gap-1">
             <button
               onClick={() => setPage(p => Math.max(1, p - 1))}
               disabled={page === 1}
-              className="flex h-7 w-7 items-center justify-center rounded-md text-gray-500 hover:bg-gray-100 disabled:opacity-30 disabled:cursor-not-allowed"
+              className="flex h-7 w-7 items-center justify-center rounded-md text-[#929292] hover:bg-[#f7f7f7] disabled:opacity-30 disabled:cursor-not-allowed"
             >
               <ChevronLeft className="h-4 w-4" />
             </button>
             <button
               onClick={() => setPage(p => Math.min(totalPages, p + 1))}
               disabled={page === totalPages}
-              className="flex h-7 w-7 items-center justify-center rounded-md text-gray-500 hover:bg-gray-100 disabled:opacity-30 disabled:cursor-not-allowed"
+              className="flex h-7 w-7 items-center justify-center rounded-md text-[#929292] hover:bg-[#f7f7f7] disabled:opacity-30 disabled:cursor-not-allowed"
             >
               <ChevronRight className="h-4 w-4" />
             </button>

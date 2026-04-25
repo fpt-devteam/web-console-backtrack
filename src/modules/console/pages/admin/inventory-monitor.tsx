@@ -2,6 +2,7 @@ import { Layout } from '../../components/admin/layout'
 import { Download } from 'lucide-react'
 import { useMemo } from 'react'
 import { Pagination } from '@/components/ui/pagination'
+import { Button } from '@/components/ui/button'
 import { useParams } from '@tanstack/react-router'
 import { useInventoryItems } from '@/hooks/use-inventory'
 import { useCurrentOrgId } from '@/contexts/current-org.context'
@@ -12,6 +13,7 @@ import { InventoryListFiltersBar } from '../../components/inventory/inventory-li
 import { InventoryGridCards } from '../../components/inventory/inventory-grid-cards'
 import { InventoryStatusTabs } from '../../components/inventory/inventory-status-tabs'
 import { useSubcategories } from '@/hooks/use-subcategories'
+import { SiteHeader } from '@/components/layout/site-header'
 
 const pageSize = 8
 
@@ -49,21 +51,17 @@ export function AdminInventoryMonitorPage() {
 
   return (
     <Layout>
-      <div className="p-4 sm:p-4 lg:p-6 min-h-screen sm:mx-4">
-        <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-2 mb-4">
-          <div>
-            <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">
-              Inventory Dashboard
-            </h1>
-          </div>
-          <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 w-full sm:w-auto">
-            <button className="flex items-center justify-center gap-2 px-4 py-1.5 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-all font-medium text-sm sm:text-base">
-              <Download className="w-4 h-4" />
-              Export
-            </button>
-          </div>
-        </div>
+      <SiteHeader
+        crumbs={[{ label: 'Inventory' }, { label: 'Dashboard' }]}
+        actions={
+          <Button variant="outline" size="sm" className="rounded-[20px] border-[#dddddd] text-[#6a6a6a] hover:bg-[#f7f7f7] gap-1.5">
+            <Download className="w-4 h-4" />
+            Export
+          </Button>
+        }
+      />
 
+      <div className="p-4 sm:p-6 lg:p-8">
         <InventoryStatusTabs
           value={listState.statusFilter}
           onChange={listState.setStatusFilter}
@@ -91,7 +89,7 @@ export function AdminInventoryMonitorPage() {
         />
 
         <div className="flex justify-end my-3">
-          <span className="text-sm text-gray-600 whitespace-nowrap">
+          <span className="text-sm text-[#6a6a6a] whitespace-nowrap">
             {items.length > 0
               ? `Showing ${(listState.currentPage - 1) * pageSize + 1}-${Math.min(
                   listState.currentPage * pageSize,

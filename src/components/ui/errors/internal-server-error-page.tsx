@@ -1,45 +1,43 @@
-import { Button, Card, CardBody, CardHeader } from '@heroui/react';
 import { Home, ServerCrash, RefreshCw } from 'lucide-react';
 import { Link } from '@tanstack/react-router';
 
 export function InternalServerError() {
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gray-100 dark:bg-gray-950">
-      <Card className="w-full max-w-md">
-        <CardHeader className="flex-col items-center gap-4">
-          <ServerCrash className="h-16 w-16 text-danger" />
+    <div className="flex min-h-screen items-center justify-center bg-[#f7f7f7]">
+      <div className="w-full max-w-md bg-white rounded-[14px] border border-[#dddddd] p-8">
+        <div className="flex flex-col items-center gap-4 mb-6">
+          <ServerCrash className="h-16 w-16 text-[#c13515]" />
           <div className="text-center">
-            <h1 className="text-3xl font-bold tracking-tight text-gray-900 dark:text-gray-50">
+            <h1 className="text-3xl font-bold tracking-tight text-[#222222]">
               500 - Server Error
             </h1>
-            <p className="mt-2 text-base text-gray-500 dark:text-gray-400">
+            <p className="mt-2 text-base text-[#6a6a6a]">
               Something went wrong on our end.
             </p>
           </div>
-        </CardHeader>
-        <CardBody className="items-center gap-4">
-          <p className="text-center text-sm text-gray-500 dark:text-gray-400">
+        </div>
+        <div className="flex flex-col items-center gap-4">
+          <p className="text-center text-sm text-[#6a6a6a]">
             We're working on fixing the issue. Please try again later.
           </p>
           <div className="flex gap-2">
-            <Button
-              color="primary"
-              startContent={<RefreshCw className="h-4 w-4" />}
+            <button
+              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-[20px] bg-[#ff385c] text-white text-sm font-medium hover:bg-[#e8324f] active:scale-[0.92] transition-all"
               onClick={() => window.location.reload()}
             >
+              <RefreshCw className="h-4 w-4" />
               Refresh Page
-            </Button>
-            <Button
-              as={Link}
+            </button>
+            <Link
               to="/"
-              variant="bordered"
-              startContent={<Home className="h-4 w-4" />}
+              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-[20px] border border-[#dddddd] text-[#222222] text-sm font-medium hover:bg-[#f7f7f7] active:scale-[0.92] transition-all"
             >
+              <Home className="h-4 w-4" />
               Go Home
-            </Button>
+            </Link>
           </div>
-        </CardBody>
-      </Card>
+        </div>
+      </div>
     </div>
   );
 }

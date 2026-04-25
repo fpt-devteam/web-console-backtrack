@@ -107,32 +107,32 @@ export function EditAccountPage() {
         <div className="mb-8">
           <button
             onClick={handleCancel}
-            className="flex items-center gap-2 text-gray-600 hover:text-gray-900 mb-4 text-sm"
+            className="flex items-center gap-2 text-[#6a6a6a] hover:text-[#222222] mb-4 text-sm transition-colors"
           >
             <ArrowLeft className="w-4 h-4" />
             Back to Plan Management
           </button>
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Edit Account Information</h1>
-          <p className="text-gray-600">Update your organization, billing, and payment details.</p>
+          <h1 className="text-3xl font-bold text-[#222222] mb-2">Edit Account Information</h1>
+          <p className="text-[#6a6a6a]">Update your organization, billing, and payment details.</p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-6">
           {/* Account Details Section */}
-          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+          <div className="bg-white rounded-[14px] border border-[#dddddd] p-6">
             <div className="flex items-center gap-3 mb-6">
-              <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
-                <Building2 className="w-5 h-5 text-blue-600" />
+              <div className="w-10 h-10 bg-[#fff0f2] rounded-lg flex items-center justify-center">
+                <Building2 className="w-5 h-5 text-[#ff385c]" />
               </div>
               <div>
-                <h2 className="text-xl font-bold text-gray-900">Account Details</h2>
-                <p className="text-sm text-gray-600">Organization and contact information</p>
+                <h2 className="text-xl font-bold text-[#222222]">Account Details</h2>
+                <p className="text-sm text-[#6a6a6a]">Organization and contact information</p>
               </div>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
               <div className="md:col-span-2">
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Organization Name <span className="text-red-500">*</span>
+                <label className="block text-sm font-medium text-[#222222] mb-2">
+                  Organization Name <span className="text-[#c13515]">*</span>
                 </label>
                 <input
                   type="text"
@@ -140,14 +140,14 @@ export function EditAccountPage() {
                   value={formData.organization}
                   onChange={handleInputChange}
                   required
-                  className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all text-sm"
+                  className="w-full px-4 py-2.5 border border-[#dddddd] rounded-lg focus:border-[#222222] outline-none transition-colors text-sm text-[#222222] placeholder:text-[#929292]"
                   placeholder="Enter organization name"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Admin Email <span className="text-red-500">*</span>
+                <label className="block text-sm font-medium text-[#222222] mb-2">
+                  Admin Email <span className="text-[#c13515]">*</span>
                 </label>
                 <input
                   type="email"
@@ -155,13 +155,13 @@ export function EditAccountPage() {
                   value={formData.adminEmail}
                   onChange={handleInputChange}
                   required
-                  className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all text-sm"
+                  className="w-full px-4 py-2.5 border border-[#dddddd] rounded-lg focus:border-[#222222] outline-none transition-colors text-sm text-[#222222] placeholder:text-[#929292]"
                   placeholder="admin@company.com"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-[#222222] mb-2">
                   Tax ID
                 </label>
                 <input
@@ -169,7 +169,7 @@ export function EditAccountPage() {
                   name="taxId"
                   value={formData.taxId}
                   onChange={handleInputChange}
-                  className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all font-mono text-sm"
+                  className="w-full px-4 py-2.5 border border-[#dddddd] rounded-lg focus:border-[#222222] outline-none transition-colors font-mono text-sm text-[#222222] placeholder:text-[#929292]"
                   placeholder="US-123456789"
                 />
               </div>
@@ -177,21 +177,21 @@ export function EditAccountPage() {
           </div>
 
           {/* Billing Address Section */}
-          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+          <div className="bg-white rounded-[14px] border border-[#dddddd] p-6">
             <div className="flex items-center gap-3 mb-6">
-              <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
-                <MapPin className="w-5 h-5 text-green-600" />
+              <div className="w-10 h-10 bg-[#e8f9f0] rounded-lg flex items-center justify-center">
+                <MapPin className="w-5 h-5 text-[#06c167]" />
               </div>
               <div>
-                <h2 className="text-xl font-bold text-gray-900">Billing Address</h2>
-                <p className="text-sm text-gray-600">Where invoices should be sent</p>
+                <h2 className="text-xl font-bold text-[#222222]">Billing Address</h2>
+                <p className="text-sm text-[#6a6a6a]">Where invoices should be sent</p>
               </div>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
               <div className="md:col-span-2">
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Street Address <span className="text-red-500">*</span>
+                <label className="block text-sm font-medium text-[#222222] mb-2">
+                  Street Address <span className="text-[#c13515]">*</span>
                 </label>
                 <input
                   type="text"
@@ -199,13 +199,13 @@ export function EditAccountPage() {
                   value={formData.street}
                   onChange={handleInputChange}
                   required
-                  className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all text-sm"
+                  className="w-full px-4 py-2.5 border border-[#dddddd] rounded-lg focus:border-[#222222] outline-none transition-colors text-sm text-[#222222] placeholder:text-[#929292]"
                   placeholder="123 Main Street"
                 />
               </div>
 
               <div className="md:col-span-2">
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-[#222222] mb-2">
                   Suite / Apartment
                 </label>
                 <input
@@ -213,14 +213,14 @@ export function EditAccountPage() {
                   name="suite"
                   value={formData.suite}
                   onChange={handleInputChange}
-                  className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all text-sm"
+                  className="w-full px-4 py-2.5 border border-[#dddddd] rounded-lg focus:border-[#222222] outline-none transition-colors text-sm text-[#222222] placeholder:text-[#929292]"
                   placeholder="Suite 400"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  City <span className="text-red-500">*</span>
+                <label className="block text-sm font-medium text-[#222222] mb-2">
+                  City <span className="text-[#c13515]">*</span>
                 </label>
                 <input
                   type="text"
@@ -228,13 +228,13 @@ export function EditAccountPage() {
                   value={formData.city}
                   onChange={handleInputChange}
                   required
-                  className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all text-sm"
+                  className="w-full px-4 py-2.5 border border-[#dddddd] rounded-lg focus:border-[#222222] outline-none transition-colors text-sm text-[#222222] placeholder:text-[#929292]"
                   placeholder="San Francisco"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-[#222222] mb-2">
                   State / Province
                 </label>
                 <input
@@ -242,13 +242,13 @@ export function EditAccountPage() {
                   name="state"
                   value={formData.state}
                   onChange={handleInputChange}
-                  className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all text-sm"
+                  className="w-full px-4 py-2.5 border border-[#dddddd] rounded-lg focus:border-[#222222] outline-none transition-colors text-sm text-[#222222] placeholder:text-[#929292]"
                   placeholder="CA"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-[#222222] mb-2">
                   ZIP / Postal Code
                 </label>
                 <input
@@ -256,13 +256,13 @@ export function EditAccountPage() {
                   name="zipCode"
                   value={formData.zipCode}
                   onChange={handleInputChange}
-                  className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all text-sm"
+                  className="w-full px-4 py-2.5 border border-[#dddddd] rounded-lg focus:border-[#222222] outline-none transition-colors text-sm text-[#222222] placeholder:text-[#929292]"
                   placeholder="94103"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-[#222222] mb-2">
                   Country
                 </label>
                 <input
@@ -270,7 +270,7 @@ export function EditAccountPage() {
                   name="country"
                   value={formData.country}
                   onChange={handleInputChange}
-                  className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all text-sm"
+                  className="w-full px-4 py-2.5 border border-[#dddddd] rounded-lg focus:border-[#222222] outline-none transition-colors text-sm text-[#222222] placeholder:text-[#929292]"
                   placeholder="United States"
                 />
               </div>
@@ -278,27 +278,27 @@ export function EditAccountPage() {
           </div>
 
           {/* Payment Method Section */}
-          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+          <div className="bg-white rounded-[14px] border border-[#dddddd] p-6">
             <div className="flex items-center gap-3 mb-6">
-              <div className="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center">
-                <CreditCard className="w-5 h-5 text-purple-600" />
+              <div className="w-10 h-10 bg-[#f7f7f7] rounded-lg flex items-center justify-center">
+                <CreditCard className="w-5 h-5 text-[#6a6a6a]" />
               </div>
               <div>
-                <h2 className="text-xl font-bold text-gray-900">Payment Method</h2>
-                <p className="text-sm text-gray-600">Credit or debit card information</p>
+                <h2 className="text-xl font-bold text-[#222222]">Payment Method</h2>
+                <p className="text-sm text-[#6a6a6a]">Credit or debit card information</p>
               </div>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-[#222222] mb-2">
                   Card Type
                 </label>
                 <select
                   name="cardType"
                   value={formData.cardType}
                   onChange={handleInputChange}
-                  className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all text-sm"
+                  className="w-full px-4 py-2.5 border border-[#dddddd] rounded-lg focus:border-[#222222] outline-none transition-colors text-sm text-[#222222]"
                 >
                   <option value="visa">Visa</option>
                   <option value="mastercard">Mastercard</option>
@@ -307,7 +307,7 @@ export function EditAccountPage() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-[#222222] mb-2">
                   Last 4 Digits
                 </label>
                 <input
@@ -316,20 +316,20 @@ export function EditAccountPage() {
                   value={formData.last4}
                   onChange={handleInputChange}
                   maxLength={4}
-                  className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all font-mono text-sm"
+                  className="w-full px-4 py-2.5 border border-[#dddddd] rounded-lg focus:border-[#222222] outline-none transition-colors font-mono text-sm text-[#222222] placeholder:text-[#929292]"
                   placeholder="4242"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-[#222222] mb-2">
                   Expiry Month
                 </label>
                 <select
                   name="expiresMonth"
                   value={formData.expiresMonth}
                   onChange={handleInputChange}
-                  className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all text-sm"
+                  className="w-full px-4 py-2.5 border border-[#dddddd] rounded-lg focus:border-[#222222] outline-none transition-colors text-sm text-[#222222]"
                 >
                   {Array.from({ length: 12 }, (_, i) => i + 1).map(month => (
                     <option key={month} value={month}>
@@ -340,14 +340,14 @@ export function EditAccountPage() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-[#222222] mb-2">
                   Expiry Year
                 </label>
                 <select
                   name="expiresYear"
                   value={formData.expiresYear}
                   onChange={handleInputChange}
-                  className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all text-sm"
+                  className="w-full px-4 py-2.5 border border-[#dddddd] rounded-lg focus:border-[#222222] outline-none transition-colors text-sm text-[#222222]"
                 >
                   {Array.from({ length: 10 }, (_, i) => new Date().getFullYear() + i).map(year => (
                     <option key={year} value={year}>
@@ -358,9 +358,9 @@ export function EditAccountPage() {
               </div>
             </div>
 
-            <div className="mt-4 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
-              <p className="text-sm text-yellow-800">
-                <strong>Note:</strong> For security reasons, we cannot display your full card number. 
+            <div className="mt-4 p-4 bg-[#f7f7f7] border border-[#dddddd] rounded-lg">
+              <p className="text-sm text-[#6a6a6a]">
+                <strong className="text-[#222222]">Note:</strong> For security reasons, we cannot display your full card number.
                 To update your payment method completely, please contact support.
               </p>
             </div>
@@ -371,13 +371,13 @@ export function EditAccountPage() {
             <button
               type="button"
               onClick={handleCancel}
-              className="px-6 py-2.5 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 text-sm transition-colors"
+              className="px-6 py-2.5 border border-[#dddddd] text-[#222222] rounded-[20px] hover:border-[#222222] text-sm transition-colors"
             >
               Cancel
             </button>
             <button
               type="submit"
-              className="px-6 py-2.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-sm transition-colors flex items-center gap-2"
+              className="px-6 py-2.5 bg-[#ff385c] text-white rounded-[20px] hover:bg-[#e00b41] text-sm transition-colors flex items-center gap-2 active:scale-[0.92]"
             >
               <Save className="w-4 h-4" />
               Save Changes

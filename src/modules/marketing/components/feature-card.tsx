@@ -6,7 +6,7 @@ interface FeatureCardProps {
 
 export function FeatureCard({ image, title, description }: FeatureCardProps) {
   return (
-    <div className="bg-white rounded-xl shadow-lg overflow-hidden border border-gray-100 hover:shadow-xl transition-shadow">
+    <div className="bg-white rounded-[14px] border border-[#dddddd] overflow-hidden transition-shadow">
       {/* Image Section */}
       <div className="w-full h-64 overflow-hidden">
         <img

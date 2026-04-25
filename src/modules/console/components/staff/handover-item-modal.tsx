@@ -88,12 +88,12 @@ export function HandoverItemModal({
         }}
       >
         <div className="space-y-1">
-          <div className="text-sm font-semibold text-slate-950">RECIPIENT INFORMATION</div>
+          <div className="text-sm font-semibold text-[#222222]">RECIPIENT INFORMATION</div>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
-            <Label htmlFor="recipientFullName" className="text-sm font-medium text-slate-950">
+            <Label htmlFor="recipientFullName" className="text-sm font-medium text-[#222222]">
               Full name
             </Label>
             <Input
@@ -106,8 +106,8 @@ export function HandoverItemModal({
             />
           </div>
           <div>
-            <Label htmlFor="recipientEmail" className="text-sm font-medium text-slate-950">
-              Email {isRequired('Email') ? <span className="text-red-600">*</span> : null}
+            <Label htmlFor="recipientEmail" className="text-sm font-medium text-[#222222]">
+              Email {isRequired('Email') ? <span className="text-[#c13515]">*</span> : null}
             </Label>
             <Input
               id="recipientEmail"
@@ -119,8 +119,8 @@ export function HandoverItemModal({
             />
           </div>
           <div>
-            <Label htmlFor="recipientNationalId" className="text-sm font-medium text-slate-950">
-              National ID / citizen ID {isRequired('NationalId') ? <span className="text-red-600">*</span> : null}
+            <Label htmlFor="recipientNationalId" className="text-sm font-medium text-[#222222]">
+              National ID / citizen ID {isRequired('NationalId') ? <span className="text-[#c13515]">*</span> : null}
             </Label>
             <Input
               id="recipientNationalId"
@@ -132,8 +132,8 @@ export function HandoverItemModal({
             />
           </div>
           <div>
-            <Label htmlFor="recipientInternalId" className="text-sm font-medium text-slate-950">
-              Student / staff ID {isRequired('OrgMemberId') ? <span className="text-red-600">*</span> : null}
+            <Label htmlFor="recipientInternalId" className="text-sm font-medium text-[#222222]">
+              Student / staff ID {isRequired('OrgMemberId') ? <span className="text-[#c13515]">*</span> : null}
             </Label>
             <Input
               id="recipientInternalId"
@@ -147,8 +147,8 @@ export function HandoverItemModal({
         </div>
 
         <div>
-          <Label htmlFor="recipientPhone" className="text-sm font-medium text-slate-950">
-            Phone number {isRequired('Phone') ? <span className="text-red-600">*</span> : null}
+          <Label htmlFor="recipientPhone" className="text-sm font-medium text-[#222222]">
+            Phone number {isRequired('Phone') ? <span className="text-[#c13515]">*</span> : null}
           </Label>
           <Input
             id="recipientPhone"
@@ -160,25 +160,25 @@ export function HandoverItemModal({
           />
         </div>
 
-        <div className="pt-2 border-t border-slate-200">
-          <div className="text-sm font-semibold text-slate-950 mb-3">STAFF</div>
+        <div className="pt-2 border-t border-[#ebebeb]">
+          <div className="text-sm font-semibold text-[#222222] mb-3">STAFF</div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <Label className="text-sm font-medium text-slate-950">Name</Label>
-              <Input value={staffName} readOnly className="mt-1 h-8 text-xs bg-slate-50" />
+              <Label className="text-sm font-medium text-[#222222]">Name</Label>
+              <Input value={staffName} readOnly className="mt-1 h-8 text-xs bg-[#f7f7f7]" />
             </div>
             <div>
-              <Label className="text-sm font-medium text-slate-950">ID</Label>
-              <Input value={staffId} readOnly className="mt-1 h-8 text-xs bg-slate-50" />
+              <Label className="text-sm font-medium text-[#222222]">ID</Label>
+              <Input value={staffId} readOnly className="mt-1 h-8 text-xs bg-[#f7f7f7]" />
             </div>
           </div>
         </div>
 
-        <div className="flex items-center justify-end gap-3 pt-4 border-t border-slate-200">
+        <div className="flex items-center justify-end gap-3 pt-4 border-t border-[#ebebeb]">
           <Button type="button" variant="outline" size="sm" disabled={createReturnReport.isPending} onClick={onClose}>
             Cancel
           </Button>
-          <Button type="submit" size="sm" className="bg-blue-600 hover:bg-blue-700" disabled={createReturnReport.isPending}>
+          <Button type="submit" size="sm" className="bg-[#ff385c] hover:bg-[#e0324f]" disabled={createReturnReport.isPending}>
             {createReturnReport.isPending ? 'Saving…' : 'Handover'}
           </Button>
         </div>

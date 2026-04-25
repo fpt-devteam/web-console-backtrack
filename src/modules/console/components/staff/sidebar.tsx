@@ -1,140 +1,224 @@
-import { Package, MessageCircle, Bell, ChevronLeft, ChevronRight, ArrowLeftRight, ClipboardList } from 'lucide-react';
-import { OrgLogo } from '@/components/org-logo';
-import { Link, useLocation, useParams } from '@tanstack/react-router';
-import { useCurrentOrgId } from '@/contexts/current-org.context';
-import { useOrganization } from '@/hooks/use-org';
-import { useCurrentUser } from '@/hooks/use-auth';
-import { LogoutPill } from '@/modules/auth/components/logout-pill';
+import {
+  Package,
+  MessageCircle,
+  Bell,
+  ClipboardList,
+  ArrowLeftRight,
+  LogOut,
+  ChevronsUpDown,
+} from 'lucide-react'
+import { OrgLogo } from '@/components/org-logo'
+import { Link, useLocation, useParams } from '@tanstack/react-router'
+import { useCurrentOrgId } from '@/contexts/current-org.context'
+import { useOrganization } from '@/hooks/use-org'
+import { useCurrentUser } from '@/hooks/use-auth'
+import { appSignOut } from '@/modules/auth/lib/app-signout'
+import {
+  Sidebar,
+  SidebarContent,
+  SidebarFooter,
+  SidebarHeader,
+  SidebarMenu,
+  SidebarMenuButton,
+  SidebarMenuItem,
+} from '@/components/ui/sidebar'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu'
 
 function getInitials(name: string | null | undefined): string {
-  if (!name?.trim()) return 'U';
-  const parts = name.trim().split(/\s+/);
-  if (parts.length >= 2) return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
-  return name.slice(0, 2).toUpperCase();
+  if (!name?.trim()) return 'U'
+  const parts = name.trim().split(/\s+/)
+  if (parts.length >= 2) return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase()
+  return name.slice(0, 2).toUpperCase()
 }
 
-interface StaffSidebarProps {
-  isOpen: boolean;
-  onToggle: () => void;
-}
+const ITEM_CLS =
+  'text-[#6a6a6a] hover:bg-[#f7f7f7] hover:text-[#222222] data-[active=true]:bg-[#fff0f2] data-[active=true]:text-[#ff385c]'
 
-export function StaffSidebar({ isOpen, onToggle }: StaffSidebarProps) {
-  const location = useLocation();
-  const { slug } = useParams({ strict: false }) as { slug?: string };
-  const { currentOrgId } = useCurrentOrgId();
-  const { data: org } = useOrganization(currentOrgId);
-  const { data: user } = useCurrentUser();
-  const userInitials = getInitials(user?.name);
-  const userDisplayName = user?.name || user?.email || 'User';
+const NAV_ITEMS = [
+  {
+    key: 'inventory',
+    name: 'Inventory',
+    icon: Package,
+    to: '/console/$slug/staff/inventory' as const,
+  },
+  {
+    key: 'chat',
+    name: 'Chat',
+    icon: MessageCircle,
+    to: '/console/$slug/staff/chat' as const,
+  },
+  {
+    key: 'history',
+    name: 'Handling History',
+    icon: ClipboardList,
+    to: '/console/$slug/staff/history' as const,
+  },
+  {
+    key: 'notification',
+    name: 'Notification',
+    icon: Bell,
+    to: '/console/$slug/staff/notification' as const,
+  },
+]
 
-  const base = `/console/${slug ?? org?.slug ?? ''}`;
+function StaffSidebarInner() {
+  const location = useLocation()
+  const { slug: slugParam } = useParams({ strict: false }) as { slug?: string }
+  const { currentOrgId } = useCurrentOrgId()
+  const { data: org } = useOrganization(currentOrgId)
+  const { data: user } = useCurrentUser()
 
-  const menuItems = [
-    { name: 'Inventory', icon: Package, path: `${base}/staff/inventory` },
-    { name: 'Chat', icon: MessageCircle, path: `${base}/staff/chat` },
-    { name: 'Handling History', icon: ClipboardList, path: `${base}/staff/history` },
-    { name: 'Notification', icon: Bell, path: `${base}/staff/notification` },
-  ];
+  const userInitials = getInitials(user?.name)
+  const userDisplayName = user?.name || user?.email || 'User'
 
-  const isActive = (path: string) => {
-    const currentPath = location.pathname;
-    if (currentPath === path) return true;
-    if (path === `${base}/staff/inventory`) {
-      return (currentPath === path || currentPath.startsWith(`${base}/staff/inventory`) || currentPath.startsWith(`${base}/staff/item`)) && !currentPath.startsWith(`${base}/staff/history`);
+  // Resolved slug used only in isActive helpers (not in Link `to`)
+  const slug = slugParam ?? org?.slug ?? ''
+  const base = `/console/${slug}`
+
+  const isActive = (key: string) => {
+    const cur = location.pathname
+    if (key === 'inventory') {
+      return (
+        (cur.startsWith(`${base}/staff/inventory`) || cur.startsWith(`${base}/staff/item`)) &&
+        !cur.startsWith(`${base}/staff/history`)
+      )
     }
-    return false;
-  };
+    if (key === 'chat') return cur.startsWith(`${base}/staff/chat`)
+    if (key === 'history') return cur.startsWith(`${base}/staff/history`)
+    if (key === 'notification') return cur.startsWith(`${base}/staff/notification`)
+    return false
+  }
 
   return (
-    <aside
-      className={`fixed left-0 top-0 h-screen bg-white border-r border-gray-200 shadow-lg flex flex-col transition-all duration-300 z-40 ${
-        isOpen ? 'w-64' : 'w-20'
-      }`}
-    >
-      {/* Header: Org + Toggle */}
-      <div className="flex items-center gap-3 px-4 py-6 border-b border-gray-200 relative">
-        <div className="flex items-center gap-3 flex-1 min-w-0">
-          <OrgLogo logoUrl={org?.logoUrl} alt={org?.name ?? 'Organization'} className="h-10 w-10 flex-shrink-0" />
-          <div className={`min-w-0 transition-all duration-300 ${isOpen ? 'opacity-100' : 'w-0 opacity-0 overflow-hidden'}`}>
-            <h1 className="font-bold text-xl tracking-wide whitespace-nowrap truncate" title={org?.name}>
-              {org?.name ?? 'Staff'}
-            </h1>
-            {org && isOpen && (
-              <p className="text-xs text-gray-500 truncate" title={org.slug}>{org.slug}</p>
-            )}
-          </div>
-        </div>
-        <button
-          onClick={onToggle}
-          className="absolute -right-3 top-1/2 -translate-y-1/2 bg-white border border-gray-200 rounded-full shadow-md p-1 hover:bg-gray-100 transition-all z-10"
-          aria-label="Toggle sidebar"
-        >
-          {isOpen ? <ChevronLeft className="w-5 h-5 text-gray-600" /> : <ChevronRight className="w-5 h-5 text-gray-600" />}
-        </button>
-      </div>
-
-      {/* Navigation Menu */}
-      <nav className="flex-1 py-6">
-        <ul className="flex flex-col gap-1 px-2">
-          {menuItems.map((item) => {
-            const Icon = item.icon;
-            const active = isActive(item.path);
-            return (
-              <li key={item.path}>
-                <Link
-                  to={item.path}
-                  className={`flex items-center gap-4 px-6 py-2 rounded-lg font-medium transition-all duration-300 ${
-                    active
-                      ? 'bg-blue-500 text-white shadow-lg'
-                      : 'hover:bg-blue-50 hover:text-blue-600'
-                  }`}
-                >
-                  <Icon className="w-5 h-5 flex-shrink-0" />
+    <>
+      {/* Header — org logo + name (dashboard-01 SidebarMenu pattern) */}
+      <SidebarHeader className="border-b border-[#dddddd]">
+        <SidebarMenu>
+          <SidebarMenuItem>
+            <SidebarMenuButton
+              size="lg"
+              tooltip={org?.name ?? 'Staff'}
+              asChild
+              className="hover:bg-[#f7f7f7] text-[#222222]"
+            >
+              <Link to="/console/$slug/staff/inventory" params={{ slug }}>
+                <OrgLogo
+                  logoUrl={org?.logoUrl}
+                  alt={org?.name ?? 'Organization'}
+                  className="h-8 w-8 flex-shrink-0"
+                />
+                <div className="flex flex-col min-w-0">
                   <span
-                    className={`transition-all duration-300 whitespace-nowrap overflow-hidden ${
-                      isOpen ? 'w-auto opacity-100' : 'w-0 opacity-0'
-                    }`}
+                    className="font-semibold text-[15px] text-[#222222] truncate leading-tight"
+                    title={org?.name}
                   >
-                    {item.name}
+                    {org?.name ?? 'Staff'}
                   </span>
-                </Link>
-              </li>
-            );
+                  {org && (
+                    <span className="text-xs text-[#929292] truncate" title={org.slug}>
+                      {org.slug}
+                    </span>
+                  )}
+                </div>
+              </Link>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+        </SidebarMenu>
+      </SidebarHeader>
+
+      {/* Navigation */}
+      <SidebarContent className="py-4">
+        <SidebarMenu className="px-3 gap-0.5">
+          {NAV_ITEMS.map((item) => {
+            const Icon = item.icon
+            const active = isActive(item.key)
+            return (
+              <SidebarMenuItem key={item.key}>
+                <SidebarMenuButton
+                  asChild
+                  isActive={active}
+                  tooltip={item.name}
+                  className={ITEM_CLS}
+                >
+                  <Link to={item.to} params={{ slug }}>
+                    <Icon />
+                    <span>{item.name}</span>
+                  </Link>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+            )
           })}
-        </ul>
-      </nav>
+        </SidebarMenu>
+      </SidebarContent>
 
-      {/* User info */}
-      <div
-        className={`border-t border-gray-200 px-4 py-3 flex items-center gap-3 min-w-0 transition-all duration-300 ${
-          isOpen ? 'opacity-100' : 'opacity-0 overflow-hidden justify-center'
-        }`}
-      >
-        <div
-          className="w-9 h-9 rounded-full bg-blue-500 flex items-center justify-center text-white font-semibold text-sm flex-shrink-0"
-          title={userDisplayName}
-        >
-          {userInitials}
-        </div>
-        {isOpen && (
-          <div className="min-w-0 flex-1">
-            <p className="text-sm font-medium text-gray-900 truncate" title={userDisplayName}>{userDisplayName}</p>
-            <p className="text-xs text-gray-500 truncate">Staff</p>
-          </div>
-        )}
-        <Link
-          to="/console/welcome"
-          className="p-1.5 rounded-md text-gray-500 hover:bg-gray-100 hover:text-gray-700 transition-colors flex-shrink-0"
-          title="change org"
-        >
-          <ArrowLeftRight className="w-4 h-4" aria-hidden />
-        </Link>
-      </div>
+      {/* Footer — user dropdown (NavUser pattern) */}
+      <SidebarFooter className="border-t border-[#dddddd]">
+        <SidebarMenu>
+          <SidebarMenuItem>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <SidebarMenuButton
+                  size="lg"
+                  tooltip={userDisplayName}
+                  className="text-[#222222] hover:bg-[#f7f7f7] data-[state=open]:bg-[#f7f7f7]"
+                >
+                  <div className="w-8 h-8 rounded-full bg-[#ff385c] flex items-center justify-center text-white font-semibold text-xs flex-shrink-0">
+                    {userInitials}
+                  </div>
+                  <div className="flex flex-col min-w-0 flex-1">
+                    <span className="text-sm font-medium text-[#222222] truncate leading-tight">
+                      {userDisplayName}
+                    </span>
+                    <span className="text-xs text-[#929292]">Staff</span>
+                  </div>
+                  <ChevronsUpDown className="ml-auto w-4 h-4 text-[#929292] flex-shrink-0" />
+                </SidebarMenuButton>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent
+                side="top"
+                align="end"
+                sideOffset={4}
+                className="w-56 rounded-xl"
+              >
+                <DropdownMenuLabel className="text-sm font-medium text-[#222222] truncate">
+                  {userDisplayName}
+                </DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem asChild>
+                  <Link to="/console/welcome" className="cursor-pointer">
+                    <ArrowLeftRight className="w-4 h-4 mr-2" />
+                    Change Organization
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem
+                  onClick={() => void appSignOut()}
+                  className="text-[#c13515] cursor-pointer focus:text-[#c13515] focus:bg-[#fff0f2]"
+                >
+                  <LogOut className="w-4 h-4 mr-2" />
+                  Log out
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </SidebarMenuItem>
+        </SidebarMenu>
+      </SidebarFooter>
 
-      {/* Footer */}
-      <div className="px-4 py-2 border-t border-gray-200 flex items-center justify-center">
-        <LogoutPill isOpen={isOpen} />
-      </div>
-    </aside>
-  );
+    </>
+  )
+}
+
+export function StaffSidebar() {
+  return (
+    <Sidebar collapsible="icon" className="border-r border-[#dddddd] bg-white">
+      <StaffSidebarInner />
+    </Sidebar>
+  )
 }

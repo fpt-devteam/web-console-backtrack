@@ -37,7 +37,7 @@ export function Filter({
       <select
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        className={`px-4 py-1.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${className}`}
+        className={`px-4 py-1.5 border border-[#dddddd] rounded-[8px] text-[#222222] bg-white focus:outline-none focus:ring-2 focus:ring-[#ff385c]/20 focus:border-[#ff385c] ${className}`}
       >
         {displayOptions.map((option) => (
           <option key={option.value} value={option.value}>
@@ -52,16 +52,16 @@ export function Filter({
   if (type === 'checkbox') {
     return (
       <div className={`flex flex-col gap-2 ${className}`}>
-        {label && <span className="text-sm font-medium text-gray-700">{label}</span>}
+        {label && <span className="text-sm font-medium text-[#222222]">{label}</span>}
         {options.map((option) => (
           <label key={option.value} className="flex items-center gap-2 cursor-pointer">
             <input
               type="checkbox"
               checked={value === option.value}
               onChange={() => onChange(option.value)}
-              className="w-4 h-4 text-blue-600 rounded border-gray-300 focus:ring-blue-500"
+              className="w-4 h-4 accent-[#ff385c] rounded border-[#dddddd]"
             />
-            <span className="text-sm text-gray-700">{option.label}</span>
+            <span className="text-sm text-[#222222]">{option.label}</span>
           </label>
         ))}
       </div>
@@ -72,16 +72,16 @@ export function Filter({
   if (type === 'button-group') {
     return (
       <div className={`flex items-center gap-2 ${className}`}>
-        {label && <span className="text-sm font-medium text-gray-700">{label}:</span>}
+        {label && <span className="text-sm font-medium text-[#222222]">{label}:</span>}
         <div className="flex gap-2">
           {options.map((option) => (
             <button
               key={option.value}
               onClick={() => onChange(option.value)}
-              className={`px-4 py-1.5 rounded-lg text-sm font-medium transition-all ${
+              className={`px-4 py-1.5 rounded-[20px] text-sm font-medium transition-all active:scale-[0.92] ${
                 value === option.value
-                  ? 'bg-blue-600 text-white'
-                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                  ? 'bg-[#222222] text-white'
+                  : 'bg-[#f7f7f7] text-[#6a6a6a] hover:bg-[#ebebeb]'
               }`}
             >
               {option.label}
@@ -94,4 +94,3 @@ export function Filter({
 
   return null
 }
-

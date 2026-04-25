@@ -160,13 +160,13 @@ export function Step1PhotosAndItem({
       />
 
       {/* Item fields */}
-      <div className="rounded-xl border border-slate-200 p-5 space-y-6">
-        <div className="text-base font-semibold text-slate-950">Item information</div>
+      <div className="rounded-[14px] border border-[#dddddd] p-5 space-y-6">
+        <div className="text-base font-semibold text-[#222222]">Item information</div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="md:col-span-2">
-            <Label htmlFor="postTitle" className="text-sm font-semibold text-slate-950">
-              Post title <span className="text-red-600">*</span>
+            <Label htmlFor="postTitle" className="text-sm font-semibold text-[#222222]">
+              Post title <span className="text-[#c13515]">*</span>
             </Label>
             <Input
               id="postTitle"
@@ -179,14 +179,14 @@ export function Step1PhotosAndItem({
           </div>
 
           <div>
-            <Label htmlFor="category" className="text-sm font-semibold text-slate-950">
-              Category <span className="text-red-600">*</span>
+            <Label htmlFor="category" className="text-sm font-semibold text-[#222222]">
+              Category <span className="text-[#c13515]">*</span>
             </Label>
             <select
               id="category"
               value={category}
               onChange={(e) => setCategory(e.target.value as ItemCategory)}
-              className="mt-1 w-full px-3 py-2 border border-slate-200 rounded-lg bg-white text-slate-950 font-medium text-sm"
+              className="mt-1 w-full px-3 py-2 border border-[#dddddd] rounded-lg bg-white text-[#222222] font-medium text-sm"
             >
               {(['PersonalBelongings', 'Cards', 'Electronics', 'Others'] as ItemCategory[]).map((c) => (
                 <option key={c} value={c}>
@@ -197,14 +197,14 @@ export function Step1PhotosAndItem({
           </div>
 
           <div>
-            <Label htmlFor="subcategory" className="text-sm font-semibold text-slate-950">
-              Subcategory <span className="text-red-600">*</span>
+            <Label htmlFor="subcategory" className="text-sm font-semibold text-[#222222]">
+              Subcategory <span className="text-[#c13515]">*</span>
             </Label>
             <select
               id="subcategory"
               value={subcategoryCode}
               onChange={(e) => setSubcategoryCode(e.target.value)}
-              className="mt-1 w-full px-3 py-2 border border-slate-200 rounded-lg bg-white text-slate-950 font-medium text-sm"
+              className="mt-1 w-full px-3 py-2 border border-[#dddddd] rounded-lg bg-white text-[#222222] font-medium text-sm"
               disabled={!subcategories || subcategories.length === 0}
             >
               {(subcategories ?? []).map((s) => (
@@ -214,13 +214,13 @@ export function Step1PhotosAndItem({
               ))}
             </select>
             {!subcategories || subcategories.length === 0 ? (
-              <div className="mt-1 text-xs text-slate-600">No subcategories available for this category.</div>
+              <div className="mt-1 text-xs text-[#929292]">No subcategories available for this category.</div>
             ) : null}
           </div>
 
           <div className="md:col-span-2">
-            <Label htmlFor="internalLocation" className="text-sm font-semibold text-slate-950">
-              Internal location <span className="text-red-600">*</span>
+            <Label htmlFor="internalLocation" className="text-sm font-semibold text-[#222222]">
+              Internal location <span className="text-[#c13515]">*</span>
             </Label>
             <Input
               id="internalLocation"
@@ -232,8 +232,8 @@ export function Step1PhotosAndItem({
           </div>
 
           <div className="md:col-span-2">
-            <Label htmlFor="eventTime" className="text-sm font-semibold text-slate-950">
-              Found time <span className="text-red-600">*</span>
+            <Label htmlFor="eventTime" className="text-sm font-semibold text-[#222222]">
+              Found time <span className="text-[#c13515]">*</span>
             </Label>
             <Input
               id="eventTime"
@@ -251,12 +251,12 @@ export function Step1PhotosAndItem({
               }}
               className="mt-1"
             />
-            <div className="mt-1 text-xs text-slate-600">When the item was found or handed to staff.</div>
+            <div className="mt-1 text-xs text-[#929292]">When the item was found or handed to staff.</div>
           </div>
 
           {category !== 'Others' ? (
             <div className="md:col-span-2">
-              <Label htmlFor="detailItemName" className="text-sm font-semibold text-slate-950">
+              <Label htmlFor="detailItemName" className="text-sm font-semibold text-[#222222]">
                 Item name
               </Label>
               <Input
@@ -272,8 +272,8 @@ export function Step1PhotosAndItem({
 
           {category === 'Others' ? (
             <div className="md:col-span-2">
-              <Label htmlFor="itemIdentifier" className="text-sm font-semibold text-slate-950">
-                Item identifier <span className="text-red-600">*</span>
+              <Label htmlFor="itemIdentifier" className="text-sm font-semibold text-[#222222]">
+                Item identifier <span className="text-[#c13515]">*</span>
               </Label>
               <Input
                 id="itemIdentifier"
@@ -289,7 +289,7 @@ export function Step1PhotosAndItem({
           {category === 'Cards' ? (
             <>
               <div className="md:col-span-2">
-                <Label htmlFor="holderName" className="text-sm font-semibold text-slate-950">
+                <Label htmlFor="holderName" className="text-sm font-semibold text-[#222222]">
                   Holder name
                 </Label>
                 <Input
@@ -300,7 +300,7 @@ export function Step1PhotosAndItem({
                 />
               </div>
               <div>
-                <Label htmlFor="cardNumber" className="text-sm font-semibold text-slate-950">
+                <Label htmlFor="cardNumber" className="text-sm font-semibold text-[#222222]">
                   Card number
                 </Label>
                 <Input
@@ -311,7 +311,7 @@ export function Step1PhotosAndItem({
                 />
               </div>
               <div>
-                <Label htmlFor="issuingAuthority" className="text-sm font-semibold text-slate-950">
+                <Label htmlFor="issuingAuthority" className="text-sm font-semibold text-[#222222]">
                   Issuing authority
                 </Label>
                 <Input
@@ -322,7 +322,7 @@ export function Step1PhotosAndItem({
                 />
               </div>
               <div>
-                <Label htmlFor="dob" className="text-sm font-semibold text-slate-950">
+                <Label htmlFor="dob" className="text-sm font-semibold text-[#222222]">
                   Date of birth
                 </Label>
                 <Input
@@ -334,7 +334,7 @@ export function Step1PhotosAndItem({
                 />
               </div>
               <div>
-                <Label htmlFor="issueDate" className="text-sm font-semibold text-slate-950">
+                <Label htmlFor="issueDate" className="text-sm font-semibold text-[#222222]">
                   Issue date
                 </Label>
                 <Input
@@ -346,7 +346,7 @@ export function Step1PhotosAndItem({
                 />
               </div>
               <div>
-                <Label htmlFor="expiryDate" className="text-sm font-semibold text-slate-950">
+                <Label htmlFor="expiryDate" className="text-sm font-semibold text-[#222222]">
                   Expiry date
                 </Label>
                 <Input
@@ -362,7 +362,7 @@ export function Step1PhotosAndItem({
 
           {category === 'Others' ? (
             <div className="md:col-span-2">
-              <Label htmlFor="primaryColor" className="text-sm font-semibold text-slate-950">
+              <Label htmlFor="primaryColor" className="text-sm font-semibold text-[#222222]">
                 Primary color
               </Label>
               <Input
@@ -378,31 +378,31 @@ export function Step1PhotosAndItem({
           {category === 'PersonalBelongings' ? (
             <>
               <div>
-                <Label htmlFor="brand" className="text-sm font-semibold text-slate-950">
+                <Label htmlFor="brand" className="text-sm font-semibold text-[#222222]">
                   Brand
                 </Label>
                 <Input id="brand" value={brand} onChange={(e) => setBrand(e.target.value)} className="mt-1" />
               </div>
               <div>
-                <Label htmlFor="color" className="text-sm font-semibold text-slate-950">
+                <Label htmlFor="color" className="text-sm font-semibold text-[#222222]">
                   Color
                 </Label>
                 <Input id="color" value={color} onChange={(e) => setColor(e.target.value)} className="mt-1" />
               </div>
               <div>
-                <Label htmlFor="condition" className="text-sm font-semibold text-slate-950">
+                <Label htmlFor="condition" className="text-sm font-semibold text-[#222222]">
                   Condition
                 </Label>
                 <Input id="condition" value={condition} onChange={(e) => setCondition(e.target.value)} className="mt-1" />
               </div>
               <div>
-                <Label htmlFor="material" className="text-sm font-semibold text-slate-950">
+                <Label htmlFor="material" className="text-sm font-semibold text-[#222222]">
                   Material
                 </Label>
                 <Input id="material" value={material} onChange={(e) => setMaterial(e.target.value)} className="mt-1" />
               </div>
               <div>
-                <Label htmlFor="size" className="text-sm font-semibold text-slate-950">
+                <Label htmlFor="size" className="text-sm font-semibold text-[#222222]">
                   Size
                 </Label>
                 <Input id="size" value={size} onChange={(e) => setSize(e.target.value)} className="mt-1" />
@@ -413,25 +413,25 @@ export function Step1PhotosAndItem({
           {category === 'Electronics' ? (
             <>
               <div>
-                <Label htmlFor="brand" className="text-sm font-semibold text-slate-950">
+                <Label htmlFor="brand" className="text-sm font-semibold text-[#222222]">
                   Brand
                 </Label>
                 <Input id="brand" value={brand} onChange={(e) => setBrand(e.target.value)} className="mt-1" />
               </div>
               <div>
-                <Label htmlFor="color" className="text-sm font-semibold text-slate-950">
+                <Label htmlFor="color" className="text-sm font-semibold text-[#222222]">
                   Color
                 </Label>
                 <Input id="color" value={color} onChange={(e) => setColor(e.target.value)} className="mt-1" />
               </div>
               <div className="md:col-span-2">
-                <Label htmlFor="model" className="text-sm font-semibold text-slate-950">
+                <Label htmlFor="model" className="text-sm font-semibold text-[#222222]">
                   Model
                 </Label>
                 <Input id="model" value={model} onChange={(e) => setModel(e.target.value)} className="mt-1" />
               </div>
               <div className="md:col-span-2">
-                <Label htmlFor="condition" className="text-sm font-semibold text-slate-950">
+                <Label htmlFor="condition" className="text-sm font-semibold text-[#222222]">
                   Screen condition
                 </Label>
                 <Input id="condition" value={condition} onChange={(e) => setCondition(e.target.value)} className="mt-1" />
@@ -442,14 +442,14 @@ export function Step1PhotosAndItem({
                   type="checkbox"
                   checked={hasCase}
                   onChange={(e) => setHasCase(e.target.checked)}
-                  className="h-4 w-4 rounded border-slate-300"
+                  className="h-4 w-4 rounded border-[#dddddd]"
                 />
-                <Label htmlFor="hasCase" className="text-sm font-semibold text-slate-950 cursor-pointer">
+                <Label htmlFor="hasCase" className="text-sm font-semibold text-[#222222] cursor-pointer">
                   Has case / accessories
                 </Label>
               </div>
               <div className="md:col-span-2">
-                <Label htmlFor="caseDescription" className="text-sm font-semibold text-slate-950">
+                <Label htmlFor="caseDescription" className="text-sm font-semibold text-[#222222]">
                   Case description
                 </Label>
                 <Input
@@ -461,7 +461,7 @@ export function Step1PhotosAndItem({
                 />
               </div>
               <div className="md:col-span-2">
-                <Label htmlFor="lockScreenDescription" className="text-sm font-semibold text-slate-950">
+                <Label htmlFor="lockScreenDescription" className="text-sm font-semibold text-[#222222]">
                   Lock screen description
                 </Label>
                 <Input
@@ -477,7 +477,7 @@ export function Step1PhotosAndItem({
 
           {category === 'PersonalBelongings' || category === 'Electronics' ? (
             <div className="md:col-span-2">
-              <Label htmlFor="distinctiveMarks" className="text-sm font-semibold text-slate-950">
+              <Label htmlFor="distinctiveMarks" className="text-sm font-semibold text-[#222222]">
                 Distinctive marks
               </Label>
               <Input
@@ -491,7 +491,7 @@ export function Step1PhotosAndItem({
           ) : null}
 
           <div className="md:col-span-2">
-            <Label htmlFor="description" className="text-sm font-semibold text-slate-950">
+            <Label htmlFor="description" className="text-sm font-semibold text-[#222222]">
               Additional details
             </Label>
             <Textarea
@@ -509,7 +509,7 @@ export function Step1PhotosAndItem({
         <Button
           type="button"
           aria-label="Next"
-          className="mb-2 h-8 w-8 rounded-full bg-slate-950 text-white hover:bg-slate-800"
+          className="mb-2 h-8 w-8 rounded-full bg-[#222222] text-white hover:bg-[#444444]"
           onClick={onNext}
         >
           <ChevronRight className="h-5 w-5 mx-auto" />

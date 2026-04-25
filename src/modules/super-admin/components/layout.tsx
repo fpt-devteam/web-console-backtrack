@@ -1,33 +1,17 @@
-import { Sidebar } from './sidebar';
-import { useState } from 'react';
+import { SidebarProvider, SidebarInset } from '@/components/ui/sidebar'
+import { SuperAdminSidebar } from './sidebar'
 
 interface LayoutProps {
-  children: React.ReactNode;
-  sidebarOpen?: boolean;
+  children: React.ReactNode
 }
 
-/**
- * Super Admin Layout Component
- * 
- * Provides layout structure for super admin pages with sidebar navigation.
- * 
- * @param children - Page content to render
- * @param sidebarOpen - Whether sidebar is expanded (optional, defaults to true)
- */
-export function Layout({ children, sidebarOpen: initialSidebarOpen = true }: LayoutProps) {
-  const [sidebarOpen, setSidebarOpen] = useState(initialSidebarOpen);
-
+export function Layout({ children }: LayoutProps) {
   return (
-    <div className="min-h-screen bg-gray-50">
-      <Sidebar isOpen={sidebarOpen} onToggle={() => setSidebarOpen(!sidebarOpen)} />
-      <main 
-        className={`transition-all duration-300 ${
-          sidebarOpen ? 'ml-64' : 'ml-20'
-        }`}
-      >
+    <SidebarProvider>
+      <SuperAdminSidebar />
+      <SidebarInset className="bg-[#f7f7f7] min-h-screen">
         {children}
-      </main>
-    </div>
-  );
+      </SidebarInset>
+    </SidebarProvider>
+  )
 }
-

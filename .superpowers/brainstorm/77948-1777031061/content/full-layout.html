@@ -1,0 +1,162 @@
+<style>
+  * { box-sizing: border-box; }
+  .role-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; margin-top: 12px; }
+  .role-panel { border: 1.5px solid #dddddd; border-radius: 12px; overflow: hidden; background: #f7f7f7; }
+  .role-label { background: #222; color: white; font-size: 10px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; padding: 5px 10px; }
+  .role-label.admin { background: #ff385c; }
+  .role-label.super { background: #222; }
+  .role-label.generic { background: #6a6a6a; }
+  .db-header { background: white; border-bottom: 1px solid #dddddd; padding: 8px 10px; display: flex; align-items: center; justify-content: space-between; }
+  .db-title { font-size: 12px; font-weight: 700; color: #222; }
+  .db-sub { font-size: 9px; color: #929292; }
+  .db-btn { font-size: 9px; background: #ff385c; color: white; border: none; border-radius: 7px; padding: 3px 8px; }
+  .db-body { padding: 8px; display: flex; flex-direction: column; gap: 6px; }
+  .kpi-row { display: grid; grid-template-columns: 1fr 1fr; gap: 5px; }
+  .kpi { background: white; border: 1px solid #dddddd; border-radius: 8px; padding: 7px 8px; }
+  .kpi .k-label { font-size: 9px; color: #929292; }
+  .kpi .k-val { font-size: 15px; font-weight: 700; color: #222; margin: 1px 0; }
+  .kpi .k-trend { font-size: 8px; color: #06c167; }
+  .kpi .k-trend.down { color: #c13515; }
+  .chart-box { background: white; border: 1px solid #dddddd; border-radius: 8px; padding: 8px; }
+  .chart-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px; }
+  .chart-title { font-size: 10px; font-weight: 700; color: #222; }
+  .chart-tabs { display: flex; gap: 3px; }
+  .ct { font-size: 8px; padding: 2px 5px; border-radius: 5px; border: 1px solid #dddddd; color: #6a6a6a; }
+  .ct.active { background: #fff0f2; color: #ff385c; border-color: #ff385c; font-weight: 700; }
+  .chart-area { height: 44px; display: flex; align-items: flex-end; gap: 2px; }
+  .ca-bar { flex: 1; border-radius: 2px 2px 0 0; background: linear-gradient(to top, rgba(255,56,92,.5), rgba(255,56,92,.15)); border-top: 1.5px solid #ff385c; }
+  .ca-bar.b { background: linear-gradient(to top, rgba(6,193,103,.5), rgba(6,193,103,.1)); border-top-color: #06c167; }
+  .table-box { background: white; border: 1px solid #dddddd; border-radius: 8px; overflow: hidden; }
+  .t-head { background: #f7f7f7; border-bottom: 1px solid #dddddd; display: flex; padding: 5px 8px; gap: 8px; }
+  .t-th { font-size: 8px; color: #6a6a6a; font-weight: 700; text-transform: uppercase; flex: 1; }
+  .t-row { display: flex; padding: 5px 8px; gap: 8px; border-bottom: 1px solid #f7f7f7; }
+  .t-td { font-size: 9px; color: #222; flex: 1; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+  .badge { display: inline-block; padding: 1px 5px; border-radius: 99px; font-size: 8px; font-weight: 700; }
+  .bg { background: #e8f9f0; color: #06c167; }
+  .ba { background: #fff8e6; color: #c97a00; }
+  .br { background: #fff0f2; color: #c13515; }
+  .bk { background: #f7f7f7; color: #6a6a6a; }
+  .comp-tree { background: #222; color: #e0e0e0; border-radius: 10px; padding: 14px 18px; font-family: monospace; font-size: 11px; line-height: 1.7; margin-top: 12px; }
+  .ct-accent { color: #ff385c; }
+  .ct-green { color: #06c167; }
+  .ct-gray { color: #929292; }
+  .ct-yellow { color: #c97a00; }
+</style>
+
+<h2>Proposed generic dashboard layout — 3 roles</h2>
+<p class="subtitle">One shared component in <code>src/components/dashboard/</code>, each role passes its own config. Does this look right?</p>
+
+<div class="role-grid">
+
+  <!-- Role 1: Console Admin -->
+  <div>
+    <div class="role-panel">
+      <div class="role-label admin">Console Admin · /admin/dashboard</div>
+      <div class="db-header">
+        <div><div class="db-title">Dashboard</div><div class="db-sub">Organization overview</div></div>
+        <button class="db-btn">+ Add Item</button>
+      </div>
+      <div class="db-body">
+        <div class="kpi-row">
+          <div class="kpi"><div class="k-label">Active Items</div><div class="k-val">248</div><div class="k-trend">↑ +12 this week</div></div>
+          <div class="kpi"><div class="k-label">Return Rate</div><div class="k-val">87%</div><div class="k-trend">↑ +2.4%</div></div>
+          <div class="kpi"><div class="k-label">Active Staff</div><div class="k-val">14</div><div class="k-trend">↑ +1</div></div>
+          <div class="kpi"><div class="k-label">Found Today</div><div class="k-val">6</div><div class="k-trend down">↓ −2 vs yesterday</div></div>
+        </div>
+        <div class="chart-box">
+          <div class="chart-head"><span class="chart-title">Item Activity</span><div class="chart-tabs"><span class="ct">7d</span><span class="ct active">30d</span><span class="ct">90d</span></div></div>
+          <div class="chart-area">
+            <div class="ca-bar" style="height:55%"></div><div class="ca-bar" style="height:40%"></div><div class="ca-bar b" style="height:30%"></div><div class="ca-bar" style="height:70%"></div><div class="ca-bar b" style="height:45%"></div><div class="ca-bar" style="height:85%"></div><div class="ca-bar b" style="height:60%"></div><div class="ca-bar" style="height:75%"></div><div class="ca-bar b" style="height:50%"></div>
+          </div>
+        </div>
+        <div class="table-box">
+          <div class="t-head"><div class="t-th">Item</div><div class="t-th">Cat.</div><div class="t-th">Status</div><div class="t-th">Staff</div></div>
+          <div class="t-row"><div class="t-td">Blue Backpack</div><div class="t-td">Bags</div><div class="t-td"><span class="badge ba">Storage</span></div><div class="t-td">Nguyen</div></div>
+          <div class="t-row"><div class="t-td">iPhone 14</div><div class="t-td">Electronics</div><div class="t-td"><span class="badge bg">Returned</span></div><div class="t-td">Tran</div></div>
+          <div class="t-row"><div class="t-td">Leather Wallet</div><div class="t-td">Personal</div><div class="t-td"><span class="badge br">Active</span></div><div class="t-td">Le</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Role 2: Super Admin -->
+  <div>
+    <div class="role-panel">
+      <div class="role-label super">Super Admin · /super-admin/dashboard</div>
+      <div class="db-header">
+        <div><div class="db-title">Platform Overview</div><div class="db-sub">All organizations</div></div>
+        <button class="db-btn">Export</button>
+      </div>
+      <div class="db-body">
+        <div class="kpi-row">
+          <div class="kpi"><div class="k-label">Organizations</div><div class="k-val">32</div><div class="k-trend">↑ +3 this month</div></div>
+          <div class="kpi"><div class="k-label">Total Users</div><div class="k-val">1,284</div><div class="k-trend">↑ +47</div></div>
+          <div class="kpi"><div class="k-label">Active Items</div><div class="k-val">5,621</div><div class="k-trend">↑ +142</div></div>
+          <div class="kpi"><div class="k-label">Revenue</div><div class="k-val">$29.8K</div><div class="k-trend">↑ +8.7%</div></div>
+        </div>
+        <div class="chart-box">
+          <div class="chart-head"><span class="chart-title">Platform Growth</span><div class="chart-tabs"><span class="ct">7d</span><span class="ct">30d</span><span class="ct active">90d</span></div></div>
+          <div class="chart-area">
+            <div class="ca-bar" style="height:30%"></div><div class="ca-bar b" style="height:25%"></div><div class="ca-bar" style="height:45%"></div><div class="ca-bar b" style="height:40%"></div><div class="ca-bar" style="height:60%"></div><div class="ca-bar b" style="height:55%"></div><div class="ca-bar" style="height:75%"></div><div class="ca-bar b" style="height:65%"></div><div class="ca-bar" style="height:90%"></div>
+          </div>
+        </div>
+        <div class="table-box">
+          <div class="t-head"><div class="t-th">Organization</div><div class="t-th">Plan</div><div class="t-th">Users</div><div class="t-th">Status</div></div>
+          <div class="t-row"><div class="t-td">Hanoi Airport</div><div class="t-td">Enterprise</div><div class="t-td">124</div><div class="t-td"><span class="badge bg">Active</span></div></div>
+          <div class="t-row"><div class="t-td">HCMC Transit</div><div class="t-td">Pro</div><div class="t-td">87</div><div class="t-td"><span class="badge bg">Active</span></div></div>
+          <div class="t-row"><div class="t-td">Da Nang Hotel</div><div class="t-td">Starter</div><div class="t-td">12</div><div class="t-td"><span class="badge ba">Trial</span></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Role 3: Generic /dashboard -->
+  <div>
+    <div class="role-panel">
+      <div class="role-label generic">Generic · /dashboard</div>
+      <div class="db-header">
+        <div><div class="db-title">Dashboard</div><div class="db-sub">Welcome to Backtrack</div></div>
+      </div>
+      <div class="db-body">
+        <div class="kpi-row">
+          <div class="kpi"><div class="k-label">Total Users</div><div class="k-val">1,284</div><div class="k-trend">↑ +47</div></div>
+          <div class="kpi"><div class="k-label">Active Users</div><div class="k-val">847</div><div class="k-trend">↑ +12</div></div>
+          <div class="kpi"><div class="k-label">Revenue</div><div class="k-val">$29.8K</div><div class="k-trend">↑ +8.7%</div></div>
+          <div class="kpi"><div class="k-label">Growth</div><div class="k-val">12.4%</div><div class="k-trend">↑ +2.1%</div></div>
+        </div>
+        <div class="chart-box">
+          <div class="chart-head"><span class="chart-title">User Activity</span><div class="chart-tabs"><span class="ct active">7d</span><span class="ct">30d</span><span class="ct">90d</span></div></div>
+          <div class="chart-area">
+            <div class="ca-bar" style="height:65%"></div><div class="ca-bar b" style="height:50%"></div><div class="ca-bar" style="height:80%"></div><div class="ca-bar b" style="height:45%"></div><div class="ca-bar" style="height:90%"></div><div class="ca-bar b" style="height:70%"></div><div class="ca-bar" style="height:55%"></div><div class="ca-bar b" style="height:75%"></div><div class="ca-bar" style="height:60%"></div>
+          </div>
+        </div>
+        <div class="table-box">
+          <div class="t-head"><div class="t-th">User</div><div class="t-th">Action</div><div class="t-th">Details</div><div class="t-th">Time</div></div>
+          <div class="t-row"><div class="t-td">Nguyen V.A</div><div class="t-td"><span class="badge bg">Login</span></div><div class="t-td">Web signin</div><div class="t-td">2m ago</div></div>
+          <div class="t-row"><div class="t-td">Tran T.B</div><div class="t-td"><span class="badge br">Create</span></div><div class="t-td">New item added</div><div class="t-td">5m ago</div></div>
+          <div class="t-row"><div class="t-td">Le V.C</div><div class="t-td"><span class="badge ba">Update</span></div><div class="t-td">Profile edit</div><div class="t-td">8m ago</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="comp-tree">
+<span class="ct-gray">// Component tree — src/components/dashboard/</span>
+<br>
+<span class="ct-accent">DashboardShell</span>  <span class="ct-gray">← layout wrapper (bg, padding, max-width)</span>
+<br>  ├── <span class="ct-green">SiteHeader</span>  <span class="ct-gray">← title, subtitle, action slot</span>
+<br>  ├── <span class="ct-green">SectionCards</span>  <span class="ct-gray">← cards: [{ label, value, trend, icon, color }]</span>
+<br>  ├── <span class="ct-green">ChartAreaInteractive</span>  <span class="ct-gray">← data, series config, title, time ranges</span>
+<br>  └── <span class="ct-green">DataTable</span>  <span class="ct-gray">← columns, data, title — sortable + paginated</span>
+<br><br>
+<span class="ct-gray">// Each role dashboard composes the shell:</span>
+<br>
+<span class="ct-yellow">AdminDashboardPage</span> → <span class="ct-accent">DashboardShell</span> + item data
+<br>
+<span class="ct-yellow">SuperAdminDashboard</span> → <span class="ct-accent">DashboardShell</span> + org data
+<br>
+<span class="ct-yellow">GenericDashboard</span> → <span class="ct-accent">DashboardShell</span> + user/activity data
+</div>
+
+<p class="subtitle" style="margin-top:12px">Does this layout and data split look right? Any changes before I build?</p>

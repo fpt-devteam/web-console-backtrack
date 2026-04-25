@@ -93,11 +93,11 @@ export function StaffNotificationPage() {
     <StaffLayout>
       <div className="h-full overflow-y-auto p-8">
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900">Notifications</h1>
+          <h1 className="text-3xl font-bold text-[#222222]">Notifications</h1>
         </div>
 
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100 flex-1 min-h-0 flex flex-col">
-          <div className="px-4 sm:px-5 pt-4 sm:pt-5 border-b border-gray-100 flex items-end justify-between gap-3">
+        <div className="bg-white rounded-[14px] border border-[#dddddd] flex-1 min-h-0 flex flex-col">
+          <div className="px-4 sm:px-5 pt-4 sm:pt-5 border-b border-[#dddddd] flex items-end justify-between gap-3">
             <div className="flex items-end gap-6">
               <button
                 type="button"
@@ -105,8 +105,8 @@ export function StaffNotificationPage() {
                 className={[
                   'pb-3 text-sm font-medium transition-colors',
                   activeTab === 'All'
-                    ? 'text-gray-900 font-black border-b-2 border-sky-600'
-                    : 'text-gray-600 hover:text-gray-900 border-b-2 border-transparent',
+                    ? 'text-[#222222] font-black border-b-2 border-[#222222]'
+                    : 'text-[#6a6a6a] hover:text-[#222222] border-b-2 border-transparent',
                 ].join(' ')}
               >
                 All
@@ -117,8 +117,8 @@ export function StaffNotificationPage() {
                 className={[
                   'pb-3 text-sm font-medium transition-colors',
                   activeTab === 'Unread'
-                    ? 'text-gray-900 font-black border-b-2 border-sky-600'
-                    : 'text-gray-600 hover:text-gray-900 border-b-2 border-transparent',
+                    ? 'text-[#222222] font-black border-b-2 border-[#222222]'
+                    : 'text-[#6a6a6a] hover:text-[#222222] border-b-2 border-transparent',
                 ].join(' ')}
               >
                 Unread{unreadCount > 0 ? ` (${unreadCount})` : ''}
@@ -128,8 +128,8 @@ export function StaffNotificationPage() {
             <button
               type="button"
               className={[
-                'mb-2 me-4 inline-flex items-center gap-2 text-sm font-semibold text-gray-700 transition-colors',
-                'hover:text-black hover:scale-[1.03] transform-gpu origin-right transition-transform',
+                'mb-2 me-4 inline-flex items-center gap-2 text-sm font-semibold text-[#6a6a6a] transition-colors',
+                'hover:text-[#222222] hover:scale-[1.03] transform-gpu origin-right transition-transform',
                 'disabled:opacity-50 disabled:pointer-events-none',
               ].join(' ')}
               onClick={() => setUnreadIds(new Set())}
@@ -142,7 +142,7 @@ export function StaffNotificationPage() {
 
           <div className="overflow-y-auto p-4 sm:p-5">
             {items.length === 0 ? (
-              <div className="p-8 text-center text-sm text-gray-600">
+              <div className="p-8 text-center text-sm text-[#6a6a6a]">
                 No notifications.
               </div>
             ) : (
@@ -155,8 +155,8 @@ export function StaffNotificationPage() {
                   if (section.items.length === 0) return null
                   return (
                     <div key={section.key}>
-                      <div className="mb-3 flex items-center justify-between">
-                        <div className="text-sm font-semibold text-gray-800">{section.title}</div>
+                        <div className="mb-3 flex items-center justify-between">
+                        <div className="text-sm font-semibold text-[#222222]">{section.title}</div>
                       </div>
 
                       <div className="space-y-3">
@@ -173,10 +173,10 @@ export function StaffNotificationPage() {
                               })
                             }}
                             className={[
-                              'w-full text-left rounded-xl border border-gray-100 px-4 py-3 sm:px-5 sm:py-3.5 transition-colors shadow-sm',
+                              'w-full text-left rounded-[12px] border border-[#dddddd] px-4 py-3 sm:px-5 sm:py-3.5 transition-colors',
                               n.isUnread
-                                ? 'bg-sky-100/40 hover:bg-sky-100/60'
-                                : 'bg-gray-50 hover:bg-gray-100/60',
+                                ? 'bg-[#fff0f2]/40 hover:bg-[#fff0f2]/60'
+                                : 'bg-[#f7f7f7] hover:bg-[#f7f7f7]/80',
                             ].join(' ')}
                           >
                             <div className="flex items-start gap-4">
@@ -184,7 +184,7 @@ export function StaffNotificationPage() {
                                 <div
                                   className={[
                                     'h-2.5 w-2.5 rounded-full',
-                                    n.isUnread ? 'bg-sky-600' : 'bg-gray-300',
+                                    n.isUnread ? 'bg-[#ff385c]' : 'bg-[#dddddd]',
                                   ].join(' ')}
                                 />
                               </div>
@@ -192,11 +192,11 @@ export function StaffNotificationPage() {
                               <div className="min-w-0 flex-1">
                                 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1">
                                   <div className="flex items-center gap-2 min-w-0">
-                                    <div className="font-semibold text-gray-900 truncate">{n.title}</div>
+                                    <div className="font-semibold text-[#222222] truncate">{n.title}</div>
                                   </div>
-                                  <div className="text-xs text-gray-500 shrink-0">{n.timeLabel}</div>
+                                  <div className="text-xs text-[#929292] shrink-0">{n.timeLabel}</div>
                                 </div>
-                                <div className="mt-1 text-sm text-gray-700">{n.message}</div>
+                                <div className="mt-1 text-sm text-[#6a6a6a]">{n.message}</div>
                               </div>
                             </div>
                           </button>

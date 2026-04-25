@@ -1,0 +1,120 @@
+<style>
+  .mockup { border-radius: 12px; overflow: hidden; border: 1.5px solid #dddddd; background: #f7f7f7; margin-bottom: 8px; }
+  .mockup-header { background: white; border-bottom: 1px solid #dddddd; padding: 8px 14px; font-size: 11px; font-weight: 600; color: #6a6a6a; letter-spacing: .06em; text-transform: uppercase; }
+  .mockup-body { padding: 12px; display: flex; flex-direction: column; gap: 8px; }
+  .m-row { display: flex; gap: 8px; }
+  .m-card { background: white; border: 1px solid #dddddd; border-radius: 10px; padding: 10px 12px; flex: 1; min-height: 52px; }
+  .m-card .m-label { font-size: 10px; color: #929292; margin-bottom: 4px; }
+  .m-card .m-val { font-size: 18px; font-weight: 700; color: #222; }
+  .m-card .m-trend { font-size: 9px; color: #06c167; margin-top: 2px; }
+  .m-chart { background: white; border: 1px solid #dddddd; border-radius: 10px; padding: 10px 12px; height: 80px; display: flex; align-items: flex-end; gap: 3px; overflow: hidden; }
+  .m-bar { flex: 1; border-radius: 3px 3px 0 0; }
+  .m-area { background: linear-gradient(to bottom, rgba(255,56,92,0.15), transparent); border-top: 2px solid #ff385c; border-radius: 10px; flex: 1; height: 100%; }
+  .m-table { background: white; border: 1px solid #dddddd; border-radius: 10px; overflow: hidden; }
+  .m-thead { background: #f7f7f7; border-bottom: 1px solid #dddddd; display: flex; padding: 6px 10px; gap: 12px; }
+  .m-th { font-size: 9px; color: #6a6a6a; font-weight: 600; text-transform: uppercase; flex: 1; }
+  .m-tr { display: flex; padding: 6px 10px; gap: 12px; border-bottom: 1px solid #f7f7f7; }
+  .m-td { font-size: 10px; color: #222; flex: 1; }
+  .m-badge { display: inline-block; padding: 1px 6px; border-radius: 99px; font-size: 9px; font-weight: 600; }
+  .badge-green { background: #e8f9f0; color: #06c167; }
+  .badge-amber { background: #fff8e6; color: #c97a00; }
+  .badge-red { background: #fff0f2; color: #c13515; }
+  .m-header { background: white; border-bottom: 1px solid #dddddd; padding: 8px 14px; display: flex; align-items: center; justify-content: space-between; }
+  .m-header-title { font-size: 13px; font-weight: 700; color: #222; }
+  .m-header-search { width: 90px; height: 22px; border: 1px solid #dddddd; border-radius: 8px; background: #f7f7f7; }
+  .section-tag { display: inline-flex; align-items: center; gap: 5px; font-size: 10px; font-weight: 600; color: #ff385c; background: #fff0f2; border-radius: 6px; padding: 3px 8px; margin-bottom: 4px; }
+  .dim { color: #929292 !important; border-color: #f0f0f0 !important; opacity: .45; }
+</style>
+
+<h2>Which sections do the 3 role dashboards need?</h2>
+<p class="subtitle">The shadcn dashboard-01 has 4 sections. Select all that should be in the generic component.</p>
+
+<div class="options" data-multiselect>
+
+  <div class="option" data-choice="header" onclick="toggleSelect(this)">
+    <div class="letter">A</div>
+    <div class="content">
+      <h3>Site Header</h3>
+      <p>Top bar with page title, breadcrumb, and action buttons (e.g. "Add Item", date range picker)</p>
+      <div class="mockup" style="margin-top:8px">
+        <div class="mockup-body" style="padding:8px">
+          <div class="m-header">
+            <div class="m-header-title">Dashboard</div>
+            <div style="display:flex;gap:6px;align-items:center">
+              <div class="m-header-search"></div>
+              <div style="width:60px;height:22px;background:#ff385c;border-radius:8px;"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="option" data-choice="cards" onclick="toggleSelect(this)">
+    <div class="letter">B</div>
+    <div class="content">
+      <h3>Section Cards</h3>
+      <p>Row of 4 KPI stat cards — value, label, trend indicator. Configurable per role.</p>
+      <div class="mockup" style="margin-top:8px">
+        <div class="mockup-body" style="padding:8px">
+          <div class="m-row">
+            <div class="m-card"><div class="m-label">Active Items</div><div class="m-val">248</div><div class="m-trend">↑ +12 this week</div></div>
+            <div class="m-card"><div class="m-label">Return Rate</div><div class="m-val">87%</div><div class="m-trend">↑ +2.4%</div></div>
+            <div class="m-card"><div class="m-label">Staff</div><div class="m-val">14</div><div class="m-trend">↑ +1</div></div>
+            <div class="m-card"><div class="m-label">Orgs</div><div class="m-val">32</div><div class="m-trend">↑ +3</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="option" data-choice="chart" onclick="toggleSelect(this)">
+    <div class="letter">C</div>
+    <div class="content">
+      <h3>Interactive Area Chart</h3>
+      <p>Time-series chart with 7d / 30d / 90d toggle. Data series configurable per role.</p>
+      <div class="mockup" style="margin-top:8px">
+        <div class="mockup-body" style="padding:8px">
+          <div style="background:white;border:1px solid #dddddd;border-radius:10px;padding:10px;display:flex;flex-direction:column;gap:6px;">
+            <div style="display:flex;justify-content:space-between;align-items:center">
+              <span style="font-size:11px;font-weight:700;color:#222">Item Activity</span>
+              <div style="display:flex;gap:4px;">
+                <span style="font-size:9px;padding:2px 8px;border-radius:6px;border:1px solid #dddddd;color:#6a6a6a">7d</span>
+                <span style="font-size:9px;padding:2px 8px;border-radius:6px;background:#fff0f2;color:#ff385c;font-weight:700">30d</span>
+                <span style="font-size:9px;padding:2px 8px;border-radius:6px;border:1px solid #dddddd;color:#6a6a6a">90d</span>
+              </div>
+            </div>
+            <div style="height:50px;display:flex;align-items:flex-end;gap:2px;padding:0 4px">
+              <div style="flex:1;background:linear-gradient(to bottom,rgba(255,56,92,.2),transparent);border-top:2px solid #ff385c;height:70%;border-radius:4px 4px 0 0"></div>
+              <div style="flex:1;background:linear-gradient(to bottom,rgba(255,56,92,.2),transparent);border-top:2px solid #ff385c;height:40%;border-radius:4px 4px 0 0"></div>
+              <div style="flex:1;background:linear-gradient(to bottom,rgba(255,56,92,.2),transparent);border-top:2px solid #ff385c;height:85%;border-radius:4px 4px 0 0"></div>
+              <div style="flex:1;background:linear-gradient(to bottom,rgba(255,56,92,.2),transparent);border-top:2px solid #ff385c;height:55%;border-radius:4px 4px 0 0"></div>
+              <div style="flex:1;background:linear-gradient(to bottom,rgba(255,56,92,.2),transparent);border-top:2px solid #ff385c;height:90%;border-radius:4px 4px 0 0"></div>
+              <div style="flex:1;background:linear-gradient(to bottom,rgba(255,56,92,.2),transparent);border-top:2px solid #ff385c;height:60%;border-radius:4px 4px 0 0"></div>
+              <div style="flex:1;background:linear-gradient(to bottom,rgba(255,56,92,.2),transparent);border-top:2px solid #ff385c;height:75%;border-radius:4px 4px 0 0"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="option" data-choice="table" onclick="toggleSelect(this)">
+    <div class="letter">D</div>
+    <div class="content">
+      <h3>Data Table</h3>
+      <p>Full-featured table — sortable columns, pagination, row actions, drag-to-reorder. Shows items / users / activity logs depending on role.</p>
+      <div class="mockup" style="margin-top:8px">
+        <div class="mockup-body" style="padding:8px">
+          <div class="m-table">
+            <div class="m-thead"><div class="m-th">Item</div><div class="m-th">Category</div><div class="m-th">Status</div><div class="m-th">Logged by</div></div>
+            <div class="m-tr"><div class="m-td">Blue Backpack</div><div class="m-td">Bags</div><div class="m-td"><span class="m-badge badge-amber">In Storage</span></div><div class="m-td">Nguyen</div></div>
+            <div class="m-tr"><div class="m-td">iPhone 14</div><div class="m-td">Electronics</div><div class="m-td"><span class="m-badge badge-green">Returned</span></div><div class="m-td">Tran</div></div>
+            <div class="m-tr"><div class="m-td">Leather Wallet</div><div class="m-td">Personal</div><div class="m-td"><span class="m-badge badge-red">Active</span></div><div class="m-td">Le</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>

@@ -67,12 +67,12 @@ export function JoinInvitationPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-[#E5F4FF] to-white flex items-center justify-center px-4 py-12">
+    <div className="min-h-screen bg-[#f7f7f7] flex items-center justify-center px-4 py-12">
       <div className="w-full max-w-xl">
         <div className="bg-white rounded-xl shadow-lg p-12">
           {state.status === 'joining' && (
             <div className="flex flex-col items-center gap-4">
-              <Loader2 className="w-16 h-16 text-blue-500 animate-spin" />
+              <Loader2 className="w-16 h-16 text-[#ff385c] animate-spin" />
               <h1 className="text-2xl font-bold text-center">Joining Organization...</h1>
               <p className="text-sm text-gray-600 text-center">
                 Please wait while we set up your membership.
@@ -82,8 +82,8 @@ export function JoinInvitationPage() {
 
           {state.status === 'success' && (
             <div className="flex flex-col items-center gap-4">
-              <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center">
-                <Check className="w-8 h-8 text-green-600" />
+              <div className="w-16 h-16 bg-[#e8f9f0] rounded-full flex items-center justify-center">
+                <Check className="w-8 h-8 text-[#06c167]" />
               </div>
               <h1 className="text-2xl font-bold text-center">Welcome aboard!</h1>
               <p className="text-sm text-gray-600 text-center">
@@ -94,14 +94,14 @@ export function JoinInvitationPage() {
 
           {state.status === 'error' && (
             <div className="flex flex-col items-center gap-4">
-              <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center">
-                <XCircle className="w-8 h-8 text-red-600" />
+              <div className="w-16 h-16 bg-[#fff0f2] rounded-full flex items-center justify-center">
+                <XCircle className="w-8 h-8 text-[#c13515]" />
               </div>
               <h1 className="text-2xl font-bold text-center">Unable to Join</h1>
               <p className="text-sm text-gray-600 text-center">{state.message}</p>
               <Button
                 onClick={handleGoToWelcome}
-                className="w-full bg-blue-500 hover:bg-blue-600 text-white py-5 text-base font-medium mt-4"
+                className="w-full bg-[#ff385c] hover:bg-[#e00b41] text-white py-5 text-base font-medium mt-4"
               >
                 Go to Dashboard
               </Button>

@@ -26,12 +26,12 @@ function Cell({
 }) {
   return (
     <div className={fullWidth ? 'md:col-span-2' : undefined}>
-      <div className="text-sm font-semibold uppercase mb-2">{label}</div>
+      <div className="text-sm font-semibold uppercase mb-2 text-[#6a6a6a]">{label}</div>
       <div
         className={
           fullWidth
-            ? 'flex items-start gap-2 min-w-0 text-gray-900 text-sm break-words leading-relaxed'
-            : 'flex items-center gap-2 text-gray-900 min-w-0'
+            ? 'flex items-start gap-2 min-w-0 text-[#222222] text-sm break-words leading-relaxed'
+            : 'flex items-center gap-2 text-[#222222] min-w-0'
         }
       >
         {children}
@@ -67,7 +67,7 @@ export function InventoryDetailAttributeGrid({
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <Cell label="STATUS">
           <>
-            <Info className="w-4 h-4 text-blue-600 shrink-0" />
+            <Info className="w-4 h-4 text-[#ff385c] shrink-0" />
             <span>{inventoryStatusLabel(item.status)}</span>
           </>
         </Cell>
@@ -78,21 +78,21 @@ export function InventoryDetailAttributeGrid({
 
         <Cell label="CATEGORY">
           <>
-            <Building2 className="w-4 h-4 text-blue-600 shrink-0" />
+            <Building2 className="w-4 h-4 text-[#ff385c] shrink-0" />
             <TextValue v={item.category} />
           </>
         </Cell>
 
         <Cell label="SUBCATEGORY">
           <>
-            <Building2 className="w-4 h-4 text-blue-600 shrink-0" />
+            <Building2 className="w-4 h-4 text-[#ff385c] shrink-0" />
             <TextValue v={subName.trim() ? subName : null} />
           </>
         </Cell>
 
         <Cell label="INTERNAL LOCATION" fullWidth>
           <>
-            <MapPin className="w-4 h-4 text-blue-600 shrink-0 mt-0.5" aria-hidden />
+            <MapPin className="w-4 h-4 text-[#ff385c] shrink-0 mt-0.5" aria-hidden />
             <span className="min-w-0 flex-1">
               <TextValue v={item.internalLocation} />
             </span>
@@ -101,14 +101,14 @@ export function InventoryDetailAttributeGrid({
 
         <Cell label="FOUND TIME">
           <>
-            <Calendar className="w-4 h-4 text-blue-600 shrink-0" />
+            <Calendar className="w-4 h-4 text-[#ff385c] shrink-0" />
             <TextValue v={item.eventTime ? new Date(item.eventTime).toLocaleString() : null} />
           </>
         </Cell>
 
         <Cell label="CREATED AT">
           <>
-            <Calendar className="w-4 h-4 text-blue-600 shrink-0" />
+            <Calendar className="w-4 h-4 text-[#ff385c] shrink-0" />
             <TextValue v={item.createdAt ? new Date(item.createdAt).toLocaleString() : null} />
           </>
         </Cell>
@@ -196,23 +196,23 @@ export function InventoryDetailAttributeGrid({
 
       {getInventoryDistinctiveMarks(item) ? (
         <div>
-          <div className="text-sm font-semibold uppercase mb-2">DISTINCTIVE MARKS</div>
-          <div className="flex items-center gap-2 text-gray-900">
-            <Tag className="w-4 h-4 text-blue-600" />
+          <div className="text-sm font-semibold uppercase mb-2 text-[#6a6a6a]">DISTINCTIVE MARKS</div>
+          <div className="flex items-center gap-2 text-[#222222]">
+            <Tag className="w-4 h-4 text-[#ff385c]" />
             <span>{getInventoryDistinctiveMarks(item)}</span>
           </div>
         </div>
       ) : null}
 
       <div>
-        <div className="text-sm font-semibold uppercase mb-2">Additional details</div>
-        <p className="text-sm text-gray-700 leading-relaxed">{getInventoryDescription(item) ?? '—'}</p>
+        <div className="text-sm font-semibold uppercase mb-2 text-[#6a6a6a]">Additional details</div>
+        <p className="text-sm text-[#222222] leading-relaxed">{getInventoryDescription(item) ?? '—'}</p>
       </div>
 
       {aiDesc ? (
         <div>
-          <div className="text-sm font-semibold uppercase mb-2">AI description</div>
-          <p className="text-sm text-gray-700 leading-relaxed">{aiDesc}</p>
+          <div className="text-sm font-semibold uppercase mb-2 text-[#6a6a6a]">AI description</div>
+          <p className="text-sm text-[#222222] leading-relaxed">{aiDesc}</p>
         </div>
       ) : null}
     </>

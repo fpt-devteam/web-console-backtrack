@@ -1,0 +1,120 @@
+<h2>How should we adapt the dashboard to the shadcn template?</h2>
+<p class="subtitle">Three approaches — each keeps all existing data &amp; charts</p>
+
+<div class="cards">
+
+  <!-- Approach A -->
+  <div class="card" data-choice="a" onclick="toggleSelect(this)">
+    <div class="card-image" style="padding:16px;background:#f8fafc;border-radius:8px;font-size:11px;font-family:monospace;line-height:1.6">
+      <div style="background:#1e293b;color:#94a3b8;padding:6px 10px;border-radius:4px;margin-bottom:8px;font-size:10px">DashboardShell wrapper</div>
+
+      <div style="background:#e0f2fe;border:1px solid #bae6fd;border-radius:6px;padding:6px 10px;margin-bottom:6px;color:#0369a1">
+        SiteHeader — "Backtrack Dashboard" + last-synced pill
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:4px;margin-bottom:6px">
+        <div style="background:#fef9c3;border:1px solid #fde047;border-radius:4px;padding:4px 6px;text-align:center;font-size:9px;color:#854d0e">Lost Items</div>
+        <div style="background:#fef9c3;border:1px solid #fde047;border-radius:4px;padding:4px 6px;text-align:center;font-size:9px;color:#854d0e">Found</div>
+        <div style="background:#fef9c3;border:1px solid #fde047;border-radius:4px;padding:4px 6px;text-align:center;font-size:9px;color:#854d0e">Return Rate</div>
+        <div style="background:#fef9c3;border:1px solid #fde047;border-radius:4px;padding:4px 6px;text-align:center;font-size:9px;color:#854d0e">Revenue</div>
+      </div>
+
+      <div style="background:#fef9c3;border:1px solid #fde047;border-radius:4px;padding:6px 10px;margin-bottom:6px;color:#854d0e;font-size:9px">
+        ChartAreaInteractive — Lost vs Found Trend (7d/30d/90d toggle)
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px;margin-bottom:6px">
+        <div style="background:#fee2e2;border:1px solid #fca5a5;border-radius:4px;padding:5px 8px;font-size:9px;color:#991b1b">City Heatmap (custom extra row)</div>
+        <div style="background:#fee2e2;border:1px solid #fca5a5;border-radius:4px;padding:5px 8px;font-size:9px;color:#991b1b">Revenue Flow (custom extra row)</div>
+      </div>
+
+      <div style="background:#fef9c3;border:1px solid #fde047;border-radius:4px;padding:6px 10px;color:#854d0e;font-size:9px">
+        DataTable — Recent Activity (All/Active/Returned/Archived/Expired filters)
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>A — Full DashboardShell</h3>
+      <p>Wire all sections into <code>DashboardShell</code>. KPI cards use <code>SectionCards</code>. Recent Activity becomes a proper <code>DataTable</code>. City Heatmap &amp; Revenue Flow added as extra rows beneath the shell.</p>
+      <p style="margin-top:8px;font-size:12px;color:#16a34a">✓ Maximum template reuse &nbsp;&nbsp; ✓ Consistent layout</p>
+      <p style="margin-top:4px;font-size:12px;color:#dc2626">✗ KPI sparklines &amp; radial ring lost &nbsp;&nbsp; ✗ Forced column changes</p>
+    </div>
+  </div>
+
+  <!-- Approach B -->
+  <div class="card" data-choice="b" onclick="toggleSelect(this)">
+    <div class="card-image" style="padding:16px;background:#f8fafc;border-radius:8px;font-size:11px;font-family:monospace;line-height:1.6">
+      <div style="background:#1e293b;color:#94a3b8;padding:6px 10px;border-radius:4px;margin-bottom:8px;font-size:10px">Layout wrapper (sidebar preserved)</div>
+
+      <div style="background:#e0f2fe;border:1px solid #bae6fd;border-radius:6px;padding:6px 10px;margin-bottom:6px;color:#0369a1">
+        SiteHeader — title + last-synced pill (shadcn style)
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:4px;margin-bottom:6px">
+        <div style="background:#dcfce7;border:1px solid #86efac;border-radius:4px;padding:4px 6px;text-align:center;font-size:9px;color:#15803d">Lost + sparkline</div>
+        <div style="background:#dcfce7;border:1px solid #86efac;border-radius:4px;padding:4px 6px;text-align:center;font-size:9px;color:#15803d">Found + sparkline</div>
+        <div style="background:#dcfce7;border:1px solid #86efac;border-radius:4px;padding:4px 6px;text-align:center;font-size:9px;color:#15803d">Rate + radial</div>
+        <div style="background:#dcfce7;border:1px solid #86efac;border-radius:4px;padding:4px 6px;text-align:center;font-size:9px;color:#15803d">Revenue + sparkline</div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px;margin-bottom:6px">
+        <div style="background:#ede9fe;border:1px solid #c4b5fd;border-radius:4px;padding:6px 8px;font-size:9px;color:#6d28d9">
+          ChartAreaInteractive<br/>Lost vs Found Trend
+        </div>
+        <div style="background:#ede9fe;border:1px solid #c4b5fd;border-radius:4px;padding:6px 8px;font-size:9px;color:#6d28d9">
+          RecentActivity<br/>(existing component)
+        </div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px">
+        <div style="background:#ede9fe;border:1px solid #c4b5fd;border-radius:4px;padding:6px 8px;font-size:9px;color:#6d28d9">
+          City Heatmap<br/>(existing component)
+        </div>
+        <div style="background:#ede9fe;border:1px solid #c4b5fd;border-radius:4px;padding:6px 8px;font-size:9px;color:#6d28d9">
+          Revenue Flow chart<br/>(ChartAreaInteractive)
+        </div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>B — Hybrid (Recommended)</h3>
+      <p>Use <code>SiteHeader</code> + <code>ChartAreaInteractive</code> from the template. Keep KPI cards with sparklines &amp; radial ring. Replace Revenue Flow with <code>ChartAreaInteractive</code>. RecentActivity &amp; City Heatmap stay as-is.</p>
+      <p style="margin-top:8px;font-size:12px;color:#16a34a">✓ All rich KPI visuals preserved &nbsp;&nbsp; ✓ Template components where they add value</p>
+      <p style="margin-top:4px;font-size:12px;color:#dc2626">✗ Slightly less unified template coverage</p>
+    </div>
+  </div>
+
+  <!-- Approach C -->
+  <div class="card" data-choice="c" onclick="toggleSelect(this)">
+    <div class="card-image" style="padding:16px;background:#f8fafc;border-radius:8px;font-size:11px;font-family:monospace;line-height:1.6">
+      <div style="background:#1e293b;color:#94a3b8;padding:6px 10px;border-radius:4px;margin-bottom:8px;font-size:10px">Layout wrapper (unchanged structure)</div>
+
+      <div style="background:#f1f5f9;border:1px dashed #94a3b8;border-radius:6px;padding:6px 10px;margin-bottom:6px;color:#475569;font-style:italic;font-size:10px">
+        Same topbar — just tokens updated (font, colors, spacing)
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:4px;margin-bottom:6px">
+        <div style="background:#f1f5f9;border:1px dashed #94a3b8;border-radius:4px;padding:4px 6px;text-align:center;font-size:9px;color:#475569">Lost — restyled</div>
+        <div style="background:#f1f5f9;border:1px dashed #94a3b8;border-radius:4px;padding:4px 6px;text-align:center;font-size:9px;color:#475569">Found — restyled</div>
+        <div style="background:#f1f5f9;border:1px dashed #94a3b8;border-radius:4px;padding:4px 6px;text-align:center;font-size:9px;color:#475569">Rate — restyled</div>
+        <div style="background:#f1f5f9;border:1px dashed #94a3b8;border-radius:4px;padding:4px 6px;text-align:center;font-size:9px;color:#475569">Revenue — restyled</div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px;margin-bottom:6px">
+        <div style="background:#f1f5f9;border:1px dashed #94a3b8;border-radius:4px;padding:6px 8px;font-size:9px;color:#475569">Lost vs Found — restyled</div>
+        <div style="background:#f1f5f9;border:1px dashed #94a3b8;border-radius:4px;padding:6px 8px;font-size:9px;color:#475569">RecentActivity — restyled</div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px">
+        <div style="background:#f1f5f9;border:1px dashed #94a3b8;border-radius:4px;padding:6px 8px;font-size:9px;color:#475569">City Heatmap — restyled</div>
+        <div style="background:#f1f5f9;border:1px dashed #94a3b8;border-radius:4px;padding:6px 8px;font-size:9px;color:#475569">Revenue Flow — restyled</div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>C — Style-only</h3>
+      <p>No structural changes. Only update Tailwind classes to match the shadcn design tokens (colors, border-radius, typography, spacing). No new components introduced.</p>
+      <p style="margin-top:8px;font-size:12px;color:#16a34a">✓ Zero functional risk &nbsp;&nbsp; ✓ Everything preserved exactly</p>
+      <p style="margin-top:4px;font-size:12px;color:#dc2626">✗ Doesn't use the shadcn template components at all</p>
+    </div>
+  </div>
+
+</div>
+
+<p class="subtitle" style="margin-top:16px">Click a card to select your preferred approach (or tell me in the terminal)</p>

@@ -9,6 +9,7 @@ import type { InventoryListItem, PostStatus } from '@/services/inventory.service
 import { InventoryStatusTabs } from '@/modules/console/components/inventory/inventory-status-tabs'
 import { InventoryGridCards } from '@/modules/console/components/inventory/inventory-grid-cards'
 import { Search } from 'lucide-react'
+import { Input } from '@/components/ui/input'
 import { useSubcategories } from '@/hooks/use-subcategories'
 
 const ALL_STATUS = 'All' as const
@@ -69,32 +70,32 @@ export function IntakeHistory() {
       <div className="text-sm">
         <div className="flex flex-col md:flex-row md:items-center gap-4">
           <div className="relative w-full md:w-1/2">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-            <input
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#929292]" />
+            <Input
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               placeholder="Search intake items..."
-              className="w-full bg-white pl-9 pr-3 py-1.5 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500 text-gray-900"
+              className="w-full pl-9 border-[#dddddd] focus-visible:ring-0 focus-visible:border-[#222222] text-[#222222]"
             />
           </div>
 
           <div className="w-full md:w-1/2 flex items-center gap-2">
-            <input
+            <Input
               type="date"
               lang="vi-VN"
               value={fromDate}
               onChange={(e) => setFromDate(e.target.value)}
               max={toDate || undefined}
-              className="w-full rounded-md border border-gray-300 bg-white px-3 py-1.5 text-gray-900 focus:outline-none focus:ring-1 focus:ring-blue-500"
+              className="w-full border-[#dddddd] focus-visible:ring-0 focus-visible:border-[#222222] text-[#222222]"
             />
-            <span className="text-gray-400 px-1">to</span>
-            <input
+            <span className="text-[#929292] px-1">to</span>
+            <Input
               type="date"
               lang="vi-VN"
               value={toDate}
               onChange={(e) => setToDate(e.target.value)}
               min={fromDate || undefined}
-              className="w-full rounded-md border border-gray-300 bg-white px-3 py-1.5 text-gray-900 focus:outline-none focus:ring-1 focus:ring-blue-500"
+              className="w-full border-[#dddddd] focus-visible:ring-0 focus-visible:border-[#222222] text-[#222222]"
             />
           </div>
 
@@ -107,7 +108,7 @@ export function IntakeHistory() {
                 setFromDate('')
                 setToDate('')
               }}
-              className="text-red-600 font-medium transition-all hover:scale-[1.03] hover:drop-shadow-sm md:ml-auto"
+              className="text-[#c13515] font-medium transition-all hover:scale-[1.03] hover:drop-shadow-sm md:ml-auto"
             >
               Clear
             </button>

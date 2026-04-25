@@ -53,19 +53,19 @@ export function SearchResultsPage() {
   const statusBadgeClass = (s: string) => {
     switch (s) {
       case 'Active':
-        return 'bg-blue-600 text-white'
+        return 'bg-[#ff385c] text-white'
       case 'InStorage':
-        return 'bg-indigo-500 text-white'
+        return 'bg-[#222222] text-white'
       case 'ReturnScheduled':
-        return 'bg-amber-500 text-white'
+        return 'bg-[#c97a00] text-white'
       case 'Returned':
-        return 'bg-green-500 text-white'
+        return 'bg-[#06c167] text-white'
       case 'Archived':
-        return 'bg-slate-600 text-white'
+        return 'bg-[#6a6a6a] text-white'
       case 'Expired':
-        return 'bg-gray-600 text-white'
+        return 'bg-[#929292] text-white'
       default:
-        return 'bg-gray-600 text-white'
+        return 'bg-[#929292] text-white'
     }
   }
 
@@ -86,11 +86,11 @@ export function SearchResultsPage() {
       <div className="h-full overflow-y-auto p-8 min-h-screen">
         <div className="max-w-6xl mx-auto">
           {/* Breadcrumb */}
-          <div className="mb-6 flex items-center gap-2 text-sm text-gray-600">
+          <div className="mb-6 flex items-center gap-2 text-sm text-[#6a6a6a]">
             <Link
               to="/console/$slug/staff/inventory"
               params={{ slug }}
-              className="hover:text-gray-900 transition-colors"
+              className="hover:text-[#222222] transition-colors"
             >
               Dashboard
             </Link>
@@ -98,18 +98,18 @@ export function SearchResultsPage() {
             <Link
               to="/console/$slug/staff/inventory"
               params={{ slug }}
-              className="hover:text-gray-900 transition-colors"
+              className="hover:text-[#222222] transition-colors"
             >
               Inventory
             </Link>
             <ChevronRight className="w-4 h-4" />
-            <span className="text-gray-900 font-medium">Search Results</span>
+            <span className="text-[#222222] font-medium">Search Results</span>
           </div>
 
           <div className="mb-6">
-            <h1 className="text-3xl font-bold text-gray-900">Search Results</h1>
+            <h1 className="text-3xl font-bold text-[#222222]">Search Results</h1>
             {searchTerm && (
-              <p className="text-gray-600 mt-1">
+              <p className="text-[#6a6a6a] mt-1">
                 Kết quả tìm kiếm theo &quot;{searchTerm}&quot;
               </p>
             )}
@@ -117,13 +117,13 @@ export function SearchResultsPage() {
 
           {isError && (
             <div className="text-center py-12">
-              <p className="text-gray-500 text-lg">Không tải được kết quả tìm kiếm.</p>
+              <p className="text-[#929292] text-lg">Không tải được kết quả tìm kiếm.</p>
             </div>
           )}
 
           {!isError && (
             <>
-              <div className="mb-4 text-sm text-gray-600">
+              <div className="mb-4 text-sm text-[#6a6a6a]">
                 {totalCount > 0
                   ? `Showing ${(currentPage - 1) * pageSize + 1}-${Math.min(currentPage * pageSize, totalCount)} of ${totalCount} results`
                   : searchTerm
@@ -140,9 +140,9 @@ export function SearchResultsPage() {
                   {items.map((item) => (
                     <div
                       key={item.id}
-                      className="bg-white rounded-xl shadow-sm p-6 hover:shadow-md transition-shadow flex gap-6"
+                      className="bg-white rounded-[14px] border border-[#dddddd] p-6 hover:border-[#222222] transition-colors flex gap-6"
                     >
-                      <div className="w-32 h-32 rounded-lg overflow-hidden flex-shrink-0 bg-gray-100">
+                      <div className="w-32 h-32 rounded-lg overflow-hidden flex-shrink-0 bg-[#f7f7f7]">
                         {item.imageUrls?.[0] ? (
                           <img
                             src={item.imageUrls[0]}
@@ -150,7 +150,7 @@ export function SearchResultsPage() {
                             className="w-full h-full object-cover"
                           />
                         ) : (
-                          <div className="w-full h-full flex items-center justify-center text-gray-400 text-sm">
+                          <div className="w-full h-full flex items-center justify-center text-[#929292] text-sm">
                             No image
                           </div>
                         )}
@@ -165,13 +165,13 @@ export function SearchResultsPage() {
                             </span>
                           </div>
                         </div>
-                        <h3 className="text-xl font-semibold text-gray-900 mb-1">
+                        <h3 className="text-xl font-semibold text-[#222222] mb-1">
                           {getInventoryTitle(item, subcategoryNameById)}
                         </h3>
-                        <p className="text-sm text-gray-600 mb-3 line-clamp-2">
+                        <p className="text-sm text-[#6a6a6a] mb-3 line-clamp-2">
                           {getInventoryDescription(item) ?? '—'}
                         </p>
-                        <div className="space-y-2 text-sm text-gray-600 mb-4">
+                        <div className="space-y-2 text-sm text-[#6a6a6a] mb-4">
                           <div className="flex items-center gap-2">
                             <Archive className="w-4 h-4 flex-shrink-0" />
                             <span>{item.category}</span>
@@ -185,7 +185,7 @@ export function SearchResultsPage() {
                           to="/console/$slug/staff/item/$itemId"
                           params={{ slug, itemId: item.id }}
                         >
-                          <button className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-all font-medium text-sm">
+                          <button className="px-4 py-2 border border-[#dddddd] text-[#6a6a6a] rounded-[20px] hover:bg-[#f7f7f7] transition-all font-medium text-sm active:scale-[0.92]">
                             View Details
                           </button>
                         </Link>

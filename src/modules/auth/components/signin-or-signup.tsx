@@ -9,7 +9,6 @@ import { showToast } from '@/lib/toast';
 import { saveTempEmail, saveInvitationCode } from '@/lib/auth-storage';
 
 function isValidEmail(email: string): boolean {
-  // Basic FE validation before calling BE.
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 }
 
@@ -48,7 +47,7 @@ export function SignInOrSignUp() {
     checkEmail.mutate(normalizedEmail, {
       onSuccess: (result) => {
         saveTempEmail(result.email);
-        
+
         if (result.exists) {
           router.navigate({ to: '/auth/signin' });
         } else {
@@ -62,31 +61,27 @@ export function SignInOrSignUp() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-[#E5F4FF] to-white flex items-center justify-center px-4 py-12">
-        <div className="w-full max-w-xl">
-        {/* Form Card */}
-        <div className="bg-white rounded-xl shadow-lg p-8">
+    <div className="min-h-screen bg-[#f7f7f7] flex items-center justify-center px-4 py-12">
+      <div className="w-full max-w-xl">
+        <div className="bg-white rounded-[14px] border border-[#dddddd] p-8">
           {/* Lock Icon */}
           <div className="flex justify-center mb-6">
-            <div className="w-16 h-16 bg-[#E5F4FF] rounded-full flex items-center justify-center">
-              <Lock className="w-8 h-8 text-blue-500" />
+            <div className="w-16 h-16 bg-[#fff0f2] rounded-full flex items-center justify-center">
+              <Lock className="w-8 h-8 text-[#ff385c]" />
             </div>
           </div>
 
-          {/* Title */}
-          <h1 className="text-2xl font-bold   text-center mb-2">
+          <h1 className="text-2xl font-bold text-[#222222] text-center mb-2">
             Sign In or Sign Up
           </h1>
 
-          {/* Instructions */}
-          <p className="text-sm text-gray-600 text-center mb-6">
+          <p className="text-sm text-[#6a6a6a] text-center mb-6">
             Enter your email to access your account or create a new one.
           </p>
 
-          {/* Form */}
           <form className="space-y-4" onSubmit={handleSubmit}>
             <div>
-              <Label htmlFor="email" className="text-sm font-medium ">
+              <Label htmlFor="email" className="text-sm font-medium text-[#222222]">
                 Email address
               </Label>
               <Input
@@ -101,45 +96,34 @@ export function SignInOrSignUp() {
               />
             </div>
 
-            {/* Hint */}
-            <p className="text-xs text-gray-500 text-start">
+            <p className="text-xs text-[#929292] text-start">
               We'll send you a magic link or password prompt.
             </p>
 
-            {/* Continue Button */}
             <Button
               type="submit"
-              className="w-full bg-blue-500 hover:bg-gray-800 text-white py-5 text-base font-medium"
+              className="w-full bg-[#ff385c] hover:bg-[#e0324f] text-white py-5 text-base font-medium"
               disabled={checkEmail.isPending}
             >
               {checkEmail.isPending ? 'Checking...' : 'Continue →'}
             </Button>
 
-            {/* Security Info */}
-            <p className="text-xs font-semibold text-gray-700 text-center mt-5">
+            <p className="text-xs font-semibold text-[#6a6a6a] text-center mt-5">
               SECURED BY ENTERPRISE SSO
             </p>
           </form>
 
-          {/* Legal Links */}
-          <div className="mt-8 pt-6 border-t border-gray-200">
-            <div className="flex flex-wrap justify-center gap-4 text-xs text-gray-500">
-              <a href="#" className="hover:text-gray-900 transition-colors">
-                Terms of Service
-              </a>
-              <span className="text-gray-300">•</span>
-              <a href="#" className="hover:text-gray-900 transition-colors">
-                Privacy Policy
-              </a>
-              <span className="text-gray-300">•</span>
-              <a href="#" className="hover:text-gray-900 transition-colors">
-                Contact Support
-              </a>
+          <div className="mt-8 pt-6 border-t border-[#ebebeb]">
+            <div className="flex flex-wrap justify-center gap-4 text-xs text-[#929292]">
+              <a href="#" className="hover:text-[#222222] transition-colors">Terms of Service</a>
+              <span className="text-[#dddddd]">•</span>
+              <a href="#" className="hover:text-[#222222] transition-colors">Privacy Policy</a>
+              <span className="text-[#dddddd]">•</span>
+              <a href="#" className="hover:text-[#222222] transition-colors">Contact Support</a>
             </div>
           </div>
 
-          {/* Copyright */}
-          <p className="text-xs text-gray-400 text-center mt-6">
+          <p className="text-xs text-[#929292] text-center mt-6">
             © 2023 Enterprise Corp. All rights reserved.
           </p>
         </div>
@@ -147,4 +131,3 @@ export function SignInOrSignUp() {
     </div>
   );
 }
-

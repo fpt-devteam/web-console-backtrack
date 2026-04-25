@@ -60,10 +60,10 @@ function formatScheduleLine(row: DailySchedule): string {
 function LabelValue({ label, value }: { label: string; value: string }) {
   return (
     <div>
-      <p className="text-[10px] font-normal uppercase tracking-[0.16em] text-slate-400">
+      <p className="text-[10px] font-normal uppercase tracking-[0.16em] text-[#929292]">
         {label}
       </p>
-      <p className="mt-1 whitespace-pre-line text-sm font-normal text-slate-800">
+      <p className="mt-1 whitespace-pre-line text-sm font-normal text-[#222222]">
         {value}
       </p>
     </div>
@@ -124,7 +124,7 @@ export function OrganizationInfoViewPage() {
   if (!currentOrgId) {
     return (
       <Layout>
-        <div className="flex min-h-[40vh] items-center justify-center bg-slate-50">
+        <div className="flex min-h-[40vh] items-center justify-center bg-[#f7f7f7]">
           <Spinner />
         </div>
       </Layout>
@@ -134,7 +134,7 @@ export function OrganizationInfoViewPage() {
   if (isLoading) {
     return (
       <Layout>
-        <div className="flex min-h-[40vh] items-center justify-center bg-slate-50">
+        <div className="flex min-h-[40vh] items-center justify-center bg-[#f7f7f7]">
           <Spinner />
         </div>
       </Layout>
@@ -144,18 +144,18 @@ export function OrganizationInfoViewPage() {
   if (isError || !org) {
     return (
       <Layout>
-        <div className="min-h-screen bg-slate-50 px-3 py-8 sm:px-6">
-          <div className="mx-auto max-w-lg rounded-2xl border border-slate-200 bg-white p-6 text-center shadow-sm">
-            <p className="text-sm font-medium text-slate-900">
+        <div className="min-h-screen bg-[#f7f7f7] px-3 py-8 sm:px-6">
+          <div className="mx-auto max-w-lg rounded-[14px] border border-[#dddddd] bg-white p-6 text-center">
+            <p className="text-sm font-medium text-[#222222]">
               Could not load organization
             </p>
-            <p className="mt-2 text-sm text-slate-600">
+            <p className="mt-2 text-sm text-[#6a6a6a]">
               {error instanceof Error ? error.message : 'Please try again.'}
             </p>
             <button
               type="button"
               onClick={() => void refetch()}
-              className="mt-4 rounded-full bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700"
+              className="mt-4 rounded-full bg-[#ff385c] px-4 py-2 text-sm font-semibold text-white hover:bg-[#e00b41] active:scale-[0.92]"
             >
               Retry
             </button>
@@ -175,16 +175,16 @@ export function OrganizationInfoViewPage() {
 
   return (
     <Layout>
-      <div className="min-h-screen bg-slate-50 px-3 py-4 sm:px-6 sm:py-6 lg:px-8 xl:px-10 2xl:px-12">
+      <div className="min-h-screen bg-[#f7f7f7] px-3 py-4 sm:px-6 sm:py-6 lg:px-8 xl:px-10 2xl:px-12">
         <div className="mx-auto">
           <div className="mb-5 flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between xl:mb-6">
-            <h1 className="text-xl font-bold tracking-tight text-slate-900 sm:text-2xl xl:text-[28px]">
+            <h1 className="text-xl font-bold tracking-tight text-[#222222] sm:text-2xl xl:text-[28px]">
               Organization Settings
             </h1>
             <div className="flex flex-wrap items-center gap-2">
               <button
                 type="button"
-                className="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white px-3 py-1.5 text-xs font-medium text-slate-700 hover:bg-slate-100 sm:px-4 sm:py-2"
+                className="inline-flex items-center gap-2 rounded-full border border-[#dddddd] bg-white px-3 py-1.5 text-xs font-medium text-[#6a6a6a] hover:bg-[#f7f7f7] sm:px-4 sm:py-2 active:scale-[0.92]"
                 onClick={() => {
                   if (publicOrgUrl) window.open(publicOrgUrl, '_blank', 'noreferrer')
                 }}
@@ -201,28 +201,28 @@ export function OrganizationInfoViewPage() {
                     params: { slug },
                   })
                 }
-                className="inline-flex items-center rounded-full bg-blue-600 px-4 py-1.5 text-xs font-semibold text-white hover:bg-blue-700 sm:px-5 sm:py-2"
+                className="inline-flex items-center rounded-full bg-[#ff385c] px-4 py-1.5 text-xs font-semibold text-white hover:bg-[#e00b41] sm:px-5 sm:py-2 active:scale-[0.92]"
               >
                 Update Information
               </button>
               <button
                 type="button"
-                className="rounded-full border border-slate-200 bg-white p-2 text-slate-600 hover:bg-slate-100"
+                className="rounded-full border border-[#dddddd] bg-white p-2 text-[#6a6a6a] hover:bg-[#f7f7f7]"
               >
                 <Bell className="h-4 w-4" />
               </button>
               <button
                 type="button"
-                className="rounded-full border border-slate-200 bg-white p-2 text-slate-600 hover:bg-slate-100"
+                className="rounded-full border border-[#dddddd] bg-white p-2 text-[#6a6a6a] hover:bg-[#f7f7f7]"
               >
                 <CircleHelp className="h-4 w-4" />
               </button>
             </div>
           </div>
 
-          <section className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+          <section className="overflow-hidden rounded-[14px] border border-[#dddddd] bg-white">
             <div
-              className={`h-28 sm:h-40 xl:h-48 ${!org.coverImageUrl?.trim() ? 'bg-[linear-gradient(120deg,#dbeafe,#eff6ff,#dbeafe)]' : ''}`}
+              className={`h-28 sm:h-40 xl:h-48 ${!org.coverImageUrl?.trim() ? 'bg-[linear-gradient(120deg,#fff0f2,#f7f7f7,#fff0f2)]' : ''}`}
               style={
                 org.coverImageUrl?.trim()
                   ? {
@@ -234,7 +234,7 @@ export function OrganizationInfoViewPage() {
               }
             />
             <div className="relative px-4 pb-4 pt-3 sm:px-6 sm:pb-5 sm:pt-4 xl:px-8 xl:pb-6 xl:pt-5">
-              <div className="absolute -top-8 flex h-16 w-16 items-center justify-center overflow-hidden rounded-full border-4 border-white bg-slate-100 shadow sm:-top-10 sm:h-20 sm:w-20">
+              <div className="absolute -top-8 flex h-16 w-16 items-center justify-center overflow-hidden rounded-full border-4 border-white bg-[#f7f7f7] shadow sm:-top-10 sm:h-20 sm:w-20">
                 <OrgLogo
                   logoUrl={org.logoUrl}
                   alt={org.name}
@@ -244,12 +244,12 @@ export function OrganizationInfoViewPage() {
               </div>
               <div className="ml-10 flex flex-col gap-2 sm:ml-24 sm:flex-row sm:items-center sm:justify-between xl:ml-22">
                 <div>
-                  <h2 className="text-lg font-bold text-slate-900 sm:text-xl xl:text-xl">
+                  <h2 className="text-lg font-bold text-[#222222] sm:text-xl xl:text-xl">
                     {org.name}
                   </h2>
-                  <p className="text-xs text-slate-500">{org.industryType}</p>
+                  <p className="text-xs text-[#6a6a6a]">{org.industryType}</p>
                 </div>
-                <span className="w-fit rounded-full bg-blue-50 px-3 py-1 text-[9px] font-bold uppercase tracking-wide text-blue-600 sm:text-[10px]">
+                <span className="w-fit rounded-full bg-[#fff0f2] px-3 py-1 text-[9px] font-bold uppercase tracking-wide text-[#ff385c] sm:text-[10px]">
                   {formatStatusLabel(org.status)}
                 </span>
               </div>
@@ -257,10 +257,10 @@ export function OrganizationInfoViewPage() {
           </section>
 
           <div className="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-[5fr_3fr] xl:gap-7">
-            <section className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm sm:p-6 xl:p-7">
+            <section className="rounded-[14px] border border-[#dddddd] bg-white p-4 sm:p-6 xl:p-7">
               <div className="mb-6 flex items-center gap-2">
-                <Info className="h-4 w-4 text-blue-600" />
-                <h3 className="text-xl font-semibold text-slate-900 xl:text-xl">
+                <Info className="h-4 w-4 text-[#ff385c]" />
+                <h3 className="text-xl font-semibold text-[#222222] xl:text-xl">
                   General Information
                 </h3>
               </div>
@@ -275,15 +275,15 @@ export function OrganizationInfoViewPage() {
                   value={org.taxIdentificationNumber || '—'}
                 />
                 <div>
-                  <p className="text-[10px] font-normal uppercase tracking-[0.16em] text-slate-400">
+                  <p className="text-[10px] font-normal uppercase tracking-[0.16em] text-[#929292]">
                     Organization Slug
                   </p>
-                  <p className="mt-1 text-sm font-normal text-slate-800">
+                  <p className="mt-1 text-sm font-normal text-[#222222]">
                     {org.slug || '—'}
                   </p>
                   <a
                     href={publicOrgUrl || '#'}
-                    className="mt-1 inline-block max-w-full break-all text-xs font-normal text-blue-600 hover:text-blue-700"
+                    className="mt-1 inline-block max-w-full break-all text-xs font-normal text-[#ff385c] hover:text-[#e00b41]"
                     target="_blank"
                     rel="noreferrer"
                   >
@@ -294,15 +294,15 @@ export function OrganizationInfoViewPage() {
 
               <div className="mt-6 grid grid-cols-1 gap-3 sm:grid-cols-[1fr_auto] sm:items-stretch">
                 {/* Link card */}
-                <div className="rounded-xl border border-slate-200 bg-slate-50 px-4 py-3">
-                  <div className="mb-2 flex items-center gap-2 text-xs font-semibold text-slate-700">
-                    <Link2 className="h-3 w-3 text-blue-600" />
+                <div className="rounded-[12px] border border-[#dddddd] bg-[#f7f7f7] px-4 py-3">
+                  <div className="mb-2 flex items-center gap-2 text-xs font-semibold text-[#222222]">
+                    <Link2 className="h-3 w-3 text-[#ff385c]" />
                     Shareable Link (Workspace)
                   </div>
                   <div className="flex items-start justify-between gap-3 min-w-0">
                     <a
                       href={publicOrgUrl || '#'}
-                      className="min-w-0 flex-1 break-all text-xs text-blue-600 hover:text-blue-700"
+                      className="min-w-0 flex-1 break-all text-xs text-[#ff385c] hover:text-[#e00b41]"
                       target="_blank"
                       rel="noreferrer"
                     >
@@ -310,7 +310,7 @@ export function OrganizationInfoViewPage() {
                     </a>
                     <button
                       type="button"
-                      className="shrink-0 rounded-md text-blue-600 hover:bg-slate-200 disabled:opacity-40 p-2"
+                      className="shrink-0 rounded-md text-[#ff385c] hover:bg-[#f0f0f0] disabled:opacity-40 p-2"
                       disabled={!publicOrgUrl}
                       onClick={() => publicOrgUrl && void navigator.clipboard.writeText(publicOrgUrl)}
                       title="Copy link"
@@ -321,13 +321,13 @@ export function OrganizationInfoViewPage() {
                 </div>
 
                 {/* QR card */}
-                <div className="rounded-xl border border-slate-200 bg-white p-3 flex flex-col items-center justify-center gap-2">
+                <div className="rounded-[12px] border border-[#dddddd] bg-white p-3 flex flex-col items-center justify-center gap-2">
                   <div ref={qrWrapRef}>
-                    {publicOrgUrl ? <QRCode value={publicOrgUrl} size={88} /> : <span className="text-xs text-slate-400">—</span>}
+                    {publicOrgUrl ? <QRCode value={publicOrgUrl} size={88} /> : <span className="text-xs text-[#929292]">—</span>}
                   </div>
                   <button
                     type="button"
-                    className="text-xs font-medium text-blue-600 hover:text-blue-700 disabled:opacity-40"
+                    className="text-xs font-medium text-[#ff385c] hover:text-[#e00b41] disabled:opacity-40"
                     disabled={!publicOrgUrl}
                     onClick={downloadQrSvg}
                   >
@@ -337,10 +337,10 @@ export function OrganizationInfoViewPage() {
               </div>
             </section>
 
-            <section className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm sm:p-6 xl:p-7">
+            <section className="rounded-[14px] border border-[#dddddd] bg-white p-4 sm:p-6 xl:p-7">
               <div className="mb-6 flex items-center gap-2">
-                <Clock3 className="h-4 w-4 text-blue-600" />
-                <h3 className="text-xl font-semibold text-slate-900 xl:text-xl">
+                <Clock3 className="h-4 w-4 text-[#ff385c]" />
+                <h3 className="text-xl font-semibold text-[#222222] xl:text-xl">
                   Opening Hours
                 </h3>
               </div>
@@ -353,9 +353,9 @@ export function OrganizationInfoViewPage() {
                       key={row.day}
                       className="flex items-center justify-between gap-4"
                     >
-                      <span className="text-sm text-slate-600">{row.day}</span>
+                      <span className="text-sm text-[#6a6a6a]">{row.day}</span>
                       <span
-                        className={`text-sm font-semibold ${line === 'CLOSED' ? 'text-slate-400' : 'text-slate-800'}`}
+                        className={`text-sm font-semibold ${line === 'CLOSED' ? 'text-[#929292]' : 'text-[#222222]'}`}
                       >
                         {line}
                       </span>
@@ -366,36 +366,36 @@ export function OrganizationInfoViewPage() {
             </section>
           </div>
 
-          <section className="mt-6 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm sm:p-6 xl:p-7">
+          <section className="mt-6 rounded-[14px] border border-[#dddddd] bg-white p-4 sm:p-6 xl:p-7">
             <div className="grid grid-cols-1 gap-5 lg:grid-cols-[1.2fr_1fr] xl:grid-cols-[1.35fr_1fr] xl:gap-7">
               <div className="space-y-5">
                 <div className="mb-4 flex items-center gap-2">
-                  <MapPin className="h-4 w-4 text-blue-600" />
-                  <h3 className="text-xl font-semibold text-slate-900 xl:text-xl">
+                  <MapPin className="h-4 w-4 text-[#ff385c]" />
+                  <h3 className="text-xl font-semibold text-[#222222] xl:text-xl">
                     Location &amp; Desk
                   </h3>
                 </div>
                 <LabelValue label="Physical Address" value={displayAddress} />
-                <div className="max-w-sm rounded-xl border border-slate-200 bg-slate-50 p-4">
-                  <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-slate-400">
+                <div className="max-w-sm rounded-[12px] border border-[#dddddd] bg-[#f7f7f7] p-4">
+                  <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-[#929292]">
                     Desk Location Note
                   </p>
-                  <p className="mt-1 text-sm font-medium text-slate-700">
+                  <p className="mt-1 text-sm font-medium text-[#6a6a6a]">
                     {locationNote}
                   </p>
                 </div>
               </div>
 
-              <div className="relative h-44 overflow-hidden rounded-xl border border-slate-200 sm:h-56 xl:h-64">
+              <div className="relative h-44 overflow-hidden rounded-[12px] border border-[#dddddd] sm:h-56 xl:h-64">
                 {showMap && mapCoords ? (
                   <OrgLocationMap
                     latitude={mapCoords.latitude}
                     longitude={mapCoords.longitude}
-                    className="z-0 h-full w-full rounded-xl"
+                    className="z-0 h-full w-full rounded-[12px]"
                   />
                 ) : (
                   <>
-                    <div className="flex h-full items-center justify-center bg-[radial-gradient(circle_at_center,#ef4444_0_8px,transparent_9px),linear-gradient(135deg,#334155,#1e293b)]">
+                    <div className="flex h-full items-center justify-center bg-[radial-gradient(circle_at_center,#ff385c_0_8px,transparent_9px),linear-gradient(135deg,#555555,#222222)]">
                       <MapPin className="h-10 w-10 text-white opacity-90" />
                     </div>
                     <p className="absolute bottom-2 left-2 right-2 text-center text-[10px] text-white/80">

@@ -311,7 +311,7 @@ export function SettingPage() {
   if (!currentOrgId) {
     return (
       <Layout>
-        <div className="flex min-h-[40vh] items-center justify-center bg-slate-50">
+        <div className="flex min-h-[40vh] items-center justify-center">
           <Spinner />
         </div>
       </Layout>
@@ -321,7 +321,7 @@ export function SettingPage() {
   if (isLoading || !formReady) {
     return (
       <Layout>
-        <div className="flex min-h-[40vh] items-center justify-center bg-slate-50">
+        <div className="flex min-h-[40vh] items-center justify-center">
           <Spinner />
         </div>
       </Layout>
@@ -331,17 +331,17 @@ export function SettingPage() {
   if (isError || !org) {
     return (
       <Layout>
-        <div className="min-h-screen bg-slate-50 px-3 py-8 sm:px-6">
-          <div className="mx-auto max-w-lg rounded-2xl border border-slate-200 bg-white p-6 text-center shadow-sm">
-            <p className="text-sm font-medium text-slate-900">
+        <div className="min-h-screen px-3 py-8 sm:px-6">
+          <div className="mx-auto max-w-lg rounded-[14px] border border-[#dddddd] bg-white p-6 text-center">
+            <p className="text-sm font-semibold text-[#222222]">
               Could not load organization
             </p>
-            <p className="mt-2 text-sm text-slate-600">
+            <p className="mt-2 text-sm text-[#6a6a6a]">
               {error instanceof Error ? error.message : 'Please try again.'}
             </p>
             <Button
               type="button"
-              className="mt-4 rounded-full bg-blue-600"
+              className="mt-4"
               onClick={() => void refetch()}
             >
               Retry
@@ -354,17 +354,16 @@ export function SettingPage() {
 
   return (
     <Layout>
-      <div className="min-h-screen bg-slate-50 px-3 py-4 sm:px-6 sm:py-6 lg:px-8 xl:px-10 2xl:px-12">
+      <div className="min-h-screen px-3 py-4 sm:px-6 sm:py-6 lg:px-8 xl:px-10 2xl:px-12">
         <div className="mx-auto ">
           <div className="mb-5 flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between xl:mb-6">
-            <h1 className="text-xl font-bold tracking-tight text-slate-900 sm:text-2xl xl:text-[28px]">
+            <h1 className="text-xl font-semibold tracking-tight text-[#222222] sm:text-2xl">
               Organization Settings
             </h1>
             <div className="flex flex-wrap items-center gap-2">
               <Button
                 type="button"
                 variant="outline"
-                className="rounded-full"
                 disabled={updateOrg.isPending}
                 onClick={() =>
                   router.navigate({ to: `/console/${orgSlug}/admin/setting/organization` })
@@ -374,7 +373,6 @@ export function SettingPage() {
               </Button>
               <Button
                 type="button"
-                className="rounded-full bg-blue-600 px-5 hover:bg-blue-700"
                 disabled={updateOrg.isPending}
                 onClick={handleSave}
               >
@@ -389,9 +387,9 @@ export function SettingPage() {
             </p>
           ) : null}
 
-          <section className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+          <section className="overflow-hidden rounded-[14px] border border-[#dddddd] bg-white">
             <div
-              className={`h-28 sm:h-40 xl:h-48 ${!org.coverImageUrl?.trim() ? 'bg-[linear-gradient(120deg,#dbeafe,#eff6ff,#dbeafe)]' : ''}`}
+              className={`h-28 sm:h-40 xl:h-48 ${!org.coverImageUrl?.trim() ? 'bg-[#f7f7f7]' : ''}`}
               style={
                 org.coverImageUrl?.trim()
                   ? {
@@ -403,7 +401,7 @@ export function SettingPage() {
               }
             />
             <div className="relative px-4 pb-4 pt-3 sm:px-6 sm:pb-5 sm:pt-4 xl:px-8 xl:pb-6 xl:pt-5">
-              <div className="absolute -top-8 flex h-16 w-16 items-center justify-center overflow-hidden rounded-full border-4 border-white bg-slate-100 shadow sm:-top-10 sm:h-20 sm:w-20">
+              <div className="absolute -top-8 flex h-16 w-16 items-center justify-center overflow-hidden rounded-full border-4 border-white bg-[#f7f7f7] sm:-top-10 sm:h-20 sm:w-20">
                 <OrgLogo
                   logoUrl={org.logoUrl}
                   alt={name}
@@ -413,7 +411,7 @@ export function SettingPage() {
               </div>
               <div className="ml-20 flex flex-col gap-3 sm:ml-24 sm:flex-row sm:items-start sm:justify-between xl:ml-28">
                 <div className="min-w-0 flex-1 space-y-3"></div>
-                <span className="w-fit shrink-0 rounded-full bg-amber-50 px-3 py-1 text-[9px] font-bold uppercase tracking-wide text-amber-800 sm:text-[10px]">
+                <span className="w-fit shrink-0 rounded-full bg-amber-50 px-3 py-1 text-[9px] font-bold uppercase tracking-wide text-amber-700 sm:text-[10px]">
                   Editing
                 </span>
               </div>
@@ -421,10 +419,10 @@ export function SettingPage() {
           </section>
 
           <div className="mt-6 flex flex-col gap-6 xl:gap-7">
-            <section className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm sm:p-6 xl:p-7">
+            <section className="rounded-[14px] border border-[#dddddd] bg-white p-4 sm:p-6 xl:p-7">
               <div className="mb-6 flex items-center gap-2">
-                <Info className="h-4 w-4 text-blue-600" />
-                <h2 className="text-xl font-semibold text-slate-900 xl:text-xl">
+                <Info className="h-4 w-4 text-[#ff385c]" />
+                <h2 className="text-lg font-semibold text-[#222222]">
                   General Information
                 </h2>
               </div>
@@ -435,13 +433,13 @@ export function SettingPage() {
                   <Input
                     value={name}
                     onChange={(e) => setName(e.target.value)}
-                    className="border-slate-200"
+                    className="border-[#dddddd]"
                   />
                 </div>
                 <div className="space-y-1.5 min-w-0">
                   <FieldLabel>Industry</FieldLabel>
                   <Select value={industry} onValueChange={setIndustry}>
-                    <SelectTrigger className="border-slate-200">
+                    <SelectTrigger className="border-[#dddddd]">
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
@@ -452,30 +450,30 @@ export function SettingPage() {
                       ))}
                     </SelectContent>
                   </Select>
-                  <p className="text-xs text-slate-500">
+                  <p className="text-xs text-[#6a6a6a]">
                     Preview: {industryLabel}
                   </p>
                 </div>
                 <div className="space-y-1.5">
                   <FieldLabel>Phone number</FieldLabel>
                   <div className="relative mt-1">
-                    <Phone className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+                    <Phone className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#929292]" />
                     <Input
                       value={phone}
                       onChange={(e) => setPhone(e.target.value)}
-                      className="border-slate-200 pl-10"
+                      className="border-[#dddddd] pl-10"
                     />
                   </div>
                 </div>
                 <div className="space-y-1.5">
                   <FieldLabel>Contact email</FieldLabel>
                   <div className="relative mt-1">
-                    <Mail className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+                    <Mail className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#929292]" />
                     <Input
                       type="email"
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
-                      className="border-slate-200 pl-10"
+                      className="border-[#dddddd] pl-10"
                     />
                   </div>
                 </div>
@@ -484,36 +482,36 @@ export function SettingPage() {
                   <Input
                     value={taxId}
                     onChange={(e) => setTaxId(e.target.value)}
-                    className="mt-1 border-slate-200"
+                    className="mt-1 border-[#dddddd]"
                   />
                 </div>
                 <div className="space-y-1.5 min-w-0">
                   <FieldLabel>Organization slug</FieldLabel>
-                  <div className="mt-1 flex min-w-0 rounded-lg border border-slate-200 bg-white shadow-sm">
-                    <span className="hidden shrink-0 items-center whitespace-nowrap rounded-l-lg border-r border-slate-200 bg-slate-100 px-2 text-xs text-slate-600 sm:flex sm:px-3 sm:text-sm">
+                  <div className="mt-1 flex min-w-0 rounded-lg border border-[#dddddd] bg-white">
+                    <span className="hidden shrink-0 items-center whitespace-nowrap rounded-l-lg border-r border-[#dddddd] bg-[#f7f7f7] px-2 text-xs text-[#6a6a6a] sm:flex sm:px-3 sm:text-sm">
                       backtrack.com/
                     </span>
                     <Input
                       value={slug}
                       onChange={(e) => setSlug(e.target.value)}
-                      className="min-w-0 rounded-lg border-0 font-medium text-blue-600 focus-visible:ring-0 sm:rounded-l-none sm:rounded-r-lg"
+                      className="min-w-0 rounded-lg border-0 font-medium text-[#ff385c] focus-visible:ring-0 sm:rounded-l-none sm:rounded-r-lg"
                     />
                   </div>
                 </div>
               </div>
 
-              <div className="mt-6 rounded-xl border border-slate-200 bg-slate-50 px-4 py-3">
-                <div className="mb-2 flex items-center gap-2 text-xs font-semibold text-slate-700">
-                  <Link2 className="h-3 w-3 text-blue-600" />
+              <div className="mt-6 rounded-xl border border-[#dddddd] bg-[#f7f7f7] px-4 py-3">
+                <div className="mb-2 flex items-center gap-2 text-xs font-semibold text-[#222222]">
+                  <Link2 className="h-3 w-3 text-[#ff385c]" />
                   Shareable Link
                 </div>
                 <div className="flex items-start justify-between gap-3">
-                  <span className="break-all text-xs text-blue-600">
+                  <span className="break-all text-xs text-[#ff385c]">
                     {shareUrl || '—'}
                   </span>
                   <button
                     type="button"
-                    className="rounded-md p-1.5 text-blue-600 hover:bg-slate-200 disabled:opacity-40"
+                    className="rounded-lg p-1.5 text-[#6a6a6a] hover:bg-[#dddddd] hover:text-[#222222] transition-colors disabled:opacity-40"
                     disabled={!shareUrl}
                     onClick={() =>
                       shareUrl && void navigator.clipboard.writeText(shareUrl)
@@ -525,10 +523,10 @@ export function SettingPage() {
               </div>
             </section>
 
-            <section className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm sm:p-6 xl:p-7">
+            <section className="rounded-[14px] border border-[#dddddd] bg-white p-4 sm:p-6 xl:p-7">
               <div className="mb-6 flex items-center gap-2">
-                <Clock3 className="h-4 w-4 text-blue-600" />
-                <h2 className="text-xl font-semibold text-slate-900 xl:text-xl">
+                <Clock3 className="h-4 w-4 text-[#ff385c]" />
+                <h2 className="text-lg font-semibold text-[#222222]">
                   Opening Hours
                 </h2>
               </div>
@@ -536,14 +534,14 @@ export function SettingPage() {
               <div className="overflow-x-auto -mx-1 px-1">
                 <table className="w-full min-w-[580px] border-separate border-spacing-y-0 border-spacing-x-6 text-sm sm:border-spacing-x-8 sm:min-w-[620px]">
                   <thead>
-                    <tr className="border-b border-slate-200 text-left">
-                      <th className="pb-3 pr-2 text-[10px] font-normal uppercase tracking-[0.16em] text-slate-400">
+                    <tr className="border-b border-[#dddddd] text-left">
+                      <th className="pb-3 pr-2 text-[10px] font-normal uppercase tracking-[0.16em] text-[#929292]">
                         Day
                       </th>
-                      <th className="pb-3 pr-2 text-[10px] font-normal uppercase tracking-[0.16em] text-slate-400">
+                      <th className="pb-3 pr-2 text-[10px] font-normal uppercase tracking-[0.16em] text-[#929292]">
                         Status
                       </th>
-                      <th className="pb-3 pr-2 text-[10px] font-normal uppercase tracking-[0.16em] text-slate-400">
+                      <th className="pb-3 pr-2 text-[10px] font-normal uppercase tracking-[0.16em] text-[#929292]">
                         Hours
                       </th>
                     </tr>
@@ -552,9 +550,9 @@ export function SettingPage() {
                     {hours.map((row, i) => (
                       <tr
                         key={row.day}
-                        className="border-b border-slate-100 last:border-0"
+                        className="border-b border-[#f0f0f0] last:border-0"
                       >
-                        <td className="py-3 pr-2 align-middle font-medium text-slate-700">
+                        <td className="py-3 pr-2 align-middle font-medium text-[#222222]">
                           {row.day}
                         </td>
                         <td className="py-3 pr-2 align-middle">
@@ -566,7 +564,7 @@ export function SettingPage() {
                               setHours(next)
                             }}
                           >
-                            <SelectTrigger className="h-9 w-[120px] border-slate-200 text-sm">
+                            <SelectTrigger className="h-9 w-[120px] border-[#dddddd] text-sm">
                               <SelectValue />
                             </SelectTrigger>
                             <SelectContent>
@@ -577,12 +575,12 @@ export function SettingPage() {
                         </td>
                         <td className="py-3 pr-2 align-middle">
                           {row.closed ? (
-                            <span className="text-sm font-semibold text-red-600">
+                            <span className="text-sm font-semibold text-[#929292]">
                               —
                             </span>
                           ) : (
                             <div className="flex flex-wrap items-center gap-3 sm:gap-5">
-                              <span className="shrink-0 text-[10px] font-normal uppercase tracking-[0.16em] text-slate-400">
+                              <span className="shrink-0 text-[10px] font-normal uppercase tracking-[0.16em] text-[#929292]">
                                 Open
                               </span>
                               <Select
@@ -593,7 +591,7 @@ export function SettingPage() {
                                   setHours(next)
                                 }}
                               >
-                                <SelectTrigger className="h-9 w-[142px] border-slate-200 text-sm sm:w-[150px]">
+                                <SelectTrigger className="h-9 w-[142px] border-[#dddddd] text-sm sm:w-[150px]">
                                   <SelectValue placeholder="Open" />
                                 </SelectTrigger>
                                 <SelectContent className="max-h-60">
@@ -607,10 +605,10 @@ export function SettingPage() {
                                   ))}
                                 </SelectContent>
                               </Select>
-                              <span className="shrink-0 px-1 text-slate-400 sm:px-2">
+                              <span className="shrink-0 px-1 text-[#929292] sm:px-2">
                                 —
                               </span>
-                              <span className="shrink-0 text-[10px] font-normal uppercase tracking-[0.16em] text-slate-400">
+                              <span className="shrink-0 text-[10px] font-normal uppercase tracking-[0.16em] text-[#929292]">
                                 Close
                               </span>
                               <Select
@@ -621,7 +619,7 @@ export function SettingPage() {
                                   setHours(next)
                                 }}
                               >
-                                <SelectTrigger className="h-9 w-[168px] border-slate-200 text-sm sm:w-[188px]">
+                                <SelectTrigger className="h-9 w-[168px] border-[#dddddd] text-sm sm:w-[188px]">
                                   <SelectValue placeholder="Close" />
                                 </SelectTrigger>
                                 <SelectContent className="max-h-60">
@@ -646,12 +644,12 @@ export function SettingPage() {
             </section>
           </div>
 
-          <section className="mt-6 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm sm:p-6 xl:p-7">
+          <section className="mt-6 rounded-[14px] border border-[#dddddd] bg-white p-4 sm:p-6 xl:p-7">
             <div className="grid grid-cols-1 gap-5 lg:grid-cols-[1.2fr_1fr] lg:items-center xl:grid-cols-[1.35fr_1fr] xl:gap-7">
               <div className="space-y-4">
                 <div className="mb-4 flex items-center gap-2">
-                  <MapPin className="h-4 w-4 text-blue-600" />
-                  <h2 className="text-xl font-semibold text-slate-900 xl:text-xl">
+                  <MapPin className="h-4 w-4 text-[#ff385c]" />
+                  <h2 className="text-lg font-semibold text-[#222222]">
                     Location &amp; Desk
                   </h2>
                 </div>
@@ -672,28 +670,28 @@ export function SettingPage() {
                       setExternalPlaceId(place.placeId ?? null)
                     }}
                     placeholder="Type address or place name, then select a result for coordinates (OpenStreetMap)"
-                    className="[&_input]:border-slate-200 [&_input]:text-sm"
+                    className="[&_input]:border-[#dddddd] [&_input]:text-sm"
                   />
                   {location && (
-                    <p className="text-xs text-green-600">
+                    <p className="text-xs text-[#06c167]">
                       Coordinates: {location.latitude.toFixed(5)},{' '}
                       {location.longitude.toFixed(5)}
                     </p>
                   )}
                 </div>
-                <div className="max-w-sm rounded-xl border border-slate-200 bg-slate-50 p-4">
-                  <p className="text-[10px] font-normal uppercase tracking-[0.16em] text-slate-400">
+                <div className="max-w-sm rounded-xl border border-[#dddddd] bg-[#f7f7f7] p-4">
+                  <p className="text-[10px] font-normal uppercase tracking-[0.16em] text-[#929292]">
                     Desk location note
                   </p>
                   <Textarea
                     value={deskNote}
                     onChange={(e) => setDeskNote(e.target.value)}
-                    className="mt-2 min-h-[80px] resize-y border-0 bg-transparent p-0 text-sm text-slate-700 focus-visible:ring-0"
+                    className="mt-2 min-h-[80px] resize-y border-0 bg-transparent p-0 text-sm text-[#222222] focus-visible:ring-0"
                   />
                 </div>
               </div>
 
-              <div className="relative h-44 overflow-hidden rounded-xl border border-slate-200 sm:h-56 xl:h-64">
+              <div className="relative h-44 overflow-hidden rounded-xl border border-[#dddddd] sm:h-56 xl:h-64">
                 {showMap && mapCoords ? (
                   <OrgLocationMap
                     latitude={mapCoords.latitude}
@@ -702,7 +700,7 @@ export function SettingPage() {
                   />
                 ) : (
                   <>
-                    <div className="flex h-full items-center justify-center bg-[radial-gradient(circle_at_center,#ef4444_0_8px,transparent_9px),linear-gradient(135deg,#334155,#1e293b)]">
+                    <div className="flex h-full items-center justify-center bg-[radial-gradient(circle_at_center,#ff385c_0_8px,transparent_9px),linear-gradient(135deg,#334155,#1e293b)]">
                       <MapPin className="h-10 w-10 text-white opacity-90" />
                     </div>
                     <p className="absolute bottom-2 left-2 right-2 text-center text-[10px] text-white/80">

@@ -23,7 +23,7 @@ export function OrgLogo({
   const roundCls = rounded === 'full' ? 'rounded-full' : 'rounded-lg';
   if (logoUrl?.trim()) {
     return (
-      <div className={cn('overflow-hidden bg-gray-100 flex-shrink-0', roundCls, className)}>
+      <div className={cn('overflow-hidden bg-[#f7f7f7] flex-shrink-0', roundCls, className)}>
         <img
           src={logoUrl.trim()}
           alt={alt}
@@ -33,7 +33,7 @@ export function OrgLogo({
     );
   }
   return (
-    <div className={cn('flex flex-shrink-0 items-center justify-center bg-blue-500', roundCls, className)}>
+    <div className={cn('flex flex-shrink-0 items-center justify-center bg-[#ff385c]', roundCls, className)}>
       <Building2 className={cn('text-white', iconClassName)} aria-hidden />
     </div>
   );

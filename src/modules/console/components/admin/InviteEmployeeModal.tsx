@@ -43,15 +43,15 @@ export function InviteEmployeeModal({
   return (
     <>
       {showDupError && (
-        <div className="mb-4 bg-red-50 border border-red-200 rounded-lg p-4 flex items-start gap-3">
-          <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
+        <div className="mb-4 bg-[#fff0f2] border border-[#dddddd] rounded-[8px] p-4 flex items-start gap-3">
+          <AlertCircle className="w-5 h-5 text-[#c13515] flex-shrink-0 mt-0.5" />
           <div className="flex-1">
-            <h3 className="text-sm font-semibold text-red-800">Unable to invite user</h3>
-            <p className="text-sm text-red-700 mt-1">
+            <h3 className="text-sm font-semibold text-[#c13515]">Unable to invite user</h3>
+            <p className="text-sm text-[#c13515] mt-1 opacity-80">
               This email is already associated with a member in this organization.
             </p>
           </div>
-          <button type="button" onClick={() => setShowDupError(false)} className="text-red-400 hover:text-red-600">
+          <button type="button" onClick={() => setShowDupError(false)} className="text-[#c13515] opacity-60 hover:opacity-100">
             <X className="w-5 h-5" />
           </button>
         </div>
@@ -99,8 +99,8 @@ export function InviteEmployeeModal({
         className="space-y-5"
       >
         <div>
-          <label className="block text-sm font-semibold text-gray-700 mb-2">
-            Email Address <span className="text-red-500">*</span>
+          <label className="block text-sm font-semibold text-[#222222] mb-2">
+            Email Address <span className="text-[#c13515]">*</span>
           </label>
           <input
             type="email"
@@ -111,22 +111,22 @@ export function InviteEmployeeModal({
               if (errors.email) setErrors((p) => ({ ...p, email: '' }));
               setShowDupError(false);
             }}
-            className={`w-full px-4 py-2 text-sm border rounded-lg focus:outline-none focus:ring-2 ${
+            className={`w-full px-4 py-2 text-sm border rounded-[8px] focus:outline-none focus:border-[#222222] ${
               errors.email || showDupError
-                ? 'border-red-300 focus:ring-red-500 bg-red-50'
-                : 'border-gray-300 focus:ring-blue-500'
+                ? 'border-[#c13515] bg-[#fff0f2]'
+                : 'border-[#dddddd]'
             }`}
           />
           {errors.email ? (
-            <p className="mt-2 text-sm text-red-600">{errors.email}</p>
+            <p className="mt-2 text-sm text-[#c13515]">{errors.email}</p>
           ) : (
-            <p className="mt-2 text-sm text-gray-500">An invitation email will be sent to this address.</p>
+            <p className="mt-2 text-sm text-[#929292]">An invitation email will be sent to this address.</p>
           )}
         </div>
 
         <div>
-          <label className="block text-sm font-semibold text-gray-700 mb-2">
-            Role <span className="text-red-500">*</span>
+          <label className="block text-sm font-semibold text-[#222222] mb-2">
+            Role <span className="text-[#c13515]">*</span>
           </label>
           <select
             value={form.role}
@@ -134,8 +134,8 @@ export function InviteEmployeeModal({
               setForm((p) => ({ ...p, role: e.target.value }));
               if (errors.role) setErrors((p) => ({ ...p, role: '' }));
             }}
-            className={`w-full px-4 py-2 text-sm border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-              errors.role ? 'border-red-300' : 'border-gray-300'
+            className={`w-full px-4 py-2 text-sm border rounded-[8px] focus:outline-none focus:border-[#222222] ${
+              errors.role ? 'border-[#c13515]' : 'border-[#dddddd]'
             }`}
           >
             <option value="">Select a role</option>
@@ -145,21 +145,21 @@ export function InviteEmployeeModal({
               </option>
             ))}
           </select>
-          {errors.role && <p className="mt-2 text-sm text-red-600">{errors.role}</p>}
+          {errors.role && <p className="mt-2 text-sm text-[#c13515]">{errors.role}</p>}
         </div>
 
         <div className="flex justify-end gap-3 pt-2">
           <button
             type="button"
             onClick={onClose}
-            className="px-4 py-2 text-sm border border-gray-300 rounded-lg font-semibold text-gray-700 hover:bg-gray-50"
+            className="px-4 py-2 text-sm border border-[#dddddd] rounded-[8px] font-semibold text-[#222222] hover:bg-[#f7f7f7] active:scale-[0.92]"
           >
             Cancel
           </button>
           <button
             type="submit"
             disabled={createInvitation.isPending || !orgId}
-            className="px-4 py-2 text-sm bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 disabled:opacity-50"
+            className="px-4 py-2 text-sm bg-[#ff385c] text-white rounded-[8px] font-semibold hover:bg-[#e0324f] disabled:opacity-50 active:scale-[0.92]"
           >
             {createInvitation.isPending ? 'Sending…' : 'Send Invite'}
           </button>
@@ -168,4 +168,3 @@ export function InviteEmployeeModal({
     </>
   );
 }
-

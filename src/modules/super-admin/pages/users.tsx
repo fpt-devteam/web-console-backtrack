@@ -16,11 +16,6 @@ function roleLabel(u: AdminUserSummary): string {
   return u.globalRole === 'PlatformSuperAdmin' ? 'Super Admin' : 'User';
 }
 
-/**
- * User Management Page
- *
- * GET /api/core/admin/users — paginated list, search, status filter.
- */
 export function UsersPage() {
   const router = useRouter();
   const [currentPage, setCurrentPage] = useState(1);
@@ -70,11 +65,11 @@ export function UsersPage() {
   const getStatusStyle = (status: AdminUserStatus) => {
     switch (status) {
       case 'Active':
-        return { dot: 'bg-green-500', text: 'text-green-700' };
+        return { dot: 'bg-green-500', text: 'text-[#06c167]' };
       case 'Inactive':
-        return { dot: 'bg-gray-400', text: 'text-gray-600' };
+        return { dot: 'bg-[#929292]', text: 'text-[#929292]' };
       default:
-        return { dot: 'bg-gray-400', text: 'text-gray-600' };
+        return { dot: 'bg-[#929292]', text: 'text-[#929292]' };
     }
   };
 
@@ -92,13 +87,13 @@ export function UsersPage() {
   };
 
   const statusOptions = [
-    { value: 'Active', label: 'Active' },
+    { value: 'Active',   label: 'Active' },
     { value: 'Inactive', label: 'Inactive' },
   ];
 
   const sortOptions = [
-    { value: 'Newest', label: 'Newest' },
-    { value: 'Oldest', label: 'Oldest' },
+    { value: 'Newest',   label: 'Newest' },
+    { value: 'Oldest',   label: 'Oldest' },
     { value: 'Name A-Z', label: 'Name A-Z' },
     { value: 'Name Z-A', label: 'Name Z-A' },
   ];
@@ -107,28 +102,28 @@ export function UsersPage() {
 
   return (
     <Layout>
-      <div className="p-8 bg-gray-50 min-h-screen">
+      <div className="p-8 bg-[#f7f7f7] min-h-screen">
         <div className="mb-4">
-          <nav className="text-sm text-gray-500">
-            <span className="hover:text-gray-700 cursor-pointer">User Management</span>
+          <nav className="text-sm text-[#6a6a6a]">
+            <span className="hover:text-[#222222] cursor-pointer">User Management</span>
           </nav>
         </div>
 
         <div className="flex items-start justify-between mb-4">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900 mb-2">Users</h1>
-            <p className="text-gray-600">
+            <h1 className="text-3xl font-bold text-[#222222] mb-2">Users</h1>
+            <p className="text-[#6a6a6a]">
               Manage and monitor all user accounts, roles, and permissions.
             </p>
           </div>
         </div>
 
         {isError ? (
-          <div className="mb-4 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800 flex items-center justify-between gap-4">
+          <div className="mb-4 rounded-[10px] border border-[#c13515]/20 bg-[#fff0f2] px-4 py-3 text-sm text-[#c13515] flex items-center justify-between gap-4">
             <span>{errMessage}</span>
             <button
               type="button"
-              className="shrink-0 font-medium text-red-900 underline"
+              className="shrink-0 font-medium text-[#c13515] underline"
               onClick={() => void refetch()}
             >
               Retry
@@ -159,32 +154,32 @@ export function UsersPage() {
           className="mb-6"
         />
 
-        <div className="bg-white rounded-xl shadow-sm overflow-hidden relative">
+        <div className="bg-white rounded-[14px] border border-[#dddddd] overflow-hidden relative">
           {isFetching ? (
             <div className="absolute inset-0 z-10 bg-white/50 pointer-events-none" aria-hidden />
           ) : null}
           <div className="overflow-x-auto">
             <table className="w-full">
-              <thead className="bg-blue-50 border-b-1 ">
+              <thead className="bg-[#f7f7f7] border-b border-[#ebebeb]">
                 <tr>
-                  <th className="px-6 py-3 text-left text-xs font-bold uppercase tracking-wider ">Email</th>
-                  <th className="px-6 py-3 text-left text-xs font-bold uppercase tracking-wider ">Role</th>
-                  <th className="px-6 py-3 text-left text-xs font-bold uppercase tracking-wider ">Status</th>
-                  <th className="px-6 py-3 text-left text-xs font-bold uppercase tracking-wider ">Created Date</th>
-                  <th className="px-6 py-3 text-left text-xs font-bold uppercase tracking-wider ">Last Login</th>
-                  <th className="px-6 py-3 text-left text-xs font-bold uppercase tracking-wider ">Action</th>
+                  <th className="px-6 py-3 text-left text-xs font-bold text-[#6a6a6a] uppercase tracking-wider">Email</th>
+                  <th className="px-6 py-3 text-left text-xs font-bold text-[#6a6a6a] uppercase tracking-wider">Role</th>
+                  <th className="px-6 py-3 text-left text-xs font-bold text-[#6a6a6a] uppercase tracking-wider">Status</th>
+                  <th className="px-6 py-3 text-left text-xs font-bold text-[#6a6a6a] uppercase tracking-wider">Created Date</th>
+                  <th className="px-6 py-3 text-left text-xs font-bold text-[#6a6a6a] uppercase tracking-wider">Last Login</th>
+                  <th className="px-6 py-3 text-left text-xs font-bold text-[#6a6a6a] uppercase tracking-wider">Action</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-gray-200">
+              <tbody className="divide-y divide-[#ebebeb]">
                 {isLoading ? (
                   <tr>
-                    <td colSpan={6} className="px-6 py-12 text-center text-gray-500">
+                    <td colSpan={6} className="px-6 py-12 text-center text-[#6a6a6a]">
                       Loading users…
                     </td>
                   </tr>
                 ) : sortedItems.length === 0 ? (
                   <tr>
-                    <td colSpan={6} className="px-6 py-12 text-center text-gray-500">
+                    <td colSpan={6} className="px-6 py-12 text-center text-[#6a6a6a]">
                       No users match your filters.
                     </td>
                   </tr>
@@ -193,12 +188,12 @@ export function UsersPage() {
                     const statusStyle = getStatusStyle(user.status);
                     const label = rowDisplayName(user);
                     return (
-                      <tr key={user.id} className="hover:bg-gray-50 transition-colors">
+                      <tr key={user.id} className="hover:bg-[#f7f7f7] transition-colors">
                         <td className="px-6 py-4 whitespace-nowrap">
-                          <span className="text-gray-600">{user.email ?? '———————————————'}</span>
+                          <span className="text-[#6a6a6a]">{user.email ?? '———————————————'}</span>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
-                          <span className="text-gray-600">{roleLabel(user)}</span>
+                          <span className="text-[#6a6a6a]">{roleLabel(user)}</span>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
                           <div className="flex items-center gap-2">
@@ -207,17 +202,17 @@ export function UsersPage() {
                           </div>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
-                          <span className="text-gray-600">{formatDate(user.createdAt)}</span>
+                          <span className="text-[#6a6a6a]">{formatDate(user.createdAt)}</span>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
-                          <span className="text-gray-600">—</span>
+                          <span className="text-[#6a6a6a]">—</span>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
                           <div className="flex items-center gap-2">
                             <button
                               type="button"
                               onClick={() => handleViewUser(user.id)}
-                              className="p-2 text-gray-400 hover:text-green-600 hover:bg-green-50 rounded-lg transition-colors"
+                              className="p-2 text-[#929292] hover:text-[#06c167] hover:bg-[#e8f9f0] rounded-lg transition-colors"
                               title="View User Details"
                             >
                               <Eye className="w-4 h-4" />
@@ -225,7 +220,7 @@ export function UsersPage() {
                             <button
                               type="button"
                               onClick={() => handleDeleteUser(user.id, label)}
-                              className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                              className="p-2 text-[#929292] hover:text-[#c13515] hover:bg-[#fff0f2] rounded-lg transition-colors"
                               title="Delete User"
                             >
                               <Trash2 className="w-4 h-4" />
@@ -240,8 +235,8 @@ export function UsersPage() {
             </table>
           </div>
 
-          <div className="px-6 py-4 border-t border-gray-200 flex items-center justify-between">
-            <div className="text-sm text-gray-600">
+          <div className="px-6 py-4 border-t border-[#dddddd] flex items-center justify-between">
+            <div className="text-sm text-[#6a6a6a]">
               {total === 0
                 ? 'No results'
                 : `Showing ${startIndex} to ${endIndex} of ${total} results`}

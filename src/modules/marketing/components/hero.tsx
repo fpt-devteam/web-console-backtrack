@@ -13,7 +13,7 @@ export function Hero() {
             <h1 className="text-4xl  sm:text-4xl lg:text-4xl font-bold  leading-tight">
               TRANSFORM LOST & FOUND INTO 
               <span> </span>
-              <span className="text-[#2885E1]">
+              <span className="text-[#ff385c]">
               INTELLIGENT RECOVERY.
               </span>
             </h1>
@@ -35,7 +35,7 @@ export function Hero() {
               <Button
                 asChild
                 size="lg"
-                className="bg-blue-500 hover:bg-[#2563EB] text-white text-base w-full sm:w-[280px] py-4 rounded-lg font-medium"
+                className="bg-[#ff385c] hover:bg-[#e0314f] text-white text-base w-full sm:w-[280px] py-4 rounded-lg font-medium"
               >
                 <Link to="/apply">Get started for free</Link>
               </Button>
@@ -43,7 +43,7 @@ export function Hero() {
                 asChild
                 size="lg"
                 variant="outline"
-                className="text-base w-full sm:w-[280px] py-4 rounded-lg border-gray-300 font-medium hover:bg-gray-50"
+                className="text-base w-full sm:w-[280px] py-4 rounded-lg border-[#dddddd] font-medium hover:bg-[#f7f7f7]"
               >
                 <Link to="/contact">Book a Demo</Link>
               </Button>

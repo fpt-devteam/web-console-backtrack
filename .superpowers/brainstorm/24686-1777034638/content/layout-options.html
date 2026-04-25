@@ -1,0 +1,137 @@
+<h2>Dashboard Relayout — 3 Options</h2>
+<p class="subtitle">All sections preserved. Choose the grid that works best.</p>
+
+<style>
+  .layout-mock { font-family: system-ui, sans-serif; font-size: 11px; display: flex; flex-direction: column; gap: 5px; padding: 12px; background: #f8fafc; border-radius: 8px; }
+  .mock-row { display: flex; gap: 5px; }
+  .mock-block { border-radius: 5px; padding: 6px 8px; display: flex; flex-direction: column; justify-content: center; min-height: 32px; font-size: 10px; font-weight: 600; }
+  .b-header  { background: #e0f2fe; border: 1px solid #7dd3fc; color: #0369a1; }
+  .b-kpi     { background: #fef9c3; border: 1px solid #fde047; color: #854d0e; flex: 1; min-height: 44px; }
+  .b-chart   { background: #dcfce7; border: 1px solid #86efac; color: #15803d; }
+  .b-activity{ background: #ede9fe; border: 1px solid #c4b5fd; color: #6d28d9; }
+  .b-map     { background: #fee2e2; border: 1px solid #fca5a5; color: #991b1b; }
+  .b-revenue { background: #fff7ed; border: 1px solid #fed7aa; color: #9a3412; }
+  .tag { font-size: 8px; font-weight: normal; opacity: 0.75; margin-top: 2px; }
+</style>
+
+<div class="cards" style="gap:20px">
+
+  <!-- Layout A -->
+  <div class="card" data-choice="a" onclick="toggleSelect(this)">
+    <div class="card-image">
+      <div class="layout-mock">
+        <!-- header -->
+        <div class="mock-row">
+          <div class="mock-block b-header" style="flex:1">Header + KPIs row</div>
+        </div>
+        <!-- 4 kpi cards -->
+        <div class="mock-row">
+          <div class="mock-block b-kpi">Lost<div class="tag">sparkline</div></div>
+          <div class="mock-block b-kpi">Found<div class="tag">sparkline</div></div>
+          <div class="mock-block b-kpi">Rate<div class="tag">radial</div></div>
+          <div class="mock-block b-kpi">Revenue<div class="tag">sparkline</div></div>
+        </div>
+        <!-- full-width trend -->
+        <div class="mock-row">
+          <div class="mock-block b-chart" style="flex:1;min-height:56px">
+            Lost vs Found Trend — full width
+            <div class="tag">7d / 30d / 90d toggle · best for time-series</div>
+          </div>
+        </div>
+        <!-- 7/5 split -->
+        <div class="mock-row">
+          <div class="mock-block b-revenue" style="flex:7;min-height:56px">Revenue Flow<div class="tag">wide chart</div></div>
+          <div class="mock-block b-map" style="flex:5;min-height:56px">City Heatmap<div class="tag">map</div></div>
+        </div>
+        <!-- full-width activity -->
+        <div class="mock-row">
+          <div class="mock-block b-activity" style="flex:1;min-height:40px">Recent Activity — full width table<div class="tag">filters + pagination · more items visible</div></div>
+        </div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>A — Expanded Trend (Recommended)</h3>
+      <p>Lost/Found trend gets full width — the most-watched chart on the page. Revenue &amp; Heatmap share a 7/5 row. Recent Activity spans full width at the bottom, showing more items at once.</p>
+      <p style="margin-top:8px;font-size:12px;color:#16a34a">✓ Trend chart readable · ✓ Activity usable · ✓ Clear hierarchy</p>
+    </div>
+  </div>
+
+  <!-- Layout B -->
+  <div class="card" data-choice="b" onclick="toggleSelect(this)">
+    <div class="card-image">
+      <div class="layout-mock">
+        <div class="mock-row">
+          <div class="mock-block b-header" style="flex:1">Header</div>
+        </div>
+        <!-- 4 kpi cards -->
+        <div class="mock-row">
+          <div class="mock-block b-kpi">Lost</div>
+          <div class="mock-block b-kpi">Found</div>
+          <div class="mock-block b-kpi">Rate</div>
+          <div class="mock-block b-kpi">Revenue</div>
+        </div>
+        <!-- 8/4 split -->
+        <div class="mock-row">
+          <div class="mock-block b-chart" style="flex:8;min-height:56px">Lost vs Found Trend<div class="tag">wide (8/12)</div></div>
+          <div class="mock-block b-activity" style="flex:4;min-height:56px">Recent Activity<div class="tag">narrow sidebar</div></div>
+        </div>
+        <!-- 6/6 split -->
+        <div class="mock-row">
+          <div class="mock-block b-revenue" style="flex:6;min-height:52px">Revenue Flow<div class="tag">half</div></div>
+          <div class="mock-block b-map" style="flex:6;min-height:52px">City Heatmap<div class="tag">half</div></div>
+        </div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>B — Wide Chart + Side Activity</h3>
+      <p>Trend chart takes 8/12 columns, Recent Activity becomes a 4/12 sidebar. Revenue and Heatmap split evenly below. Similar to current but with better proportions.</p>
+      <p style="margin-top:8px;font-size:12px;color:#16a34a">✓ One fewer row · ✓ Less scrolling</p>
+      <p style="margin-top:4px;font-size:12px;color:#dc2626">✗ Activity list is narrow · ✗ Revenue chart still squeezed</p>
+    </div>
+  </div>
+
+  <!-- Layout C -->
+  <div class="card" data-choice="c" onclick="toggleSelect(this)">
+    <div class="card-image">
+      <div class="layout-mock">
+        <div class="mock-row">
+          <div class="mock-block b-header" style="flex:1">Header</div>
+        </div>
+        <!-- 2 large KPIs + activity tall sidebar -->
+        <div class="mock-row">
+          <div style="flex:8;display:flex;flex-direction:column;gap:5px">
+            <!-- 4 kpis in 2x2 -->
+            <div class="mock-row">
+              <div class="mock-block b-kpi" style="flex:1">Lost</div>
+              <div class="mock-block b-kpi" style="flex:1">Found</div>
+              <div class="mock-block b-kpi" style="flex:1">Rate</div>
+              <div class="mock-block b-kpi" style="flex:1">Revenue</div>
+            </div>
+            <!-- trend below kpis -->
+            <div class="mock-row">
+              <div class="mock-block b-chart" style="flex:1;min-height:52px">Lost vs Found Trend<div class="tag">7d/30d/90d</div></div>
+            </div>
+          </div>
+          <div class="mock-block b-activity" style="flex:4;min-height:96px">Recent Activity<div class="tag">tall — shows 6+ items</div></div>
+        </div>
+        <!-- full-width revenue -->
+        <div class="mock-row">
+          <div class="mock-block b-revenue" style="flex:1;min-height:48px">Revenue Flow — full width<div class="tag">financial data benefits from max width</div></div>
+        </div>
+        <!-- heatmap centred -->
+        <div class="mock-row">
+          <div class="mock-block b-map" style="flex:1;min-height:44px">City Heatmap — full width<div class="tag">map reads better wider</div></div>
+        </div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>C — Split-panel Hero</h3>
+      <p>KPI cards + Trend share the left 8/12. Recent Activity runs tall on the right 4/12. Revenue and Heatmap each get full-width rows below — maximum data visibility.</p>
+      <p style="margin-top:8px;font-size:12px;color:#16a34a">✓ KPIs &amp; trend always visible together · ✓ Revenue/heatmap fully readable</p>
+      <p style="margin-top:4px;font-size:12px;color:#dc2626">✗ More scrolling · ✗ Complex grid nesting</p>
+    </div>
+  </div>
+
+</div>
+
+<p class="subtitle" style="margin-top:16px">Click a layout in the browser, or tell me your choice in the terminal.</p>

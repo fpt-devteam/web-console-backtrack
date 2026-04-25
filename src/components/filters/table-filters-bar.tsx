@@ -37,7 +37,7 @@ export function TableFiltersBar({
   className = '',
 }: TableFiltersBarProps) {
   return (
-    <div className={`bg-white rounded-xl shadow-sm p-4 ${className}`}>
+    <div className={`bg-white rounded-[14px] border border-[#dddddd] p-4 ${className}`}>
       <div className="flex items-center gap-4">
         <SearchFilter
           value={searchValue}

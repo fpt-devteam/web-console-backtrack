@@ -37,17 +37,17 @@ export function StaffInventoryPage() {
       <div className="h-full overflow-y-auto p-4 sm:p-4 lg:p-6 min-h-screen sm:mx-4">
         <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4 mb-4">
           <div>
-            <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">
+            <h1 className="text-2xl sm:text-3xl font-bold text-[#222222]">
               Inventory Dashboard
             </h1>
           </div>
           <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 w-full sm:w-auto">
-            <button className="flex items-center justify-center gap-2 px-4 py-1.5 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-all font-medium text-sm sm:text-base">
+            <button className="flex items-center justify-center gap-2 px-4 py-1.5 border border-[#dddddd] text-[#6a6a6a] rounded-[20px] hover:bg-[#f7f7f7] transition-all font-medium text-sm sm:text-base active:scale-[0.92]">
               <Download className="w-4 h-4" />
               Export
             </button>
             <Link to="/console/$slug/staff/inventory-add-item" params={{ slug }} className="w-full sm:w-auto">
-              <button className="flex items-center justify-center gap-2 px-4 py-1.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-all font-medium text-sm sm:text-base w-full sm:w-auto">
+              <button className="flex items-center justify-center gap-2 px-4 py-1.5 bg-[#ff385c] text-white rounded-[20px] hover:bg-[#e00b41] transition-all font-medium text-sm sm:text-base w-full sm:w-auto active:scale-[0.92]">
                 <Plus className="w-4 h-4" />
                 <span className="hidden sm:inline">Add found item</span>
                 <span className="sm:hidden">Add Item</span>
@@ -81,7 +81,7 @@ export function StaffInventoryPage() {
         />
 
         <div className="flex justify-end my-3">
-          <span className="text-sm text-gray-600 whitespace-nowrap">
+          <span className="text-sm text-[#6a6a6a] whitespace-nowrap">
             {items.length > 0
               ? `Showing ${(listState.currentPage - 1) * pageSize + 1}-${Math.min(
                   listState.currentPage * pageSize,

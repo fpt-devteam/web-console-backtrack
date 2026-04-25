@@ -37,14 +37,14 @@ export function AdminModal({
           role="dialog"
           aria-modal="true"
           aria-label={title}
-          className="w-full max-w-lg sm:max-w-xl lg:max-w-2xl xl:max-w-3xl 2xl:max-w-4xl bg-white rounded-xl shadow-xl border border-gray-200 overflow-hidden"
+          className="w-full max-w-lg sm:max-w-xl lg:max-w-2xl xl:max-w-3xl 2xl:max-w-4xl bg-white rounded-[14px] border border-[#dddddd] overflow-hidden"
         >
-          <div className="px-5 py-4 sm:px-6 border-b border-gray-200 flex items-center justify-between">
-            <h2 className="text-base sm:text-lg font-semibold text-gray-900">{title}</h2>
+          <div className="px-5 py-4 sm:px-6 border-b border-[#ebebeb] flex items-center justify-between">
+            <h2 className="text-base sm:text-lg font-semibold text-[#222222]">{title}</h2>
             <button
               type="button"
               onClick={onClose}
-              className="p-2 rounded-lg text-gray-500 hover:text-gray-900 hover:bg-gray-100 transition-colors"
+              className="p-2 rounded-[8px] text-[#929292] hover:text-[#222222] hover:bg-[#f7f7f7] transition-colors"
               aria-label="Close"
             >
               <X className="w-5 h-5" />
@@ -56,4 +56,3 @@ export function AdminModal({
     </div>
   );
 }
-

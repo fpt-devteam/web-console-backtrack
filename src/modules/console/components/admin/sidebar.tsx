@@ -1,242 +1,302 @@
-import { LayoutGrid, Users, CreditCard, Settings, ChevronLeft, ChevronRight, ChevronDown, ChevronUp, ArrowLeftRight, Package } from 'lucide-react';
-import { OrgLogo } from '@/components/org-logo';
-import { Link, useLocation, useParams } from '@tanstack/react-router';
-import { useState, useEffect, useMemo } from 'react';
-import { useCurrentOrgId } from '@/contexts/current-org.context';
-import { useOrganization } from '@/hooks/use-org';
-import { useCurrentUser } from '@/hooks/use-auth';
-import { LogoutPill } from '@/modules/auth/components/logout-pill';
+import {
+  LayoutGrid,
+  Users,
+  CreditCard,
+  Settings,
+  Package,
+  ArrowLeftRight,
+  LogOut,
+  ChevronDown,
+  ChevronRight,
+  ChevronsUpDown,
+} from 'lucide-react'
+import { OrgLogo } from '@/components/org-logo'
+import { Link, useLocation, useParams } from '@tanstack/react-router'
+import { useMemo } from 'react'
+import { useCurrentOrgId } from '@/contexts/current-org.context'
+import { useOrganization } from '@/hooks/use-org'
+import { useCurrentUser } from '@/hooks/use-auth'
+import { appSignOut } from '@/modules/auth/lib/app-signout'
+import {
+  Sidebar,
+  SidebarContent,
+  SidebarFooter,
+  SidebarHeader,
+  SidebarMenu,
+  SidebarMenuButton,
+  SidebarMenuItem,
+  SidebarMenuSub,
+  SidebarMenuSubButton,
+  SidebarMenuSubItem,
+  useSidebar,
+} from '@/components/ui/sidebar'
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from '@/components/ui/collapsible'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu'
+
+const MENU_ITEM_CLS =
+  'text-[#6a6a6a] hover:bg-[#f7f7f7] hover:text-[#222222] data-[active=true]:bg-[#fff0f2] data-[active=true]:text-[#ff385c]'
 
 function getInitials(name: string | null | undefined): string {
-  if (!name?.trim()) return 'U';
-  const parts = name.trim().split(/\s+/);
-  if (parts.length >= 2) return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
-  return name.slice(0, 2).toUpperCase();
+  if (!name?.trim()) return 'U'
+  const parts = name.trim().split(/\s+/)
+  if (parts.length >= 2) return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase()
+  return name.slice(0, 2).toUpperCase()
 }
 
-interface SidebarProps {
-  isOpen: boolean;
-  onToggle: () => void;
-}
+function AdminSidebarInner() {
+  const location = useLocation()
+  const { state } = useSidebar()
+  const isCollapsed = state === 'collapsed'
 
-export function Sidebar({ isOpen, onToggle }: SidebarProps) {
-  const location = useLocation();
-  const { slug } = useParams({ strict: false }) as { slug?: string };
-  const { currentOrgId } = useCurrentOrgId();
-  const { data: org } = useOrganization(currentOrgId);
-  const { data: user } = useCurrentUser();
-  const userInitials = getInitials(user?.name);
-  const userDisplayName = user?.name || user?.email || 'User';
+  const { slug: slugParam } = useParams({ strict: false }) as { slug?: string }
+  const { currentOrgId } = useCurrentOrgId()
+  const { data: org } = useOrganization(currentOrgId)
+  const { data: user } = useCurrentUser()
+  const userInitials = getInitials(user?.name)
+  const userDisplayName = user?.name || user?.email || 'User'
 
-  const base = `/console/${slug ?? org?.slug ?? ''}`;
+  // Resolved slug for use in isActive helpers (not for Link `to` prop)
+  const slug = slugParam ?? org?.slug ?? ''
+  const base = `/console/${slug}`
 
-  const settingSubPaths = useMemo(() => [
-    `${base}/admin/setting`,
-    `${base}/admin/setting/organization`,
-    `${base}/admin/setting/organization/edit`,
-    `${base}/account/security`,
-  ], [base]);
-  const isSettingActive = settingSubPaths.some((p) => location.pathname === p || location.pathname.startsWith(p + '/'));
-  const [settingExpanded, setSettingExpanded] = useState(isSettingActive);
-  useEffect(() => {
-    if (isSettingActive) setSettingExpanded(true);
-  }, [isSettingActive]);
+  const settingSubPaths = useMemo(
+    () => [
+      `${base}/admin/setting`,
+      `${base}/admin/setting/organization`,
+      `${base}/admin/setting/organization/edit`,
+      `${base}/account/security`,
+    ],
+    [base],
+  )
+  const isSettingActive = settingSubPaths.some(
+    (p) => location.pathname === p || location.pathname.startsWith(p + '/'),
+  )
 
-  const menuItems: { name: string; icon: typeof LayoutGrid; path?: string; children?: { name: string; path: string }[] }[] = [
-    { name: 'Dashboard', icon: LayoutGrid, path: `${base}/admin/dashboard` },
-    { name: 'Employee', icon: Users, path: `${base}/admin/employee` },
-    { name: 'Plan', icon: CreditCard, path: `${base}/admin/plan` },
-    { name: 'Inventory', icon: Package, path: `${base}/admin/inventory` },
-    {
-      name: 'Setting',
-      icon: Settings,
-      children: [
-        { name: 'Organization Information', path: `${base}/admin/setting/organization` },
-        { name: 'Security', path: `${base}/account/security` },
-      ],
-    },
-  ];
+  const isActive = (routeKey: string) => {
+    const cur = location.pathname
+    if (routeKey === 'dashboard') return cur === `${base}/admin/dashboard`
+    if (routeKey === 'employee') return cur === `${base}/admin/employee`
+    if (routeKey === 'plan') return cur === `${base}/admin/plan` || cur === `${base}/admin/edit-account`
+    if (routeKey === 'inventory') return cur === `${base}/admin/inventory` || cur.startsWith(`${base}/admin/inventory/`)
+    return false
+  }
 
-  const isActive = (path: string) => {
-    const currentPath = location.pathname;
-    if (currentPath === path) return true;
+  const isSettingChildActive = (routeKey: 'organization' | 'security') => {
+    const cur = location.pathname
+    if (routeKey === 'organization')
+      return (
+        cur === `${base}/admin/setting/organization` ||
+        cur.startsWith(`${base}/admin/setting/organization/`)
+      )
+    if (routeKey === 'security') return cur === `${base}/account/security`
+    return false
+  }
 
-    if (path === `${base}/admin/employee`) {
-      if (currentPath === path) return true;
-    }
-
-    if (path === `${base}/admin/plan`) {
-      if (currentPath === path || currentPath === `${base}/admin/edit-account`) return true;
-    }
-
-    if (path === `${base}/admin/inventory`) {
-      if (currentPath === path || currentPath.startsWith(`${base}/admin/inventory/`)) return true;
-    }
-
-    return false;
-  };
-
-  const isSettingChildActive = (path: string) => {
-    const currentPath = location.pathname;
-    if (path === `${base}/admin/setting/organization`)
-      return currentPath === path || currentPath.startsWith(`${base}/admin/setting/organization/`);
-    if (path === `${base}/account/security`) return currentPath === path;
-    return false;
-  };
+  const navItems = [
+    { key: 'dashboard', name: 'Dashboard', icon: LayoutGrid, to: '/console/$slug/admin/dashboard' as const },
+    { key: 'employee',  name: 'Employee',  icon: Users,       to: '/console/$slug/admin/employee'  as const },
+    { key: 'plan',      name: 'Plan',      icon: CreditCard,  to: '/console/$slug/admin/plan'      as const },
+    { key: 'inventory', name: 'Inventory', icon: Package,     to: '/console/$slug/admin/inventory' as const },
+  ]
 
   return (
-    <aside 
-      className={`fixed left-0 top-0 h-screen bg-white border-r border-gray-200 shadow-lg flex flex-col transition-all duration-300 z-40 ${
-        isOpen ? 'w-64' : 'w-20'
-      }`}
-    >
-      {/* Header: Org + Toggle */}
-      <div className="flex items-center gap-3 px-4 py-6 border-b border-gray-200 relative">
-        <div className="flex items-center gap-3 flex-1 min-w-0">
-          <OrgLogo logoUrl={org?.logoUrl} alt={org?.name ?? 'Organization'} className="h-10 w-10 flex-shrink-0" />
-          <div className={`min-w-0 transition-all duration-300 ${isOpen ? 'opacity-100' : 'w-0 opacity-0 overflow-hidden'}`}>
-            <h1 className="font-bold text-xl tracking-wide whitespace-nowrap truncate" title={org?.name}>
-              {org?.name ?? 'Admin'}
-            </h1>
-            {org && isOpen && (
-              <p className="text-xs text-gray-500 truncate" title={org.slug}>{org.slug}</p>
-            )}
-          </div>
-        </div>
-        <button
-          onClick={onToggle}
-          className="absolute -right-3 top-1/2 -translate-y-1/2 bg-white border border-gray-200 rounded-full shadow-md p-1 hover:bg-gray-100 transition-all z-10"
-          aria-label="Toggle sidebar"
-        >
-          {isOpen ? <ChevronLeft className="w-5 h-5 text-gray-600" /> : <ChevronRight className="w-5 h-5 text-gray-600" />}
-        </button>
-      </div>
-
-      {/* Navigation Menu */}
-      <nav className="flex-1 py-6">
-        <ul className="flex flex-col gap-1 px-2">
-          {menuItems.map((item) => {
-            const Icon = item.icon;
-            const hasChildren = item.children && item.children.length > 0;
-            const active = hasChildren ? isSettingActive : isActive(item.path!);
-
-            if (hasChildren) {
-              const firstChildPath = item.children![0].path;
-              if (!isOpen) {
-                return (
-                  <li key={item.name}>
-                    <Link
-                      to={firstChildPath}
-                      className={`flex items-center gap-4 px-6 py-2 rounded-lg font-medium transition-all duration-300 ${
-                        active
-                          ? 'bg-blue-500 text-white shadow-lg'
-                          : 'hover:bg-blue-50 hover:text-blue-600'
-                      }`}
-                    >
-                      <Icon className="w-5 h-5 flex-shrink-0" />
-                    </Link>
-                  </li>
-                );
-              }
-              return (
-                <li key={item.name}>
-                  <button
-                    type="button"
-                    onClick={() => setSettingExpanded((prev) => !prev)}
-                    className={`flex items-center justify-between gap-2 w-full px-6 py-2 rounded-lg font-medium transition-all duration-300 text-left ${
-                      active
-                        ? 'bg-blue-500 text-white shadow-lg'
-                        : 'hover:bg-blue-50 hover:text-blue-600'
-                    }`}
-                  >
-                    <div className="flex items-center gap-4 min-w-0">
-                      <Icon className="w-5 h-5 flex-shrink-0" />
-                      <span className="whitespace-nowrap overflow-hidden">{item.name}</span>
-                    </div>
-                    {settingExpanded ? <ChevronUp className="w-4 h-4 flex-shrink-0" /> : <ChevronDown className="w-4 h-4 flex-shrink-0" />}
-                  </button>
-                  {settingExpanded && item.children && (
-                    <ul className="mt-1 ml-4 pl-4 border-l-2 border-gray-200 flex flex-col gap-0.5">
-                      {item.children.map((child) => {
-                        const childActive = isSettingChildActive(child.path);
-                        return (
-                          <li key={child.path}>
-                            <Link
-                              to={child.path}
-                              className={`block px-3 py-2 rounded-lg text-sm font-medium transition-all ${
-                                childActive
-                                  ? 'bg-blue-50 text-blue-700 border-l-2 border-blue-600 -ml-[2px] pl-[10px]'
-                                  : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900'
-                              }`}
-                            >
-                              {child.name}
-                            </Link>
-                          </li>
-                        );
-                      })}
-                    </ul>
-                  )}
-                </li>
-              );
-            }
-
-            return (
-              <li key={item.path}>
-                <Link
-                  to={item.path!}
-                  className={`flex items-center gap-4 px-6 py-2 rounded-lg font-medium transition-all duration-300 ${
-                    active
-                      ? 'bg-blue-500 text-white shadow-lg'
-                      : 'hover:bg-blue-50 hover:text-blue-600'
-                  }`}
-                >
-                  <Icon className="w-5 h-5 flex-shrink-0" />
+    <>
+      {/* Header — org logo + name (dashboard-01 SidebarMenu pattern) */}
+      <SidebarHeader className="border-b border-[#dddddd]">
+        <SidebarMenu>
+          <SidebarMenuItem>
+            <SidebarMenuButton
+              size="lg"
+              tooltip={org?.name ?? 'Admin'}
+              asChild
+              className="hover:bg-[#f7f7f7] text-[#222222]"
+            >
+              <Link to="/console/$slug/admin/dashboard" params={{ slug }}>
+                <OrgLogo
+                  logoUrl={org?.logoUrl}
+                  alt={org?.name ?? 'Organization'}
+                  className="h-8 w-8 flex-shrink-0"
+                />
+                <div className="flex flex-col min-w-0">
                   <span
-                    className={`transition-all duration-300 whitespace-nowrap overflow-hidden ${
-                      isOpen ? 'w-auto opacity-100' : 'w-0 opacity-0'
-                    }`}
+                    className="font-semibold text-[15px] text-[#222222] truncate leading-tight"
+                    title={org?.name}
                   >
-                    {item.name}
+                    {org?.name ?? 'Admin'}
                   </span>
-                </Link>
-              </li>
-            );
+                  {org && (
+                    <span className="text-xs text-[#929292] truncate" title={org.slug}>
+                      {org.slug}
+                    </span>
+                  )}
+                </div>
+              </Link>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+        </SidebarMenu>
+      </SidebarHeader>
+
+      {/* Nav */}
+      <SidebarContent className="py-4">
+        <SidebarMenu className="px-3 gap-0.5">
+          {/* Plain nav items */}
+          {navItems.map((item) => {
+            const Icon = item.icon
+            const active = isActive(item.key)
+            return (
+              <SidebarMenuItem key={item.key}>
+                <SidebarMenuButton
+                  asChild
+                  isActive={active}
+                  tooltip={item.name}
+                  className={MENU_ITEM_CLS}
+                >
+                  <Link to={item.to} params={{ slug }}>
+                    <Icon />
+                    <span>{item.name}</span>
+                  </Link>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+            )
           })}
-        </ul>
-      </nav>
 
-      {/* User info */}
-      <div
-        className={`border-t border-gray-200 px-4 py-3 flex items-center gap-3 min-w-0 transition-all duration-300 ${
-          isOpen ? 'opacity-100' : 'opacity-0 overflow-hidden justify-center'
-        }`}
-      >
-        <div
-          className="w-9 h-9 rounded-full bg-blue-500 flex items-center justify-center text-white font-semibold text-sm flex-shrink-0"
-          title={userDisplayName}
-        >
-          {userInitials}
-        </div>
-        {isOpen && (
-          <div className="min-w-0 flex-1">
-            <p className="text-sm font-medium text-gray-900 truncate" title={userDisplayName}>{userDisplayName}</p>
-            <p className="text-xs text-gray-500 truncate">Admin</p>
-          </div>
-        )}
-        <Link
-          to="/console/welcome"
-          className="p-1.5 rounded-md text-gray-500 hover:bg-gray-100 hover:text-gray-700 transition-colors flex-shrink-0"
-          title="change org"
-        >
-          <ArrowLeftRight className="w-4 h-4" aria-hidden />
-        </Link>
-      </div>
+          {/* Setting with collapsible sub-menu */}
+          {isCollapsed ? (
+            <SidebarMenuItem>
+              <SidebarMenuButton
+                asChild
+                isActive={isSettingActive}
+                tooltip="Setting"
+                className={MENU_ITEM_CLS}
+              >
+                <Link to="/console/$slug/admin/setting/organization" params={{ slug }}>
+                  <Settings />
+                  <span>Setting</span>
+                </Link>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+          ) : (
+            <Collapsible defaultOpen={isSettingActive} className="group/collapsible">
+              <SidebarMenuItem>
+                <CollapsibleTrigger asChild>
+                  <SidebarMenuButton
+                    isActive={isSettingActive}
+                    tooltip="Setting"
+                    className={`${MENU_ITEM_CLS} justify-between`}
+                  >
+                    <div className="flex items-center gap-2">
+                      <Settings className="w-4 h-4" />
+                      <span>Setting</span>
+                    </div>
+                    <ChevronDown className="w-4 h-4 opacity-60 transition-transform group-data-[state=open]/collapsible:rotate-180" />
+                  </SidebarMenuButton>
+                </CollapsibleTrigger>
+                <CollapsibleContent>
+                  <SidebarMenuSub>
+                    <SidebarMenuSubItem>
+                      <SidebarMenuSubButton
+                        asChild
+                        isActive={isSettingChildActive('organization')}
+                        className="text-[#6a6a6a] hover:bg-[#f7f7f7] hover:text-[#222222] data-[active=true]:bg-[#fff0f2] data-[active=true]:text-[#ff385c]"
+                      >
+                        <Link to="/console/$slug/admin/setting/organization" params={{ slug }}>
+                          <ChevronRight className="w-3 h-3 opacity-40" />
+                          <span>Organization Info</span>
+                        </Link>
+                      </SidebarMenuSubButton>
+                    </SidebarMenuSubItem>
+                    <SidebarMenuSubItem>
+                      <SidebarMenuSubButton
+                        asChild
+                        isActive={isSettingChildActive('security')}
+                        className="text-[#6a6a6a] hover:bg-[#f7f7f7] hover:text-[#222222] data-[active=true]:bg-[#fff0f2] data-[active=true]:text-[#ff385c]"
+                      >
+                        <Link to="/console/$slug/account/security" params={{ slug }}>
+                          <ChevronRight className="w-3 h-3 opacity-40" />
+                          <span>Security</span>
+                        </Link>
+                      </SidebarMenuSubButton>
+                    </SidebarMenuSubItem>
+                  </SidebarMenuSub>
+                </CollapsibleContent>
+              </SidebarMenuItem>
+            </Collapsible>
+          )}
+        </SidebarMenu>
+      </SidebarContent>
 
-      {/* Footer */}
-      <div className="px-4 py-2 border-t border-gray-200 flex items-center justify-center">
-        <LogoutPill isOpen={isOpen} />
-      </div>
-    </aside>
-  );
+      {/* Footer — NavUser dropdown (dashboard-01 pattern) */}
+      <SidebarFooter className="border-t border-[#dddddd]">
+        <SidebarMenu>
+          <SidebarMenuItem>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <SidebarMenuButton
+                  size="lg"
+                  tooltip={userDisplayName}
+                  className="text-[#222222] hover:bg-[#f7f7f7] data-[state=open]:bg-[#f7f7f7]"
+                >
+                  <div className="w-8 h-8 rounded-full bg-[#ff385c] flex items-center justify-center text-white font-semibold text-xs flex-shrink-0">
+                    {userInitials}
+                  </div>
+                  <div className="flex flex-col min-w-0 flex-1">
+                    <span className="text-sm font-medium text-[#222222] truncate leading-tight">
+                      {userDisplayName}
+                    </span>
+                    <span className="text-xs text-[#929292]">Admin</span>
+                  </div>
+                  <ChevronsUpDown className="ml-auto w-4 h-4 text-[#929292] flex-shrink-0" />
+                </SidebarMenuButton>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent
+                side="top"
+                align="end"
+                sideOffset={4}
+                className="w-56 rounded-xl"
+              >
+                <DropdownMenuLabel className="text-sm font-medium text-[#222222] truncate">
+                  {userDisplayName}
+                </DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem asChild>
+                  <Link to="/console/welcome" className="cursor-pointer">
+                    <ArrowLeftRight className="w-4 h-4 mr-2" />
+                    Change Organization
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem
+                  onClick={() => void appSignOut()}
+                  className="text-[#c13515] cursor-pointer focus:text-[#c13515] focus:bg-[#fff0f2]"
+                >
+                  <LogOut className="w-4 h-4 mr-2" />
+                  Log out
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </SidebarMenuItem>
+        </SidebarMenu>
+      </SidebarFooter>
+
+    </>
+  )
 }
 
+export function AdminSidebar() {
+  return (
+    <Sidebar collapsible="icon" className="border-r border-[#dddddd] bg-white">
+      <AdminSidebarInner />
+    </Sidebar>
+  )
+}

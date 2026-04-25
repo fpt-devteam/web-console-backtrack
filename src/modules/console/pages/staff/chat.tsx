@@ -71,11 +71,11 @@ function TypingIndicator({ conversationId }: { conversationId: string }) {
   if (!active.length) return null
   return (
     <div className="flex items-end gap-2 px-4 pb-3">
-      <div className="flex items-center gap-1 bg-gray-100 rounded-2xl rounded-bl-sm px-4 py-3">
+      <div className="flex items-center gap-1 bg-[#f7f7f7] rounded-2xl rounded-bl-sm px-4 py-3">
         {[0, 1, 2].map(i => (
           <span
             key={i}
-            className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"
+            className="w-2 h-2 bg-[#929292] rounded-full animate-bounce"
             style={{ animationDelay: `${i * 0.15}s` }}
           />
         ))}
@@ -103,8 +103,8 @@ function buildGroups(messages: Array<IMessage>): Array<MsgGroup> {
 
 function bubbleClass(isOwn: boolean, pos: 'only' | 'first' | 'middle' | 'last') {
   const base = isOwn
-    ? 'bg-blue-500 text-white'
-    : 'bg-gray-100 text-gray-900'
+    ? 'bg-[#222222] text-white'
+    : 'bg-[#f7f7f7] text-[#222222]'
   const radius: Record<string, string> = {
     only:   'rounded-2xl',
     first:  isOwn ? 'rounded-2xl rounded-br-md' : 'rounded-2xl rounded-bl-md',
@@ -160,7 +160,7 @@ function MessagePanel({ conversationId, partner, readOnly = false }: {
   if (isLoading) {
     return (
       <div className="flex-1 flex items-center justify-center">
-        <Loader2 className="w-6 h-6 animate-spin text-blue-500" />
+        <Loader2 className="w-6 h-6 animate-spin text-[#ff385c]" />
       </div>
     )
   }
@@ -179,7 +179,7 @@ function MessagePanel({ conversationId, partner, readOnly = false }: {
             <button
               onClick={() => fetchNextPage()}
               disabled={isFetchingNextPage}
-              className="text-xs text-blue-500 hover:underline disabled:opacity-50"
+              className="text-xs text-[#ff385c] hover:underline disabled:opacity-50"
             >
               {isFetchingNextPage ? 'Loading…' : 'Load older messages'}
             </button>
@@ -187,7 +187,7 @@ function MessagePanel({ conversationId, partner, readOnly = false }: {
         )}
 
         {allMessages.length === 0 && (
-          <p className="text-center text-sm text-gray-400 mt-8">No messages yet.</p>
+          <p className="text-center text-sm text-[#929292] mt-8">No messages yet.</p>
         )}
 
         {groups.map((group, gi) => {
@@ -230,7 +230,7 @@ function MessagePanel({ conversationId, partner, readOnly = false }: {
                         <p className="leading-relaxed">{msg.content}</p>
                       )}
                       {isLast && (
-                        <p className={`text-[10px] mt-0.5 ${isOwn ? 'text-blue-100 text-right' : 'text-gray-400'}`}>
+                        <p className={`text-[10px] mt-0.5 ${isOwn ? 'text-white/60 text-right' : 'text-[#929292]'}`}>
                           {formatTime(msg.createdAt)}
                         </p>
                       )}
@@ -249,23 +249,23 @@ function MessagePanel({ conversationId, partner, readOnly = false }: {
       <div>
         {!readOnly && <TypingIndicator conversationId={conversationId} />}
         {readOnly ? (
-          <div className="px-4 py-3 border-t border-gray-100 text-center text-xs text-gray-400">
+          <div className="px-4 py-3 border-t border-[#dddddd] text-center text-xs text-[#929292]">
             This conversation has been resolved.
           </div>
         ) : (
-          <div className="px-4 py-3 border-t border-gray-100">
+          <div className="px-4 py-3 border-t border-[#dddddd]">
           <div className="flex items-center gap-2">
-            <button className="p-2 text-gray-400 hover:text-gray-600 transition-colors rounded-full hover:bg-gray-100">
+            <button className="p-2 text-[#929292] hover:text-[#6a6a6a] transition-colors rounded-full hover:bg-[#f7f7f7]">
               <Smile className="w-5 h-5" />
             </button>
-            <button className="p-2 text-gray-400 hover:text-gray-600 transition-colors rounded-full hover:bg-gray-100">
+            <button className="p-2 text-[#929292] hover:text-[#6a6a6a] transition-colors rounded-full hover:bg-[#f7f7f7]">
               <ImageIcon className="w-5 h-5" />
             </button>
-            <button className="p-2 text-gray-400 hover:text-gray-600 transition-colors rounded-full hover:bg-gray-100">
+            <button className="p-2 text-[#929292] hover:text-[#6a6a6a] transition-colors rounded-full hover:bg-[#f7f7f7]">
               <Paperclip className="w-5 h-5" />
             </button>
 
-            <div className="flex-1 flex items-center bg-gray-100 rounded-full px-4 py-2 gap-2">
+            <div className="flex-1 flex items-center bg-[#f7f7f7] rounded-full px-4 py-2 gap-2">
               <input
                 ref={inputRef}
                 type="text"
@@ -273,14 +273,14 @@ function MessagePanel({ conversationId, partner, readOnly = false }: {
                 value={text}
                 onChange={e => { setText(e.target.value); startTyping() }}
                 onKeyDown={handleKeyDown}
-                className="flex-1 bg-transparent text-sm text-gray-900 placeholder-gray-400 focus:outline-none"
+                className="flex-1 bg-transparent text-sm text-[#222222] placeholder-[#929292] focus:outline-none"
               />
             </div>
 
             <button
               onClick={handleSend}
               disabled={!text.trim()}
-              className="w-9 h-9 flex items-center justify-center rounded-full bg-blue-500 text-white hover:bg-blue-600 transition-colors disabled:opacity-40 disabled:cursor-not-allowed flex-shrink-0"
+              className="w-9 h-9 flex items-center justify-center rounded-full bg-[#ff385c] text-white hover:bg-[#e00b41] transition-colors disabled:opacity-40 disabled:cursor-not-allowed flex-shrink-0"
             >
               <Send className="w-4 h-4" />
             </button>
@@ -311,25 +311,25 @@ function AssignConfirmDialog({
       <div className="bg-white rounded-2xl shadow-2xl w-full max-w-sm mx-4 p-6">
         <div className="flex items-start justify-between mb-4">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0">
-              <UserCheck className="w-5 h-5 text-blue-600" />
+            <div className="w-10 h-10 bg-[#fff0f2] rounded-full flex items-center justify-center flex-shrink-0">
+              <UserCheck className="w-5 h-5 text-[#ff385c]" />
             </div>
             <div>
-              <h3 className="font-semibold text-gray-900 text-sm">Assign conversation?</h3>
-              <p className="text-xs text-gray-500 mt-0.5">This will assign the chat to you</p>
+              <h3 className="font-semibold text-[#222222] text-sm">Assign conversation?</h3>
+              <p className="text-xs text-[#929292] mt-0.5">This will assign the chat to you</p>
             </div>
           </div>
-          <button onClick={onCancel} className="text-gray-400 hover:text-gray-600 transition-colors p-1">
+          <button onClick={onCancel} className="text-[#929292] hover:text-[#6a6a6a] transition-colors p-1">
             <X className="w-4 h-4" />
           </button>
         </div>
 
-        <div className="bg-gray-50 rounded-xl p-3 mb-5 flex items-center gap-3">
+        <div className="bg-[#f7f7f7] rounded-xl p-3 mb-5 flex items-center gap-3">
           <Avatar url={conv.partner?.avatarUrl} name={label} className="w-10 h-10 rounded-full flex-shrink-0" />
           <div className="min-w-0">
-            <p className="text-sm font-medium text-gray-900 truncate">{label}</p>
+            <p className="text-sm font-medium text-[#222222] truncate">{label}</p>
             {conv.lastMessageContent && (
-              <p className="text-xs text-gray-500 truncate">{conv.lastMessageContent}</p>
+              <p className="text-xs text-[#929292] truncate">{conv.lastMessageContent}</p>
             )}
           </div>
         </div>
@@ -338,14 +338,14 @@ function AssignConfirmDialog({
           <button
             onClick={onCancel}
             disabled={isPending}
-            className="flex-1 px-4 py-2.5 text-sm font-medium text-gray-700 border border-gray-200 rounded-xl hover:bg-gray-50 transition-colors disabled:opacity-50"
+            className="flex-1 px-4 py-2.5 text-sm font-medium text-[#222222] border border-[#dddddd] rounded-xl hover:bg-[#f7f7f7] transition-colors disabled:opacity-50"
           >
             Cancel
           </button>
           <button
             onClick={onConfirm}
             disabled={isPending}
-            className="flex-1 px-4 py-2.5 text-sm font-medium text-white bg-blue-500 rounded-xl hover:bg-blue-600 transition-colors disabled:opacity-50 flex items-center justify-center gap-1.5"
+            className="flex-1 px-4 py-2.5 text-sm font-medium text-white bg-[#ff385c] rounded-xl hover:bg-[#e00b41] transition-colors disabled:opacity-50 flex items-center justify-center gap-1.5"
           >
             {isPending ? (
               <><Loader2 className="w-4 h-4 animate-spin" /> Assigning…</>
@@ -363,10 +363,10 @@ function AssignConfirmDialog({
 
 function statusBadge(status: ConversationStatus | undefined) {
   switch (status) {
-    case ConversationStatus.QUEUE:       return 'bg-amber-100 text-amber-700'
-    case ConversationStatus.IN_PROGRESS: return 'bg-blue-100 text-blue-700'
-    case ConversationStatus.CLOSED:      return 'bg-green-100 text-green-700'
-    default:                             return 'bg-gray-100 text-gray-600'
+    case ConversationStatus.QUEUE:       return 'bg-[#fff8e6] text-[#c97a00]'
+    case ConversationStatus.IN_PROGRESS: return 'bg-[#fff0f2] text-[#ff385c]'
+    case ConversationStatus.CLOSED:      return 'bg-[#e8f9f0] text-[#06c167]'
+    default:                             return 'bg-[#f7f7f7] text-[#929292]'
   }
 }
 
@@ -390,7 +390,7 @@ function ConvItem({ conv, isActive, onSelect }: {
     <button
       onClick={onSelect}
       className={`w-full px-4 py-3 flex items-center gap-3 transition-colors text-left
-        ${isActive ? 'bg-blue-50' : 'hover:bg-gray-50'}`}
+        ${isActive ? 'bg-[#fff0f2]' : 'hover:bg-[#f7f7f7]'}`}
     >
       <div className="relative flex-shrink-0">
         <Avatar url={conv.partner?.avatarUrl} name={name} className="w-12 h-12 rounded-full" />
@@ -401,20 +401,20 @@ function ConvItem({ conv, isActive, onSelect }: {
 
       <div className="flex-1 min-w-0">
         <div className="flex items-baseline justify-between gap-1 mb-0.5">
-          <span className={`text-sm truncate ${hasUnread ? 'font-semibold text-gray-900' : 'font-medium text-gray-800'}`}>
+          <span className={`text-sm truncate ${hasUnread ? 'font-semibold text-[#222222]' : 'font-medium text-[#222222]'}`}>
             {name}
           </span>
-          <span className="text-[11px] text-gray-400 flex-shrink-0">
+          <span className="text-[11px] text-[#929292] flex-shrink-0">
             {formatTime(conv.lastMessageAt)}
           </span>
         </div>
 
         <div className="flex items-center justify-between gap-1">
-          <p className={`text-xs truncate ${hasUnread ? 'font-medium text-gray-700' : 'text-gray-500'}`}>
+          <p className={`text-xs truncate ${hasUnread ? 'font-medium text-[#6a6a6a]' : 'text-[#929292]'}`}>
             {conv.lastMessageContent ?? 'No messages yet'}
           </p>
           {hasUnread && (
-            <span className="flex-shrink-0 min-w-[18px] h-[18px] bg-blue-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center px-1">
+            <span className="flex-shrink-0 min-w-[18px] h-[18px] bg-[#ff385c] text-white text-[10px] font-bold rounded-full flex items-center justify-center px-1">
               {conv.unreadCount}
             </span>
           )}
@@ -506,35 +506,35 @@ export function StaffChatPage() {
         />
       )}
 
-      <div className="h-full overflow-hidden flex bg-gray-50">
+      <div className="h-full overflow-hidden flex bg-[#f7f7f7]">
 
         {/* ── Left pane ── */}
-        <div className="w-110 border-r border-gray-200 bg-white flex flex-col min-h-0">
+        <div className="w-110 border-r border-[#dddddd] bg-white flex flex-col min-h-0">
 
           {/* Header */}
-          <div className="px-4 pt-5 pb-3 border-b border-gray-100">
+          <div className="px-4 pt-5 pb-3 border-b border-[#dddddd]">
             <div className="flex items-center justify-between mb-4">
-              <h2 className="text-lg font-bold text-gray-900">Messages</h2>
+              <h2 className="text-lg font-bold text-[#222222]">Messages</h2>
             </div>
 
             {/* Search */}
             <div className="relative mb-3">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#929292]" />
               <input
                 type="text"
                 placeholder="Search…"
                 value={searchTerm}
                 onChange={e => setSearchTerm(e.target.value)}
-                className="w-full pl-9 pr-4 py-2 bg-gray-100 rounded-full text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-400"
+                className="w-full pl-9 pr-4 py-2 bg-[#f7f7f7] rounded-full text-sm text-[#222222] placeholder-[#929292] focus:outline-none focus:border-[#222222]"
               />
             </div>
 
             {/* Tabs */}
-            <div className="flex bg-gray-100 rounded-xl p-1 gap-2 w-full">
+            <div className="flex bg-[#f7f7f7] rounded-xl p-1 gap-2 w-full">
               <button
                 onClick={() => setTab('assigned')}
                 className={`flex-1 py-1.5 rounded-lg text-sm font-semibold transition-all ${
-                  tab === 'assigned' ? 'bg-white text-blue-600 shadow-sm' : 'text-gray-500 hover:text-gray-700'
+                  tab === 'assigned' ? 'bg-white text-[#222222] shadow-sm' : 'text-[#929292] hover:text-[#6a6a6a]'
                 }`}
               >
                 My Chats
@@ -542,13 +542,13 @@ export function StaffChatPage() {
               <button
                 onClick={() => setTab('queue')}
                 className={`flex-1 py-1.5 rounded-lg text-sm font-semibold transition-all ${
-                  tab === 'queue' ? 'bg-white text-blue-600 shadow-sm' : 'text-gray-500 hover:text-gray-700'
+                  tab === 'queue' ? 'bg-white text-[#222222] shadow-sm' : 'text-[#929292] hover:text-[#6a6a6a]'
                 }`}
               >
                 <span className="flex items-center justify-center gap-1">
                   Queue
                   {queueList.length > 0 && (
-                    <span className="bg-amber-500 text-white text-xs font-bold px-1.5 py-0.5 rounded-full leading-none">
+                    <span className="bg-[#c97a00] text-white text-xs font-bold px-1.5 py-0.5 rounded-full leading-none">
                       {queueList.length}
                     </span>
                   )}
@@ -557,7 +557,7 @@ export function StaffChatPage() {
               <button
                 onClick={() => setTab('resolved')}
                 className={`flex-1 py-1.5 rounded-lg text-sm font-semibold transition-all ${
-                  tab === 'resolved' ? 'bg-white text-blue-600 shadow-sm' : 'text-gray-500 hover:text-gray-700'
+                  tab === 'resolved' ? 'bg-white text-[#222222] shadow-sm' : 'text-[#929292] hover:text-[#6a6a6a]'
                 }`}
               >
                 Resolved
@@ -569,12 +569,12 @@ export function StaffChatPage() {
           <div className="flex-1 overflow-y-auto">
             {isLoadingList ? (
               <div className="flex items-center justify-center py-12">
-                <Loader2 className="w-5 h-5 animate-spin text-blue-400" />
+                <Loader2 className="w-5 h-5 animate-spin text-[#ff385c]" />
               </div>
             ) : filtered.length === 0 ? (
               <div className="flex flex-col items-center justify-center py-16 text-center px-4 gap-2">
-                <RefreshCw className="w-8 h-8 text-gray-200" />
-                <p className="text-sm text-gray-400">
+                <RefreshCw className="w-8 h-8 text-[#dddddd]" />
+                <p className="text-sm text-[#929292]">
                   {tab === 'queue' ? 'No conversations in queue' : tab === 'assigned' ? 'No assigned conversations' : 'No resolved conversations'}
                 </p>
               </div>
@@ -596,7 +596,7 @@ export function StaffChatPage() {
           {activeConversationId && activeConv ? (
             <>
               {/* Chat header */}
-              <div className="flex-shrink-0 px-5 py-3 border-b border-gray-100 flex items-center justify-between bg-white">
+              <div className="flex-shrink-0 px-5 py-3 border-b border-[#dddddd] flex items-center justify-between bg-white">
                 <div className="flex items-center gap-3">
                   <div className="relative">
                     <Avatar url={activeConv?.partner?.avatarUrl} name={partnerName} className="w-10 h-10 rounded-full" />
@@ -605,8 +605,8 @@ export function StaffChatPage() {
                     )}
                   </div>
                   <div>
-                    <h3 className="font-semibold text-gray-900 text-sm leading-tight">{partnerName}</h3>
-                    <p className={`text-xs font-medium ${isResolved ? 'text-gray-400' : 'text-green-500'}`}>
+                    <h3 className="font-semibold text-[#222222] text-sm leading-tight">{partnerName}</h3>
+                    <p className={`text-xs font-medium ${isResolved ? 'text-[#929292]' : 'text-[#06c167]'}`}>
                       {isResolved ? 'Resolved' : 'Active now'}
                     </p>
                   </div>
@@ -632,11 +632,11 @@ export function StaffChatPage() {
             </>
           ) : (
             <div className="flex-1 flex flex-col items-center justify-center gap-3 text-center px-8">
-              <div className="w-20 h-20 bg-blue-50 rounded-full flex items-center justify-center">
-                <Smile className="w-10 h-10 text-blue-300" />
+              <div className="w-20 h-20 bg-[#f7f7f7] rounded-full flex items-center justify-center">
+                <Smile className="w-10 h-10 text-[#929292]" />
               </div>
-              <p className="text-base font-medium text-gray-700">No conversation selected</p>
-              <p className="text-sm text-gray-400">Choose a chat from the left to start messaging</p>
+              <p className="text-base font-medium text-[#222222]">No conversation selected</p>
+              <p className="text-sm text-[#929292]">Choose a chat from the left to start messaging</p>
             </div>
           )}
         </div>

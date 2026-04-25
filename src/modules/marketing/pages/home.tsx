@@ -30,11 +30,11 @@ export function HomePage() {
   ];
 
   return (
-    <div className="bg-gradient-to-b from-[#E5F4FF] to-white min-h-screen">
+    <div className="bg-[#f7f7f7] min-h-screen">
       <Hero />
       
       {/* Trusted By Section */}
-      <section className="py-12 border-b border-gray-100">
+      <section className="py-12 border-b border-[#dddddd]">
         <div className="max-w-7xl mx-auto px-6 sm:px-6 lg:px-8">
           <div className="text-center mb-7">
             <p className="text-sm font-medium  uppercase tracking-wide">

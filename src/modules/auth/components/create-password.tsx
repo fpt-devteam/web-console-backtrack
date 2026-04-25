@@ -15,17 +15,15 @@ export function CreatePassword() {
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [email, setEmail] = useState('');
-  
+
   const router = useRouter();
   const signUp = useSignUp();
 
-  // Get email from sessionStorage (không hiển thị trên URL)
   useEffect(() => {
     const tempEmail = getTempEmail();
     if (tempEmail) {
       setEmail(tempEmail);
     } else {
-      // If no email provided, redirect back to signin-or-signup
       showToast.error('Please enter your email first');
       router.navigate({ to: '/auth/signin-or-signup' });
     }
@@ -34,13 +32,11 @@ export function CreatePassword() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    // Validate passwords match
     if (password !== confirmPassword) {
       showToast.error('Passwords do not match');
       return;
     }
 
-    // Validate password length
     if (password.length < 6) {
       showToast.error('Password must be at least 6 characters long');
       return;
@@ -69,35 +65,31 @@ export function CreatePassword() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-[#E5F4FF] to-white flex items-center justify-center px-4 py-12">
+    <div className="min-h-screen bg-[#f7f7f7] flex items-center justify-center px-4 py-12">
       <div className="w-full max-w-xl">
-        {/* Form Card */}
-        <div className="bg-white rounded-xl shadow-lg p-8">
+        <div className="bg-white rounded-[14px] border border-[#dddddd] p-8">
           {/* Lock Icon */}
           <div className="flex justify-center mb-6">
-            <div className="w-16 h-16 bg-[#E5F4FF] rounded-full flex items-center justify-center">
-              <Lock className="w-8 h-8 text-blue-500" />
+            <div className="w-16 h-16 bg-[#fff0f2] rounded-full flex items-center justify-center">
+              <Lock className="w-8 h-8 text-[#ff385c]" />
             </div>
           </div>
 
-          {/* Title */}
-          <h1 className="text-2xl font-bold  text-center mb-2">
+          <h1 className="text-2xl font-bold text-[#222222] text-center mb-2">
             Create a Password
           </h1>
 
-          {/* Subtitle */}
-          <p className="text-sm text-gray-600 text-center mb-6">
+          <p className="text-sm text-[#6a6a6a] text-center mb-6">
             Set a password to secure your account.
           </p>
 
-          {/* Form */}
           <form className="space-y-4" onSubmit={handleSubmit}>
             {/* Email Field */}
             <div>
-              <Label htmlFor="email" className="text-sm font-medium ">
+              <Label htmlFor="email" className="text-sm font-medium text-[#222222]">
                 Email address
               </Label>
-              <div className="relative mt-2 text-gray-600">
+              <div className="relative mt-2 text-[#929292]">
                 <Input
                   id="email"
                   type="email"
@@ -106,14 +98,14 @@ export function CreatePassword() {
                   className="pr-10"
                 />
                 <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
-                  <Lock className="h-5 w-5 text-gray-400" />
+                  <Lock className="h-5 w-5 text-[#929292]" />
                 </div>
               </div>
             </div>
 
             {/* Password Field */}
             <div>
-              <Label htmlFor="password" className="text-sm font-medium  mb-2 block">
+              <Label htmlFor="password" className="text-sm font-medium text-[#222222] mb-2 block">
                 Password
               </Label>
               <div className="relative">
@@ -129,22 +121,18 @@ export function CreatePassword() {
                 />
                 <button
                   type="button"
-                  className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600"
+                  className="absolute inset-y-0 right-0 pr-3 flex items-center text-[#929292] hover:text-[#6a6a6a]"
                   onClick={() => setShowPassword(!showPassword)}
                   aria-label={showPassword ? 'Hide password' : 'Show password'}
                 >
-                  {showPassword ? (
-                    <EyeOff className="h-5 w-5" />
-                  ) : (
-                    <Eye className="h-5 w-5" />
-                  )}
+                  {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
                 </button>
               </div>
             </div>
 
             {/* Confirm Password Field */}
             <div>
-              <Label htmlFor="confirmPassword" className="text-sm font-medium  mb-2 block">
+              <Label htmlFor="confirmPassword" className="text-sm font-medium text-[#222222] mb-2 block">
                 Confirm Password
               </Label>
               <div className="relative">
@@ -160,53 +148,39 @@ export function CreatePassword() {
                 />
                 <button
                   type="button"
-                  className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600"
+                  className="absolute inset-y-0 right-0 pr-3 flex items-center text-[#929292] hover:text-[#6a6a6a]"
                   onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                   aria-label={showConfirmPassword ? 'Hide password' : 'Show password'}
                 >
-                  {showConfirmPassword ? (
-                    <EyeOff className="h-5 w-5" />
-                  ) : (
-                    <Eye className="h-5 w-5" />
-                  )}
+                  {showConfirmPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
                 </button>
               </div>
             </div>
 
-            {/* Continue Button */}
             <Button
               type="submit"
-              className="w-full bg-blue-500 hover:bg-blue-600 text-white py-5 text-base font-medium mt-6"
+              className="w-full bg-[#ff385c] hover:bg-[#e0324f] text-white py-5 text-base font-medium mt-6"
               disabled={signUp.isPending}
             >
               {signUp.isPending ? 'Creating Account...' : 'Continue'}
             </Button>
 
-            {/* Security Info */}
-            <p className="text-xs font-semibold text-gray-700 text-center mt-5">
+            <p className="text-xs font-semibold text-[#6a6a6a] text-center mt-5">
               SECURED BY ENTERPRISE SSO
             </p>
           </form>
 
-          {/* Legal Links */}
-          <div className="mt-8 pt-6 border-t border-gray-200">
-            <div className="flex flex-wrap justify-center gap-4 text-xs text-gray-500">
-              <a href="#" className="hover:text-gray-900 transition-colors">
-                Terms of Service
-              </a>
-              <span className="text-gray-300">|</span>
-              <a href="#" className="hover:text-gray-900 transition-colors">
-                Privacy Policy
-              </a>
-              <span className="text-gray-300">|</span>
-              <a href="#" className="hover:text-gray-900 transition-colors">
-                Contact Support
-              </a>
+          <div className="mt-8 pt-6 border-t border-[#ebebeb]">
+            <div className="flex flex-wrap justify-center gap-4 text-xs text-[#929292]">
+              <a href="#" className="hover:text-[#222222] transition-colors">Terms of Service</a>
+              <span className="text-[#dddddd]">|</span>
+              <a href="#" className="hover:text-[#222222] transition-colors">Privacy Policy</a>
+              <span className="text-[#dddddd]">|</span>
+              <a href="#" className="hover:text-[#222222] transition-colors">Contact Support</a>
             </div>
           </div>
 
-          {/* Copyright */}
-          <p className="text-xs text-gray-400 text-center mt-6">
+          <p className="text-xs text-[#929292] text-center mt-6">
             © 2023 Enterprise Corp. All rights reserved.
           </p>
         </div>

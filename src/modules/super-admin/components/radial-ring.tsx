@@ -8,11 +8,11 @@ export function RadialRing({ value }: RadialRingProps) {
   const offset = circ * (1 - value / 100);
   return (
     <svg width={68} height={68} viewBox="0 0 68 68" style={{ transform: 'rotate(-90deg)' }}>
-      <circle cx={34} cy={34} r={r} fill="none" stroke="#EFF6FF" strokeWidth={7} />
+      <circle cx={34} cy={34} r={r} fill="none" stroke="#f7f7f7" strokeWidth={7} />
       <circle
         cx={34} cy={34} r={r}
         fill="none"
-        stroke="#3B82F6"
+        stroke="#ff385c"
         strokeWidth={7}
         strokeLinecap="round"
         strokeDasharray={circ}

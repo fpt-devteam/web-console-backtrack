@@ -6,18 +6,26 @@ export type InventoryStatus =
   | 'Expired'
   | (string & {})
 
+/**
+ * Airbnb design-token status badge classes.
+ *
+ * InStorage  → Rausch (brand primary) — item is actively held
+ * Returned   → Success green         — item has been returned / resolved
+ * Archived   → Muted gray            — item is inactive / archived
+ * Expired    → Amber                 — item has lapsed / expired
+ */
 export function inventoryStatusBadgeClass(s: InventoryStatus) {
   switch (s) {
     case 'InStorage':
-      return 'bg-indigo-500 text-white'
+      return 'bg-[#fff0f2] text-[#ff385c]'
     case 'Returned':
-      return 'bg-green-500 text-white'
+      return 'bg-[#e8f9f0] text-[#06c167]'
     case 'Archived':
-      return 'bg-slate-600 text-white'
+      return 'bg-[#f7f7f7] text-[#6a6a6a]'
     case 'Expired':
-      return 'bg-gray-600 text-white'
+      return 'bg-[#fff8e6] text-[#c97a00]'
     default:
-      return 'bg-gray-600 text-white'
+      return 'bg-[#f7f7f7] text-[#6a6a6a]'
   }
 }
 
@@ -38,18 +46,7 @@ export function inventoryStatusLabel(s: InventoryStatus) {
   }
 }
 
+/** Alias kept for callers that use inventoryStatusPillClass — same token mapping. */
 export function inventoryStatusPillClass(s: InventoryStatus) {
-  switch (s) {
-    case 'InStorage':
-      return 'bg-indigo-500 text-white'
-    case 'Returned':
-      return 'bg-green-500 text-white'
-    case 'Archived':
-      return 'bg-slate-600 text-white'
-    case 'Expired':
-      return 'bg-gray-600 text-white'
-    default:
-      return 'bg-gray-500 text-white'
-  }
+  return inventoryStatusBadgeClass(s)
 }
-

@@ -29,13 +29,13 @@ export function InventoryGridCards({
   if (isError) {
     return (
       <div className="text-center py-12">
-        <p className="text-gray-500 text-lg">Failed to load inventory items.</p>
+        <p className="text-[#929292] text-lg">Failed to load inventory items.</p>
       </div>
     )
   }
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
       {isLoading ? (
         <div className="col-span-full py-12">
           <Spinner className="mx-auto" />
@@ -50,68 +50,78 @@ export function InventoryGridCards({
           const subName = getInventorySubcategoryName(item, subcategoryNameById)
           const imgAlt = displayTitle.trim() || subName.trim() || 'Inventory item'
           const dateValue = getDate ? getDate(item) : item.eventTime
-          const dateObj = typeof dateValue === 'string' || dateValue instanceof Date ? new Date(dateValue) : null
+          const dateObj =
+            typeof dateValue === 'string' || dateValue instanceof Date
+              ? new Date(dateValue)
+              : null
           const dateText =
             dateObj && !Number.isNaN(dateObj.getTime())
-              ? dateObj.toLocaleDateString('vi-VN', { year: 'numeric', month: '2-digit', day: '2-digit' })
+              ? dateObj.toLocaleDateString('vi-VN', {
+                  year: 'numeric',
+                  month: '2-digit',
+                  day: '2-digit',
+                })
               : '—'
           const foundLocation = item.internalLocation?.trim() || '—'
 
           return (
-          <div
-            key={item.id}
-            className="bg-white rounded-xl shadow-sm overflow-hidden hover:shadow-md transition-shadow flex flex-col"
-          >
-            <div className="relative h-48 bg-gradient-to-br from-gray-100 to-gray-200 shrink-0">
-              {item.imageUrls?.[0] ? (
-                <img
-                  src={item.imageUrls[0]}
-                  alt={imgAlt}
-                  className="w-full h-full object-contain bg-white"
-                  loading="lazy"
-                  decoding="async"
-                />
-              ) : (
-                <div className="w-full h-full flex items-center justify-center text-gray-400">No image</div>
-              )}
-              <span
-                className={`absolute top-3 right-3 px-3 py-1 rounded-full text-xs font-semibold ${inventoryStatusBadgeClass(
-                  item.status,
-                )}`}
-              >
-                {inventoryStatusLabel(item.status)}
-              </span>
-            </div>
-            <div className="mt-1 h-px w-full bg-gray-200" />
-            <div className="p-4 pt-3 flex flex-col flex-1">
-              <h3 className="font-semibold text-gray-900 mb-3 line-clamp-2 leading-5 min-h-[40px]">
-                {displayTitle}
-              </h3>
-              <div className="text-sm text-gray-600 mb-3 flex items-start gap-2 min-h-[40px]">
-                <MapPin className="w-4 h-4 flex-shrink-0 mt-0.5" />
-                <p className="line-clamp-2 leading-5">{foundLocation}</p>
+            <Link
+              key={item.id}
+              to={detailLink.to}
+              params={detailLink.params(item)}
+              className="group block rounded-[14px] border border-[#dddddd] bg-white overflow-hidden hover:border-[#b0b0b0] hover:shadow-sm transition-all"
+            >
+              {/* Image */}
+              <div className="relative h-44 bg-[#f7f7f7] shrink-0">
+                {item.imageUrls?.[0] ? (
+                  <img
+                    src={item.imageUrls[0]}
+                    alt={imgAlt}
+                    className="w-full h-full object-contain"
+                    loading="lazy"
+                    decoding="async"
+                  />
+                ) : (
+                  <div className="w-full h-full flex items-center justify-center text-[#929292] text-sm">
+                    No image
+                  </div>
+                )}
+                {/* Status badge */}
+                <span
+                  className={`absolute top-2.5 right-2.5 px-2 py-0.5 rounded-full text-xs font-semibold ${inventoryStatusBadgeClass(item.status)}`}
+                >
+                  {inventoryStatusLabel(item.status)}
+                </span>
               </div>
-              <div className="space-y-2 text-sm text-gray-600 mb-4 flex-1">
-                <div className="flex items-center gap-2">
-                  <Archive className="w-4 h-4 flex-shrink-0" />
-                  <span>{subName.trim() ? subName : '—'}</span>
+
+              <div className="h-px w-full bg-[#f0f0f0]" />
+
+              {/* Body */}
+              <div className="p-4 space-y-2.5">
+                <h3 className="font-semibold text-[#222222] line-clamp-2 leading-5 min-h-[40px] text-sm group-hover:text-[#ff385c] transition-colors">
+                  {displayTitle}
+                </h3>
+
+                <div className="flex items-start gap-1.5 text-sm text-[#6a6a6a]">
+                  <MapPin className="w-3.5 h-3.5 flex-shrink-0 mt-0.5 text-[#929292]" />
+                  <span className="line-clamp-1">{foundLocation}</span>
                 </div>
-                <div className="flex items-center gap-2">
-                  <Calendar className="w-4 h-4 flex-shrink-0" />
-                  <span>{dateText}</span>
+
+                <div className="flex items-center gap-3 text-xs text-[#929292]">
+                  <span className="flex items-center gap-1">
+                    <Archive className="w-3.5 h-3.5" />
+                    {subName.trim() ? subName : '—'}
+                  </span>
+                  <span className="flex items-center gap-1">
+                    <Calendar className="w-3.5 h-3.5" />
+                    {dateText}
+                  </span>
                 </div>
               </div>
-              <Link to={detailLink.to} params={detailLink.params(item)} className="mt-auto block">
-                <button className="w-full py-1.5 border border-gray-300 rounded-lg text-black transition-all font-medium text-sm hover:bg-gray-50 hover:scale-[1.03] hover:drop-shadow-sm">
-                  View Details
-                </button>
-              </Link>
-            </div>
-          </div>
+            </Link>
           )
         })
       )}
     </div>
   )
 }
-

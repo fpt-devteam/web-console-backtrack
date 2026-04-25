@@ -1,3 +1,3 @@
-export { Sidebar } from './sidebar';
+export { AdminSidebar } from './sidebar';
 export { Layout } from './layout';
 

@@ -30,15 +30,15 @@ export function InventoryPhotosPicker({
   return (
     <div>
       <div className="flex items-center justify-between mb-4">
-        <div className="text-base font-semibold text-gray-900">Photos</div>
-        <span className="text-sm text-slate-700">Max {maxPhotos} photos</span>
+        <div className="text-base font-semibold text-[#222222]">Photos</div>
+        <span className="text-sm text-[#6a6a6a]">Max {maxPhotos} photos</span>
       </div>
 
       <div className="flex gap-4 flex-wrap">
         {photoPreviews.map((p, index) => (
           <div
             key={`${p.url}:${index}`}
-            className="relative w-32 h-32 rounded-lg overflow-hidden group border border-slate-200"
+            className="relative w-32 h-32 rounded-[8px] overflow-hidden group border border-[#dddddd]"
             draggable
             onDragStart={(e) => {
               e.dataTransfer.setData('text/plain', String(index))
@@ -61,12 +61,12 @@ export function InventoryPhotosPicker({
             <img
               src={p.url}
               alt={`Upload ${index + 1}`}
-              className="w-full h-full object-contain bg-slate-50"
+              className="w-full h-full object-contain bg-[#f7f7f7]"
             />
             <button
               type="button"
               onClick={() => onRemovePhoto(index)}
-              className="absolute top-1 right-1 p-1 bg-red-600 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
+              className="absolute top-1 right-1 p-1 bg-[#c13515] text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
               aria-label="Remove photo"
             >
               <X className="w-3 h-3" />
@@ -75,7 +75,7 @@ export function InventoryPhotosPicker({
         ))}
 
         {photoPreviews.length < maxPhotos ? (
-          <label className="w-32 h-32 border-2 border-dashed border-slate-300 rounded-lg flex flex-col items-center justify-center cursor-pointer hover:border-sky-500 hover:bg-sky-50 transition-colors">
+          <label className="w-32 h-32 border-2 border-dashed border-[#dddddd] rounded-[8px] flex flex-col items-center justify-center cursor-pointer hover:border-[#ff385c] hover:bg-[#fff0f2] transition-colors">
             <input
               type="file"
               accept="image/*"
@@ -84,8 +84,8 @@ export function InventoryPhotosPicker({
               className="hidden"
               disabled={photoPreviews.length >= maxPhotos}
             />
-            <Camera className="w-6 h-6 text-slate-700 mb-2" />
-            <span className="text-xs text-slate-800 text-center px-2">Add photos</span>
+            <Camera className="w-6 h-6 text-[#6a6a6a] mb-2" />
+            <span className="text-xs text-[#222222] text-center px-2">Add photos</span>
           </label>
         ) : null}
       </div>
@@ -97,8 +97,8 @@ export function InventoryPhotosPicker({
           disabled={Boolean(analyzeDisabled) || isAnalyzing}
           title={analyzeHint}
           className={cx(
-            'flex w-full sm:w-auto items-center justify-center gap-2 px-4 py-1.5 border border-gray-300 rounded-lg text-black transition-all font-medium text-sm hover:bg-gray-50 hover:scale-[1.03] hover:drop-shadow-sm',
-            'disabled:opacity-50 disabled:pointer-events-none disabled:hover:scale-100 disabled:hover:shadow-none',
+            'flex w-full sm:w-auto items-center justify-center gap-2 px-4 py-1.5 border border-[#dddddd] rounded-[8px] text-[#222222] transition-all font-medium text-sm hover:bg-[#f7f7f7] hover:scale-[1.03] active:scale-[0.92]',
+            'disabled:opacity-50 disabled:pointer-events-none disabled:hover:scale-100',
           )}
         >
           {isAnalyzing ? <Loader2 className="h-4 w-4 animate-spin shrink-0" /> : <Sparkles className="h-4 w-4 shrink-0" />}
@@ -108,4 +108,3 @@ export function InventoryPhotosPicker({
     </div>
   )
 }
-

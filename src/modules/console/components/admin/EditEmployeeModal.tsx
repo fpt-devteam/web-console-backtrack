@@ -29,7 +29,7 @@ export function EditEmployeeModal({
   }, [member?.membershipId]);
 
   if (!member) {
-    return <div className="text-sm text-gray-700">Member not found.</div>;
+    return <div className="text-sm text-[#222222]">Member not found.</div>;
   }
 
   return (
@@ -59,24 +59,24 @@ export function EditEmployeeModal({
     >
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         <div className="lg:col-span-2">
-          <label className="block text-sm font-semibold text-gray-700 mb-2">Email</label>
+          <label className="block text-sm font-semibold text-[#222222] mb-2">Email</label>
           <input
             type="email"
             value={member.email ?? ''}
             readOnly
-            className="w-full px-4 py-2 text-sm border border-gray-300 rounded-lg bg-gray-50 text-gray-700 cursor-not-allowed"
+            className="w-full px-4 py-2 text-sm border border-[#dddddd] rounded-[8px] bg-[#f7f7f7] text-[#222222] cursor-not-allowed"
           />
         </div>
 
         <div>
-          <label className="block text-sm font-semibold text-gray-700 mb-2">
-            Role <span className="text-red-500">*</span>
+          <label className="block text-sm font-semibold text-[#222222] mb-2">
+            Role <span className="text-[#c13515]">*</span>
           </label>
           <select
             value={role}
             onChange={(e) => setRole(e.target.value)}
-            className={`w-full px-4 py-2 text-sm border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-              error ? 'border-red-300' : 'border-gray-300'
+            className={`w-full px-4 py-2 text-sm border rounded-[8px] focus:outline-none focus:border-[#222222] ${
+              error ? 'border-[#c13515]' : 'border-[#dddddd]'
             }`}
           >
             <option value="">Select a role</option>
@@ -86,13 +86,13 @@ export function EditEmployeeModal({
               </option>
             ))}
           </select>
-          {error && <p className="mt-2 text-sm text-red-600">{error}</p>}
+          {error && <p className="mt-2 text-sm text-[#c13515]">{error}</p>}
         </div>
 
         <div>
-          <label className="block text-sm font-semibold text-gray-700 mb-2">Status</label>
-          <div className="px-4 py-2 text-sm border border-gray-300 rounded-lg bg-gray-50 flex items-center justify-between">
-            <span className="text-gray-700">{member.status}</span>
+          <label className="block text-sm font-semibold text-[#222222] mb-2">Status</label>
+          <div className="px-4 py-2 text-sm border border-[#dddddd] rounded-[8px] bg-[#f7f7f7] flex items-center justify-between">
+            <span className="text-[#222222]">{member.status}</span>
             <span className={`px-2.5 py-1 rounded-full text-xs font-semibold ${getStatusColor(member.status)}`}>
               {member.status}
             </span>
@@ -104,14 +104,14 @@ export function EditEmployeeModal({
         <button
           type="button"
           onClick={onClose}
-          className="px-4 py-2 text-sm border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+          className="px-4 py-2 text-sm border border-[#dddddd] text-[#222222] rounded-[8px] hover:bg-[#f7f7f7] transition-colors active:scale-[0.92]"
         >
           Cancel
         </button>
         <button
           type="submit"
           disabled={updateRole.isPending || !orgId}
-          className="px-4 py-2 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 transition-colors"
+          className="px-4 py-2 text-sm bg-[#ff385c] text-white rounded-[8px] hover:bg-[#e0324f] disabled:opacity-50 transition-colors active:scale-[0.92]"
         >
           {updateRole.isPending ? 'Saving…' : 'Save Changes'}
         </button>
@@ -119,4 +119,3 @@ export function EditEmployeeModal({
     </form>
   );
 }
-

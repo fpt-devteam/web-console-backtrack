@@ -19,8 +19,9 @@ export function InventoryStatusTabs({
   className?: string
 }) {
   return (
-    <div className={['border-b border-gray-200', className].filter(Boolean).join(' ')}>
-      <div className="flex items-center gap-8 overflow-x-auto scrollbar-none">
+    // Airbnb tab strip — Ink Black 2px underline for active, Hairline Gray rule
+    <div className={['border-b border-[#dddddd]', className].filter(Boolean).join(' ')}>
+      <div className="flex items-center gap-6 overflow-x-auto scrollbar-none">
         {TABS.map((t) => {
           const active = value === t
           return (
@@ -29,16 +30,16 @@ export function InventoryStatusTabs({
               type="button"
               onClick={() => onChange(t)}
               className={[
-                'relative whitespace-nowrap py-1 text-sm font-medium transition-all',
-                active ? 'text-blue-600' : 'text-black',
-                'hover:scale-[1.03] hover:drop-shadow-sm',
+                'relative whitespace-nowrap py-3 text-sm font-medium transition-colors',
+                active ? 'text-[#222222]' : 'text-[#6a6a6a] hover:text-[#222222]',
               ].join(' ')}
             >
               {t === 'All' ? 'All' : inventoryStatusLabel(t)}
+              {/* 2px Ink Black underline — matches Airbnb's tab indicator */}
               <span
                 className={[
-                  'absolute left-0 right-0 -bottom-px h-0.5 transition-colors',
-                  active ? 'bg-blue-600' : 'bg-transparent',
+                  'absolute left-0 right-0 -bottom-px h-0.5 rounded-full transition-colors',
+                  active ? 'bg-[#222222]' : 'bg-transparent',
                 ].join(' ')}
               />
             </button>
@@ -48,4 +49,5 @@ export function InventoryStatusTabs({
     </div>
   )
 }
+
 

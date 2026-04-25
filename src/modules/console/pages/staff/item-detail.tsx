@@ -49,7 +49,7 @@ export function ItemDetailPage() {
                 variant="outline"
                 size="sm"
                 type="button"
-                className="border-blue-600 text-blue-600 hover:bg-blue-600 hover:text-white transition-all hover:scale-[1.03] hover:drop-shadow-sm"
+                className="border-[#222222] text-[#222222] hover:bg-[#222222] hover:text-white transition-all hover:scale-[1.03] hover:drop-shadow-sm"
                 onClick={() => setHandoverOpen(true)}
               >
                 Handover
@@ -58,7 +58,7 @@ export function ItemDetailPage() {
                 variant="outline"
                 size="sm"
                 type="button"
-                className="border-blue-600 text-blue-600 hover:bg-blue-600 hover:text-white transition-all hover:scale-[1.03] hover:drop-shadow-sm"
+                className="border-[#222222] text-[#222222] hover:bg-[#222222] hover:text-white transition-all hover:scale-[1.03] hover:drop-shadow-sm"
                 onClick={() => navigate({ to: `/console/${slug}/staff/item-edit/${item.id}` })}
               >
                 Edit
@@ -66,7 +66,7 @@ export function ItemDetailPage() {
               <Button
                 variant="outline"
                 size="sm"
-                className="text-red-600 border-red-300 hover:bg-red-600 hover:text-white transition-all hover:scale-[1.03] hover:drop-shadow-sm"
+                className="text-[#c13515] border-[#c13515] hover:bg-[#c13515] hover:text-white transition-all hover:scale-[1.03] hover:drop-shadow-sm"
                 disabled={deleteItem.isPending}
                 onClick={() => {
                   if (window.confirm('Are you sure you want to delete this item? This cannot be undone.')) {

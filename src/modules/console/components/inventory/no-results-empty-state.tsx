@@ -22,8 +22,8 @@ export function NoResultsEmptyState({
           loading="lazy"
           decoding="async"
         />
-        <h3 className="text-xl font-semibold text-slate-900">{title}</h3>
-        <p className=" text-sm text-slate-500">{description}</p>
+        <h3 className="text-xl font-semibold text-[#222222]">{title}</h3>
+        <p className=" text-sm text-[#6a6a6a]">{description}</p>
         {action ? <div className="mt-5">{action}</div> : null}
       </div>
     </div>

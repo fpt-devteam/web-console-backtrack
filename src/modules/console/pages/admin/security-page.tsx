@@ -205,34 +205,34 @@ export function SecurityPage() {
   };
 
   const inputClass = (field: string) =>
-    `w-full text-sm xl:text-sm placeholder:text-xs xl:placeholder:text-xs pl-12 pr-12 px-4 py-1.5 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-      passwordErrors[field] ? 'border-red-500 bg-red-50' : 'border-gray-300'
+    `w-full text-sm placeholder:text-xs pl-12 pr-12 px-4 py-2 border rounded-lg focus:border-[#222222] outline-none transition-colors ${
+      passwordErrors[field] ? 'border-[#c13515] bg-[#fff8f8]' : 'border-[#dddddd]'
     }`;
 
   return (
     <Layout>
-      <div className="py-5 bg-gray-50">
+      <div className="py-5 bg-[#f7f7f7]">
         <div className=" mx-10 space-y-4 xl:space-y-6">
           <div className="mb-3 xl:mb-5">
-            <h1 className="text-xl md:text-2xl xl:text-3xl font-bold text-gray-900 mb-2">Security</h1>
-            <p className="text-xs md:text-sm xl:text-sm text-gray-600">Manage your password and organisation security settings.</p>
+            <h1 className="text-xl md:text-2xl xl:text-3xl font-bold text-[#222222] mb-2">Security</h1>
+            <p className="text-xs md:text-sm xl:text-sm text-[#6a6a6a]">Manage your password and organisation security settings.</p>
           </div>
 
           {/* ── Change password ── */}
-          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4 md:p-6 xl:p-8">
-            <h2 className="text-base md:text-lg xl:text-lg font-semibold text-gray-900 mb-3 xl:mb-5 flex items-center gap-2">
-              <Lock className="w-3.5 h-3.5 xl:w-4 xl:h-4 text-blue-600" />
+          <div className="bg-white rounded-[14px] border border-[#dddddd] p-4 md:p-6 xl:p-8">
+            <h2 className="text-base md:text-lg xl:text-lg font-semibold text-[#222222] mb-3 xl:mb-5 flex items-center gap-2">
+              <Lock className="w-3.5 h-3.5 xl:w-4 xl:h-4 text-[#ff385c]" />
               Change password
             </h2>
             <form onSubmit={handleSubmit} className="space-y-4 xl:space-y-6">
               {passwordErrors.form && (
-                <p className="text-xs xl:text-xs text-red-600 bg-red-50 px-3 xl:px-4 py-2 xl:py-3 rounded-lg">{passwordErrors.form}</p>
+                <p className="text-xs xl:text-xs text-[#c13515] bg-[#fff8f8] px-3 xl:px-4 py-2 xl:py-3 rounded-lg border border-[#f5c0c0]">{passwordErrors.form}</p>
               )}
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Current password</label>
+                <label className="block text-sm font-medium text-[#222222] mb-2">Current password</label>
                 <div className="relative">
-                  <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500">
+                  <span className="absolute left-4 top-1/2 -translate-y-1/2 text-[#929292]">
                     <Lock className="w-2.5 h-2.5 md:w-3 md:h-3 xl:w-4 xl:h-4" />
                   </span>
                   <input
@@ -246,22 +246,22 @@ export function SecurityPage() {
                   <button
                     type="button"
                     onClick={() => setShowCurrent((s) => !s)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-[#929292] hover:text-[#222222]"
                     aria-label="Toggle visibility"
                   >
                     {showCurrent ? <EyeOff className="w-2.5 h-2.5 md:w-3 md:h-3 xl:w-4 xl:h-4" /> : <Eye className="w-2.5 h-2.5 md:w-3 md:h-3 xl:w-4 xl:h-4" />}
                   </button>
                 </div>
                 {passwordErrors.currentPassword && (
-                  <p className="text-[10px] md:text-xs xl:text-xs text-red-600 mt-1">{passwordErrors.currentPassword}</p>
+                  <p className="text-[10px] md:text-xs xl:text-xs text-[#c13515] mt-1">{passwordErrors.currentPassword}</p>
                 )}
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6 xl:gap-8">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">New password</label>
+                  <label className="block text-sm font-medium text-[#222222] mb-2">New password</label>
                   <div className="relative">
-                    <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500">
+                    <span className="absolute left-4 top-1/2 -translate-y-1/2 text-[#929292]">
                       <Lock className="w-2.5 h-2.5 md:w-3 md:h-3 xl:w-4 xl:h-4" />
                     </span>
                     <input
@@ -275,21 +275,21 @@ export function SecurityPage() {
                     <button
                       type="button"
                       onClick={() => setShowNew((s) => !s)}
-                      className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-[#929292] hover:text-[#222222]"
                       aria-label="Toggle visibility"
                     >
                       {showNew ? <EyeOff className="w-2.5 h-2.5 md:w-3 md:h-3 xl:w-4 xl:h-4" /> : <Eye className="w-2.5 h-2.5 md:w-3 md:h-3 xl:w-4 xl:h-4" />}
                     </button>
                   </div>
                   {passwordErrors.newPassword && (
-                    <p className="text-[10px] md:text-xs xl:text-xs text-red-600 mt-1">{passwordErrors.newPassword}</p>
+                    <p className="text-[10px] md:text-xs xl:text-xs text-[#c13515] mt-1">{passwordErrors.newPassword}</p>
                   )}
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Confirm new password</label>
+                  <label className="block text-sm font-medium text-[#222222] mb-2">Confirm new password</label>
                   <div className="relative">
-                    <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500">
+                    <span className="absolute left-4 top-1/2 -translate-y-1/2 text-[#929292]">
                       <Lock className="w-2.5 h-2.5 md:w-3 md:h-3 xl:w-4 xl:h-4" />
                     </span>
                     <input
@@ -303,14 +303,14 @@ export function SecurityPage() {
                     <button
                       type="button"
                       onClick={() => setShowConfirm((s) => !s)}
-                      className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-[#929292] hover:text-[#222222]"
                       aria-label="Toggle visibility"
                     >
                       {showConfirm ? <EyeOff className="w-2.5 h-2.5 md:w-3 md:h-3 xl:w-4 xl:h-4" /> : <Eye className="w-2.5 h-2.5 md:w-3 md:h-3 xl:w-4 xl:h-4" />}
                     </button>
                   </div>
                   {passwordErrors.confirmPassword && (
-                    <p className="text-[10px] md:text-xs xl:text-xs text-red-600 mt-1">{passwordErrors.confirmPassword}</p>
+                    <p className="text-[10px] md:text-xs xl:text-xs text-[#c13515] mt-1">{passwordErrors.confirmPassword}</p>
                   )}
                 </div>
               </div>
@@ -319,7 +319,7 @@ export function SecurityPage() {
                 <button
                   type="submit"
                   disabled={isSubmitting}
-                  className="w-full md:w-auto px-6 py-1.5 md:py-2 xl:px-8 xl:py-2.5 xl:text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium disabled:opacity-50 transition-colors"
+                  className="w-full md:w-auto px-6 py-2 md:py-2 xl:px-8 xl:py-2.5 xl:text-sm bg-[#ff385c] text-white rounded-[20px] hover:bg-[#e00b41] font-medium disabled:opacity-50 transition-colors active:scale-[0.92]"
                 >
                   {isSubmitting ? 'Updating…' : 'Update password'}
                 </button>
@@ -328,54 +328,54 @@ export function SecurityPage() {
           </div>
 
           {/* ── Finder Contact Policy ── */}
-          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4 md:p-6 xl:p-8">
+          <div className="bg-white rounded-[14px] border border-[#dddddd] p-4 md:p-6 xl:p-8">
             <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-2 md:gap-4 mb-2 xl:mb-3">
               <div className="flex items-center gap-2">
-                <ShieldCheck className="w-3.5 h-3.5 xl:w-4 xl:h-4 text-blue-600 shrink-0" />
-                <h2 className="text-base md:text-lg xl:text-lg font-semibold text-gray-900">Finder Contact Policy</h2>
+                <ShieldCheck className="w-3.5 h-3.5 xl:w-4 xl:h-4 text-[#ff385c] shrink-0" />
+                <h2 className="text-base md:text-lg xl:text-lg font-semibold text-[#222222]">Finder Contact Policy</h2>
               </div>
-              <span className="flex items-center gap-1 text-[10px] xl:text-[10px] text-gray-500 shrink-0 sself-start sm:self-auto">
-                <Check className="w-3 h-3 xl:w-3.5 xl:h-3.5 text-blue-600" />
+              <span className="flex items-center gap-1 text-[10px] xl:text-[10px] text-[#929292] shrink-0 sself-start sm:self-auto">
+                <Check className="w-3 h-3 xl:w-3.5 xl:h-3.5 text-[#ff385c]" />
                 = Required
               </span>
             </div>
-            <p className="text-[10px] md:text-xs xl:text-sm text-gray-500 mb-3 xl:mb-6 ">
+            <p className="text-[10px] md:text-xs xl:text-sm text-[#929292] mb-3 xl:mb-6 ">
               Fields marked as required must be provided when staff registers a found item.
             </p>
 
             {policyError && (
-              <p className="mb-4 xl:mb-6 text-[10px] md:text-xs xl:text-xs text-red-600 bg-red-50  rounded-lg">{policyError}</p>
+              <p className="mb-4 xl:mb-6 text-[10px] md:text-xs xl:text-xs text-[#c13515] bg-[#fff8f8] rounded-lg px-3 py-2">{policyError}</p>
             )}
 
-            <div className="overflow-x-auto rounded-lg border border-gray-200">
+            <div className="overflow-x-auto rounded-[10px] border border-[#dddddd]">
               <table className="w-full text-sm min-w-[300px]">
                 <thead>
-                  <tr className="border-b border-gray-200 bg-gray-50">
-                    <th className="py-2 px-3 md:py-3 md:px-4 xl:py-4 xl:px-6 text-left text-[10px] md:text-xs xl:text-xs font-semibold uppercase tracking-widest text-gray-400">
+                  <tr className="border-b border-[#dddddd] bg-[#f7f7f7]">
+                    <th className="py-2 px-3 md:py-3 md:px-4 xl:py-4 xl:px-6 text-left text-[10px] md:text-xs xl:text-xs font-semibold uppercase tracking-widest text-[#929292]">
                       Field
                     </th>
-                    <th className="py-2 px-3 md:py-3 md:px-4 xl:py-4 xl:px-6 text-left text-[10px] md:text-xs xl:text-xs font-semibold uppercase tracking-widest text-gray-400 hidden sm:table-cell">
+                    <th className="py-2 px-3 md:py-3 md:px-4 xl:py-4 xl:px-6 text-left text-[10px] md:text-xs xl:text-xs font-semibold uppercase tracking-widest text-[#929292] hidden sm:table-cell">
                       Description
                     </th>
-                    <th className="py-2 px-3 md:py-3 md:px-4 xl:py-4 xl:px-6 text-center text-[10px] md:text-xs xl:text-xs font-semibold uppercase tracking-widest text-gray-400 w-20 md:w-24 xl:w-32">
+                    <th className="py-2 px-3 md:py-3 md:px-4 xl:py-4 xl:px-6 text-center text-[10px] md:text-xs xl:text-xs font-semibold uppercase tracking-widest text-[#929292] w-20 md:w-24 xl:w-32">
                       Required
                     </th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-gray-100">
+                <tbody className="divide-y divide-[#f0f0f0]">
                   {FINDER_FIELDS.map((f) => {
                     const checked = checkedFields.includes(f.value);
                     return (
                       <tr
                         key={f.value}
                         onClick={() => toggleField(f.value)}
-                        className="cursor-pointer hover:bg-blue-50/50 transition-colors"
+                        className="cursor-pointer hover:bg-[#f7f7f7] transition-colors"
                       >
                         <td className="py-3 px-3 md:py-4 md:px-4 xl:py-5 xl:px-6">
-                          <div className="font-medium text-gray-800 text-xs md:text-sm xl:text-sm">{f.label}</div>
-                          <div className="text-gray-500 text-[10px] md:hidden mt-0.5">{f.description}</div>
+                          <div className="font-medium text-[#222222] text-xs md:text-sm xl:text-sm">{f.label}</div>
+                          <div className="text-[#929292] text-[10px] md:hidden mt-0.5">{f.description}</div>
                         </td>
-                        <td className="py-3 px-3 md:py-4 md:px-4 xl:py-5 xl:px-6 text-gray-500 text-xs md:text-sm xl:text-sm hidden sm:table-cell">
+                        <td className="py-3 px-3 md:py-4 md:px-4 xl:py-5 xl:px-6 text-[#6a6a6a] text-xs md:text-sm xl:text-sm hidden sm:table-cell">
                           {f.description}
                         </td>
                         <td className="py-3 px-3 md:py-4 md:px-4 xl:py-5 xl:px-6">
@@ -383,8 +383,8 @@ export function SecurityPage() {
                             <div
                               className={`w-3.5 h-3.5 md:w-4 md:h-4 xl:w-5 xl:h-5 rounded flex items-center justify-center border-2 xl:border-[3px] transition-colors ${
                                 checked
-                                  ? 'bg-blue-600 border-blue-600'
-                                  : 'border-gray-300 bg-white'
+                                  ? 'bg-[#ff385c] border-[#ff385c]'
+                                  : 'border-[#dddddd] bg-white'
                               }`}
                             >
                               {checked && <Check className="w-2.5 h-2.5 md:w-3 md:h-3 xl:w-3.5 xl:h-3.5 text-white" strokeWidth={3} />}
@@ -403,7 +403,7 @@ export function SecurityPage() {
                 type="button"
                 disabled={policySaving || !org}
                 onClick={handleSavePolicy}
-                className="w-full md:w-auto px-6 py-1.5 md:py-2 xl:px-8 xl:py-2.5 xl:text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium disabled:opacity-50 transition-colors"
+                className="w-full md:w-auto px-6 py-2 md:py-2 xl:px-8 xl:py-2.5 xl:text-sm bg-[#ff385c] text-white rounded-[20px] hover:bg-[#e00b41] font-medium disabled:opacity-50 transition-colors active:scale-[0.92]"
               >
                 {policySaving ? 'Saving…' : 'Save policy'}
               </button>
@@ -411,63 +411,63 @@ export function SecurityPage() {
           </div>
 
           {/* ── Owner Contact Policy ── */}
-          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4 md:p-6 xl:p-8">
+          <div className="bg-white rounded-[14px] border border-[#dddddd] p-4 md:p-6 xl:p-8">
             <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-2 md:gap-4 mb-2 xl:mb-3">
               <div className="flex items-center gap-2">
-                <ShieldCheck className="w-3.5 h-3.5 xl:w-4 xl:h-4 text-blue-600 shrink-0" />
-                <h2 className="text-base md:text-lg xl:text-lg font-semibold text-gray-900">Owner Contact Policy</h2>
+                <ShieldCheck className="w-3.5 h-3.5 xl:w-4 xl:h-4 text-[#ff385c] shrink-0" />
+                <h2 className="text-base md:text-lg xl:text-lg font-semibold text-[#222222]">Owner Contact Policy</h2>
               </div>
-              <span className="flex items-center gap-1 text-[10px] xl:text-[10px] text-gray-500 shrink-0 sself-start sm:self-auto">
-                <Check className="w-3 h-3 xl:w-3.5 xl:h-3.5 text-blue-600" />
+              <span className="flex items-center gap-1 text-[10px] xl:text-[10px] text-[#929292] shrink-0 sself-start sm:self-auto">
+                <Check className="w-3 h-3 xl:w-3.5 xl:h-3.5 text-[#ff385c]" />
                 = Required
               </span>
             </div>
-            <p className="text-[10px] md:text-xs xl:text-sm text-gray-500 mb-3 xl:mb-6 ">
+            <p className="text-[10px] md:text-xs xl:text-sm text-[#929292] mb-3 xl:mb-6 ">
               Fields marked as required must be provided when staff hands over an item to the owner.
             </p>
 
             {ownerPolicyError && (
-              <p className="mb-4 xl:mb-6 text-[10px] md:text-xs xl:text-xs text-red-600 bg-red-50  rounded-lg">
+              <p className="mb-4 xl:mb-6 text-[10px] md:text-xs xl:text-xs text-[#c13515] bg-[#fff8f8] rounded-lg px-3 py-2">
                 {ownerPolicyError}
               </p>
             )}
 
-            <div className="overflow-x-auto rounded-lg border border-gray-200">
+            <div className="overflow-x-auto rounded-[10px] border border-[#dddddd]">
               <table className="w-full text-sm min-w-[300px]">
                 <thead>
-                  <tr className="border-b border-gray-200 bg-gray-50">
-                    <th className="py-2 px-3 md:py-3 md:px-4 xl:py-4 xl:px-6 text-left text-[10px] md:text-xs xl:text-xs font-semibold uppercase tracking-widest text-gray-400">
+                  <tr className="border-b border-[#dddddd] bg-[#f7f7f7]">
+                    <th className="py-2 px-3 md:py-3 md:px-4 xl:py-4 xl:px-6 text-left text-[10px] md:text-xs xl:text-xs font-semibold uppercase tracking-widest text-[#929292]">
                       Field
                     </th>
-                    <th className="py-2 px-3 md:py-3 md:px-4 xl:py-4 xl:px-6 text-left text-[10px] md:text-xs xl:text-xs font-semibold uppercase tracking-widest text-gray-400 hidden sm:table-cell">
+                    <th className="py-2 px-3 md:py-3 md:px-4 xl:py-4 xl:px-6 text-left text-[10px] md:text-xs xl:text-xs font-semibold uppercase tracking-widest text-[#929292] hidden sm:table-cell">
                       Description
                     </th>
-                    <th className="py-2 px-3 md:py-3 md:px-4 xl:py-4 xl:px-6 text-center text-[10px] md:text-xs xl:text-xs font-semibold uppercase tracking-widest text-gray-400 w-20 md:w-24 xl:w-32">
+                    <th className="py-2 px-3 md:py-3 md:px-4 xl:py-4 xl:px-6 text-center text-[10px] md:text-xs xl:text-xs font-semibold uppercase tracking-widest text-[#929292] w-20 md:w-24 xl:w-32">
                       Required
                     </th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-gray-100">
+                <tbody className="divide-y divide-[#f0f0f0]">
                   {OWNER_FIELDS.map((f) => {
                     const checked = checkedOwnerFields.includes(f.value);
                     return (
                       <tr
                         key={f.value}
                         onClick={() => toggleOwnerField(f.value)}
-                        className="cursor-pointer hover:bg-blue-50/50 transition-colors"
+                        className="cursor-pointer hover:bg-[#f7f7f7] transition-colors"
                       >
                         <td className="py-3 px-3 md:py-4 md:px-4 xl:py-5 xl:px-6">
-                          <div className="font-medium text-gray-800 text-xs md:text-sm xl:text-sm">{f.label}</div>
-                          <div className="text-gray-500 text-[10px] md:hidden mt-0.5">{f.description}</div>
+                          <div className="font-medium text-[#222222] text-xs md:text-sm xl:text-sm">{f.label}</div>
+                          <div className="text-[#929292] text-[10px] md:hidden mt-0.5">{f.description}</div>
                         </td>
-                        <td className="py-3 px-3 md:py-4 md:px-4 xl:py-5 xl:px-6 text-gray-500 text-xs md:text-sm xl:text-sm hidden sm:table-cell">
+                        <td className="py-3 px-3 md:py-4 md:px-4 xl:py-5 xl:px-6 text-[#6a6a6a] text-xs md:text-sm xl:text-sm hidden sm:table-cell">
                           {f.description}
                         </td>
                         <td className="py-3 px-3 md:py-4 md:px-4 xl:py-5 xl:px-6">
                           <div className="flex justify-center">
                             <div
                               className={`w-3.5 h-3.5 md:w-4 md:h-4 xl:w-5 xl:h-5 rounded flex items-center justify-center border-2 xl:border-[3px] transition-colors ${
-                                checked ? 'bg-blue-600 border-blue-600' : 'border-gray-300 bg-white'
+                                checked ? 'bg-[#ff385c] border-[#ff385c]' : 'border-[#dddddd] bg-white'
                               }`}
                             >
                               {checked && (
@@ -491,7 +491,7 @@ export function SecurityPage() {
                 type="button"
                 disabled={ownerPolicySaving || !org}
                 onClick={handleSaveOwnerPolicy}
-                className="w-full md:w-auto px-6 py-1.5 md:py-2 xl:px-8 xl:py-2.5 xl:text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium disabled:opacity-50 transition-colors"
+                className="w-full md:w-auto px-6 py-2 md:py-2 xl:px-8 xl:py-2.5 xl:text-sm bg-[#ff385c] text-white rounded-[20px] hover:bg-[#e00b41] font-medium disabled:opacity-50 transition-colors active:scale-[0.92]"
               >
                 {ownerPolicySaving ? 'Saving…' : 'Save policy'}
               </button>

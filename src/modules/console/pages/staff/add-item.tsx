@@ -92,10 +92,10 @@ function Stepper({
                   className={cx(
                     'flex h-7 w-7 items-center justify-center rounded-full border text-xs font-semibold',
                     isActive
-                      ? 'bg-slate-950 border-slate-950 text-white'
+                      ? 'bg-[#222222] border-[#222222] text-white'
                       : isDone
-                        ? 'bg-slate-950 border-slate-950 text-white'
-                        : 'bg-white border-slate-300 text-slate-950',
+                        ? 'bg-[#222222] border-[#222222] text-white'
+                        : 'bg-white border-[#dddddd] text-[#222222]',
                   )}
                 >
                   {isDone ? <Check className="h-4 w-4" /> : s.id}
@@ -104,8 +104,8 @@ function Stepper({
                   <span
                     className={cx(
                       'block text-sm',
-                      isDone ? 'font-semibold text-slate-950' : 'font-medium text-slate-700',
-                      isActive ? 'text-slate-950 underline underline-offset-4 decoration-2 decoration-slate-950' : '',
+                      isDone ? 'font-semibold text-[#222222]' : 'font-medium text-[#6a6a6a]',
+                      isActive ? 'text-[#222222] underline underline-offset-4 decoration-2 decoration-[#222222]' : '',
                     )}
                   >
                     {s.title}
@@ -118,7 +118,7 @@ function Stepper({
                   <div
                     className={cx(
                       'h-[1px] w-full border-t-2 border-dashed',
-                      s.id < current ? 'border-slate-950' : 'border-slate-300',
+                      s.id < current ? 'border-[#222222]' : 'border-[#dddddd]',
                     )}
                   />
                 </div>
@@ -673,21 +673,21 @@ export function AddFoundItemPage() {
       <div className="h-full overflow-y-auto p-8">
         <div className="max-w-5xl mx-auto">
           {/* Breadcrumb */}
-          <div className="mb-6 flex items-center gap-2 text-sm text-gray-600">
+          <div className="mb-6 flex items-center gap-2 text-sm text-[#6a6a6a]">
             <Link
               to="/console/$slug/staff/inventory"
               params={{ slug }}
-              className="hover:text-gray-900 transition-colors"
+              className="hover:text-[#222222] transition-colors"
             >
               Inventory
             </Link>
             <ChevronRight className="w-4 h-4" />
-            <span className="text-gray-900 font-medium">Add Found Item</span>
+            <span className="text-[#222222] font-medium">Add Found Item</span>
           </div>
 
           {/* Header */}
           <div className="mb-6">
-            <h1 className="text-3xl font-bold text-gray-900">Add Found Item</h1>
+            <h1 className="text-3xl font-bold text-[#222222]">Add Found Item</h1>
           </div>
         </div>
 
@@ -697,16 +697,16 @@ export function AddFoundItemPage() {
         </div>
 
         {/* Form Container */}
-        <div className="max-w-6xl mx-auto w-full bg-white rounded-xl shadow-lg px-4 sm:px-6 lg:px-7 py-4 flex-1 min-h-0">
+        <div className="max-w-6xl mx-auto w-full bg-white rounded-[14px] border border-[#dddddd] px-4 sm:px-6 lg:px-7 py-4 flex-1 min-h-0">
 
           {submitError && (
-            <div className="mb-4 p-3 rounded-md bg-red-50 text-red-700 text-sm">
+            <div className="mb-4 p-3 rounded-md bg-[#fff0f2] text-[#c13515] text-sm">
               {submitError}
             </div>
           )}
 
           {step !== 3 && analysisWarnings && analysisWarnings.length > 0 ? (
-            <div className="mb-4 p-3 rounded-md bg-amber-50 text-amber-800 text-sm">
+            <div className="mb-4 p-3 rounded-md bg-[#fff8e6] text-[#c97a00] text-sm">
               <div className="font-semibold mb-1">AI warnings</div>
               <ul className="list-disc pl-5 space-y-1">
                 {analysisWarnings.map((w, idx) => (
