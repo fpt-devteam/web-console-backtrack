@@ -1,4 +1,4 @@
-import { Flame, MessageCircle, Package, TrendingUp } from 'lucide-react'
+import { Flame, Package, TrendingUp } from 'lucide-react'
 import type { EngagementMetrics } from '@/services/staff-dashboard.service'
 
 const RANK_STYLE = {
