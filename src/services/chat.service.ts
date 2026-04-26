@@ -44,7 +44,7 @@ interface RawConversation {
  *   1. List responses   → { conversationId, type, partner, lastMessage, … }
  *   2. Single GET/assign → { conversation: { conversationId, … } }
  */
-function normalizeConv(raw: unknown): IConversation {
+export function normalizeConv(raw: unknown): IConversation {
   const obj = (
     raw && typeof raw === 'object' && 'conversation' in raw
       ? (raw as { conversation: unknown }).conversation
@@ -78,7 +78,7 @@ interface RawListPayload {
 }
 
 /** Normalise a `{ conversations, nextCursor, hasMore }` wrapper or plain array. */
-function toList(data: unknown): ConversationListResponse {
+export function toList(data: unknown): ConversationListResponse {
   if (!data) return { conversations: [] };
   const items: Array<unknown> = Array.isArray(data)
     ? data

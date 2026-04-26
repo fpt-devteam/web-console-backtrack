@@ -1,15 +1,96 @@
-import { useCallback, useEffect, useRef } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { chatKeys } from './use-chat';
 import type {
+  IConversation,
   IMessage,
   WSConversationUpdatedEvent,
   WSMessageSendSuccess,
   WSSendSupportMessagePayload,
 } from '@/types/chat.types';
+import { normalizeConv, toList } from '@/services/chat.service';
 import { useChatContext } from '@/contexts/chat.context';
 import { auth } from '@/lib/firebase';
 import { MessageType } from '@/types/chat.types';
+
+// ── useSocketChatQueue ─────────────────────────────────
+
+/**
+ * Join the org queue room via WebSocket and receive the live queue list.
+ * Emits `join:org:queue` on mount and `leave:org:queue` on unmount.
+ * Re-requests the list whenever a `conversation:new` event fires.
+ *
+ * Stores data in the React Query cache under `chatKeys.queue()` so that
+ * `useConversationUpdates` (patchOrInvalidate) can patch it in-place.
+ */
+export function useSocketChatQueue(orgId?: string) {
+  const { socket, isConnected } = useChatContext();
+  const queryClient = useQueryClient();
+  const [data, setData] = useState<Array<IConversation>>([]);
+  const [isLoading, setIsLoading] = useState(!!orgId);
+
+  useEffect(() => {
+    if (!socket || !orgId || !isConnected) {
+      setIsLoading(false);
+      return;
+    }
+
+    setIsLoading(true);
+
+    function handleQueueList(payload: unknown) {
+      console.log('[useSocketChatQueue] org:queue:list received', payload);
+      try {
+        const { conversations } = toList(payload);
+        setData(conversations);
+        queryClient.setQueryData(chatKeys.queue(), conversations);
+      } catch (err) {
+        console.error('[useSocketChatQueue] Failed to parse queue list', err);
+      }
+      setIsLoading(false);
+    }
+
+    function handleQueueError(err: unknown) {
+      console.error('[useSocketChatQueue] org:queue:error received', err);
+      setIsLoading(false);
+    }
+
+    function handleQueueNew(payload: unknown) {
+      const conversation = normalizeConv(payload);
+      setData((prev) => {
+        if (prev.some((c) => c.id === conversation.id)) return prev;
+        return [conversation, ...prev];
+      });
+      queryClient.setQueryData<Array<IConversation>>(chatKeys.queue(), (old) => {
+        if (!old) return [conversation];
+        if (old.some((c) => c.id === conversation.id)) return old;
+        return [conversation, ...old];
+      });
+    }
+
+    console.log('[useSocketChatQueue] emitting join:org:queue', { orgId });
+    socket.emit('join:org:queue', { orgId });
+    socket.on('org:queue:list', handleQueueList);
+    socket.on('org:queue:error', handleQueueError);
+    socket.on('queue:new', handleQueueNew);
+
+    return () => {
+      socket.off('org:queue:list', handleQueueList);
+      socket.off('org:queue:error', handleQueueError);
+      socket.off('queue:new', handleQueueNew);
+      socket.emit('leave:org:queue', orgId);
+      setData([]);
+    };
+  }, [socket, orgId, isConnected, queryClient]);
+
+  const removeFromQueue = useCallback((conversationId: string) => {
+    setData((prev) => prev.filter((c) => c.id !== conversationId));
+    queryClient.setQueryData<Array<IConversation>>(chatKeys.queue(), (old) =>
+      old?.filter((c) => c.id !== conversationId) ?? []
+    );
+  }, [queryClient]);
+
+  return { data, isLoading, removeFromQueue };
+}
 
 // ── useIncomingMessages ─────────────────────────────────
 
@@ -244,16 +325,9 @@ export function useConversationUpdates() {
       patchOrInvalidate(chatKeys.assigned());
     }
 
-    // New conversation created by a customer → appears in queue immediately
-    function handleConversationNew() {
-      void queryClient.invalidateQueries({ queryKey: chatKeys.queue() });
-    }
-
     socket.on('conversation:updated', handleConversationUpdated);
-    socket.on('conversation:new', handleConversationNew);
     return () => {
       socket.off('conversation:updated', handleConversationUpdated);
-      socket.off('conversation:new', handleConversationNew);
     };
   }, [socket, queryClient]);
 }
