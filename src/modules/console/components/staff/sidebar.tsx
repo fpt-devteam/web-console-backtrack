@@ -6,6 +6,7 @@ import {
   ArrowLeftRight,
   LogOut,
   ChevronsUpDown,
+  LayoutDashboard,
 } from 'lucide-react'
 import { OrgLogo } from '@/components/org-logo'
 import { Link, useLocation, useParams } from '@tanstack/react-router'
@@ -42,6 +43,12 @@ const ITEM_CLS =
   'text-[#6a6a6a] hover:bg-[#f7f7f7] hover:text-[#222222] data-[active=true]:bg-[#fff0f2] data-[active=true]:text-[#ff385c]'
 
 const NAV_ITEMS = [
+  {
+    key: 'dashboard',
+    name: 'Dashboard',
+    icon: LayoutDashboard,
+    to: '/console/$slug/staff/dashboard' as const,
+  },
   {
     key: 'inventory',
     name: 'Inventory',
@@ -84,6 +91,7 @@ function StaffSidebarInner() {
 
   const isActive = (key: string) => {
     const cur = location.pathname
+    if (key === 'dashboard') return cur === `${base}/staff/dashboard` || cur === `${base}/staff`
     if (key === 'inventory') {
       return (
         (cur.startsWith(`${base}/staff/inventory`) || cur.startsWith(`${base}/staff/item`)) &&
