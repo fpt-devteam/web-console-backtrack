@@ -96,8 +96,6 @@ export function useAssignConversation() {
   return useMutation({
     mutationFn: (conversationId: string) => chatService.assignSelf(conversationId),
     onSuccess: () => {
-      // Refresh both lists after assignment
-      queryClient.invalidateQueries({ queryKey: chatKeys.queue() });
       queryClient.invalidateQueries({ queryKey: chatKeys.assigned() });
     },
   });
