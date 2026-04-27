@@ -127,6 +127,7 @@ export interface InventorySubcategory {
 
 export interface CreateInventoryPayload {
   postTitle: string
+  postType?: PostType
   /** Maps to BE `*DetailInput.ItemName` (Personal/Cards/Electronics). */
   detailItemName?: string
   /** Maps to `OtherDetail.itemIdentifier` only; not a stored field for other categories. */
@@ -222,6 +223,7 @@ export interface GetInventoryParams {
   pageSize?: number
   query?: string
   status?: PostStatus
+  postType?: PostType
   category?: ItemCategory
   /** Maps to BE `InventoryFilter.staffId` → post author (Firebase UID). */
   staffId?: string
@@ -264,6 +266,7 @@ type SearchInventoriesBody = {
   query?: string
   filters?: {
     status?: PostStatus
+    postType?: PostType
     category?: ItemCategory
     staffId?: string
     time?: { from?: string; to?: string }
@@ -276,10 +279,11 @@ export const inventoryService = {
   async create(orgId: string, payload: CreateInventoryPayload): Promise<InventoryItem> {
     const postTitle = payload.postTitle.trim()
     const detailItemName = payload.detailItemName?.trim() || postTitle
+    const postType = payload.postType ?? 'Found'
     const body =
       payload.category === 'PersonalBelongings'
         ? {
-            postType: 'Found',
+            postType,
             postTitle,
             category: payload.category,
             subcategoryCode: payload.subcategoryCode,
@@ -300,7 +304,7 @@ export const inventoryService = {
           }
         : payload.category === 'Electronics'
           ? {
-              postType: 'Found',
+              postType,
               postTitle,
               category: payload.category,
               subcategoryCode: payload.subcategoryCode,
@@ -323,7 +327,7 @@ export const inventoryService = {
             }
         : payload.category === 'Cards'
           ? {
-              postType: 'Found',
+              postType,
               postTitle,
               category: payload.category,
               subcategoryCode: payload.subcategoryCode,
@@ -344,7 +348,7 @@ export const inventoryService = {
             }
           : payload.category === 'Others'
             ? {
-                postType: 'Found',
+                postType,
                 postTitle,
                 category: payload.category,
                 subcategoryCode: payload.subcategoryCode,
@@ -359,7 +363,7 @@ export const inventoryService = {
                 finderInfo: payload.finderInfo ?? undefined,
               }
             : {
-                postType: 'Found',
+                postType,
                 postTitle,
                 category: payload.category,
                 subcategoryCode: payload.subcategoryCode,
@@ -384,6 +388,7 @@ export const inventoryService = {
       query: params?.query?.trim() || undefined,
       filters: {
         status: params?.status ?? undefined,
+        postType: params?.postType ?? undefined,
         category: params?.category ?? undefined,
         staffId: params?.staffId?.trim() || undefined,
         time,
@@ -395,6 +400,7 @@ export const inventoryService = {
     // Keep payload minimal (avoid sending empty filters)
     if (
       !body.filters?.status &&
+      !body.filters?.postType &&
       !body.filters?.category &&
       !body.filters?.staffId &&
       !body.filters?.time
@@ -437,7 +443,7 @@ export const inventoryService = {
    * Endpoint: POST /api/core/post-image/analyze
    * Body:     { imageUrls: string[], subcategoryCode: string }
    */
-  async analyzeImage(imageUrls: string[], subcategoryCode: string): Promise<AnalyzeImageResult> {
+  async analyzeImage(imageUrls: Array<string>, subcategoryCode: string): Promise<AnalyzeImageResult> {
     const { data } = await privateClient.post<ApiResponse<AnalyzeImageResult>>(
       '/api/core/post-image/analyze',
       { imageUrls, subcategoryCode },

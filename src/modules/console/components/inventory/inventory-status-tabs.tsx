@@ -13,14 +13,15 @@ export function InventoryStatusTabs({
   value,
   onChange,
   className,
+  hideBorder = false,
 }: {
   value: StatusFilter
   onChange: (v: StatusFilter) => void
   className?: string
+  hideBorder?: boolean
 }) {
   return (
-    // Airbnb tab strip — Ink Black 2px underline for active, Hairline Gray rule
-    <div className={['border-b border-[#dddddd]', className].filter(Boolean).join(' ')}>
+    <div className={[hideBorder ? '' : 'border-b border-[#dddddd]', className].filter(Boolean).join(' ')}>
       <div className="flex items-center gap-6 overflow-x-auto scrollbar-none">
         {TABS.map((t) => {
           const active = value === t
