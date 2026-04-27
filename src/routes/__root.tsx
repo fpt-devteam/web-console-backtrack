@@ -18,8 +18,8 @@ function RootComponent() {
         toastOptions={{
           duration: 4000,
           style: {
-            background: '#363636',
-            color: '#fff',
+            background: '#fff',
+            color: '#222222',
           },
           success: {
             duration: 3000,
@@ -37,7 +37,6 @@ function RootComponent() {
           },
         }}
       />
-      
       <Outlet />
     </>
   );

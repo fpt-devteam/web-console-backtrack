@@ -1,5 +1,6 @@
 import { privateClient } from '@/lib/api-client';
 import type { ApiResponse } from '@/types/api-response.type';
+import type { AdminSubscriptionResult, AdminPaymentHistoryItem } from '@/types/admin-user.types';
 
 export interface SubscriptionPlanResult {
   id: string;
@@ -35,16 +36,14 @@ export interface SubscriptionResult {
 
 export const subscriptionService = {
   /**
-   * Get all subscription plans
-   * 
-   * @param subscriberType - 0 for User, 1 for Organization
+   * Get all subscription plans for a subscriber type
    */
-  async getPlans(subscriberType: 0 | 1 = 1): Promise<SubscriptionPlanResult[]> {
-    const { data } = await privateClient.get<ApiResponse<SubscriptionPlanResult[]>>(
+  async getPlans(subscriberType: 'User' | 'Organization' = 'Organization'): Promise<SubscriptionPlanResult[]> {
+    const { data } = await privateClient.get<ApiResponse<SubscriptionPlanResult[] | null>>(
       `/api/core/subscription-plans?subscriberType=${subscriberType}`
     );
     if (!data.success) throw new Error(data.error?.message ?? 'Failed to fetch subscription plans');
-    return data.data;
+    return data.data ?? [];
   },
 
   /**
@@ -79,5 +78,35 @@ export const subscriptionService = {
     const { data } = await privateClient.delete<ApiResponse<SubscriptionResult>>('/api/core/subscriptions/me');
     if (!data.success) throw new Error(data.error?.message ?? 'Failed to cancel subscription');
     return data.data;
+  },
+
+  /**
+   * Get current subscription for a specific organization
+   */
+  async getOrgSubscription(organizationId: string): Promise<AdminSubscriptionResult | null> {
+    try {
+      const { data } = await privateClient.get<ApiResponse<AdminSubscriptionResult>>(
+        `/api/core/subscriptions/me?organizationId=${organizationId}`
+      );
+      if (!data.success) return null;
+      return data.data;
+    } catch (error: any) {
+      if (error.response?.status === 404) return null;
+      throw error;
+    }
+  },
+
+  /**
+   * Get payment history for a specific organization
+   */
+  async getOrgPaymentHistory(organizationId: string): Promise<AdminPaymentHistoryItem[]> {
+    const { data } = await privateClient.get<ApiResponse<AdminPaymentHistoryItem[] | { items: AdminPaymentHistoryItem[]; total: number } | null>>(
+      `/api/core/subscriptions/payments?organizationId=${organizationId}`
+    );
+    if (!data.success) throw new Error(data.error?.message ?? 'Failed to fetch payment history');
+    const result = data.data;
+    if (!result) return [];
+    if (Array.isArray(result)) return result;
+    return result.items ?? [];
   },
 };

@@ -1,320 +1,287 @@
-import { Layout } from '../../components/admin/layout';
-import { useState, useEffect } from 'react';
-// import { useRouter } from '@tanstack/react-router';
-import { 
-  CreditCard, 
-  Mail, 
-  Receipt, 
-  Check,
+import { useEffect, useState } from 'react';
+import {
+  CalendarDays,
+  CreditCard,
+  FileText,
+  Loader2,
+  ShieldCheck,
+  Sparkles,
+  TriangleAlert,
 } from 'lucide-react';
-import {
-  mockCurrentPlan,
-  mockAvailablePlans,
-  mockPaymentMethod,
-  mockOrgBillingHistory,
-  type PaymentMethod,
-} from '@/mock/data';
+import { Layout } from '../../components/admin/layout';
+import type { AdminPaymentHistoryItem, AdminSubscriptionResult } from '@/types/admin-user.types';
+import { type PaymentMethod, mockPaymentMethod,  } from '@/mock/data';
 import { showToast } from '@/lib/toast';
-import {
-  getPaymentMethod,
-} from '@/mock/storage/account-storage';
+import { getPaymentMethod } from '@/mock/storage/account-storage';
+import { subscriptionService } from '@/services/subscription.service';
+import { useCurrentOrgId } from '@/contexts/current-org.context';
+
+function formatDate(isoString: string): string {
+  return new Date(isoString).toLocaleDateString('en-US', {
+    month: 'short',
+    day: 'numeric',
+    year: 'numeric',
+  });
+}
+
+function statusLabel(status: string) {
+  if (status === 'Succeeded') return { label: 'Paid', cls: 'text-[#06c167] bg-[#e8f9f0]' };
+  if (status === 'Pending') return { label: 'Pending', cls: 'text-[#c97a00] bg-[#fff8e6]' };
+  return { label: status, cls: 'text-[#c13515] bg-[#fff0f2]' };
+}
+
+function subscriptionStatusBadge(status: string) {
+  if (status === 'Active') return 'bg-[#e8f9f0] text-[#06c167]';
+  if (status === 'PastDue' || status === 'Unpaid') return 'bg-[#fff8e6] text-[#c97a00]';
+  return 'bg-[#fff0f2] text-[#c13515]';
+}
 
 export function PlanPage() {
-  const [billingCycle, setBillingCycle] = useState<'monthly' | 'yearly'>('monthly');
-  
-  // State for payment data
+  const { currentOrgId } = useCurrentOrgId();
+
+  const [subscription, setSubscription] = useState<AdminSubscriptionResult | null>(null);
+  const [payments, setPayments] = useState<Array<AdminPaymentHistoryItem>>([]);
+  const [isLoadingSubscription, setIsLoadingSubscription] = useState(true);
+  const [isLoadingPayments, setIsLoadingPayments] = useState(true);
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>(mockPaymentMethod);
-  
-  // Load data from localStorage on mount
+
   useEffect(() => {
     setPaymentMethod(getPaymentMethod(mockPaymentMethod));
   }, []);
 
-  const handleUpgrade = (planId: string) => {
-    showToast.success(`Upgrade to ${planId} plan initiated!`);
-  };
+  useEffect(() => {
+    if (!currentOrgId) return;
 
-  const handleDowngrade = (planId: string) => {
-    showToast.success(`Downgrade to ${planId} plan initiated!`);
-  };
+    setIsLoadingSubscription(true);
+    subscriptionService
+      .getOrgSubscription(currentOrgId)
+      .then(setSubscription)
+      .catch(() => showToast.error('Failed to load subscription'))
+      .finally(() => setIsLoadingSubscription(false));
 
-  const handleCancelSubscription = () => {
-    showToast.error('Subscription cancellation requested.');
-  };
+    setIsLoadingPayments(true);
+    subscriptionService
+      .getOrgPaymentHistory(currentOrgId)
+      .then(setPayments)
+      .catch(() => showToast.error('Failed to load payment history'))
+      .finally(() => setIsLoadingPayments(false));
+  }, [currentOrgId]);
 
-  const handleDownloadInvoice = () => {
-    showToast.success('Invoice downloaded!');
-  };
+  const isFree = (subscription?.planSnapshot.price ?? 0) === 0;
+
+  const handleDownloadInvoice = () => showToast.success('Invoice downloaded!');
+  const handleCancelSubscription = () => showToast.error('Subscription cancellation requested.');
 
   return (
     <Layout>
       <div className="p-4 sm:p-8 w-full">
         {/* Header */}
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-[#222222] mb-2">Plan Management</h1>
+          <h1 className="text-3xl font-bold text-[#222222] mb-1">Plan Management</h1>
           <p className="text-[#6a6a6a]">Manage your organization's subscription and billing details.</p>
         </div>
 
-        <div className="space-y-8">
-          {/* Current plan + Payment method (same row height on large screens) */}
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-stretch">
-            {/* Current Subscription */}
-            <div className="lg:col-span-2 h-full min-h-0">
-              <div className="bg-white rounded-[14px] border border-[#dddddd] p-6 h-full">
-              <div className="flex items-start justify-between mb-6">
-                <div>
-                  <div className="flex items-center gap-3 mb-2">
-                    <h2 className="text-2xl font-bold text-[#222222]">{mockCurrentPlan.name}</h2>
-                    <span className="px-3 py-1 bg-[#e8f9f0] text-[#06c167] text-sm font-semibold rounded-full">
-                      {mockCurrentPlan.status.toUpperCase()}
-                    </span>
-                  </div>
-                  <p className="text-sm text-[#6a6a6a]">Renews on {mockCurrentPlan.renewsOn}</p>
-                </div>
-                <div className="text-right">
-                  <div className="text-3xl font-bold text-[#222222]">
-                    ${mockCurrentPlan.price}
-                    <span className="text-lg text-[#6a6a6a]">/mo</span>
-                  </div>
-                  <p className="text-sm text-[#6a6a6a]">Billed monthly</p>
-                </div>
-              </div>
+        <div className="space-y-6">
+          {/* ── Top row: Plan card + Payment card ── */}
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
 
-              {/* Usage Stats */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
-                <div className="p-4 bg-[#f7f7f7] rounded-lg">
-                  <div className="flex items-center gap-2 text-sm text-[#6a6a6a] mb-1">
-                    <Receipt className="w-4 h-4" />
-                    <span>Total Posts</span>
-                  </div>
-                  <div className="text-2xl font-bold text-[#222222]">
-                    {mockCurrentPlan.usage.posts.current}
-                    <span className="text-base text-[#6a6a6a]">
-                      {mockCurrentPlan.usage.posts.limit ? ` / ${mockCurrentPlan.usage.posts.limit}` : ' / ∞'}
-                    </span>
-                  </div>
-                </div>
-
-                <div className="p-4 bg-[#f7f7f7] rounded-lg">
-                  <div className="flex items-center gap-2 text-sm text-[#6a6a6a] mb-1">
-                    <Mail className="w-4 h-4" />
-                    <span>Employees</span>
-                  </div>
-                  <div className="text-2xl font-bold text-[#222222]">
-                    {mockCurrentPlan.usage.employees.current}
-                    <span className="text-base text-[#6a6a6a]"> / {mockCurrentPlan.usage.employees.limit}</span>
-                  </div>
-                </div>
-              </div>
-
-              {/* Action Buttons */}
-              <div className="flex gap-3">
-                <button
-                  onClick={() => handleUpgrade('premium')}
-                  className="px-6 py-2 bg-[#ff385c] text-white rounded-[20px] hover:bg-[#e00b41] text-sm transition-colors active:scale-[0.92]"
-                >
-                  Upgrade Plan
-                </button>
-                <button
-                  onClick={handleDownloadInvoice}
-                  className="px-6 py-2 border border-[#dddddd] text-[#222222] rounded-[20px] hover:border-[#222222] text-sm transition-colors active:scale-[0.92]"
-                >
-                  Download Invoice
-                </button>
-                <button
-                  onClick={handleCancelSubscription}
-                  className="px-6 py-2 text-[#c13515] hover:bg-[#fff0f2] rounded-[20px] text-sm transition-colors ml-auto active:scale-[0.92]"
-                >
-                  Cancel Subscription
-                </button>
-              </div>
-              </div>
-            </div>
-
-            {/* Payment Method — khung cùng chiều cao cột; nội dung xếp bình thường */}
-            <div className="lg:col-span-1 h-full min-h-0">
-              <div className="bg-white rounded-[14px] border border-[#dddddd] p-6 h-full">
-                <h3 className="text-lg font-bold text-[#222222] mb-4">Payment Method</h3>
-                <div className="flex items-center gap-3 mb-4">
-                  <div className="w-12 h-8 bg-[#f7f7f7] rounded-lg flex items-center justify-center shrink-0">
-                    <CreditCard className="w-6 h-6 text-[#6a6a6a]" />
-                  </div>
-                  <div className="min-w-0">
-                    <p className="text-[#222222] font-medium">
-                      {paymentMethod.type.charAt(0).toUpperCase() + paymentMethod.type.slice(1)} ending in{' '}
-                      {paymentMethod.last4}
-                    </p>
-                    <p className="text-sm text-[#6a6a6a]">
-                      Expires {paymentMethod.expiresMonth}/{paymentMethod.expiresYear}
-                    </p>
-                  </div>
-                </div>
-                <button type="button" className="text-[#ff385c] hover:text-[#e00b41] text-sm font-medium">
-                  + Add Payment Method
-                </button>
-              </div>
-            </div>
-          </div>
-
-          {/* Available Plans — full width */}
-          <div className="w-full">
-            <div className="bg-white rounded-[14px] border border-[#dddddd] p-6">
-              <div className="flex items-center justify-between mb-6">
-                <h2 className="text-xl font-bold text-[#222222]">Available Plans</h2>
-
-                {/* Billing Cycle Toggle */}
-                <div className="flex items-center gap-2 bg-[#f7f7f7] rounded-[20px] p-1">
-                  <button
-                    onClick={() => setBillingCycle('monthly')}
-                    className={`px-4 py-2 rounded-[16px] text-sm transition-colors ${
-                      billingCycle === 'monthly'
-                        ? 'bg-white text-[#222222] shadow-sm'
-                        : 'text-[#6a6a6a] hover:text-[#222222]'
-                    }`}
-                  >
-                    Monthly
-                  </button>
-                  <button
-                    onClick={() => setBillingCycle('yearly')}
-                    className={`px-4 py-2 rounded-[16px] text-sm transition-colors ${
-                      billingCycle === 'yearly'
-                        ? 'bg-white text-[#222222] shadow-sm'
-                        : 'text-[#6a6a6a] hover:text-[#222222]'
-                    }`}
-                  >
-                    Yearly <span className="text-[#06c167] text-xs">(Save 20%)</span>
-                  </button>
-                </div>
-              </div>
-
-              {/* Plan Cards */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                {mockAvailablePlans.map((plan) => {
-                  const isCurrentPlan = plan.name === mockCurrentPlan.name;
-                  const price = billingCycle === 'monthly' ? plan.monthlyPrice : plan.yearlyPrice;
-
-                  return (
-                    <div
-                      key={plan.id}
-                      className={`relative p-5 rounded-[14px] border-2 transition-all ${
-                        isCurrentPlan
-                          ? 'border-[#222222] bg-[#f7f7f7]'
-                          : 'border-[#dddddd] bg-white hover:border-[#222222]'
-                      }`}
-                    >
-                      {isCurrentPlan && (
-                        <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-1 bg-[#222222] text-white text-xs font-semibold rounded-full">
-                          Current Plan
-                        </div>
-                      )}
-
-                      <h3 className="text-xl font-bold text-[#222222] mb-1">{plan.name}</h3>
-                      <p className="text-sm text-[#6a6a6a] mb-4 h-10">{plan.description}</p>
-
-                      <div className="mb-4">
-                        <span className="text-3xl font-bold text-[#222222]">${price}</span>
-                        <span className="text-[#6a6a6a]">/{billingCycle === 'monthly' ? 'mo' : 'yr'}</span>
-                      </div>
-
-                      <ul className="space-y-2 mb-5">
-                        <li className="flex items-start gap-2 text-sm">
-                          <Check className="w-4 h-4 text-[#06c167] mt-0.5 flex-shrink-0" />
-                          <span className="text-[#6a6a6a]">{plan.features.employees}</span>
-                        </li>
-                        <li className="flex items-start gap-2 text-sm">
-                          <Check className="w-4 h-4 text-[#06c167] mt-0.5 flex-shrink-0" />
-                          <span className="text-[#6a6a6a]">{plan.features.posts}</span>
-                        </li>
-                        {plan.features.analytics && (
-                          <li className="flex items-start gap-2 text-sm">
-                            <Check className="w-4 h-4 text-[#06c167] mt-0.5 flex-shrink-0" />
-                            <span className="text-[#6a6a6a]">Basic Analytics</span>
-                          </li>
-                        )}
-                        {plan.features.support && (
-                          <li className="flex items-start gap-2 text-sm">
-                            <Check className="w-4 h-4 text-[#06c167] mt-0.5 flex-shrink-0" />
-                            <span className="text-[#6a6a6a]">{plan.features.support}</span>
-                          </li>
-                        )}
-                      </ul>
-
-                      {isCurrentPlan ? (
-                        <button
-                          disabled
-                          className="w-full py-2 bg-[#f7f7f7] text-[#929292] rounded-[20px] text-sm cursor-not-allowed"
-                        >
-                          Current Plan
-                        </button>
-                      ) : plan.monthlyPrice < mockCurrentPlan.price ? (
-                        <button
-                          onClick={() => handleDowngrade(plan.id)}
-                          className="w-full py-2 border border-[#dddddd] text-[#222222] rounded-[20px] hover:border-[#222222] text-sm transition-colors active:scale-[0.92]"
-                        >
-                          Downgrade
-                        </button>
-                      ) : (
-                        <button
-                          onClick={() => handleUpgrade(plan.id)}
-                          className="w-full py-2 bg-[#ff385c] text-white rounded-[20px] hover:bg-[#e00b41] text-sm transition-colors active:scale-[0.92]"
-                        >
-                          Upgrade
-                        </button>
-                      )}
+            {/* Current Plan card */}
+            <div className="lg:col-span-2 rounded-[16px] overflow-hidden border border-[#dddddd] bg-white">
+              {/* Header */}
+              <div className="px-6 py-6 border-b border-[#f0f0f0]">
+                {isLoadingSubscription ? (
+                  <Loader2 className="w-6 h-6 animate-spin text-[#6a6a6a]" />
+                ) : !subscription ? (
+                  <p className="font-semibold text-[#6a6a6a]">No active subscription</p>
+                ) : (
+                  <div className="flex items-start justify-between gap-4">
+                    <div>
+                      <span className={`inline-block px-2.5 py-0.5 rounded-full text-xs font-semibold mb-3 ${subscriptionStatusBadge(subscription.status)}`}>
+                        {subscription.status.toUpperCase()}
+                      </span>
+                      <h2 className="text-2xl font-bold text-[#222222] leading-tight">{subscription.planSnapshot.name}</h2>
+                      {!isFree && <p className="text-[#6a6a6a] text-sm mt-0.5">
+                        Billed {subscription.planSnapshot.billingInterval.toLowerCase()}
+                      </p>}
                     </div>
-                  );
-                })}
+                    <div className="text-right flex-shrink-0">
+                      <div className="text-4xl font-bold text-[#222222]">
+                        ${subscription.planSnapshot.price}
+                      </div>
+                      <div className="text-[#6a6a6a] text-sm">
+                        /{subscription.planSnapshot.billingInterval === 'Monthly' ? 'month' : 'year'}
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {/* Details below header */}
+              {subscription && (
+                <div className="px-6 py-5 space-y-4">
+                  {/* Renewal date — paid plans only */}
+                  {!isFree && (
+                    <div className="flex items-center gap-3">
+                      <div className="w-9 h-9 rounded-full bg-[#fff0f2] flex items-center justify-center flex-shrink-0">
+                        <CalendarDays className="w-4 h-4 text-[#ff385c]" />
+                      </div>
+                      <div>
+                        <p className="text-xs text-[#6a6a6a]">Auto-renews on</p>
+                        <p className="text-sm font-medium text-[#222222]">{formatDate(subscription.currentPeriodEnd)}</p>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Included features */}
+                  {subscription.planSnapshot.features.length > 0 && (
+                    <div className="flex items-start gap-3">
+                      <div className="w-9 h-9 rounded-full bg-[#f0f7ff] flex items-center justify-center flex-shrink-0">
+                        <ShieldCheck className="w-4 h-4 text-[#0070f3]" />
+                      </div>
+                      <div>
+                        <p className="text-xs text-[#6a6a6a] mb-2">Included features</p>
+                        <div className="flex flex-wrap gap-2">
+                          {subscription.planSnapshot.features.map((f) => (
+                            <span key={f} className="px-2.5 py-0.5 bg-[#f7f7f7] text-[#222222] text-xs rounded-full border border-[#ebebeb]">
+                              {f}
+                            </span>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+
+            {/* Payment + quick stats */}
+            <div className="lg:col-span-1 flex flex-col gap-4">
+              {/* Payment Method */}
+              <div className="bg-white rounded-[16px] border border-[#dddddd] px-5 py-5 flex-1">
+                <div className="flex items-center gap-2 mb-4">
+                  <div className="w-8 h-8 rounded-full bg-[#f0f7ff] flex items-center justify-center">
+                    <CreditCard className="w-4 h-4 text-[#ff385c]" />
+                  </div>
+                  <p className="font-semibold text-[#222222]">Payment</p>
+                </div>
+
+                <div className="bg-[#ff385c] rounded-[12px] px-4 py-4 text-white mb-4">
+                  <CreditCard className="w-5 h-5 text-white/60 mb-3" />
+                  <p className="text-sm font-medium tracking-wider mb-1">
+                    •••• •••• •••• {paymentMethod.last4}
+                  </p>
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs text-white/60 capitalize">{paymentMethod.type}</span>
+                    <span className="text-xs text-white/60">
+                      {paymentMethod.expiresMonth}/{paymentMethod.expiresYear}
+                    </span>
+                  </div>
+                </div>
+
+                <button className="w-full py-2 border border-[#dddddd] text-[#222222] rounded-[20px] hover:border-[#222222] text-sm transition-colors active:scale-[0.92]">
+                  Update payment method
+                </button>
               </div>
             </div>
           </div>
 
-          {/* Billing History — full width */}
-          <div className="w-full bg-white rounded-[14px] border border-[#dddddd] overflow-hidden">
-              <div className="px-6 pt-6 pb-2">
-                <h2 className="text-lg font-semibold text-[#222222]">Billing History</h2>
+          {/* ── Invoices ── */}
+          <div className="bg-white rounded-[16px] border border-[#dddddd] overflow-hidden">
+            <div className="px-6 py-5 flex items-center gap-3 border-b border-[#f0f0f0]">
+              <div className="w-8 h-8 rounded-full bg-[#fff8e6] flex items-center justify-center">
+                <FileText className="w-4 h-4 text-[#c97a00]" />
               </div>
-              <div className="overflow-x-auto px-6 pb-6">
-                <table className="min-w-[640px] w-full text-sm">
-                    <thead>
-                      <tr className="bg-[#f7f7f7] text-left text-[#6a6a6a] uppercase text-xs font-bold tracking-wider border-b border-[#dddddd]">
-                        <th className="px-4 py-3 font-medium">Invoice</th>
-                        <th className="px-4 py-3 font-medium">Date</th>
-                        <th className="px-4 py-3 font-medium">Description</th>
-                        <th className="px-4 py-3 font-medium">Amount</th>
-                        <th className="px-4 py-3 font-medium">Status</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {mockOrgBillingHistory.map((row) => (
-                        <tr key={row.id} className="border-t border-[#dddddd] hover:bg-[#f7f7f7]">
-                          <td className="px-4 py-3 text-[#222222] font-medium">{row.id}</td>
-                          <td className="px-4 py-3 text-[#6a6a6a]">{row.invoiceDate}</td>
-                          <td className="px-4 py-3 text-[#6a6a6a]">{row.description}</td>
-                          <td className="px-4 py-3 text-[#222222]">
-                            ${row.amount.toFixed(2)} {row.currency}
+              <h2 className="font-semibold text-[#222222]">Invoices</h2>
+            </div>
+
+            {isLoadingPayments ? (
+              <div className="flex items-center justify-center h-24">
+                <Loader2 className="w-5 h-5 animate-spin text-[#6a6a6a]" />
+              </div>
+            ) : payments.length === 0 ? (
+              <div className="flex flex-col items-center justify-center py-12 gap-2">
+                <div className="w-12 h-12 rounded-full bg-[#f7f7f7] flex items-center justify-center mb-1">
+                  <FileText className="w-6 h-6 text-[#6a6a6a]" />
+                </div>
+                <p className="text-[#6a6a6a] text-sm">No invoices yet</p>
+              </div>
+            ) : (
+              <div className="overflow-x-auto">
+                <table className="w-full text-sm">
+                  <thead>
+                    <tr className="bg-[#fafafa] text-[#6a6a6a] text-xs uppercase tracking-wider">
+                      <th className="px-6 py-3 text-left font-medium">Date</th>
+                      <th className="px-6 py-3 text-left font-medium">Description</th>
+                      <th className="px-6 py-3 text-left font-medium">Total</th>
+                      <th className="px-6 py-3 text-left font-medium">Status</th>
+                      <th className="px-6 py-3 text-left font-medium">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-[#f5f5f5]">
+                    {payments.map((row) => {
+                      const { label, cls } = statusLabel(row.status);
+                      return (
+                        <tr key={row.id} className="hover:bg-[#fafafa] transition-colors">
+                          <td className="px-6 py-4 text-[#222222] font-medium whitespace-nowrap">
+                            {formatDate(row.paymentDate)}
                           </td>
-                          <td className="px-4 py-3">
-                            <span
-                              className={`inline-flex px-2.5 py-0.5 rounded-full text-xs font-semibold ${
-                                row.status === 'Paid'
-                                  ? 'bg-[#e8f9f0] text-[#06c167]'
-                                  : row.status === 'Pending'
-                                    ? 'bg-[#fff8e6] text-[#c97a00]'
-                                    : 'bg-[#fff0f2] text-[#c13515]'
-                              }`}
-                            >
-                              {row.status}
+                          <td className="px-6 py-4 text-[#6a6a6a]">
+                            {row.planName ?? '—'}
+                          </td>
+                          <td className="px-6 py-4 text-[#222222] font-semibold">
+                            ${row.amount.toFixed(2)}
+                            <span className="text-xs text-[#6a6a6a] font-normal ml-1">{row.currency}</span>
+                          </td>
+                          <td className="px-6 py-4">
+                            <span className={`inline-flex px-2.5 py-0.5 rounded-full text-xs font-semibold ${cls}`}>
+                              {label}
                             </span>
                           </td>
+                          <td className="px-6 py-4">
+                            <button
+                              onClick={handleDownloadInvoice}
+                              className="flex items-center gap-1.5 text-[#0070f3] hover:text-[#0060d3] text-sm font-medium transition-colors"
+                            >
+                              <Sparkles className="w-3.5 h-3.5" />
+                              View
+                            </button>
+                          </td>
                         </tr>
-                      ))}
-                    </tbody>
-                  </table>
+                      );
+                    })}
+                  </tbody>
+                </table>
               </div>
+            )}
+          </div>
+
+          {/* ── Cancellation ── */}
+          <div className="bg-white rounded-[16px] border border-[#ffd6d6] overflow-hidden">
+            <div className="px-6 py-5 flex items-center gap-3 border-b border-[#ffd6d6]">
+              <div className="w-8 h-8 rounded-full bg-[#fff0f2] flex items-center justify-center">
+                <TriangleAlert className="w-4 h-4 text-[#c13515]" />
+              </div>
+              <h2 className="font-semibold text-[#c13515]">Cancellation</h2>
+            </div>
+            <div className="px-6 py-5 flex items-center justify-between gap-4">
+              <div>
+                <p className="text-sm font-medium text-[#222222]">Cancel your plan</p>
+                <p className="text-xs text-[#6a6a6a] mt-0.5">
+                  Your subscription will remain active until the end of the billing period.
+                </p>
+              </div>
+              <button
+                onClick={handleCancelSubscription}
+                disabled={isFree}
+                title={isFree ? 'Not available on a free plan' : undefined}
+                className="px-5 py-2 bg-[#c13515] text-white rounded-[20px] text-sm font-medium transition-colors flex-shrink-0 disabled:opacity-40 disabled:cursor-not-allowed enabled:hover:bg-[#a02a10] enabled:active:scale-[0.92]"
+              >
+                Cancel plan
+              </button>
+            </div>
           </div>
         </div>
       </div>
     </Layout>
   );
 }
-

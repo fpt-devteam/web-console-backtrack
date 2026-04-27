@@ -46,6 +46,7 @@ import { Route as ConsoleSlugStaffHistoryRouteImport } from './routes/console/$s
 import { Route as ConsoleSlugStaffDashboardRouteImport } from './routes/console/$slug/staff/dashboard'
 import { Route as ConsoleSlugStaffChatRouteImport } from './routes/console/$slug/staff/chat'
 import { Route as ConsoleSlugAdminSettingRouteImport } from './routes/console/$slug/admin/setting'
+import { Route as ConsoleSlugAdminPricingRouteImport } from './routes/console/$slug/admin/pricing'
 import { Route as ConsoleSlugAdminPlanRouteImport } from './routes/console/$slug/admin/plan'
 import { Route as ConsoleSlugAdminInventoryRouteImport } from './routes/console/$slug/admin/inventory'
 import { Route as ConsoleSlugAdminEmployeeRouteImport } from './routes/console/$slug/admin/employee'
@@ -253,6 +254,11 @@ const ConsoleSlugAdminSettingRoute = ConsoleSlugAdminSettingRouteImport.update({
   path: '/setting',
   getParentRoute: () => ConsoleSlugAdminRoute,
 } as any)
+const ConsoleSlugAdminPricingRoute = ConsoleSlugAdminPricingRouteImport.update({
+  id: '/pricing',
+  path: '/pricing',
+  getParentRoute: () => ConsoleSlugAdminRoute,
+} as any)
 const ConsoleSlugAdminPlanRoute = ConsoleSlugAdminPlanRouteImport.update({
   id: '/plan',
   path: '/plan',
@@ -372,6 +378,7 @@ export interface FileRoutesByFullPath {
   '/console/$slug/admin/employee': typeof ConsoleSlugAdminEmployeeRoute
   '/console/$slug/admin/inventory': typeof ConsoleSlugAdminInventoryRouteWithChildren
   '/console/$slug/admin/plan': typeof ConsoleSlugAdminPlanRoute
+  '/console/$slug/admin/pricing': typeof ConsoleSlugAdminPricingRoute
   '/console/$slug/admin/setting': typeof ConsoleSlugAdminSettingRouteWithChildren
   '/console/$slug/staff/chat': typeof ConsoleSlugStaffChatRoute
   '/console/$slug/staff/dashboard': typeof ConsoleSlugStaffDashboardRoute
@@ -423,6 +430,7 @@ export interface FileRoutesByTo {
   '/console/$slug/admin/edit-account': typeof ConsoleSlugAdminEditAccountRoute
   '/console/$slug/admin/employee': typeof ConsoleSlugAdminEmployeeRoute
   '/console/$slug/admin/plan': typeof ConsoleSlugAdminPlanRoute
+  '/console/$slug/admin/pricing': typeof ConsoleSlugAdminPricingRoute
   '/console/$slug/staff/chat': typeof ConsoleSlugStaffChatRoute
   '/console/$slug/staff/dashboard': typeof ConsoleSlugStaffDashboardRoute
   '/console/$slug/staff/history': typeof ConsoleSlugStaffHistoryRoute
@@ -475,6 +483,7 @@ export interface FileRoutesById {
   '/console/$slug/admin/employee': typeof ConsoleSlugAdminEmployeeRoute
   '/console/$slug/admin/inventory': typeof ConsoleSlugAdminInventoryRouteWithChildren
   '/console/$slug/admin/plan': typeof ConsoleSlugAdminPlanRoute
+  '/console/$slug/admin/pricing': typeof ConsoleSlugAdminPricingRoute
   '/console/$slug/admin/setting': typeof ConsoleSlugAdminSettingRouteWithChildren
   '/console/$slug/staff/chat': typeof ConsoleSlugStaffChatRoute
   '/console/$slug/staff/dashboard': typeof ConsoleSlugStaffDashboardRoute
@@ -529,6 +538,7 @@ export interface FileRouteTypes {
     | '/console/$slug/admin/employee'
     | '/console/$slug/admin/inventory'
     | '/console/$slug/admin/plan'
+    | '/console/$slug/admin/pricing'
     | '/console/$slug/admin/setting'
     | '/console/$slug/staff/chat'
     | '/console/$slug/staff/dashboard'
@@ -580,6 +590,7 @@ export interface FileRouteTypes {
     | '/console/$slug/admin/edit-account'
     | '/console/$slug/admin/employee'
     | '/console/$slug/admin/plan'
+    | '/console/$slug/admin/pricing'
     | '/console/$slug/staff/chat'
     | '/console/$slug/staff/dashboard'
     | '/console/$slug/staff/history'
@@ -631,6 +642,7 @@ export interface FileRouteTypes {
     | '/console/$slug/admin/employee'
     | '/console/$slug/admin/inventory'
     | '/console/$slug/admin/plan'
+    | '/console/$slug/admin/pricing'
     | '/console/$slug/admin/setting'
     | '/console/$slug/staff/chat'
     | '/console/$slug/staff/dashboard'
@@ -927,6 +939,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ConsoleSlugAdminSettingRouteImport
       parentRoute: typeof ConsoleSlugAdminRoute
     }
+    '/console/$slug/admin/pricing': {
+      id: '/console/$slug/admin/pricing'
+      path: '/pricing'
+      fullPath: '/console/$slug/admin/pricing'
+      preLoaderRoute: typeof ConsoleSlugAdminPricingRouteImport
+      parentRoute: typeof ConsoleSlugAdminRoute
+    }
     '/console/$slug/admin/plan': {
       id: '/console/$slug/admin/plan'
       path: '/plan'
@@ -1153,6 +1172,7 @@ interface ConsoleSlugAdminRouteChildren {
   ConsoleSlugAdminEmployeeRoute: typeof ConsoleSlugAdminEmployeeRoute
   ConsoleSlugAdminInventoryRoute: typeof ConsoleSlugAdminInventoryRouteWithChildren
   ConsoleSlugAdminPlanRoute: typeof ConsoleSlugAdminPlanRoute
+  ConsoleSlugAdminPricingRoute: typeof ConsoleSlugAdminPricingRoute
   ConsoleSlugAdminSettingRoute: typeof ConsoleSlugAdminSettingRouteWithChildren
 }
 
@@ -1162,6 +1182,7 @@ const ConsoleSlugAdminRouteChildren: ConsoleSlugAdminRouteChildren = {
   ConsoleSlugAdminEmployeeRoute: ConsoleSlugAdminEmployeeRoute,
   ConsoleSlugAdminInventoryRoute: ConsoleSlugAdminInventoryRouteWithChildren,
   ConsoleSlugAdminPlanRoute: ConsoleSlugAdminPlanRoute,
+  ConsoleSlugAdminPricingRoute: ConsoleSlugAdminPricingRoute,
   ConsoleSlugAdminSettingRoute: ConsoleSlugAdminSettingRouteWithChildren,
 }
 

@@ -2,6 +2,7 @@ import {
   LayoutGrid,
   Users,
   CreditCard,
+  Tag,
   Settings,
   Package,
   ArrowLeftRight,
@@ -88,6 +89,7 @@ function AdminSidebarInner() {
     if (routeKey === 'dashboard') return cur === `${base}/admin/dashboard`
     if (routeKey === 'employee') return cur === `${base}/admin/employee`
     if (routeKey === 'plan') return cur === `${base}/admin/plan` || cur === `${base}/admin/edit-account`
+    if (routeKey === 'pricing') return cur === `${base}/admin/pricing`
     if (routeKey === 'inventory') return cur === `${base}/admin/inventory` || cur.startsWith(`${base}/admin/inventory/`)
     return false
   }
@@ -107,6 +109,7 @@ function AdminSidebarInner() {
     { key: 'dashboard', name: 'Dashboard', icon: LayoutGrid, to: '/console/$slug/admin/dashboard' as const },
     { key: 'employee',  name: 'Employee',  icon: Users,       to: '/console/$slug/admin/employee'  as const },
     { key: 'plan',      name: 'Plan',      icon: CreditCard,  to: '/console/$slug/admin/plan'      as const },
+    { key: 'pricing',   name: 'Pricing',   icon: Tag,         to: '/console/$slug/admin/pricing'   as const },
     { key: 'inventory', name: 'Inventory', icon: Package,     to: '/console/$slug/admin/inventory' as const },
   ]
 
