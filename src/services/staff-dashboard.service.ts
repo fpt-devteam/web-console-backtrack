@@ -1,4 +1,5 @@
 import type { ApiResponse } from '@/types/api-response.type'
+import type { PostStatus } from '@/services/inventory.service'
 import { auth } from '@/lib/firebase'
 import { privateClient } from '@/lib/api-client'
 
@@ -48,6 +49,23 @@ interface RecentItemsResponse {
 
 // ── API 5: /api/core/orgs/{orgId}/return-rate ─────────────────────────────
 
+export interface StatusCount {
+  status: PostStatus
+  count: number
+  /** 0–100 */
+  pct: number
+}
+
+export interface PostTypeStats {
+  total: number
+  statuses: Array<StatusCount>
+}
+
+export interface PostStatusBreakdown {
+  org: { lost: PostTypeStats; found: PostTypeStats }
+  mine: { lost: PostTypeStats; found: PostTypeStats }
+}
+
 export interface ReturnRateBreakdown {
   returned: number
   inStorage: number
@@ -87,12 +105,19 @@ export const staffDashboardService = {
   },
 
   async getRecentItems(orgId: string, page = 1, pageSize = 3): Promise<RecentItemsResponse> {
-    const { data } = await privateClient.get<ApiResponse<RecentItemsResponse>>(
+    const { data } = await privateClient.get<ApiResponse<{ items: Array<DashboardInventoryItem> }>>(
       `/api/core/orgs/${orgId}/inventory`,
-      { params: { staffId: 'me', page, pageSize, orderBy: 'createdAt', orderDir: 'desc' } }
+      { params: { staffId: 'me', page, pageSize: pageSize + 1, orderBy: 'createdAt', orderDir: 'desc' } }
     )
     if (!data.success) throw new Error('Failed to fetch recent items')
-    return data.data
+    const all = data.data.items
+    const hasMore = all.length > pageSize
+    return {
+      items: all.slice(0, pageSize),
+      totalCount: hasMore
+        ? page * pageSize + 1
+        : (page - 1) * pageSize + all.length,
+    }
   },
 
   async getOrgReturnRate(orgId: string): Promise<ReturnRateBreakdown> {
@@ -108,6 +133,14 @@ export const staffDashboardService = {
       `/api/core/orgs/${orgId}/staff/dashboard/return-rate`
     )
     if (!data.success) throw new Error('Failed to fetch staff return rate')
+    return data.data
+  },
+
+  async getPostStatusBreakdown(orgId: string): Promise<PostStatusBreakdown> {
+    const { data } = await privateClient.get<ApiResponse<PostStatusBreakdown>>(
+      `/api/core/orgs/${orgId}/staff/dashboard/post-status-breakdown`
+    )
+    if (!data.success) throw new Error('Failed to fetch post status breakdown')
     return data.data
   },
 

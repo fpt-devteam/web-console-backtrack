@@ -88,6 +88,16 @@ export function useStaffPostStats() {
   })
 }
 
+export function usePostStatusBreakdown() {
+  const { currentOrgId } = useCurrentOrgId()
+  return useQuery({
+    queryKey: ['staff-dashboard', 'post-status-breakdown', currentOrgId],
+    queryFn: () => staffDashboardService.getPostStatusBreakdown(currentOrgId!),
+    enabled: !!currentOrgId,
+    staleTime: STALE,
+  })
+}
+
 export function useStaffEngagement() {
   const { currentOrgId } = useCurrentOrgId()
   return useQuery({
