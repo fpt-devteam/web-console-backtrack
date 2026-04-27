@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Activity, AlertCircle, Archive, CheckCircle, Package, Users } from 'lucide-react'
+import { Activity,CheckCircle, Package, Users } from 'lucide-react'
 import { Layout } from '../../components/admin/layout'
 import { StatCard } from '../../components/admin/dashboard/stat-card'
 import { MonthlyActivityChart } from '../../components/admin/dashboard/monthly-activity-chart'
