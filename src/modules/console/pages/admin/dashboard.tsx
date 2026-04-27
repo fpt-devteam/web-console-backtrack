@@ -4,7 +4,7 @@ import { Layout } from '../../components/admin/layout'
 import { StatCard } from '../../components/admin/dashboard/stat-card'
 import { MonthlyActivityChart } from '../../components/admin/dashboard/monthly-activity-chart'
 import { StaffPerformancePanel } from '../../components/admin/dashboard/staff-performance-panel'
-import { OrgItemStatsPanel } from '../../components/admin/dashboard/org-item-stats-panel'
+// import { OrgItemStatsPanel } from '../../components/admin/dashboard/org-item-stats-panel'
 import { RecentInventoryPanel } from '../../components/admin/dashboard/recent-inventory-panel'
 import { SiteHeader } from '@/components/layout/site-header'
 import { useCurrentUser } from '@/hooks/use-auth'
@@ -88,18 +88,18 @@ export function AdminDashboardPage() {
 
         {/* Monthly trend (2/3) + Org item stats (1/3) */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-          <div className="lg:col-span-2">
+          <div className="lg:col-span-3">
             {monthly
               ? <MonthlyActivityChart data={monthly} />
               : <div className="h-full min-h-[296px] bg-white rounded-2xl border border-[#dddddd] animate-pulse" />
             }
           </div>
-          <div>
+          {/* <div>
             {stats
               ? <OrgItemStatsPanel data={stats} />
               : <div className="h-full min-h-[296px] bg-white rounded-2xl border border-[#dddddd] animate-pulse" />
             }
-          </div>
+          </div> */}
         </div>
 
         {/* Staff performance (1/2) + Recent inventory (1/2) */}

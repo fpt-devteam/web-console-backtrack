@@ -1,24 +1,12 @@
-/**
- * Revenue transaction status type
- */
-export type RevenueStatus = 'Completed' | 'Pending' | 'Failed' | 'Refunded';
+interface ApiSuccess<T> { success: true; data: T }
 
-/**
- * Payment method type
- */
-export type PaymentMethod = 'Credit Card' | 'Bank Transfer' | 'PayPal' | 'Stripe' | 'Wire Transfer';
+export type RevenueStatus = 'Succeeded' | 'Failed' | 'Pending';
 
-/**
- * Revenue type - distinguishes between subscription and QR sales
- */
-export type RevenueType = 'Subscription' | 'QR Sales';
+export type SubscriberType = 'Organization' | 'User';
 
-/**
- * Revenue transaction interface
- */
 export interface RevenueTransaction {
   id: string;
-  revenueType: RevenueType;
+  subscriberType: SubscriberType;
   tenantId?: string;
   tenantName?: string;
   userId?: string;
@@ -26,7 +14,7 @@ export interface RevenueTransaction {
   amount: number;
   currency: string;
   status: RevenueStatus;
-  paymentMethod: PaymentMethod;
+  paymentMethod: string;
   transactionDate: Date;
   description: string;
   invoiceNumber?: string;
@@ -56,17 +44,16 @@ export interface RevenueSummary {
  * Contains sample revenue transaction data for testing and development.
  * Includes both subscription revenue (from tenants) and QR sales revenue (from end users).
  */
-export const mockRevenueTransactions: RevenueTransaction[] = [
-  // Subscription Revenue (from tenants)
+export const mockRevenueTransactions: Array<RevenueTransaction> = [
   {
     id: '1',
-    revenueType: 'Subscription',
+    subscriberType: 'Organization',
     tenantId: '1',
     tenantName: 'Acme Corp',
     amount: 4999.99,
-    currency: 'USD',
-    status: 'Completed',
-    paymentMethod: 'Credit Card',
+    currency: 'usd',
+    status: 'Succeeded',
+    paymentMethod: 'Stripe',
     transactionDate: new Date('2024-01-15'),
     description: 'Enterprise Gold - Monthly Subscription',
     invoiceNumber: 'INV-2024-001',
@@ -74,12 +61,12 @@ export const mockRevenueTransactions: RevenueTransaction[] = [
   },
   {
     id: '2',
-    revenueType: 'Subscription',
+    subscriberType: 'Organization',
     tenantId: '2',
     tenantName: 'Stark Industries',
     amount: 2999.99,
-    currency: 'USD',
-    status: 'Completed',
+    currency: 'usd',
+    status: 'Succeeded',
     paymentMethod: 'Stripe',
     transactionDate: new Date('2024-01-14'),
     description: 'Enterprise Silver - Monthly Subscription',
@@ -88,13 +75,13 @@ export const mockRevenueTransactions: RevenueTransaction[] = [
   },
   {
     id: '3',
-    revenueType: 'Subscription',
+    subscriberType: 'Organization',
     tenantId: '3',
     tenantName: 'Wayne Enterprises',
     amount: 1999.99,
-    currency: 'USD',
+    currency: 'usd',
     status: 'Pending',
-    paymentMethod: 'Bank Transfer',
+    paymentMethod: 'Stripe',
     transactionDate: new Date('2024-01-13'),
     description: 'Professional - Monthly Subscription',
     invoiceNumber: 'INV-2024-003',
@@ -102,104 +89,96 @@ export const mockRevenueTransactions: RevenueTransaction[] = [
   },
   {
     id: '4',
-    revenueType: 'Subscription',
+    subscriberType: 'Organization',
     tenantId: '4',
     tenantName: 'Cyberdyne',
     amount: 4999.99,
-    currency: 'USD',
-    status: 'Completed',
-    paymentMethod: 'Credit Card',
+    currency: 'usd',
+    status: 'Succeeded',
+    paymentMethod: 'Stripe',
     transactionDate: new Date('2024-01-12'),
     description: 'Enterprise Gold - Monthly Subscription',
     invoiceNumber: 'INV-2024-004',
     subscriptionPlan: 'Enterprise Gold',
   },
-  // QR Sales Revenue (from end users)
   {
     id: '5',
-    revenueType: 'QR Sales',
+    subscriberType: 'User',
     userId: 'user-1',
     userName: 'John Doe',
-    amount: 29.99,
-    currency: 'USD',
-    status: 'Completed',
-    paymentMethod: 'Credit Card',
+    amount: 1.99,
+    currency: 'usd',
+    status: 'Succeeded',
+    paymentMethod: 'Stripe',
     transactionDate: new Date('2024-01-15'),
-    description: 'QR Code Purchase - Premium QR',
-    qrCodeId: 'qr-001',
-    qrCodeName: 'Premium QR Code',
+    description: 'QR Code Purchase',
+    invoiceNumber: 'INV-2024-005',
   },
   {
     id: '6',
-    revenueType: 'QR Sales',
+    subscriberType: 'User',
     userId: 'user-2',
     userName: 'Jane Smith',
-    amount: 19.99,
-    currency: 'USD',
-    status: 'Completed',
-    paymentMethod: 'PayPal',
+    amount: 1.99,
+    currency: 'usd',
+    status: 'Succeeded',
+    paymentMethod: 'Stripe',
     transactionDate: new Date('2024-01-14'),
-    description: 'QR Code Purchase - Standard QR',
-    qrCodeId: 'qr-002',
-    qrCodeName: 'Standard QR Code',
+    description: 'QR Code Purchase',
+    invoiceNumber: 'INV-2024-006',
   },
   {
     id: '7',
-    revenueType: 'QR Sales',
+    subscriberType: 'User',
     userId: 'user-3',
     userName: 'Bob Johnson',
-    amount: 49.99,
-    currency: 'USD',
-    status: 'Completed',
+    amount: 1.99,
+    currency: 'usd',
+    status: 'Succeeded',
     paymentMethod: 'Stripe',
     transactionDate: new Date('2024-01-13'),
-    description: 'QR Code Purchase - Enterprise QR',
-    qrCodeId: 'qr-003',
-    qrCodeName: 'Enterprise QR Code',
+    description: 'QR Code Purchase',
+    invoiceNumber: 'INV-2024-007',
   },
   {
     id: '8',
-    revenueType: 'QR Sales',
+    subscriberType: 'User',
     userId: 'user-4',
     userName: 'Alice Williams',
-    amount: 29.99,
-    currency: 'USD',
+    amount: 1.99,
+    currency: 'usd',
     status: 'Pending',
-    paymentMethod: 'Credit Card',
+    paymentMethod: 'Stripe',
     transactionDate: new Date('2024-01-12'),
-    description: 'QR Code Purchase - Premium QR',
-    qrCodeId: 'qr-004',
-    qrCodeName: 'Premium QR Code',
+    description: 'QR Code Purchase',
+    invoiceNumber: 'INV-2024-008',
   },
-  // Add more subscription revenue transactions
   ...Array.from({ length: 25 }, (_, i) => ({
     id: `sub-${i + 9}`,
-    revenueType: 'Subscription' as RevenueType,
+    subscriberType: 'Organization' as SubscriberType,
     tenantId: String(i + 9),
     tenantName: `Company ${i + 9}`,
-    amount: [999.99, 1499.99, 1999.99, 2999.99, 4999.99][i % 5],
-    currency: 'USD',
-    status: ['Completed', 'Pending', 'Failed', 'Refunded'][i % 4] as RevenueStatus,
-    paymentMethod: ['Credit Card', 'Bank Transfer', 'PayPal', 'Stripe', 'Wire Transfer'][i % 5] as PaymentMethod,
+    amount: [9.99, 19.99, 29.99, 49.99, 99.99][i % 5],
+    currency: 'usd',
+    status: ['Succeeded', 'Pending', 'Failed'][i % 3] as RevenueStatus,
+    paymentMethod: 'Stripe',
     transactionDate: new Date(2024, 0, 15 - (i % 30)),
     description: `${['Basic', 'Professional', 'Enterprise Silver', 'Enterprise Gold'][i % 4]} - Monthly Subscription`,
     invoiceNumber: `INV-2024-${String(i + 9).padStart(3, '0')}`,
     subscriptionPlan: ['Basic', 'Professional', 'Enterprise Silver', 'Enterprise Gold'][i % 4],
   })),
-  // Add more QR sales revenue transactions
   ...Array.from({ length: 25 }, (_, i) => ({
     id: `qr-${i + 1}`,
-    revenueType: 'QR Sales' as RevenueType,
+    subscriberType: 'User' as SubscriberType,
     userId: `user-${i + 5}`,
     userName: `User ${i + 5}`,
-    amount: [9.99, 19.99, 29.99, 49.99, 99.99][i % 5],
-    currency: 'USD',
-    status: ['Completed', 'Pending', 'Failed', 'Refunded'][i % 4] as RevenueStatus,
-    paymentMethod: ['Credit Card', 'PayPal', 'Stripe'][i % 3] as PaymentMethod,
+    amount: 1.99,
+    currency: 'usd',
+    status: ['Succeeded', 'Pending', 'Failed'][i % 3] as RevenueStatus,
+    paymentMethod: 'Stripe',
     transactionDate: new Date(2024, 0, 15 - (i % 30)),
-    description: `QR Code Purchase - ${['Standard', 'Premium', 'Enterprise'][i % 3]} QR`,
-    qrCodeId: `qr-code-${i + 1}`,
-    qrCodeName: `${['Standard', 'Premium', 'Enterprise'][i % 3]} QR Code`,
+    description: 'QR Code Purchase',
+    invoiceNumber: `INV-2024-QR-${String(i + 1).padStart(3, '0')}`,
   })),
 ];
 
@@ -218,10 +197,18 @@ export const mockRevenueSummary: RevenueSummary = {
   qrSalesTransactions: 250,
 };
 
+export interface MonthlyRevenueItem {
+  month: string
+  subscription: number
+  qrSales: number
+  total: number
+}
+
 /**
  * Mock monthly revenue data for chart (combined)
+ * GET /api/core/super-admin/revenue/monthly
  */
-export const mockMonthlyRevenue = [
+export const mockMonthlyRevenue: Array<MonthlyRevenueItem> = [
   { month: 'Jan', subscription: 80000, qrSales: 15000, total: 95000 },
   { month: 'Feb', subscription: 85000, qrSales: 20000, total: 105000 },
   { month: 'Mar', subscription: 90000, qrSales: 20000, total: 110000 },
@@ -235,4 +222,32 @@ export const mockMonthlyRevenue = [
   { month: 'Nov', subscription: 105000, qrSales: 20000, total: 125000 },
   { month: 'Dec', subscription: 105000, qrSales: 20000, total: 125000 },
 ];
+
+// ── ApiSuccess envelopes (mirrors real API shape) ──────────────────────────
+
+/** GET /api/core/super-admin/revenue/summary */
+export const mockRevenueSummaryApi: ApiSuccess<RevenueSummary> = {
+  success: true,
+  data: mockRevenueSummary,
+}
+
+/** GET /api/core/super-admin/revenue/monthly?months=12 */
+export const mockMonthlyRevenueApi: ApiSuccess<Array<MonthlyRevenueItem>> = {
+  success: true,
+  data: mockMonthlyRevenue,
+}
+
+export interface RevenueTransactionsPage {
+  items: Array<RevenueTransaction>
+  total: number
+}
+
+/** GET /api/core/super-admin/revenue/transactions?page=1&pageSize=10 */
+export const mockRevenueTransactionsApi: ApiSuccess<RevenueTransactionsPage> = {
+  success: true,
+  data: {
+    items: mockRevenueTransactions.slice(0, 10),
+    total: mockRevenueTransactions.length,
+  },
+}
 

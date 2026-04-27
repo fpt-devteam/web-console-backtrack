@@ -1,6 +1,6 @@
-import { privateClient } from '@/lib/api-client'
 import type { ApiResponse } from '@/types/api-response.type'
 import type { PagedResponse } from '@/types/pagination.type'
+import { privateClient } from '@/lib/api-client'
 
 export type PostStatus =
   | 'Active'
@@ -99,7 +99,7 @@ export interface InventoryItem {
   cardDetail?: CardDetail | null
   electronicDetail?: ElectronicDetail | null
   otherDetail?: OtherDetail | null
-  imageUrls: string[]
+  imageUrls: Array<string>
   location: GeoPoint
   displayAddress?: string | null
   externalPlaceId?: string | null
@@ -134,7 +134,7 @@ export interface CreateInventoryPayload {
   itemName: string
   description: string
   distinctiveMarks?: string | null
-  imageUrls?: string[]
+  imageUrls?: Array<string>
   category: ItemCategory
   subcategoryCode: string
   /** Required by BE for org inventory items. */
@@ -168,7 +168,7 @@ export interface UpdateInventoryPayload {
   /** UpdatePostCommand.EventTime (ISO DateTimeOffset) */
   eventTime?: string
   /** UpdatePostCommand.ImageUrls */
-  imageUrls?: string[]
+  imageUrls?: Array<string>
   /** UpdatePostCommand.DisplayAddress */
   displayAddress?: string | null
   /** UpdatePostCommand.ExternalPlaceId */
@@ -259,7 +259,7 @@ export type AnalyzeImageResult = {
     issuingAuthority?: string | null
     additionalDetails?: string | null
   } | null
-  warnings?: string[] | null
+  warnings?: Array<string> | null
 }
 
 type SearchInventoriesBody = {
@@ -346,6 +346,7 @@ export const inventoryService = {
               imageUrls: payload.imageUrls ?? [],
               finderInfo: payload.finderInfo ?? undefined,
             }
+          // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
           : payload.category === 'Others'
             ? {
                 postType,

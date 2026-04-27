@@ -2,29 +2,13 @@ import { useEffect, useState } from 'react';
 
 import { Clock } from 'lucide-react';
 
-import { ChartAreaInteractive, SiteHeader } from '@/components/dashboard';
-import type { SeriesConfig } from '@/components/dashboard';
 import { KpiCards, Layout, LostFoundTrend, RecentActivity } from '../components';
-import type { DashboardKpi } from '@/services/super-admin.service';
+import type { SeriesConfig } from '@/components/dashboard';
+import type { DashboardKpi, RevenueMonthlyItem } from '@/services/super-admin.service';
+import { ChartAreaInteractive, SiteHeader } from '@/components/dashboard';
 import { superAdminService } from '@/services/super-admin.service';
 
 
-// ── mock data (charts without API yet) ───────────────────────────────────────
-
-const revenueData = [
-  { month: 'May', org: 12.4, user: 3.2 },
-  { month: 'Jun', org: 14.2, user: 3.8 },
-  { month: 'Jul', org: 15.8, user: 4.1 },
-  { month: 'Aug', org: 17.2, user: 4.6 },
-  { month: 'Sep', org: 16.8, user: 4.4 },
-  { month: 'Oct', org: 19.1, user: 5.2 },
-  { month: 'Nov', org: 21.3, user: 5.8 },
-  { month: 'Dec', org: 23.6, user: 6.3 },
-  { month: 'Jan', org: 25.2, user: 6.9 },
-  { month: 'Feb', org: 24.1, user: 6.6 },
-  { month: 'Mar', org: 27.4, user: 7.4 },
-  { month: 'Apr', org: 29.8, user: 8.1 },
-];
 
 const hotspots = [
   { x: 50, y: 19, r: 26, label: 'Hanoi',     count: 445, color: '#F59E0B' },
@@ -35,7 +19,7 @@ const hotspots = [
   { x: 61, y: 84, r: 13, label: 'Can Tho',   count: 143, color: '#F59E0B' },
 ];
 
-const REVENUE_SERIES: SeriesConfig[] = [
+const REVENUE_SERIES: Array<SeriesConfig> = [
   { key: 'org',  label: 'Org Revenue', color: '#3B82F6' },
   { key: 'user', label: 'User Fees',   color: '#8B5CF6' },
 ];
@@ -62,9 +46,11 @@ function LastSyncedPill() {
 
 export function DashboardPage() {
   const [kpi, setKpi] = useState<DashboardKpi | null>(null);
+  const [revenueData, setRevenueData] = useState<Array<RevenueMonthlyItem>>([]);
 
   useEffect(() => {
     superAdminService.getDashboardKpi().then(setKpi).catch(console.error);
+    superAdminService.getRevenueMonthly().then(setRevenueData).catch(console.error);
   }, []);
 
   const revenueChartData = revenueData.map(d => ({
