@@ -1,5 +1,4 @@
 import { Layout } from '../components/layout';
-import { Eye } from 'lucide-react';
 import { useState } from 'react';
 import { useRouter } from '@tanstack/react-router';
 import type { OrgStatus } from '@/services/super-admin.service';
