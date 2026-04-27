@@ -27,11 +27,12 @@ export interface SubscriptionResult {
   organizationId?: string;
   planId: string;
   planSnapshot: SubscriptionPlanSnapshot;
-  status: string; // e.g. "Active", "Canceled"
+  status: string;
   currentPeriodStart: string;
   currentPeriodEnd: string;
   cancelAtPeriodEnd: boolean;
   createdAt: string;
+  clientSecret?: string; // Stripe PaymentIntent secret — only present on creation
 }
 
 export const subscriptionService = {
@@ -63,21 +64,29 @@ export const subscriptionService = {
   },
 
   /**
-   * Create a new subscription
+   * Create a new subscription for an organization.
+   * Response includes a Stripe `clientSecret` for payment confirmation.
    */
-  async createSubscription(planId: string): Promise<SubscriptionResult> {
-    const { data } = await privateClient.post<ApiResponse<SubscriptionResult>>('/api/core/subscriptions', { planId });
+  async createSubscription(planId: string, organizationId: string): Promise<SubscriptionResult> {
+    const { data } = await privateClient.post<ApiResponse<SubscriptionResult>>(
+      '/api/core/subscriptions',
+      { planId, organizationId },
+    );
     if (!data.success) throw new Error(data.error?.message ?? 'Failed to create subscription');
     return data.data;
   },
 
   /**
-   * Cancel current subscription
+   * Cancel an organization's subscription.
+   * cancelAtPeriodEnd=true keeps access until billing period ends (soft cancel).
+   * cancelAtPeriodEnd=false ends immediately.
    */
-  async cancelSubscription(): Promise<SubscriptionResult> {
-    const { data } = await privateClient.delete<ApiResponse<SubscriptionResult>>('/api/core/subscriptions/me');
+  async cancelSubscription(organizationId: string, cancelAtPeriodEnd = false): Promise<void> {
+    const { data } = await privateClient.delete<ApiResponse<unknown>>(
+      '/api/core/subscriptions/me',
+      { data: { organizationId, cancelAtPeriodEnd } },
+    );
     if (!data.success) throw new Error(data.error?.message ?? 'Failed to cancel subscription');
-    return data.data;
   },
 
   /**
@@ -94,6 +103,19 @@ export const subscriptionService = {
       if (error.response?.status === 404) return null;
       throw error;
     }
+  },
+
+  /**
+   * Create a Stripe Customer Portal session and return the hosted URL.
+   * The user is redirected to this URL to update their payment method.
+   */
+  async createCustomerPortalSession(organizationId: string, returnUrl: string): Promise<string> {
+    const { data } = await privateClient.post<ApiResponse<{ url: string }>>(
+      '/api/core/subscriptions/customer-portal',
+      { organizationId, returnUrl },
+    );
+    if (!data.success) throw new Error(data.error?.message ?? 'Failed to open billing portal');
+    return data.data.url;
   },
 
   /**

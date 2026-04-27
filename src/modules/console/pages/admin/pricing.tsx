@@ -6,15 +6,19 @@ import { showToast } from '@/lib/toast';
 import { subscriptionService } from '@/services/subscription.service';
 import type { SubscriptionPlanResult } from '@/services/subscription.service';
 import { useCurrentOrgId } from '@/contexts/current-org.context';
+import { useNavigate, useParams } from '@tanstack/react-router';
 
 export function PricingPage() {
   const { currentOrgId } = useCurrentOrgId();
+  const { slug } = useParams({ strict: false }) as { slug: string };
+  const navigate = useNavigate();
   const [billingCycle, setBillingCycle] = useState<'Monthly' | 'Yearly'>('Monthly');
 
   const [plans, setPlans] = useState<Array<SubscriptionPlanResult>>([]);
   const [subscription, setSubscription] = useState<AdminSubscriptionResult | null>(null);
   const [isLoadingPlans, setIsLoadingPlans] = useState(true);
   const [isLoadingSubscription, setIsLoadingSubscription] = useState(true);
+  const [processingPlanId, setProcessingPlanId] = useState<string | null>(null);
 
   const isLoading = isLoadingPlans || isLoadingSubscription;
 
@@ -41,11 +45,41 @@ export function PricingPage() {
   const visiblePlans = plans.filter((p) => p.billingInterval === billingCycle);
   const currentPlanPrice = subscription?.planSnapshot.price ?? 0;
 
-  const handleSelect = (plan: SubscriptionPlanResult) => {
-    if (plan.price < currentPlanPrice) {
-      showToast.success(`Downgrade to ${plan.name} initiated!`);
-    } else {
-      showToast.success(`Upgrade to ${plan.name} initiated!`);
+  const handleSelect = async (plan: SubscriptionPlanResult) => {
+    if (!currentOrgId) return;
+    setProcessingPlanId(plan.id);
+    try {
+      const result = await subscriptionService.createSubscription(plan.id, currentOrgId);
+
+      // Free plan — no Stripe checkout needed
+      if (!result.clientSecret) {
+        showToast.success(`Switched to ${plan.name}!`);
+        void navigate({ to: '/console/$slug/admin/plan', params: { slug } });
+        return;
+      }
+
+      // Paid plan — save state and go to Stripe checkout
+      sessionStorage.setItem('checkout', JSON.stringify({
+        clientSecret: result.clientSecret,
+        planId: plan.id,
+        planLabel: plan.name,
+        planPrice: `$${plan.price}`,
+        planPeriod: `/ ${plan.billingInterval.toLowerCase()}`,
+        features: plan.features,
+      }));
+      void navigate({ to: '/console/$slug/admin/checkout', params: { slug } });
+    } catch (err: any) {
+      const status = err?.response?.status;
+      if (status === 409) {
+        showToast.error('You already have an active subscription.');
+        void navigate({ to: '/console/$slug/admin/plan', params: { slug } });
+      } else if (status === 403) {
+        showToast.error('You do not have permission to manage subscriptions.');
+      } else {
+        showToast.error(err?.response?.data?.error?.message ?? 'Failed to create subscription.');
+      }
+    } finally {
+      setProcessingPlanId(null);
     }
   };
 
@@ -104,6 +138,7 @@ export function PricingPage() {
                 subscription?.planSnapshot.name === plan.name &&
                 !isCurrentInterval;
               const isDowngrade = !isCurrentPlan && plan.price < currentPlanPrice;
+              const isProcessing = processingPlanId === plan.id;
 
               return (
                 <div
@@ -116,12 +151,10 @@ export function PricingPage() {
                 >
                   {/* ── Fixed top section ── */}
                   <div className="px-5 pt-6 pb-4 space-y-4">
-                    {/* Icon */}
                     <div className="w-10 h-10 rounded-full bg-[#fff0f2] flex items-center justify-center">
                       <Network className="w-5 h-5 text-[#ff385c]" />
                     </div>
 
-                    {/* Name */}
                     <div>
                       <h3 className="text-xl font-bold text-[#222222]">{plan.name}</h3>
                       <p className="text-sm text-[#6a6a6a] mt-0.5">
@@ -129,7 +162,6 @@ export function PricingPage() {
                       </p>
                     </div>
 
-                    {/* Price */}
                     <div className="flex items-end gap-1.5">
                       <span className="text-4xl font-bold text-[#222222]">
                         {plan.price === 0 ? 'Free' : `$${plan.price}`}
@@ -156,7 +188,7 @@ export function PricingPage() {
                     )}
                   </div>
 
-                  {/* ── CTA button — aligned across all cards ── */}
+                  {/* ── CTA button ── */}
                   <div className="px-5 pb-5">
                     {isCurrentPlan ? (
                       <button
@@ -167,16 +199,20 @@ export function PricingPage() {
                       </button>
                     ) : isDowngrade ? (
                       <button
-                        onClick={() => handleSelect(plan)}
-                        className="w-full py-2.5 border-2 border-[#dddddd] text-[#222222] rounded-xl text-sm font-medium hover:border-[#222222] transition-colors active:scale-[0.98]"
+                        onClick={() => void handleSelect(plan)}
+                        disabled={!!processingPlanId}
+                        className="w-full py-2.5 border-2 border-[#dddddd] text-[#222222] rounded-[20px] text-sm font-medium hover:border-[#222222] transition-colors active:scale-[0.98] disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                       >
+                        {isProcessing && <Loader2 className="w-4 h-4 animate-spin" />}
                         Downgrade to {plan.name}
                       </button>
                     ) : (
                       <button
-                        onClick={() => handleSelect(plan)}
-                        className="w-full py-2.5 bg-[#ff385c] text-white rounded-xl text-sm font-medium hover:bg-[#e00b41] transition-colors active:scale-[0.98]"
+                        onClick={() => void handleSelect(plan)}
+                        disabled={!!processingPlanId}
+                        className="w-full py-2.5 bg-[#ff385c] text-white rounded-[20px] text-sm font-medium hover:bg-[#e00b41] transition-colors active:scale-[0.98] disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                       >
+                        {isProcessing && <Loader2 className="w-4 h-4 animate-spin" />}
                         Get {plan.name} plan
                       </button>
                     )}
@@ -193,7 +229,7 @@ export function PricingPage() {
                         <ul className="space-y-2">
                           {plan.features.map((f) => (
                             <li key={f} className="flex items-start gap-2 text-sm">
-                              <Check className="w-4 h-4 text-[#06c167] mt-0.5 shrink-0" />
+                              <Check className="w-4 h-4 text-[#06c167] mt-0.5 flex-shrink-0" />
                               <span className="text-[#6a6a6a]">{f}</span>
                             </li>
                           ))}

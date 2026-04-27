@@ -1,5 +1,6 @@
 export { EmployeePage } from './employee';
 export { PricingPage } from './pricing';
+export { CheckoutPage } from './checkout';
 export { AdminDashboardPage } from './dashboard';
 export { PlanPage } from './plan';
 export { EditAccountPage } from './edit-account';

@@ -75,6 +75,7 @@ export interface AdminPaymentHistoryItem {
   paymentDate: string;
   providerInvoiceId: string;
   planName?: string | null;
+  invoiceUrl?: string | null;
 }
 
 export interface AdminQrUsageOverview {

@@ -52,6 +52,7 @@ import { Route as ConsoleSlugAdminInventoryRouteImport } from './routes/console/
 import { Route as ConsoleSlugAdminEmployeeRouteImport } from './routes/console/$slug/admin/employee'
 import { Route as ConsoleSlugAdminEditAccountRouteImport } from './routes/console/$slug/admin/edit-account'
 import { Route as ConsoleSlugAdminDashboardRouteImport } from './routes/console/$slug/admin/dashboard'
+import { Route as ConsoleSlugAdminCheckoutRouteImport } from './routes/console/$slug/admin/checkout'
 import { Route as ConsoleSlugAccountSecurityRouteImport } from './routes/console/$slug/account/security'
 import { Route as ConsoleSlugAdminSettingIndexRouteImport } from './routes/console/$slug/admin/setting/index'
 import { Route as ConsoleSlugAdminInventoryIndexRouteImport } from './routes/console/$slug/admin/inventory/index'
@@ -288,6 +289,12 @@ const ConsoleSlugAdminDashboardRoute =
     path: '/dashboard',
     getParentRoute: () => ConsoleSlugAdminRoute,
   } as any)
+const ConsoleSlugAdminCheckoutRoute =
+  ConsoleSlugAdminCheckoutRouteImport.update({
+    id: '/checkout',
+    path: '/checkout',
+    getParentRoute: () => ConsoleSlugAdminRoute,
+  } as any)
 const ConsoleSlugAccountSecurityRoute =
   ConsoleSlugAccountSecurityRouteImport.update({
     id: '/account/security',
@@ -373,6 +380,7 @@ export interface FileRoutesByFullPath {
   '/super-admin/organization/$tenantId': typeof SuperAdminOrganizationTenantIdRoute
   '/super-admin/users/$userId': typeof SuperAdminUsersUserIdRoute
   '/console/$slug/account/security': typeof ConsoleSlugAccountSecurityRoute
+  '/console/$slug/admin/checkout': typeof ConsoleSlugAdminCheckoutRoute
   '/console/$slug/admin/dashboard': typeof ConsoleSlugAdminDashboardRoute
   '/console/$slug/admin/edit-account': typeof ConsoleSlugAdminEditAccountRoute
   '/console/$slug/admin/employee': typeof ConsoleSlugAdminEmployeeRoute
@@ -426,6 +434,7 @@ export interface FileRoutesByTo {
   '/super-admin/organization/$tenantId': typeof SuperAdminOrganizationTenantIdRoute
   '/super-admin/users/$userId': typeof SuperAdminUsersUserIdRoute
   '/console/$slug/account/security': typeof ConsoleSlugAccountSecurityRoute
+  '/console/$slug/admin/checkout': typeof ConsoleSlugAdminCheckoutRoute
   '/console/$slug/admin/dashboard': typeof ConsoleSlugAdminDashboardRoute
   '/console/$slug/admin/edit-account': typeof ConsoleSlugAdminEditAccountRoute
   '/console/$slug/admin/employee': typeof ConsoleSlugAdminEmployeeRoute
@@ -478,6 +487,7 @@ export interface FileRoutesById {
   '/super-admin/organization/$tenantId': typeof SuperAdminOrganizationTenantIdRoute
   '/super-admin/users/$userId': typeof SuperAdminUsersUserIdRoute
   '/console/$slug/account/security': typeof ConsoleSlugAccountSecurityRoute
+  '/console/$slug/admin/checkout': typeof ConsoleSlugAdminCheckoutRoute
   '/console/$slug/admin/dashboard': typeof ConsoleSlugAdminDashboardRoute
   '/console/$slug/admin/edit-account': typeof ConsoleSlugAdminEditAccountRoute
   '/console/$slug/admin/employee': typeof ConsoleSlugAdminEmployeeRoute
@@ -533,6 +543,7 @@ export interface FileRouteTypes {
     | '/super-admin/organization/$tenantId'
     | '/super-admin/users/$userId'
     | '/console/$slug/account/security'
+    | '/console/$slug/admin/checkout'
     | '/console/$slug/admin/dashboard'
     | '/console/$slug/admin/edit-account'
     | '/console/$slug/admin/employee'
@@ -586,6 +597,7 @@ export interface FileRouteTypes {
     | '/super-admin/organization/$tenantId'
     | '/super-admin/users/$userId'
     | '/console/$slug/account/security'
+    | '/console/$slug/admin/checkout'
     | '/console/$slug/admin/dashboard'
     | '/console/$slug/admin/edit-account'
     | '/console/$slug/admin/employee'
@@ -637,6 +649,7 @@ export interface FileRouteTypes {
     | '/super-admin/organization/$tenantId'
     | '/super-admin/users/$userId'
     | '/console/$slug/account/security'
+    | '/console/$slug/admin/checkout'
     | '/console/$slug/admin/dashboard'
     | '/console/$slug/admin/edit-account'
     | '/console/$slug/admin/employee'
@@ -981,6 +994,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ConsoleSlugAdminDashboardRouteImport
       parentRoute: typeof ConsoleSlugAdminRoute
     }
+    '/console/$slug/admin/checkout': {
+      id: '/console/$slug/admin/checkout'
+      path: '/checkout'
+      fullPath: '/console/$slug/admin/checkout'
+      preLoaderRoute: typeof ConsoleSlugAdminCheckoutRouteImport
+      parentRoute: typeof ConsoleSlugAdminRoute
+    }
     '/console/$slug/account/security': {
       id: '/console/$slug/account/security'
       path: '/account/security'
@@ -1167,6 +1187,7 @@ const ConsoleSlugAdminSettingRouteWithChildren =
   )
 
 interface ConsoleSlugAdminRouteChildren {
+  ConsoleSlugAdminCheckoutRoute: typeof ConsoleSlugAdminCheckoutRoute
   ConsoleSlugAdminDashboardRoute: typeof ConsoleSlugAdminDashboardRoute
   ConsoleSlugAdminEditAccountRoute: typeof ConsoleSlugAdminEditAccountRoute
   ConsoleSlugAdminEmployeeRoute: typeof ConsoleSlugAdminEmployeeRoute
@@ -1177,6 +1198,7 @@ interface ConsoleSlugAdminRouteChildren {
 }
 
 const ConsoleSlugAdminRouteChildren: ConsoleSlugAdminRouteChildren = {
+  ConsoleSlugAdminCheckoutRoute: ConsoleSlugAdminCheckoutRoute,
   ConsoleSlugAdminDashboardRoute: ConsoleSlugAdminDashboardRoute,
   ConsoleSlugAdminEditAccountRoute: ConsoleSlugAdminEditAccountRoute,
   ConsoleSlugAdminEmployeeRoute: ConsoleSlugAdminEmployeeRoute,
