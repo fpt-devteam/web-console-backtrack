@@ -2,18 +2,19 @@ import type { ApiResponse } from '@/types/api-response.type';
 import type { PagedResponse } from '@/types/pagination.type';
 import { privateClient } from '@/lib/api-client';
 
-export type OrgStatus = 'Active' | 'Inactive' | 'Pending';
+export type OrgStatus = 'Active' | 'Suspended';
 
 export interface SuperAdminOrg {
   id: string;
   name: string;
-  logoUrl: string;
-  adminEmail: string;
+  logoUrl?: string | null;
+  adminEmail?: string | null;
+  subscriptionPlan: string;
   status: OrgStatus;
-  capacity: { current: number; limit: number };
+  capacity: { current: number; limit: number | null };
   performance: number;
-  totalRevenue: number;
   successRate: number;
+  nextBilling: string | null;
   createdAt: string;
 }
 

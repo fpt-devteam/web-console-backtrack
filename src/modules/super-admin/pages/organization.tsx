@@ -1,5 +1,5 @@
 import { Layout } from '../components/layout';
-import { Trash2, Eye } from 'lucide-react';
+import { Eye } from 'lucide-react';
 import { useState } from 'react';
 import { useRouter } from '@tanstack/react-router';
 import type { OrgStatus } from '@/services/super-admin.service';
@@ -22,11 +22,31 @@ function getSortParams(sort: SortFilter): { sortBy: string; sortOrder: 'asc' | '
 
 function getStatusStyle(status: OrgStatus) {
   switch (status) {
-    case 'Active':   return { dot: 'bg-green-500', text: 'text-[#06c167]' };
-    case 'Pending':  return { dot: 'bg-amber-500',  text: 'text-[#c97a00]' };
-    case 'Inactive': return { dot: 'bg-[#929292]', text: 'text-[#929292]' };
-    default:         return { dot: 'bg-[#929292]', text: 'text-[#929292]' };
+    case 'Active':    return { dot: 'bg-green-500',  text: 'text-[#06c167]' };
+    case 'Suspended': return { dot: 'bg-[#c13515]',  text: 'text-[#c13515]' };
+    default:          return { dot: 'bg-[#929292]',  text: 'text-[#929292]' };
   }
+}
+
+function formatCapacity(current: number, limit: number | null | undefined): string {
+  if (limit == null) return `${current} members (unlimited)`;
+  return `${current} / ${limit} members`;
+}
+
+function formatNextBilling(iso: string | null): string {
+  if (!iso) return '—';
+  return new Date(iso).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+}
+
+function PlanBadge({ plan }: { plan: string }) {
+  const isFree = plan.toLowerCase() === 'free';
+  return (
+    <span className={`inline-block px-2 py-0.5 rounded-full text-xs font-medium ${
+      isFree ? 'bg-[#f5f5f5] text-[#929292]' : 'bg-[#e8f9f0] text-[#06c167]'
+    }`}>
+      {plan}
+    </span>
+  );
 }
 
 function formatDate(iso: string) {
@@ -81,16 +101,9 @@ export function OrganizationPage() {
     router.navigate({ to: '/super-admin/organization/$tenantId', params: { tenantId: orgId } });
   };
 
-  const handleDeleteOrg = (orgId: string, orgName: string) => {
-    if (window.confirm(`Are you sure you want to delete ${orgName}?`)) {
-      console.log('Delete org:', orgId);
-    }
-  };
-
   const statusOptions = [
-    { value: 'Active',   label: 'Active' },
-    { value: 'Pending',  label: 'Pending' },
-    { value: 'Inactive', label: 'Inactive' },
+    { value: 'Active',    label: 'Active' },
+    { value: 'Suspended', label: 'Suspended' },
   ];
 
   const sortOptions = [
@@ -148,30 +161,31 @@ export function OrganizationPage() {
                 <tr>
                   <th className="px-6 py-3 text-left text-xs font-bold text-[#6a6a6a] uppercase tracking-wider">Tenant Name</th>
                   <th className="px-6 py-3 text-left text-xs font-bold text-[#6a6a6a] uppercase tracking-wider">Admin Email</th>
+                  <th className="px-6 py-3 text-left text-xs font-bold text-[#6a6a6a] uppercase tracking-wider">Plan</th>
                   <th className="px-6 py-3 text-left text-xs font-bold text-[#6a6a6a] uppercase tracking-wider">Status</th>
-                  <th className="px-6 py-3 text-left text-xs font-bold text-[#6a6a6a] uppercase tracking-wider">Created Date</th>
                   <th className="px-6 py-3 text-left text-xs font-bold text-[#6a6a6a] uppercase tracking-wider">Capacity</th>
-                  <th className="px-6 py-3 text-left text-xs font-bold text-[#6a6a6a] uppercase tracking-wider">Action</th>
+                  <th className="px-6 py-3 text-left text-xs font-bold text-[#6a6a6a] uppercase tracking-wider">Next Billing</th>
+                  <th className="px-6 py-3 text-left text-xs font-bold text-[#6a6a6a] uppercase tracking-wider">Created</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-[#ebebeb]">
                 {isLoading && (
                   <tr>
-                    <td colSpan={6} className="px-6 py-10 text-center text-[#6a6a6a]">
+                    <td colSpan={7} className="px-6 py-10 text-center text-[#6a6a6a]">
                       Loading...
                     </td>
                   </tr>
                 )}
                 {isError && (
                   <tr>
-                    <td colSpan={6} className="px-6 py-10 text-center text-[#c13515]">
+                    <td colSpan={7} className="px-6 py-10 text-center text-[#c13515]">
                       Failed to load organizations.
                     </td>
                   </tr>
                 )}
                 {!isLoading && !isError && organizations.length === 0 && (
                   <tr>
-                    <td colSpan={6} className="px-6 py-10 text-center text-[#6a6a6a]">
+                    <td colSpan={7} className="px-6 py-10 text-center text-[#6a6a6a]">
                       No organizations found.
                     </td>
                   </tr>
@@ -192,39 +206,27 @@ export function OrganizationPage() {
                         </div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
-                        <span className="text-sm text-[#6a6a6a]">{org.adminEmail}</span>
+                        <span className="text-sm text-[#6a6a6a]">{org.adminEmail ?? '—'}</span>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <PlanBadge plan={org.subscriptionPlan} />
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="flex items-center gap-2">
-                          <span className={`w-2 h-2 rounded-full ${statusStyle.dot}`}></span>
+                          <span className={`w-2 h-2 rounded-full ${statusStyle.dot}`} />
                           <span className={`text-sm font-medium ${statusStyle.text}`}>{org.status}</span>
                         </div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
-                        <span className="text-sm text-[#6a6a6a]">{formatDate(org.createdAt)}</span>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
                         <span className="text-sm text-[#6a6a6a]">
-                          {org.capacity.current} / {org.capacity.limit || '∞'}
+                          {formatCapacity(org.capacity.current, org.capacity.limit)}
                         </span>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="flex items-center gap-1">
-                          <button
-                            onClick={() => handleViewOrg(org.id)}
-                            className="p-2 text-[#929292] hover:text-[#06c167] hover:bg-[#e8f9f0] rounded-lg transition-colors"
-                            title="View Tenant Details"
-                          >
-                            <Eye className="w-4 h-4" />
-                          </button>
-                          <button
-                            onClick={() => handleDeleteOrg(org.id, org.name)}
-                            className="p-2 text-[#929292] hover:text-[#c13515] hover:bg-[#fff0f2] rounded-lg transition-colors"
-                            title="Delete Tenant"
-                          >
-                            <Trash2 className="w-4 h-4" />
-                          </button>
-                        </div>
+                        <span className="text-sm text-[#6a6a6a]">{formatNextBilling(org.nextBilling)}</span>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <span className="text-sm text-[#6a6a6a]">{formatDate(org.createdAt)}</span>
                       </td>
                     </tr>
                   );
