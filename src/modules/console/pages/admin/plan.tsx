@@ -85,10 +85,10 @@ export function PlanPage() {
     if (!currentOrgId) return;
     setIsCancelling(true);
     try {
-      await subscriptionService.cancelSubscription(currentOrgId, false);
-      setSubscription(null);
+      await subscriptionService.cancelSubscription(currentOrgId, true);
+      setSubscription((prev) => prev ? { ...prev, cancelAtPeriodEnd: true } : null);
       setShowCancelDialog(false);
-      showToast.success('Subscription cancelled successfully.');
+      showToast.success('Subscription will be cancelled at the end of the billing period.');
     } catch (err: any) {
       showToast.error(err?.response?.data?.error?.message ?? 'Failed to cancel subscription.');
     } finally {
@@ -316,14 +316,14 @@ export function PlanPage() {
               </div>
               <div>
                 <h3 className="font-bold text-[#222222]">Cancel subscription?</h3>
-                <p className="text-xs text-[#6a6a6a] mt-0.5">This action cannot be undone.</p>
+                <p className="text-xs text-[#6a6a6a] mt-0.5">You can re-subscribe at any time.</p>
               </div>
             </div>
 
             {subscription && (
               <div className="bg-[#f7f7f7] rounded-[12px] px-4 py-3 text-sm text-[#6a6a6a]">
                 Your <span className="font-medium text-[#222222]">{subscription.planSnapshot.name}</span> subscription
-                will end immediately. Access to paid features will be revoked right away.
+                will remain active until <span className="font-medium text-[#222222]">{formatDate(subscription.currentPeriodEnd)}</span>. After that, access to paid features will be removed.
               </div>
             )}
 
