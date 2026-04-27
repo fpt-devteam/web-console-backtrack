@@ -17,7 +17,7 @@ export interface AdminUserSummary {
 /** BE: PagedResult<T> — total + items */
 export interface AdminPagedResult<T> {
   total: number;
-  items: T[];
+  items: Array<T>;
 }
 
 /** BE: UserResult — nested in AdminUserDetailResult */
@@ -40,7 +40,7 @@ export interface AdminSubscriptionPlanSnapshot {
   price: number;
   currency: string;
   billingInterval: SubscriptionBillingInterval;
-  features: string[];
+  features: Array<string>;
 }
 
 export type AdminSubscriptionStatus =
@@ -78,6 +78,34 @@ export interface AdminPaymentHistoryItem {
   invoiceUrl?: string | null;
 }
 
+export interface AdminPlan {
+  id: string;
+  name: string;
+  price: number;
+  currency: string;
+  billingInterval: 'Monthly' | 'Yearly';
+  subscriberType: 'User' | 'Organization';
+  features: Array<string>;
+  providerPriceId: string;
+  isActive: boolean;
+  createdAt: string;
+}
+
+export interface AdminPlansGrouped {
+  user: Array<AdminPlan>;
+  organization: Array<AdminPlan>;
+}
+
+export interface CreatePlanRequest {
+  name: string;
+  price: number;
+  currency: string;
+  billingInterval: 'Monthly' | 'Yearly';
+  subscriberType: 'User' | 'Organization';
+  features: Array<string>;
+  providerPriceId: string;
+}
+
 export interface AdminQrUsageOverview {
   totalQrCodes: number;
 }
@@ -87,5 +115,5 @@ export interface AdminUserDetail {
   basicInfo: AdminUserBasicInfo;
   subscription: AdminSubscriptionResult | null;
   qrUsage: AdminQrUsageOverview;
-  billingHistory: AdminPaymentHistoryItem[];
+  billingHistory: Array<AdminPaymentHistoryItem>;
 }
