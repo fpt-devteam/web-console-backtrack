@@ -79,6 +79,7 @@ export function AdminInventoryMonitorPage() {
           onFromDateChange={listState.setFromDate}
           toDate={listState.toDate}
           onToDateChange={listState.setToDate}
+          layout="oneRow"
           showStatusFilter={false}
           showAuthorFilter
           authorValue={listState.staffId}
