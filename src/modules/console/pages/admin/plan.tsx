@@ -120,9 +120,15 @@ export function PlanPage() {
                 ) : (
                   <div className="flex items-start justify-between gap-4">
                     <div>
-                      <span className={`inline-block px-2.5 py-0.5 rounded-full text-xs font-semibold mb-3 ${subscriptionStatusBadge(subscription.status)}`}>
-                        {subscription.status.toUpperCase()}
-                      </span>
+                      {subscription.cancelAtPeriodEnd ? (
+                        <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold mb-3 bg-[#f5f5f5] text-[#6a6a6a]">
+                          Cancels {new Date(subscription.currentPeriodEnd).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                        </span>
+                      ) : (
+                        <span className={`inline-block px-2.5 py-0.5 rounded-full text-xs font-semibold mb-3 ${subscriptionStatusBadge(subscription.status)}`}>
+                          {subscription.status.toUpperCase()}
+                        </span>
+                      )}
                       <h2 className="text-2xl font-bold text-[#222222] leading-tight">{subscription.planSnapshot.name}</h2>
                       {!isFree && <p className="text-[#6a6a6a] text-sm mt-0.5">
                         Billed {subscription.planSnapshot.billingInterval.toLowerCase()}
@@ -288,8 +294,13 @@ export function PlanPage() {
               </div>
               <button
                 onClick={() => setShowCancelDialog(true)}
-                disabled={isFree}
-                title={isFree ? 'Not available on a free plan' : undefined}
+                disabled={!subscription || isFree || subscription.cancelAtPeriodEnd}
+                title={
+                  !subscription ? 'No active subscription' :
+                  isFree ? 'Not available on a free plan' :
+                  subscription.cancelAtPeriodEnd ? 'Already scheduled for cancellation' :
+                  undefined
+                }
                 className="px-5 py-2 bg-[#c13515] text-white rounded-[20px] text-sm font-medium transition-colors flex-shrink-0 disabled:opacity-40 disabled:cursor-not-allowed enabled:hover:bg-[#a02a10] enabled:active:scale-[0.92]"
               >
                 Cancel plan
