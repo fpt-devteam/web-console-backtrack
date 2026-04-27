@@ -2,21 +2,18 @@ import { useState } from 'react'
 import { useParams } from '@tanstack/react-router'
 import { MessageCircle, Package, Users } from 'lucide-react'
 import { StaffLayout } from '../../components/staff/layout'
-import { ActivityChart } from '../../components/staff/dashboard/activity-chart'
 import { EngagementMetricsPanel } from '../../components/staff/dashboard/engagement-metrics'
+import { PostStatusBreakdownChart } from '../../components/staff/dashboard/post-status-breakdown-chart'
 import { PostStatsPanel } from '../../components/staff/dashboard/post-stats-panel'
 import { RecentItemsPanel } from '../../components/staff/dashboard/recent-items-panel'
-import { ReturnRateChart } from '../../components/staff/dashboard/return-rate-chart'
 import { StatCard } from '../../components/staff/dashboard/stat-card'
 import { useCurrentUser } from '@/hooks/use-auth'
 import {
-  useMyReturnRate,
-  useOrgReturnRate,
+  usePostStatusBreakdown,
   useStaffDashboardStats,
   useStaffEngagement,
   useStaffPostStats,
   useStaffRecentItems,
-  useStaffWeeklyActivity,
 } from '@/hooks/use-staff-dashboard'
 
 function greeting(): string {
@@ -29,15 +26,13 @@ function greeting(): string {
 export function StaffDashboardPage() {
   const { slug = '' } = useParams({ strict: false })
   const { data: user } = useCurrentUser()
-  const { data: stats }       = useStaffDashboardStats()
-  const { data: weekly }      = useStaffWeeklyActivity()
+  const { data: stats }          = useStaffDashboardStats()
   const [itemsPage, setItemsPage] = useState(1)
   const PAGE_SIZE = 3
-  const { data: recentItems } = useStaffRecentItems(itemsPage, PAGE_SIZE)
-  const { data: orgRate }     = useOrgReturnRate()
-  const { data: myRate }      = useMyReturnRate()
-  const { data: postStats }   = useStaffPostStats()
-  const { data: engagement }  = useStaffEngagement()
+  const { data: recentItems }    = useStaffRecentItems(itemsPage, PAGE_SIZE)
+  const { data: postStats }      = useStaffPostStats()
+  const { data: breakdown }      = usePostStatusBreakdown()
+  const { data: engagement }     = useStaffEngagement()
 
   const firstName = user?.name ? user.name.split(' ')[0] : 'there'
 
@@ -87,30 +82,12 @@ export function StaffDashboardPage() {
           />
         </div>
 
-        {/* Activity chart + Post stats */}
+        {/* Post status breakdown + Post stats */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
           <div className="lg:col-span-2">
-            <ActivityChart data={weekly ?? []} />
+            {breakdown && <PostStatusBreakdownChart data={breakdown} />}
           </div>
           {postStats && <PostStatsPanel data={postStats} />}
-        </div>
-
-        {/* Return rate charts */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-          {orgRate && (
-            <ReturnRateChart
-              title="Organization Return Rate"
-              subtitle="All items ever logged by the org"
-              data={orgRate}
-            />
-          )}
-          {myRate && (
-            <ReturnRateChart
-              title="My Return Rate"
-              subtitle="Items I personally logged"
-              data={myRate}
-            />
-          )}
         </div>
 
         {/* Recent items + Engagement */}

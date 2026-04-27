@@ -8,9 +8,9 @@ export function getApiErrorMessage(err: unknown, fallback = 'Request failed. Ple
   const ax = err as AxiosError<ApiResponse<unknown>>
   const data = ax.response?.data
   if (data && typeof data === 'object') {
-    const msg = data.error?.message?.trim()
+    const msg = data.error?.message.trim()
     const code = data.error?.code?.trim()
-    if (msg && code) return `${msg} (${code})`
+    if (msg && code) return `${msg}`
     if (msg) return msg
   }
 

@@ -1,16 +1,17 @@
 import { StaffLayout } from '../../components/staff/layout'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { ChevronRight, Check } from 'lucide-react'
-import { Link, useNavigate, useParams } from '@tanstack/react-router'
+import { Link, useNavigate, useParams, useSearch } from '@tanstack/react-router'
 import { useCurrentOrgId } from '@/contexts/current-org.context'
 import { inventoryService } from '@/services/inventory.service'
-import type { ItemCategory } from '@/services/inventory.service'
+import type { ItemCategory, PostType } from '@/services/inventory.service'
 import { uploadInventoryImage } from '@/services/storage.service'
 import { useCreateInventoryItem } from '@/hooks/use-inventory'
 import { useUser } from '@/hooks/use-user'
 import { useOrganization } from '@/hooks/use-org'
 import type { FinderContactField } from '@/types/organization.types'
 import { collectInventoryImageUrls, revokeObjectUrls } from '@/utils/inventory-photos'
+import { getApiErrorMessage } from '@/utils/api-error'
 import { Step1PhotosAndItem, type PhotoPreview } from './add-item/step1-photos-item'
 import { Step2Finder, type FinderInfo } from './add-item/step2-finder'
 import { Step3Preview, type StaffInfo } from './add-item/step3-preview'
@@ -131,9 +132,10 @@ function Stepper({
   )
 }
 
-export function AddFoundItemPage() {
+export function AddItemPage() {
   const navigate = useNavigate()
   const { slug } = useParams({ strict: false }) as { slug: string }
+  const { type: postType = 'Found' } = useSearch({ strict: false }) as { type?: PostType }
   const { currentOrgId } = useCurrentOrgId()
   const createItem = useCreateInventoryItem(currentOrgId)
   const { data: me } = useUser()
@@ -377,7 +379,7 @@ export function AddFoundItemPage() {
       const result = await inventoryService.analyzeImage(urls, subcategoryCode.trim())
       applyAnalysisResult(result)
     } catch (err) {
-      setSubmitError(err instanceof Error ? err.message : 'Image analysis failed. Please try again.')
+      setSubmitError(getApiErrorMessage(err, 'Image analysis failed. Please try again.'))
     } finally {
       setIsAnalyzing(false)
     }
@@ -425,6 +427,7 @@ export function AddFoundItemPage() {
     }
     return {
     postTitle: postTitle.trim(),
+    postType,
     detailItemName: detailItemName.trim() || undefined,
     itemName: itemName.trim(),
     description: description.trim(),
@@ -682,12 +685,16 @@ export function AddFoundItemPage() {
               Inventory
             </Link>
             <ChevronRight className="w-4 h-4" />
-            <span className="text-[#222222] font-medium">Add Found Item</span>
+            <span className="text-[#222222] font-medium">
+              {postType === 'Lost' ? 'Add Lost Item' : 'Add Found Item'}
+            </span>
           </div>
 
           {/* Header */}
           <div className="mb-6">
-            <h1 className="text-3xl font-bold text-[#222222]">Add Found Item</h1>
+            <h1 className="text-3xl font-bold text-[#222222]">
+              {postType === 'Lost' ? 'Add Lost Item' : 'Add Found Item'}
+            </h1>
           </div>
         </div>
 
