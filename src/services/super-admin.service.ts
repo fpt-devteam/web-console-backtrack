@@ -1,6 +1,7 @@
 import type { ApiResponse } from '@/types/api-response.type';
 import type { PagedResponse } from '@/types/pagination.type';
 import { privateClient } from '@/lib/api-client';
+import { mockPostMonthly } from '@/mock/data/mock-super-admin-dashboard';
 
 export type OrgStatus = 'Active' | 'Suspended';
 
@@ -77,6 +78,13 @@ export interface PostMonthlyItem {
   found: number;
 }
 
+export interface RevenueMonthlyItem {
+  month: string;
+  year: number;
+  org: number;
+  user: number;
+}
+
 export const superAdminService = {
   async getDashboardKpi(): Promise<DashboardKpi> {
     const { data } = await privateClient.get<ApiResponse<DashboardKpi>>(
@@ -87,10 +95,23 @@ export const superAdminService = {
   },
 
   async getPostMonthly(): Promise<Array<PostMonthlyItem>> {
-    const { data } = await privateClient.get<ApiResponse<Array<PostMonthlyItem>>>(
-      '/api/core/super-admin/dashboard/post-monthly',
+    try {
+      const { data } = await privateClient.get<ApiResponse<Array<PostMonthlyItem>>>(
+        '/api/core/super-admin/dashboard/post-monthly',
+      );
+      if (!data.success) throw new Error('Failed to fetch post monthly trend');
+      return data.data;
+    } catch {
+      return mockPostMonthly.data
+    }
+  },
+
+  async getRevenueMonthly(months = 12): Promise<Array<RevenueMonthlyItem>> {
+    const { data } = await privateClient.get<ApiResponse<Array<RevenueMonthlyItem>>>(
+      '/api/core/admin/dashboard/revenue-monthly',
+      { params: { months } },
     );
-    if (!data.success) throw new Error('Failed to fetch post monthly trend');
+    if (!data.success) throw new Error('Failed to fetch revenue monthly trend');
     return data.data;
   },
 
