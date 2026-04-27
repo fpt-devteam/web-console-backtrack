@@ -29,6 +29,8 @@ export interface AdminDashboardStats {
   expiredItems: number
   returnRate: number
   foundToday: number
+  lostPosts: number
+  foundPosts: number
 }
 
 /** GET /api/admin/orgs/{orgId}/dashboard/stats */
@@ -44,6 +46,8 @@ export const mockAdminDashboardStats: ApiSuccess<AdminDashboardStats> = {
     expiredItems: 7,
     returnRate: 85,
     foundToday: 6,
+    lostPosts: 38,
+    foundPosts: 104,
   },
 }
 
@@ -51,7 +55,8 @@ export const mockAdminDashboardStats: ApiSuccess<AdminDashboardStats> = {
 
 export interface MonthlyActivityPoint {
   month: string
-  logged: number
+  lost: number
+  found: number
   returned: number
 }
 
@@ -59,18 +64,18 @@ export interface MonthlyActivityPoint {
 export const mockMonthlyActivity: ApiSuccess<Array<MonthlyActivityPoint>> = {
   success: true,
   data: [
-    { month: 'May',  logged: 28, returned: 22 },
-    { month: 'Jun',  logged: 34, returned: 28 },
-    { month: 'Jul',  logged: 38, returned: 32 },
-    { month: 'Aug',  logged: 42, returned: 36 },
-    { month: 'Sep',  logged: 36, returned: 30 },
-    { month: 'Oct',  logged: 45, returned: 40 },
-    { month: 'Nov',  logged: 52, returned: 46 },
-    { month: 'Dec',  logged: 48, returned: 43 },
-    { month: 'Jan',  logged: 55, returned: 50 },
-    { month: 'Feb',  logged: 50, returned: 44 },
-    { month: 'Mar',  logged: 60, returned: 55 },
-    { month: 'Apr',  logged: 65, returned: 58 },
+    { month: 'May', lost:  8, found: 20, returned: 22 },
+    { month: 'Jun', lost: 10, found: 24, returned: 28 },
+    { month: 'Jul', lost: 12, found: 26, returned: 32 },
+    { month: 'Aug', lost: 14, found: 28, returned: 36 },
+    { month: 'Sep', lost: 11, found: 25, returned: 30 },
+    { month: 'Oct', lost: 13, found: 32, returned: 40 },
+    { month: 'Nov', lost: 16, found: 36, returned: 46 },
+    { month: 'Dec', lost: 15, found: 33, returned: 43 },
+    { month: 'Jan', lost: 17, found: 38, returned: 50 },
+    { month: 'Feb', lost: 15, found: 35, returned: 44 },
+    { month: 'Mar', lost: 19, found: 41, returned: 55 },
+    { month: 'Apr', lost: 21, found: 44, returned: 58 },
   ],
 }
 

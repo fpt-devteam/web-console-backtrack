@@ -1,4 +1,5 @@
 import { ChevronLeft, ChevronRight, Package } from 'lucide-react'
+import { Link, useParams } from '@tanstack/react-router'
 import type { AdminInventoryItem } from '@/services/admin-dashboard.service'
 
 const STATUS_STYLE: Record<string, string> = {
@@ -47,6 +48,7 @@ interface RecentInventoryPanelProps {
 }
 
 export function RecentInventoryPanel({ items, totalCount, page, pageSize, onPageChange }: RecentInventoryPanelProps) {
+  const { slug = '' } = useParams({ strict: false })
   const totalPages = totalCount > 0 ? Math.max(1, Math.ceil(totalCount / pageSize)) : undefined
   const hasPrev = page > 1
   const hasNext = totalCount > 0 ? page < (totalPages ?? 1) : items.length >= pageSize
@@ -60,9 +62,13 @@ export function RecentInventoryPanel({ items, totalCount, page, pageSize, onPage
           <h2 className="text-sm font-semibold text-[#222222]">Recent Inventory</h2>
           <p className="text-xs text-[#929292] mt-0.5">Latest items logged across all staff</p>
         </div>
-        {totalCount > 0 && (
-          <span className="text-xs text-[#929292]">{totalCount} total</span>
-        )}
+        <Link
+          to="/console/$slug/admin/inventory"
+          params={{ slug }}
+          className="text-xs text-[#ff385c] font-medium hover:underline"
+        >
+          View all
+        </Link>
       </div>
 
       <div className="flex-1 space-y-0.5 min-h-[172px]">

@@ -21,7 +21,7 @@ export function CategoryBreakdownPanel({ data }: CategoryBreakdownPanelProps) {
             <PieChart>
               <Pie
                 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                data={data as any[]}
+                data={data as Array<any>}
                 dataKey="count"
                 nameKey="category"
                 cx="50%"

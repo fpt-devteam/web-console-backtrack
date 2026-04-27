@@ -9,7 +9,6 @@ import type {
 } from '@/mock/data/mock-admin-dashboard'
 import { privateClient } from '@/lib/api-client'
 import {
-  mockAdminDashboardStats,
   mockCategoryBreakdown,
   mockMonthlyActivity,
   mockOrgReturnRate,
@@ -26,21 +25,17 @@ interface RecentInventoryResponse {
 
 export const adminDashboardService = {
   async getStats(orgId: string): Promise<AdminDashboardStats> {
-    try {
-      const { data } = await privateClient.get<ApiResponse<AdminDashboardStats>>(
-        `/api/admin/orgs/${orgId}/dashboard/stats`
-      )
-      if (!data.success) throw new Error('Failed to fetch admin dashboard stats')
-      return data.data
-    } catch {
-      return mockAdminDashboardStats.data
-    }
+    const { data } = await privateClient.get<ApiResponse<AdminDashboardStats>>(
+      `/api/core/admin/orgs/${orgId}/dashboard/stats`
+    )
+    if (!data.success) throw new Error('Failed to fetch admin dashboard stats')
+    return data.data
   },
 
   async getMonthlyActivity(orgId: string): Promise<Array<MonthlyActivityPoint>> {
     try {
       const { data } = await privateClient.get<ApiResponse<Array<MonthlyActivityPoint>>>(
-        `/api/admin/orgs/${orgId}/dashboard/monthly-activity`
+        `/api/core/admin/orgs/${orgId}/dashboard/monthly-activity`
       )
       if (!data.success) throw new Error('Failed to fetch monthly activity')
       return data.data
@@ -52,7 +47,7 @@ export const adminDashboardService = {
   async getStaffPerformance(orgId: string): Promise<Array<StaffPerformanceItem>> {
     try {
       const { data } = await privateClient.get<ApiResponse<Array<StaffPerformanceItem>>>(
-        `/api/admin/orgs/${orgId}/dashboard/staff-performance`
+        `/api/core/admin/orgs/${orgId}/dashboard/staff-performance`
       )
       if (!data.success) throw new Error('Failed to fetch staff performance')
       return data.data
@@ -64,7 +59,7 @@ export const adminDashboardService = {
   async getCategoryBreakdown(orgId: string): Promise<Array<CategoryBreakdownItem>> {
     try {
       const { data } = await privateClient.get<ApiResponse<Array<CategoryBreakdownItem>>>(
-        `/api/admin/orgs/${orgId}/dashboard/category-breakdown`
+        `/api/core/admin/orgs/${orgId}/dashboard/category-breakdown`
       )
       if (!data.success) throw new Error('Failed to fetch category breakdown')
       return data.data
@@ -76,7 +71,7 @@ export const adminDashboardService = {
   async getOrgReturnRate(orgId: string): Promise<OrgReturnRateBreakdown> {
     try {
       const { data } = await privateClient.get<ApiResponse<OrgReturnRateBreakdown>>(
-        `/api/core/orgs/${orgId}/return-rate`
+        `/api/core/admin/orgs/${orgId}/dashboard/return-rate`
       )
       if (!data.success) throw new Error('Failed to fetch org return rate')
       return data.data
@@ -87,12 +82,19 @@ export const adminDashboardService = {
 
   async getRecentInventory(orgId: string, page = 1, pageSize = 3): Promise<RecentInventoryResponse> {
     try {
-      const { data } = await privateClient.get<ApiResponse<RecentInventoryResponse>>(
+      const { data } = await privateClient.get<ApiResponse<{ items: Array<AdminInventoryItem> }>>(
         `/api/core/orgs/${orgId}/inventory`,
-        { params: { page, pageSize, orderBy: 'createdAt', orderDir: 'desc' } }
+        { params: { page, pageSize: pageSize + 1, orderBy: 'createdAt', orderDir: 'desc' } }
       )
       if (!data.success) throw new Error('Failed to fetch recent inventory')
-      return data.data
+      const all = data.data.items
+      const hasMore = all.length > pageSize
+      return {
+        items: all.slice(0, pageSize),
+        totalCount: hasMore
+          ? page * pageSize + 1
+          : (page - 1) * pageSize + all.length,
+      }
     } catch {
       return mockRecentInventory.data
     }

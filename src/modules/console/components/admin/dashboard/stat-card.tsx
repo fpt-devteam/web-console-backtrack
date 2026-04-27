@@ -8,11 +8,12 @@ interface StatCardProps {
   icon: LucideIcon
   iconBg: string
   iconColor: string
+  urgent?: boolean
 }
 
-export function StatCard({ label, value, sub, badge, icon: Icon, iconBg, iconColor }: StatCardProps) {
+export function StatCard({ label, value, sub, badge, icon: Icon, iconBg, iconColor, urgent }: StatCardProps) {
   return (
-    <div className="bg-white rounded-2xl border border-[#dddddd] p-5 flex flex-col gap-3">
+    <div className={`bg-white rounded-2xl border p-5 flex flex-col gap-3 ${urgent ? 'border-[#f5a623]' : 'border-[#dddddd]'}`}>
       <div className="flex items-center justify-between">
         <span className="text-sm font-medium text-[#6a6a6a]">{label}</span>
         <div className={`w-9 h-9 rounded-xl flex items-center justify-center ${iconBg}`}>

@@ -83,7 +83,7 @@ export function PostStatusBreakdownChart({ data }: Props) {
             cursor={{ fill: '#f7f7f7' }}
             contentStyle={{ borderRadius: 12, border: '1px solid #dddddd', fontSize: 12 }}
             content={({ active, payload, label }) => {
-              if (!active || !payload?.length) return null
+              if (!active || !payload.length) return null
               return (
                 <div className="bg-white border border-[#dddddd] rounded-xl px-3 py-2.5 shadow-lg text-xs space-y-1">
                   <p className="font-semibold text-[#222222] mb-1.5">{label as string}</p>
