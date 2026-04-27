@@ -6,14 +6,22 @@ export type GetAdminUsersParams = {
   page?: number;
   pageSize?: number;
   search?: string;
-  /** Omit when showing all statuses */
   status?: 'Active' | 'Inactive';
 };
 
+export interface AdminUsersResult extends AdminPagedResult<AdminUserSummary> {
+  totalCount: number;
+  page: number;
+  pageSize: number;
+  totalPages: number;
+  realUserCount: number;
+  anonymousCount: number;
+}
+
 export const adminUserService = {
-  async getUsers(params: GetAdminUsersParams = {}): Promise<AdminPagedResult<AdminUserSummary>> {
+  async getUsers(params: GetAdminUsersParams = {}): Promise<AdminUsersResult> {
     const { page = 1, pageSize = 20, search, status } = params;
-    const { data } = await privateClient.get<ApiResponse<AdminPagedResult<AdminUserSummary>>>(
+    const { data } = await privateClient.get<ApiResponse<AdminUsersResult>>(
       '/api/core/admin/users',
       {
         params: {

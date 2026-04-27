@@ -1,11 +1,10 @@
 import { Layout } from '../components/layout';
-import { Eye, Trash2 } from 'lucide-react';
-import { useEffect, useMemo, useState } from 'react';
+import { Ghost, Users } from 'lucide-react';
+import { useEffect, useState } from 'react';
 import { useDebouncedValue, SEARCH_DEBOUNCE_MS } from '@/hooks/use-debounce';
 import type { AdminUserStatus, AdminUserSummary } from '@/types/admin-user.types';
 import { TableFiltersBar } from '@/components/filters/table-filters-bar';
 import { Pagination } from '@/components/ui/pagination';
-import { useRouter } from '@tanstack/react-router';
 import { useAdminUsers } from '@/hooks/use-admin-users';
 
 function rowDisplayName(u: AdminUserSummary): string {
@@ -16,86 +15,45 @@ function roleLabel(u: AdminUserSummary): string {
   return u.globalRole === 'PlatformSuperAdmin' ? 'Super Admin' : 'User';
 }
 
+function getStatusStyle(status: AdminUserStatus) {
+  switch (status) {
+    case 'Active':   return { dot: 'bg-green-500', text: 'text-[#06c167]' };
+    case 'Inactive': return { dot: 'bg-[#929292]', text: 'text-[#929292]' };
+    default:         return { dot: 'bg-[#929292]', text: 'text-[#929292]' };
+  }
+}
+
+function formatDate(iso: string) {
+  return new Date(iso).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+}
+
 export function UsersPage() {
-  const router = useRouter();
   const [currentPage, setCurrentPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState('');
-  const debouncedSearchTerm = useDebouncedValue(searchTerm.trim(), SEARCH_DEBOUNCE_MS);
+  const debouncedSearch = useDebouncedValue(searchTerm.trim(), SEARCH_DEBOUNCE_MS);
   const [statusFilter, setStatusFilter] = useState<AdminUserStatus | 'All'>('All');
-  const [sortFilter, setSortFilter] = useState<'Newest' | 'Oldest' | 'Name A-Z' | 'Name Z-A'>('Newest');
   const pageSize = 10;
 
-  useEffect(() => {
-    setCurrentPage(1);
-  }, [debouncedSearchTerm, statusFilter]);
+  useEffect(() => { setCurrentPage(1); }, [debouncedSearch, statusFilter]);
 
   const { data, isLoading, isError, error, refetch, isFetching } = useAdminUsers({
     page: currentPage,
     pageSize,
-    search: debouncedSearchTerm || undefined,
+    search: debouncedSearch || undefined,
     status: statusFilter === 'All' ? undefined : statusFilter,
   });
 
-  const sortedItems = useMemo(() => {
-    const items = [...(data?.items ?? [])];
-    items.sort((a, b) => {
-      const nameA = rowDisplayName(a);
-      const nameB = rowDisplayName(b);
-      switch (sortFilter) {
-        case 'Newest':
-          return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
-        case 'Oldest':
-          return new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
-        case 'Name A-Z':
-          return nameA.localeCompare(nameB);
-        case 'Name Z-A':
-          return nameB.localeCompare(nameA);
-        default:
-          return 0;
-      }
-    });
-    return items;
-  }, [data?.items, sortFilter]);
-
-  const total = data?.total ?? 0;
-  const totalPages = Math.max(1, Math.ceil(total / pageSize));
-  const startIndex = total === 0 ? 0 : (currentPage - 1) * pageSize + 1;
-  const endIndex = total === 0 ? 0 : Math.min(currentPage * pageSize, total);
-
-  const getStatusStyle = (status: AdminUserStatus) => {
-    switch (status) {
-      case 'Active':
-        return { dot: 'bg-green-500', text: 'text-[#06c167]' };
-      case 'Inactive':
-        return { dot: 'bg-[#929292]', text: 'text-[#929292]' };
-      default:
-        return { dot: 'bg-[#929292]', text: 'text-[#929292]' };
-    }
-  };
-
-  const formatDate = (iso: string) =>
-    new Date(iso).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
-
-  const handleViewUser = (userId: string) => {
-    router.navigate({ to: '/super-admin/users/$userId', params: { userId } });
-  };
-
-  const handleDeleteUser = (userId: string, userName: string) => {
-    if (window.confirm(`Are you sure you want to delete ${userName}?`)) {
-      console.log('Delete user:', userId);
-    }
-  };
+  const items = data?.items ?? [];
+  const totalCount = data?.totalCount ?? data?.total ?? 0;
+  const totalPages = data?.totalPages ?? 1;
+  const realUserCount = data?.realUserCount ?? 0;
+  const anonymousCount = data?.anonymousCount ?? 0;
+  const startIndex = totalCount === 0 ? 0 : (currentPage - 1) * pageSize + 1;
+  const endIndex = totalCount === 0 ? 0 : Math.min(currentPage * pageSize, totalCount);
 
   const statusOptions = [
     { value: 'Active',   label: 'Active' },
     { value: 'Inactive', label: 'Inactive' },
-  ];
-
-  const sortOptions = [
-    { value: 'Newest',   label: 'Newest' },
-    { value: 'Oldest',   label: 'Oldest' },
-    { value: 'Name A-Z', label: 'Name A-Z' },
-    { value: 'Name Z-A', label: 'Name Z-A' },
   ];
 
   const errMessage = error instanceof Error ? error.message : 'Failed to load users';
@@ -105,31 +63,41 @@ export function UsersPage() {
       <div className="p-8 bg-[#f7f7f7] min-h-screen">
         <div className="mb-4">
           <nav className="text-sm text-[#6a6a6a]">
-            <span className="hover:text-[#222222] cursor-pointer">User Management</span>
+            <span>User Management</span>
           </nav>
         </div>
 
-        <div className="flex items-start justify-between mb-4">
+        <div className="flex items-start justify-between mb-6">
           <div>
-            <h1 className="text-3xl font-bold text-[#222222] mb-2">Users</h1>
-            <p className="text-[#6a6a6a]">
-              Manage and monitor all user accounts, roles, and permissions.
-            </p>
+            <h1 className="text-3xl font-bold text-[#222222] mb-1">Users</h1>
+            <p className="text-[#6a6a6a]">Manage and monitor all user accounts, roles, and permissions.</p>
           </div>
+
+          {/* Real / Anonymous stat pills */}
+          {!isLoading && (
+            <div className="flex items-center gap-3">
+              <div className="flex items-center gap-2 bg-white border border-[#dddddd] rounded-[20px] px-4 py-2">
+                <Users className="w-4 h-4 text-[#06c167]" />
+                <span className="text-sm font-semibold text-[#222222]">{realUserCount.toLocaleString()}</span>
+                <span className="text-xs text-[#6a6a6a]">real users</span>
+              </div>
+              <div className="flex items-center gap-2 bg-white border border-[#dddddd] rounded-[20px] px-4 py-2">
+                <Ghost className="w-4 h-4 text-[#929292]" />
+                <span className="text-sm font-semibold text-[#222222]">{anonymousCount.toLocaleString()}</span>
+                <span className="text-xs text-[#6a6a6a]">anonymous</span>
+              </div>
+            </div>
+          )}
         </div>
 
-        {isError ? (
+        {isError && (
           <div className="mb-4 rounded-[10px] border border-[#c13515]/20 bg-[#fff0f2] px-4 py-3 text-sm text-[#c13515] flex items-center justify-between gap-4">
             <span>{errMessage}</span>
-            <button
-              type="button"
-              className="shrink-0 font-medium text-[#c13515] underline"
-              onClick={() => void refetch()}
-            >
+            <button type="button" className="shrink-0 font-medium underline" onClick={() => void refetch()}>
               Retry
             </button>
           </div>
-        ) : null}
+        )}
 
         <TableFiltersBar
           searchValue={searchTerm}
@@ -139,61 +107,58 @@ export function UsersPage() {
             {
               label: 'Status',
               value: statusFilter,
-              onChange: (value) => setStatusFilter(value as typeof statusFilter),
+              onChange: (v) => setStatusFilter(v as typeof statusFilter),
               options: statusOptions,
               allLabel: 'All',
-            },
-            {
-              label: 'Sort',
-              value: sortFilter,
-              onChange: (value) => setSortFilter(value as typeof sortFilter),
-              options: sortOptions,
-              showAll: false,
             },
           ]}
           className="mb-6"
         />
 
         <div className="bg-white rounded-[14px] border border-[#dddddd] overflow-hidden relative">
-          {isFetching ? (
-            <div className="absolute inset-0 z-10 bg-white/50 pointer-events-none" aria-hidden />
-          ) : null}
+          {isFetching && <div className="absolute inset-0 z-10 bg-white/50 pointer-events-none" aria-hidden />}
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead className="bg-[#f7f7f7] border-b border-[#ebebeb]">
                 <tr>
+                  <th className="px-6 py-3 text-left text-xs font-bold text-[#6a6a6a] uppercase tracking-wider">User</th>
                   <th className="px-6 py-3 text-left text-xs font-bold text-[#6a6a6a] uppercase tracking-wider">Email</th>
                   <th className="px-6 py-3 text-left text-xs font-bold text-[#6a6a6a] uppercase tracking-wider">Role</th>
                   <th className="px-6 py-3 text-left text-xs font-bold text-[#6a6a6a] uppercase tracking-wider">Status</th>
-                  <th className="px-6 py-3 text-left text-xs font-bold text-[#6a6a6a] uppercase tracking-wider">Created Date</th>
-                  <th className="px-6 py-3 text-left text-xs font-bold text-[#6a6a6a] uppercase tracking-wider">Last Login</th>
-                  <th className="px-6 py-3 text-left text-xs font-bold text-[#6a6a6a] uppercase tracking-wider">Action</th>
+                  <th className="px-6 py-3 text-left text-xs font-bold text-[#6a6a6a] uppercase tracking-wider">Created</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-[#ebebeb]">
                 {isLoading ? (
                   <tr>
-                    <td colSpan={6} className="px-6 py-12 text-center text-[#6a6a6a]">
-                      Loading users…
-                    </td>
+                    <td colSpan={5} className="px-6 py-12 text-center text-[#6a6a6a]">Loading users…</td>
                   </tr>
-                ) : sortedItems.length === 0 ? (
+                ) : items.length === 0 ? (
                   <tr>
-                    <td colSpan={6} className="px-6 py-12 text-center text-[#6a6a6a]">
-                      No users match your filters.
-                    </td>
+                    <td colSpan={5} className="px-6 py-12 text-center text-[#6a6a6a]">No users match your filters.</td>
                   </tr>
                 ) : (
-                  sortedItems.map((user) => {
+                  items.map((user) => {
                     const statusStyle = getStatusStyle(user.status);
-                    const label = rowDisplayName(user);
                     return (
                       <tr key={user.id} className="hover:bg-[#f7f7f7] transition-colors">
                         <td className="px-6 py-4 whitespace-nowrap">
-                          <span className="text-[#6a6a6a]">{user.email ?? '———————————————'}</span>
+                          <div className="flex items-center gap-3">
+                            {user.avatarUrl ? (
+                              <img src={user.avatarUrl} alt="" className="w-8 h-8 rounded-full object-cover flex-shrink-0" />
+                            ) : (
+                              <div className="w-8 h-8 rounded-full bg-[#f0f0f0] flex items-center justify-center flex-shrink-0 text-xs font-semibold text-[#6a6a6a]">
+                                {rowDisplayName(user).charAt(0).toUpperCase()}
+                              </div>
+                            )}
+                            <span className="font-medium text-[#222222]">{rowDisplayName(user)}</span>
+                          </div>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
-                          <span className="text-[#6a6a6a]">{roleLabel(user)}</span>
+                          <span className="text-sm text-[#6a6a6a]">{user.email ?? '—'}</span>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <span className="text-sm text-[#6a6a6a]">{roleLabel(user)}</span>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
                           <div className="flex items-center gap-2">
@@ -202,30 +167,7 @@ export function UsersPage() {
                           </div>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
-                          <span className="text-[#6a6a6a]">{formatDate(user.createdAt)}</span>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <span className="text-[#6a6a6a]">—</span>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <div className="flex items-center gap-2">
-                            <button
-                              type="button"
-                              onClick={() => handleViewUser(user.id)}
-                              className="p-2 text-[#929292] hover:text-[#06c167] hover:bg-[#e8f9f0] rounded-lg transition-colors"
-                              title="View User Details"
-                            >
-                              <Eye className="w-4 h-4" />
-                            </button>
-                            <button
-                              type="button"
-                              onClick={() => handleDeleteUser(user.id, label)}
-                              className="p-2 text-[#929292] hover:text-[#c13515] hover:bg-[#fff0f2] rounded-lg transition-colors"
-                              title="Delete User"
-                            >
-                              <Trash2 className="w-4 h-4" />
-                            </button>
-                          </div>
+                          <span className="text-sm text-[#6a6a6a]">{formatDate(user.createdAt)}</span>
                         </td>
                       </tr>
                     );
@@ -237,15 +179,13 @@ export function UsersPage() {
 
           <div className="px-6 py-4 border-t border-[#dddddd] flex items-center justify-between">
             <div className="text-sm text-[#6a6a6a]">
-              {total === 0
+              {totalCount === 0
                 ? 'No results'
-                : `Showing ${startIndex} to ${endIndex} of ${total} results`}
+                : `Showing ${startIndex} to ${endIndex} of ${totalCount} results`}
             </div>
-            <Pagination
-              currentPage={currentPage}
-              totalPages={totalPages}
-              onPageChange={setCurrentPage}
-            />
+            {totalPages > 1 && (
+              <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={setCurrentPage} />
+            )}
           </div>
         </div>
       </div>
