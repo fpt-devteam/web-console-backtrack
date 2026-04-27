@@ -73,6 +73,8 @@ export function AdminInventoryMonitorPage() {
           onSearchTermChange={listState.setSearchTerm}
           statusFilter={listState.statusFilter}
           onStatusChange={listState.setStatusFilter}
+          postTypeFilter={listState.postTypeFilter}
+          onPostTypeChange={listState.setPostTypeFilter}
           categoryFilter={listState.categoryFilter}
           onCategoryChange={listState.setCategoryFilter}
           fromDate={listState.fromDate}

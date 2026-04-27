@@ -223,6 +223,7 @@ export interface GetInventoryParams {
   pageSize?: number
   query?: string
   status?: PostStatus
+  postType?: PostType
   category?: ItemCategory
   /** Maps to BE `InventoryFilter.staffId` → post author (Firebase UID). */
   staffId?: string
@@ -265,6 +266,7 @@ type SearchInventoriesBody = {
   query?: string
   filters?: {
     status?: PostStatus
+    postType?: PostType
     category?: ItemCategory
     staffId?: string
     time?: { from?: string; to?: string }
@@ -386,6 +388,7 @@ export const inventoryService = {
       query: params?.query?.trim() || undefined,
       filters: {
         status: params?.status ?? undefined,
+        postType: params?.postType ?? undefined,
         category: params?.category ?? undefined,
         staffId: params?.staffId?.trim() || undefined,
         time,
@@ -397,6 +400,7 @@ export const inventoryService = {
     // Keep payload minimal (avoid sending empty filters)
     if (
       !body.filters?.status &&
+      !body.filters?.postType &&
       !body.filters?.category &&
       !body.filters?.staffId &&
       !body.filters?.time

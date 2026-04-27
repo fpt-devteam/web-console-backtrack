@@ -3,8 +3,26 @@ import { Link } from '@tanstack/react-router'
 import { inventoryStatusBadgeClass, inventoryStatusLabel } from './status'
 import { NoResultsEmptyState } from './no-results-empty-state'
 import type { InventoryListItem } from '@/services/inventory.service'
-import { Spinner } from '@/components/ui/spinner'
 import { getInventorySubcategoryName, getInventoryTitle } from '@/utils/inventory-view'
+
+function SkeletonCard() {
+  return (
+    <div className="rounded-2xl border border-[#ebebeb] bg-white overflow-hidden">
+      <div className="h-44 bg-[#f0f0f0] animate-pulse" />
+      <div className="p-3 space-y-2">
+        <div className="h-4 bg-[#f0f0f0] rounded-full animate-pulse w-3/4" />
+        <div className="h-3 bg-[#f0f0f0] rounded-full animate-pulse w-1/3" />
+        <div className="space-y-1.5 pt-1">
+          <div className="h-3 bg-[#f0f0f0] rounded-full animate-pulse w-2/3" />
+          <div className="flex justify-between">
+            <div className="h-3 bg-[#f0f0f0] rounded-full animate-pulse w-1/4" />
+            <div className="h-3 bg-[#f0f0f0] rounded-full animate-pulse w-1/4" />
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+}
 
 export function InventoryGridCards({
   items,
@@ -36,8 +54,8 @@ export function InventoryGridCards({
 
   if (isLoading) {
     return (
-      <div className="py-16">
-        <Spinner className="mx-auto" />
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+        {Array.from({ length: 8 }, (_, i) => <SkeletonCard key={i} />)}
       </div>
     )
   }
@@ -90,19 +108,28 @@ export function InventoryGridCards({
                   <span className="text-xs font-medium">No image</span>
                 </div>
               )}
-              {/* Status badge */}
+              {/* Post type badge */}
               <span
-                className={`absolute top-2.5 right-2.5 px-2 py-0.5 rounded-full text-[11px] font-semibold ${inventoryStatusBadgeClass(item.status)}`}
+                className={`absolute top-2.5 left-2.5 px-2 py-0.5 rounded-full text-[11px] font-semibold ${
+                  item.postType === 'Lost'
+                    ? 'bg-[#fff3e0] text-[#e65100]'
+                    : 'bg-[#e8f5e9] text-[#2e7d32]'
+                }`}
               >
-                {inventoryStatusLabel(item.status)}
+                {item.postType === 'Lost' ? 'Lost' : 'Found'}
               </span>
             </div>
 
             {/* Body */}
-            <div className="p-4 space-y-3">
-              <h3 className="font-semibold text-[#222222] line-clamp-2 leading-snug text-sm group-hover:text-[#ff385c] transition-colors min-h-[40px]">
+            <div className="p-3 space-y-2">
+              <h3 className="font-semibold text-[#222222] line-clamp-2 leading-snug text-sm group-hover:text-[#ff385c] transition-colors">
                 {displayTitle}
               </h3>
+              <span
+                className={`inline-block px-2 py-0.5 rounded-full text-[11px] font-semibold ${inventoryStatusBadgeClass(item.status)}`}
+              >
+                {inventoryStatusLabel(item.status)}
+              </span>
 
               <div className="space-y-1.5">
                 <div className="flex items-center gap-1.5 text-xs text-[#6a6a6a]">

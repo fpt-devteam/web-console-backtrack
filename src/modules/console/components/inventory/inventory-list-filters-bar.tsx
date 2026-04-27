@@ -2,9 +2,15 @@ import { Search, X } from 'lucide-react'
 import { FilterDateRangeChip, FilterDropdownChip } from './filter-dropdown-chip'
 import type { ChipOption } from './filter-dropdown-chip'
 import type { ReactNode } from 'react'
-import type { CategoryFilter, StatusFilter } from './use-inventory-list-state'
+import type { CategoryFilter, PostTypeFilter, StatusFilter } from './use-inventory-list-state'
 
 export type InventoryAuthorOption = ChipOption
+
+const POST_TYPE_OPTIONS: Array<ChipOption> = [
+  { value: 'All', label: 'All types' },
+  { value: 'Found', label: 'Found' },
+  { value: 'Lost', label: 'Lost' },
+]
 
 const CATEGORY_OPTIONS: Array<ChipOption> = [
   { value: 'All', label: 'All categories' },
@@ -29,6 +35,8 @@ export function InventoryListFiltersBar({
   onSearchTermChange,
   statusFilter,
   onStatusChange,
+  postTypeFilter,
+  onPostTypeChange,
   categoryFilter,
   onCategoryChange,
   fromDate,
@@ -50,6 +58,8 @@ export function InventoryListFiltersBar({
   onSearchTermChange: (v: string) => void
   statusFilter: StatusFilter
   onStatusChange: (v: StatusFilter) => void
+  postTypeFilter?: PostTypeFilter
+  onPostTypeChange?: (v: PostTypeFilter) => void
   categoryFilter: CategoryFilter
   onCategoryChange: (v: CategoryFilter) => void
   fromDate: string
@@ -109,6 +119,17 @@ export function InventoryListFiltersBar({
         {/* Date range + category chips */}
         {categoryFirst ? CategoryChip : DateRangeChip}
         {categoryFirst ? DateRangeChip : CategoryChip}
+
+        {/* Post type chip */}
+        {onPostTypeChange && (
+          <FilterDropdownChip
+            label="Type"
+            value={postTypeFilter ?? 'All'}
+            defaultValue="All"
+            options={POST_TYPE_OPTIONS}
+            onChange={(v) => onPostTypeChange(v as PostTypeFilter)}
+          />
+        )}
 
         {/* Author chip */}
         {showAuthorFilter && (
