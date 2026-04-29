@@ -1,7 +1,7 @@
-import type { StatusFilter } from './use-inventory-list-state'
 import { inventoryStatusLabel } from './status'
+import type { StatusFilter } from './use-inventory-list-state'
 
-const TABS: StatusFilter[] = [
+const TABS: Array<StatusFilter> = [
   'All',
   'InStorage',
   'Returned',
@@ -13,7 +13,7 @@ export function InventoryStatusTabs({
   value,
   onChange,
   className,
-  hideBorder = false,
+  hideBorder: _hideBorder = false,
 }: {
   value: StatusFilter
   onChange: (v: StatusFilter) => void
@@ -21,32 +21,26 @@ export function InventoryStatusTabs({
   hideBorder?: boolean
 }) {
   return (
-    <div className={[hideBorder ? '' : 'border-b border-[#dddddd]', className].filter(Boolean).join(' ')}>
-      <div className="flex items-center gap-6 overflow-x-auto scrollbar-none">
-        {TABS.map((t) => {
-          const active = value === t
-          return (
-            <button
-              key={t}
-              type="button"
-              onClick={() => onChange(t)}
-              className={[
-                'relative whitespace-nowrap py-3 text-sm font-medium transition-colors',
-                active ? 'text-[#222222]' : 'text-[#6a6a6a] hover:text-[#222222]',
-              ].join(' ')}
-            >
-              {t === 'All' ? 'All' : inventoryStatusLabel(t)}
-              {/* 2px Ink Black underline — matches Airbnb's tab indicator */}
-              <span
-                className={[
-                  'absolute left-0 right-0 -bottom-px h-0.5 rounded-full transition-colors',
-                  active ? 'bg-[#222222]' : 'bg-transparent',
-                ].join(' ')}
-              />
-            </button>
-          )
-        })}
-      </div>
+    <div className={['flex gap-2', className].filter(Boolean).join(' ')}>
+      {TABS.map((t) => {
+        const active = value === t
+        const label = t === 'All' ? 'All' : inventoryStatusLabel(t)
+        return (
+          <button
+            key={t}
+            type="button"
+            onClick={() => onChange(t)}
+            className={[
+              'px-4 py-2 rounded-lg border text-sm font-medium transition-all whitespace-nowrap active:scale-[0.97]',
+              active
+                ? 'border-primary text-primary bg-white shadow-sm'
+                : 'border-hairline text-ash bg-white hover:bg-neutral-50 hover:border-ink hover:text-ink transition-colors',
+            ].join(' ')}
+          >
+            {label}
+          </button>
+        )
+      })}
     </div>
   )
 }

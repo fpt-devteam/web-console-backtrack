@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
-import { useDebouncedValue } from '@/hooks/use-debounce'
 import type { ItemCategory, PostStatus, PostType } from '@/services/inventory.service'
+import { useDebouncedValue } from '@/hooks/use-debounce'
 
 const ALL_STATUS = 'All' as const
 export type InventoryAllFilter = typeof ALL_STATUS
@@ -56,9 +56,9 @@ export function useInventoryListState({
       page: currentPage,
       pageSize,
       query: debouncedSearch || undefined,
-      status: statusFilter !== ALL_STATUS ? (statusFilter as PostStatus) : undefined,
-      postType: postTypeFilter !== ALL_STATUS ? (postTypeFilter as PostType) : undefined,
-      category: categoryFilter !== ALL_STATUS ? (categoryFilter as ItemCategory) : undefined,
+      status: statusFilter !== ALL_STATUS ? statusFilter : undefined,
+      postType: postTypeFilter !== ALL_STATUS ? postTypeFilter : undefined,
+      category: categoryFilter !== ALL_STATUS ? categoryFilter : undefined,
       fromDate: fromDate || undefined,
       toDate: toDate || undefined,
       staffId: debouncedStaffId || undefined,

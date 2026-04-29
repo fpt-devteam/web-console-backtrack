@@ -8,8 +8,8 @@ import {
   ChevronsUpDown,
   LayoutDashboard,
 } from 'lucide-react'
-import { OrgLogo } from '@/components/org-logo'
 import { Link, useLocation, useParams } from '@tanstack/react-router'
+import { OrgLogo } from '@/components/org-logo'
 import { useCurrentOrgId } from '@/contexts/current-org.context'
 import { useOrganization } from '@/hooks/use-org'
 import { useCurrentUser } from '@/hooks/use-auth'
@@ -77,7 +77,7 @@ const NAV_ITEMS = [
 
 function StaffSidebarInner() {
   const location = useLocation()
-  const { slug: slugParam } = useParams({ strict: false }) as { slug?: string }
+  const { slug: slugParam } = useParams({ strict: false })
   const { currentOrgId } = useCurrentOrgId()
   const { data: org } = useOrganization(currentOrgId)
   const { data: user } = useCurrentUser()
