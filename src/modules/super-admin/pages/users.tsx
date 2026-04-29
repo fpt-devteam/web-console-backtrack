@@ -6,6 +6,7 @@ import type { AdminUserStatus, AdminUserSummary } from '@/types/admin-user.types
 import { TableFiltersBar } from '@/components/filters/table-filters-bar';
 import { Pagination } from '@/components/ui/pagination';
 import { useAdminUsers } from '@/hooks/use-admin-users';
+import { useRouter } from '@tanstack/react-router';
 
 function rowDisplayName(u: AdminUserSummary): string {
   return (u.displayName || u.email || 'Unknown').trim();
@@ -28,6 +29,7 @@ function formatDate(iso: string) {
 }
 
 export function UsersPage() {
+  const router = useRouter();
   const [currentPage, setCurrentPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState('');
   const debouncedSearch = useDebouncedValue(searchTerm.trim(), SEARCH_DEBOUNCE_MS);
@@ -141,7 +143,13 @@ export function UsersPage() {
                   items.map((user) => {
                     const statusStyle = getStatusStyle(user.status);
                     return (
-                      <tr key={user.id} className="hover:bg-[#f7f7f7] transition-colors">
+                      <tr
+                        key={user.id}
+                        className="hover:bg-[#f7f7f7] transition-colors cursor-pointer"
+                        onClick={() => {
+                          router.navigate({ to: '/super-admin/users/$userId', params: { userId: user.id } });
+                        }}
+                      >
                         <td className="px-6 py-4 whitespace-nowrap">
                           <div className="flex items-center gap-3">
                             {user.avatarUrl ? (

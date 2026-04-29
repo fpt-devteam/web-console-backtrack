@@ -236,8 +236,9 @@ export function SettingPage() {
     industryOptions.find((o) => o.value === industry)?.label ?? industry
 
   const shareUrl = useMemo(() => {
-    if (!slug.trim() || typeof window === 'undefined') return ''
-    return `${window.location.origin}/portal/${slug.trim().toLowerCase().replace(/\s+/g, '-')}`
+    const s = slug.trim().toLowerCase().replace(/\s+/g, '-')
+    if (!s) return ''
+    return `https://thebacktrack.vercel.app/organizations/${s}`
   }, [slug])
 
   const mapCoords = location
@@ -486,15 +487,16 @@ export function SettingPage() {
                   />
                 </div>
                 <div className="space-y-1.5 min-w-0">
-                  <FieldLabel>Organization slug</FieldLabel>
-                  <div className="mt-1 flex min-w-0 rounded-lg border border-[#dddddd] bg-white">
-                    <span className="hidden shrink-0 items-center whitespace-nowrap rounded-l-lg border-r border-[#dddddd] bg-[#f7f7f7] px-2 text-xs text-[#6a6a6a] sm:flex sm:px-3 sm:text-sm">
-                      backtrack.com/
-                    </span>
+                  <FieldLabel>Workspace URL</FieldLabel>
+                  <div className="mt-1 flex items-center min-w-0">
+                    <div className="h-10 px-3 flex items-center rounded-l-md border border-[#dddddd] bg-[#f7f7f7] text-sm text-[#6a6a6a] whitespace-nowrap">
+                      https://thebacktrack.vercel.app/organizations/
+                    </div>
                     <Input
                       value={slug}
                       onChange={(e) => setSlug(e.target.value)}
-                      className="min-w-0 rounded-lg border-0 font-medium text-[#ff385c] focus-visible:ring-0 sm:rounded-l-none sm:rounded-r-lg"
+                      placeholder="fptu-hcm"
+                      className="min-w-0 w-full rounded-l-none border border-l-0 border-[#dddddd] font-medium text-[#222222]"
                     />
                   </div>
                 </div>

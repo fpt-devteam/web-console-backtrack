@@ -1,9 +1,13 @@
 import { Layout } from '../components/layout';
 import { useRouter, useParams } from '@tanstack/react-router';
-import { mockTenants } from '@/mock/data/mock-tenants';
-import { CheckCircle2, Calendar, ArrowLeft, Phone } from 'lucide-react';
+import { Calendar, ArrowLeft, Phone, Mail } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { OrgLogo } from '@/components/org-logo';
+import { useSuperAdminOrgDetail } from '@/hooks/use-super-admin';
+
+const WORKSPACE_BASE_URL =
+  (import.meta.env.VITE_WORKSPACE_BASE_URL as string | undefined) ??
+  'https://thebacktrack.vercel.app/organizations/';
 
 const INDUSTRY_OPTIONS: Record<string, string> = {
   technology: 'Technology & Software',
@@ -39,10 +43,60 @@ export function OrganizationDetailPage() {
   const router = useRouter();
   const { tenantId } = useParams({ from: '/super-admin/organization/$tenantId' });
 
-  // Find tenant by ID
-  const tenant = mockTenants.find(t => t.id === tenantId);
+  const { data, isLoading, isError, error } = useSuperAdminOrgDetail(tenantId, { billingPage: 1, billingPageSize: 20 })
+
+  const org = data?.basicInfo
+  const sub = data?.subscription
+
+  const tenant: any = org
+    ? {
+        id: org.id,
+        name: org.name,
+        slug: org.slug,
+        logoUrl: org.logoUrl ?? null,
+        status: org.status,
+        industryType: org.industryType,
+        taxIdentificationNumber: org.taxIdentificationNumber,
+        displayAddress: org.displayAddress,
+        phone: org.phone,
+        contactEmail: org.contactEmail ?? null,
+        subscriptionPlan: sub
+          ? {
+              tier: sub.planSnapshot.name,
+              status: sub.status,
+              renewalDate: new Date(sub.currentPeriodEnd),
+              billingCycle: sub.planSnapshot.billingInterval,
+              price: { amount: sub.planSnapshot.price, period: sub.planSnapshot.billingInterval === 'Yearly' ? 'yr' : 'mo' },
+              quotasSummary: undefined,
+              description: (sub.planSnapshot.features ?? []).join(', '),
+              includedFeatures: sub.planSnapshot.features ?? [],
+            }
+          : {
+              tier: 'Free',
+              status: 'Active',
+              renewalDate: null,
+              billingCycle: '—',
+              price: null,
+              quotasSummary: undefined,
+              description: 'Default free plan (no billing)',
+              includedFeatures: [],
+            },
+        usageOverview: undefined,
+        billingHistory: (data?.billingHistory ?? []).map((p) => ({
+          id: p.providerInvoiceId || p.id,
+          invoiceDate: new Date(p.paymentDate),
+          amount: Number(p.amount),
+          currency: p.currency,
+          status: p.status,
+          invoiceUrl: p.invoiceUrl ?? null,
+          planName: p.planName ?? null,
+        })),
+        members: [],
+      }
+    : null
+
   const industryLabel = tenant?.industryType ? (INDUSTRY_OPTIONS[tenant.industryType] ?? tenant.industryType) : null;
-  const taxId = tenant?.taxIdentificationNumber ?? tenant?.taxId;
+  const taxId = tenant?.taxIdentificationNumber ?? null;
 
   /**
    * Handles navigation back to organization list
@@ -70,25 +124,18 @@ export function OrganizationDetailPage() {
     }
   };
 
-  /**
-   * Gets subscription status color
-   *
-   * @param status - Subscription status
-   * @returns CSS classes for status indicator
-   */
-  const getSubscriptionStatusColor = (status: string) => {
-    switch (status) {
-      case 'Good Standing':
-        return 'text-[#06c167]';
-      case 'Payment Due':
-        return 'text-[#c97a00]';
-      case 'Suspended':
-        return 'text-[#c13515]';
-      case 'Cancelled':
-        return 'text-[#6a6a6a]';
-      default:
-        return 'text-[#6a6a6a]';
+  const getPaymentStatusBadgeClass = (status: string | null | undefined) => {
+    const s = (status ?? '').toLowerCase();
+    if (s.includes('succeed') || s === 'paid' || s === 'success' || s === 'successful') {
+      return 'bg-[#e8f9f0] text-[#06c167] border-[#06c167]/20';
     }
+    if (s.includes('fail') || s.includes('error') || s.includes('cancel') || s.includes('void')) {
+      return 'bg-[#ffefef] text-[#c13515] border-[#c13515]/20';
+    }
+    if (s.includes('due') || s.includes('unpaid') || s.includes('pastdue') || s.includes('pending')) {
+      return 'bg-[#fff8e6] text-[#c97a00] border-[#c97a00]/20';
+    }
+    return 'bg-[#f7f7f7] text-[#6a6a6a] border-[#dddddd]';
   };
 
   /**
@@ -165,14 +212,43 @@ export function OrganizationDetailPage() {
     return `${gb}GB`;
   };
 
+  if (isLoading) {
+    return (
+      <Layout>
+        <div className="p-8 bg-[#f7f7f7] min-h-screen">
+          <div className="bg-white rounded-[14px] border border-[#dddddd] p-8 text-center text-[#6a6a6a]">
+            Loading...
+          </div>
+        </div>
+      </Layout>
+    );
+  }
+
+  if (isError) {
+    return (
+      <Layout>
+        <div className="p-8 bg-[#f7f7f7] min-h-screen">
+          <div className="bg-white rounded-[14px] border border-[#dddddd] p-8 text-center">
+            <h2 className="text-2xl font-bold text-[#222222] mb-2">Failed to load organization</h2>
+            <p className="text-[#6a6a6a] mb-6">{error instanceof Error ? error.message : 'Please try again.'}</p>
+            <Button onClick={handleBack} variant="outline">
+              <ArrowLeft className="w-4 h-4 mr-2" />
+              Back to Organizations
+            </Button>
+          </div>
+        </div>
+      </Layout>
+    );
+  }
+
   // Handle tenant not found
   if (!tenant) {
     return (
       <Layout>
         <div className="p-8 bg-[#f7f7f7] min-h-screen">
           <div className="bg-white rounded-[14px] border border-[#dddddd] p-8 text-center">
-            <h2 className="text-2xl font-bold text-[#222222] mb-2">Tenant Not Found</h2>
-            <p className="text-[#6a6a6a] mb-6">The requested tenant could not be found.</p>
+            <h2 className="text-2xl font-bold text-[#222222] mb-2">Organization Not Found</h2>
+            <p className="text-[#6a6a6a] mb-6">The requested organization could not be found.</p>
             <Button onClick={handleBack} variant="outline">
               <ArrowLeft className="w-4 h-4 mr-2" />
               Back to Organizations
@@ -188,8 +264,8 @@ export function OrganizationDetailPage() {
   return (
     <Layout>
       <div className="p-8 bg-[#f7f7f7] min-h-screen">
-        {/* Breadcrumbs */}
-        <div className="mb-6">
+        {/* Breadcrumbs + Back */}
+        <div className="mb-6 flex items-center justify-between gap-4">
           <nav className="text-sm text-[#929292]">
             <button
               onClick={handleBack}
@@ -202,14 +278,6 @@ export function OrganizationDetailPage() {
           </nav>
         </div>
 
-        {/* Public Data View Banner */}
-        <div className="mb-6 bg-[#fff8e6] border border-[#c97a00]/20 rounded-lg p-4">
-          <p className="text-sm text-[#c97a00]">
-            <strong>Public Data View:</strong> You are viewing restricted public data for this organization.
-            Sensitive tenant details like admin contacts and recent activity logs are hidden for data protection compliance.
-          </p>
-        </div>
-
         {/* Organization Information (Org Admin card style) */}
         <div className="bg-white rounded-[14px] border border-[#dddddd] p-8 mb-6">
           <div className="space-y-6">
@@ -218,9 +286,9 @@ export function OrganizationDetailPage() {
                 <OrgLogo logoUrl={tenant.logoUrl} alt={tenant.name} className="h-16 w-16" iconClassName="h-8 w-8" rounded="lg" />
               ) : (
                 <div
-                  className={`flex h-16 w-16 flex-shrink-0 items-center justify-center rounded-lg text-lg font-semibold text-[#6a6a6a] ${tenant.avatarColor}`}
+                  className="flex h-16 w-16 flex-shrink-0 items-center justify-center rounded-lg bg-[#f7f7f7] text-lg font-semibold text-[#6a6a6a]"
                 >
-                  {tenant.avatarText}
+                  {tenant.name?.slice(0, 1)?.toUpperCase() ?? 'O'}
                 </div>
               )}
               <div className="flex min-w-0 flex-1 flex-wrap items-center gap-3">
@@ -252,12 +320,20 @@ export function OrganizationDetailPage() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-[#222222] mb-2">Workspace URL (slug)</label>
-              <div className="flex items-center gap-2">
-                <div className="flex-1 px-4 py-2 border border-[#dddddd] rounded-lg bg-[#f7f7f7] text-[#222222]">
-                  {tenant.slug || '—'}
+              <label className="block text-sm font-medium text-[#222222] mb-2">
+                Workspace URL <span className="text-[#c13515]">*</span>
+              </label>
+              <div className="flex w-full overflow-hidden rounded-lg border border-[#dddddd] bg-[#f7f7f7]">
+                <div className="px-4 py-2 text-[#6a6a6a] whitespace-nowrap">
+                  {WORKSPACE_BASE_URL}
                 </div>
-                <span className="text-sm text-[#929292]">.backtrack.com</span>
+                <div className="h-auto w-px bg-[#dddddd]" />
+                <input
+                  value={tenant.slug || ''}
+                  readOnly
+                  className="min-w-0 flex-1 bg-transparent px-4 py-2 text-[#222222] outline-none"
+                  placeholder="org-slug"
+                />
               </div>
             </div>
 
@@ -269,6 +345,18 @@ export function OrganizationDetailPage() {
                 </span>
                 <div className="w-full pl-12 pr-4 py-2 border border-[#dddddd] rounded-lg bg-[#f7f7f7] text-[#222222]">
                   {tenant.phone || '—'}
+                </div>
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-[#222222] mb-2">Contact Email</label>
+              <div className="relative">
+                <span className="absolute left-4 top-1/2 -translate-y-1/2 text-[#929292]">
+                  <Mail className="w-4 h-4" />
+                </span>
+                <div className="w-full pl-12 pr-4 py-2 border border-[#dddddd] rounded-lg bg-[#f7f7f7] text-[#222222]">
+                  {tenant.contactEmail || '—'}
                 </div>
               </div>
             </div>
@@ -294,57 +382,98 @@ export function OrganizationDetailPage() {
         </div>
 
         {/* Cards Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div className={`grid grid-cols-1 ${tenant.usageOverview ? 'lg:grid-cols-2' : ''} gap-6`}>
           {/* Subscription Plan Card */}
           {tenant.subscriptionPlan && (
-            <div className="bg-white rounded-[14px] border border-[#dddddd] p-6">
-              <h2 className="text-lg font-semibold text-[#222222] mb-4">Subscription Plan</h2>
-              <div className="space-y-4">
-                <div>
-                  <p className="text-sm text-[#6a6a6a] mb-1">CURRENT TIER</p>
-                  <p className="text-xl font-bold text-[#222222]">
-                    {tenant.subscriptionPlan.tier}
-                  </p>
-                </div>
-                <div className="flex items-center gap-2">
-                  <CheckCircle2
-                    className={`w-5 h-5 ${getSubscriptionStatusColor(tenant.subscriptionPlan.status)}`}
-                  />
-                  <span className={`font-medium ${getSubscriptionStatusColor(tenant.subscriptionPlan.status)}`}>
-                    {tenant.subscriptionPlan.status}
-                  </span>
-                </div>
-                <div className="flex items-center gap-2 text-[#6a6a6a]">
-                  <Calendar className="w-4 h-4" />
-                  <span className="text-sm">
-                    Renewal: {formatDate(tenant.subscriptionPlan.renewalDate)}
-                  </span>
-                </div>
-
-                {(tenant.subscriptionPlan.billingCycle || tenant.subscriptionPlan.price || tenant.subscriptionPlan.quotasSummary) && (
-                  <div className="pt-2 border-t border-[#dddddd]">
-                    <div className="flex flex-wrap gap-x-6 gap-y-2 text-sm text-[#6a6a6a]">
-                      {tenant.subscriptionPlan.billingCycle && (
-                        <div>Billing: <span className="font-medium text-[#222222]">{tenant.subscriptionPlan.billingCycle}</span></div>
-                      )}
-                      {tenant.subscriptionPlan.price && (
-                        <div>
-                          Price: <span className="font-medium text-[#222222]">${tenant.subscriptionPlan.price.amount.toFixed(2)}</span>/{tenant.subscriptionPlan.price.period}
-                        </div>
-                      )}
-                      {tenant.subscriptionPlan.quotasSummary && (
-                        <div>
-                          Limits: <span className="font-medium text-[#222222]">{tenant.subscriptionPlan.quotasSummary.activeUsersLimit} users</span> / <span className="font-medium text-[#222222]">{tenant.subscriptionPlan.quotasSummary.storageLimitGB}GB</span>
-                        </div>
-                      )}
-                    </div>
+            <div className={`bg-white rounded-[14px] border border-[#dddddd] p-6 ${tenant.usageOverview ? '' : 'lg:col-span-2'}`}>
+              <div className="flex items-start justify-between gap-4">
+                <div className="min-w-0">
+                  <div className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[#929292]">
+                    Subscription
                   </div>
-                )}
+                  <div className="mt-1 flex flex-wrap items-center gap-2">
+                    <h2 className="text-lg font-semibold text-[#222222] truncate">
+                      {tenant.subscriptionPlan.tier}
+                    </h2>
+                    <span
+                      className={[
+                        'inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs font-semibold',
+                        tenant.subscriptionPlan.status === 'Active'
+                          ? 'bg-[#e8f9f0] text-[#06c167] border-[#06c167]/20'
+                          : tenant.subscriptionPlan.status === 'PastDue' || tenant.subscriptionPlan.status === 'Unpaid'
+                            ? 'bg-[#fff8e6] text-[#c97a00] border-[#c97a00]/20'
+                            : 'bg-[#f7f7f7] text-[#6a6a6a] border-[#dddddd]',
+                      ].join(' ')}
+                    >
+                      <span className="h-1.5 w-1.5 rounded-full bg-current opacity-70" />
+                      {tenant.subscriptionPlan.status}
+                    </span>
+                  </div>
+                </div>
 
-                <p className="text-sm text-[#6a6a6a] pt-2 border-t border-[#dddddd]">
+                <div
+                  className={[
+                    'shrink-0 rounded-[12px] border px-3 py-2 text-right',
+                    'bg-[#f7f7f7] border-[#ebebeb]',
+                  ].join(' ')}
+                >
+                  <div className="text-sm font-semibold text-[#222222] whitespace-nowrap">
+                    <span className="text-[#6a6a6a] font-medium">Price:</span>{' '}
+                    {tenant.subscriptionPlan.price
+                      ? `${tenant.subscriptionPlan.price.amount.toFixed(2)}${tenant.subscriptionPlan.price?.period ? `/${tenant.subscriptionPlan.price.period}` : ''}`
+                      : 'Free'}
+                  </div>
+                </div>
+              </div>
+
+              <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div className="rounded-[12px] border border-[#ebebeb] bg-white px-4 py-3">
+                  <div className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[#929292]">
+                    Billing cycle
+                  </div>
+                  <div className="mt-1 text-sm font-semibold text-[#222222]">
+                    {tenant.subscriptionPlan.billingCycle || '—'}
+                  </div>
+                </div>
+                <div className="rounded-[12px] border border-[#ebebeb] bg-white px-4 py-3">
+                  <div className="flex items-center justify-between gap-2">
+                    <div className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[#929292]">
+                      Renewal
+                    </div>
+                    <Calendar className="w-4 h-4 text-[#929292]" />
+                  </div>
+                  <div className="mt-1 text-sm font-semibold text-[#222222]">
+                    {tenant.subscriptionPlan.renewalDate ? formatDate(tenant.subscriptionPlan.renewalDate) : '—'}
+                  </div>
+                </div>
+              </div>
+
+              {tenant.subscriptionPlan.includedFeatures?.length ? (
+                <div className="mt-4 pt-4 border-t border-[#ebebeb]">
+                  <div className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[#929292] mb-2">
+                    Included features
+                  </div>
+                  <div className="flex flex-wrap gap-2">
+                    {tenant.subscriptionPlan.includedFeatures.slice(0, 8).map((f: any) => (
+                      <span
+                        key={String(f)}
+                        className="inline-flex items-center rounded-full border border-[#dddddd] bg-[#f7f7f7] px-3 py-1 text-xs font-medium text-[#222222]"
+                      >
+                        {String(f)}
+                      </span>
+                    ))}
+                    {tenant.subscriptionPlan.includedFeatures.length > 8 ? (
+                      <span className="inline-flex items-center rounded-full border border-[#dddddd] bg-white px-3 py-1 text-xs font-medium text-[#6a6a6a]">
+                        +{tenant.subscriptionPlan.includedFeatures.length - 8} more
+                      </span>
+                    ) : null}
+                  </div>
+                </div>
+              ) : tenant.subscriptionPlan.description ? (
+                <p className="mt-4 pt-4 border-t border-[#ebebeb] text-sm text-[#6a6a6a]">
                   {tenant.subscriptionPlan.description}
                 </p>
-              </div>
+              ) : null}
             </div>
           )}
 
@@ -430,33 +559,56 @@ export function OrganizationDetailPage() {
           )}
         </div>
 
-        {tenant.billingHistory && tenant.billingHistory.length > 0 && (
-          <div className="mt-6 bg-white rounded-[14px] border border-[#dddddd] p-6">
-            <h2 className="text-lg font-semibold text-[#222222] mb-4">Billing History</h2>
-            <div className="overflow-x-auto">
-              <table className="min-w-[600px] w-full text-sm">
-                <thead>
-                  <tr className="bg-[#f7f7f7] text-left text-[#6a6a6a] uppercase text-xs font-bold tracking-wider border-b border-[#dddddd]">
-                    <th className="font-medium py-2 ps-2">Invoice</th>
-                    <th className="font-medium py-2 ps-2">Date</th>
-                    <th className="font-medium py-2 ps-2">Amount</th>
-                    <th className="font-medium py-2">Status</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {tenant.billingHistory.slice(0, 6).map((inv) => (
+        <div className="mt-6 bg-white rounded-[14px] border border-[#dddddd] p-6">
+          <h2 className="text-lg font-semibold text-[#222222] mb-4">Billing History</h2>
+          <div className="overflow-x-auto">
+            <table className="min-w-[600px] w-full text-sm">
+              <thead>
+                <tr className="bg-[#f7f7f7] text-left text-[#6a6a6a] uppercase text-xs font-bold tracking-wider border-b border-[#dddddd]">
+                  <th className="font-medium py-2 ps-2">Invoice</th>
+                  <th className="font-medium py-2 ps-2">Date</th>
+                  <th className="font-medium py-2 ps-2">Amount</th>
+                  <th className="font-medium py-2">Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                {tenant.billingHistory && tenant.billingHistory.length > 0 ? (
+                  tenant.billingHistory.slice(0, 6).map((inv: any) => (
                     <tr key={inv.id} className="border-t border-[#dddddd]">
-                      <td className="py-3 pr-4 text-[#6a6a6a]">{inv.id}</td>
+                      <td className="py-3 pr-4 text-[#6a6a6a]">
+                        {inv.invoiceUrl ? (
+                          <a className="text-[#ff385c] hover:text-[#e00b41]" href={inv.invoiceUrl} target="_blank" rel="noreferrer">
+                            {inv.id}
+                          </a>
+                        ) : (
+                          inv.id
+                        )}
+                      </td>
                       <td className="py-3 pr-4 text-[#6a6a6a]">{formatDate(inv.invoiceDate)}</td>
-                      <td className="py-3 pr-4 text-[#6a6a6a]">${inv.amount.toFixed(2)} {inv.currency}</td>
-                      <td className="py-3 text-[#6a6a6a]">{inv.status}</td>
+                      <td className="py-3 pr-4 text-[#6a6a6a]">{inv.amount.toFixed(2)} {inv.currency}</td>
+                      <td className="py-3">
+                        <span
+                          className={[
+                            'inline-flex items-center rounded-full border px-2.5 py-1 text-xs font-semibold',
+                            getPaymentStatusBadgeClass(inv.status),
+                          ].join(' ')}
+                        >
+                          {inv.status ?? '—'}
+                        </span>
+                      </td>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+                  ))
+                ) : (
+                  <tr className="border-t border-[#dddddd]">
+                    <td className="py-8 text-center text-[#929292]" colSpan={4}>
+                      No billing records yet.
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
           </div>
-        )}
+        </div>
 
         {tenant.members && tenant.members.length > 0 && (
           <div className="mt-6 bg-white rounded-[14px] border border-[#dddddd] p-6">
@@ -473,7 +625,7 @@ export function OrganizationDetailPage() {
                   </tr>
                 </thead>
                 <tbody>
-                  {tenant.members.slice(0, 6).map((m) => (
+                  {tenant.members.slice(0, 6).map((m: any) => (
                     <tr key={m.id} className="border-t border-[#dddddd]">
                       <td className="py-3 pr-4 text-[#6a6a6a]">{m.name}</td>
                       <td className="py-3 pr-4 text-[#6a6a6a]">{m.email}</td>
@@ -489,6 +641,16 @@ export function OrganizationDetailPage() {
             </div>
           </div>
         )}
+
+        <div className="mt-4 me-4 flex justify-end">
+          <Button
+            onClick={handleBack}
+            className="bg-[#ff385c] text-white border border-transparent hover:bg-white hover:text-[#ff385c] hover:border-[#ff385c] transition-colors"
+          >
+            
+            Back
+          </Button>
+        </div>
       </div>
     </Layout>
   );
