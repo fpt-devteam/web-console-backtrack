@@ -1,5 +1,5 @@
 import { useNavigate } from "@tanstack/react-router";
-import { Download, Plus } from "lucide-react";
+import { Plus } from "lucide-react";
 
 export const InventoryCtaButton = ({ addItemUrl }: { addItemUrl: string }) => {
   const navigate = useNavigate();

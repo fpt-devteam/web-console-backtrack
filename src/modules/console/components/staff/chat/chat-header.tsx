@@ -11,17 +11,17 @@ interface ChatHeaderProps {
 
 export function ChatHeader({ partnerName, avatarUrl, isResolved, isResolvePending, onResolve }: ChatHeaderProps) {
   return (
-    <div className="flex-shrink-0 px-5 py-3 border-b border-[#dddddd] flex items-center justify-between bg-white">
-      <div className="flex items-center gap-3">
+    <div className="flex-shrink-0 px-5 py-5 border-b border-[#dddddd] flex items-center justify-between bg-white">
+      <div className="flex items-center gap-4">
         <div className="relative">
-          <Avatar url={avatarUrl} name={partnerName} className="w-10 h-10 rounded-full" />
+          <Avatar url={avatarUrl} name={partnerName} className="w-12 h-12 rounded-full" />
           {!isResolved && (
-            <span className="absolute bottom-0 right-0 w-2.5 h-2.5 bg-green-500 border-2 border-white rounded-full" />
+            <span className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 border-2 border-white rounded-full" />
           )}
         </div>
         <div>
-          <h3 className="font-semibold text-[#222222] text-sm leading-tight">{partnerName}</h3>
-          <p className={`text-xs font-medium ${isResolved ? 'text-[#929292]' : 'text-[#06c167]'}`}>
+          <h3 className="font-semibold text-ink text-base leading-tight">{partnerName}</h3>
+          <p className={`text-sm font-medium ${isResolved ? 'text-mute' : 'text-[#06c167]'}`}>
             {isResolved ? 'Resolved' : 'Active now'}
           </p>
         </div>
@@ -30,12 +30,12 @@ export function ChatHeader({ partnerName, avatarUrl, isResolved, isResolvePendin
         <button
           onClick={onResolve}
           disabled={isResolvePending}
-          className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-white bg-green-500 rounded-full hover:bg-green-600 transition-colors disabled:opacity-60"
+          className="flex items-center gap-2 px-4 py-2 text-sm font-semibold text-white bg-green-500 rounded-full hover:bg-green-600 transition-colors disabled:opacity-60"
         >
           {isResolvePending ? (
-            <Loader2 className="w-3.5 h-3.5 animate-spin" />
+            <Loader2 className="w-4 h-4 animate-spin" />
           ) : (
-            <CheckCircle2 className="w-3.5 h-3.5" />
+            <CheckCircle2 className="w-4 h-4" />
           )}
           Resolve
         </button>

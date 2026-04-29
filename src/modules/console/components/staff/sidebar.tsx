@@ -40,7 +40,7 @@ function getInitials(name: string | null | undefined): string {
 }
 
 const ITEM_CLS =
-  'text-[#6a6a6a] hover:bg-[#f7f7f7] hover:text-[#222222] data-[active=true]:bg-[#fff0f2] data-[active=true]:text-[#ff385c]'
+  'text-base text-charcoal hover:bg-cloud data-[active=true]:bg-[#fff0f2] data-[active=true]:text-rausch'
 
 const NAV_ITEMS = [
   {
@@ -107,33 +107,28 @@ function StaffSidebarInner() {
   return (
     <>
       {/* Header — org logo + name (dashboard-01 SidebarMenu pattern) */}
-      <SidebarHeader className="border-b border-[#dddddd]">
+      <SidebarHeader className="border-b border-hairline py-4">
         <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton
               size="lg"
               tooltip={org?.name ?? 'Staff'}
               asChild
-              className="hover:bg-[#f7f7f7] text-[#222222]"
+              className="hover:bg-cloud text-ink"
             >
               <Link to="/console/$slug/staff/inventory" params={{ slug }}>
                 <OrgLogo
                   logoUrl={org?.logoUrl}
                   alt={org?.name ?? 'Organization'}
-                  className="h-8 w-8 flex-shrink-0"
+                  className="h-11 w-11 flex-shrink-0"
                 />
                 <div className="flex flex-col min-w-0">
                   <span
-                    className="font-semibold text-[15px] text-[#222222] truncate leading-tight"
+                    className="font-semibold text-base text-ink leading-tight"
                     title={org?.name}
                   >
                     {org?.name ?? 'Staff'}
                   </span>
-                  {org && (
-                    <span className="text-xs text-[#929292] truncate" title={org.slug}>
-                      {org.slug}
-                    </span>
-                  )}
                 </div>
               </Link>
             </SidebarMenuButton>
@@ -167,7 +162,7 @@ function StaffSidebarInner() {
       </SidebarContent>
 
       {/* Footer — user dropdown (NavUser pattern) */}
-      <SidebarFooter className="border-t border-[#dddddd]">
+      <SidebarFooter className="border-t border-[#dddddd] py-4">
         <SidebarMenu>
           <SidebarMenuItem>
             <DropdownMenu>
@@ -181,10 +176,10 @@ function StaffSidebarInner() {
                     {userInitials}
                   </div>
                   <div className="flex flex-col min-w-0 flex-1">
-                    <span className="text-sm font-medium text-[#222222] truncate leading-tight">
+                    <span className="text-base font-medium text-ink truncate leading-tight">
                       {userDisplayName}
                     </span>
-                    <span className="text-xs text-[#929292]">Staff</span>
+                    <span className="text-sm text-mute">Staff</span>
                   </div>
                   <ChevronsUpDown className="ml-auto w-4 h-4 text-[#929292] flex-shrink-0" />
                 </SidebarMenuButton>
@@ -192,8 +187,8 @@ function StaffSidebarInner() {
               <DropdownMenuContent
                 side="top"
                 align="end"
-                sideOffset={4}
-                className="w-56 rounded-xl"
+                sideOffset={16}
+                className="w-56 rounded-xl border-hairline"
               >
                 <DropdownMenuLabel className="text-sm font-medium text-[#222222] truncate">
                   {userDisplayName}
