@@ -2,7 +2,6 @@ import { useState } from 'react'
 import { StaffLayout } from '../../components/staff'
 import { IntakeHistory } from './history-tabs/intake-history'
 import { HandoverHistory } from './history-tabs/handover-history'
-import { SiteHeader } from '@/components/layout/site-header'
 
 type Tab = 'intake' | 'handover'
 
@@ -16,12 +15,12 @@ export function StaffProcessingHistoryPage() {
 
   return (
     <StaffLayout>
-      <SiteHeader crumbs={[{ label: 'Handling History' }]} />
+      <div className="h-full overflow-y-auto flex flex-col">
+        <div className="p-4 sm:p-6 lg:p-8 flex-1 flex flex-col min-h-0">
+          <h1 className="text-2xl font-bold text-black">Handling History</h1>
 
-      <div className="p-4 sm:p-6 lg:p-8">
-        {/* Airbnb-style underline tab strip */}
-        <div className="border-b border-[#dddddd] mb-6">
-          <div className="flex items-center gap-6">
+          {/* Tabs (match Inventory status tabs UI) */}
+          <div className="flex gap-2 my-4">
             {TABS.map(({ value, label }) => {
               const active = tab === value
               return (
@@ -30,25 +29,23 @@ export function StaffProcessingHistoryPage() {
                   type="button"
                   onClick={() => setTab(value)}
                   className={[
-                    'relative whitespace-nowrap py-3 text-sm font-medium transition-colors',
-                    active ? 'text-[#222222]' : 'text-[#6a6a6a] hover:text-[#222222]',
+                    'px-4 py-2 rounded-lg border text-sm font-medium transition-all whitespace-nowrap active:scale-[0.97]',
+                    active
+                      ? 'border-primary text-primary bg-white shadow-sm'
+                      : 'border-hairline text-ash bg-white hover:bg-neutral-50 hover:border-ink hover:text-ink transition-colors',
                   ].join(' ')}
                 >
                   {label}
-                  <span
-                    className={[
-                      'absolute left-0 right-0 -bottom-px h-0.5 rounded-full transition-colors',
-                      active ? 'bg-[#222222]' : 'bg-transparent',
-                    ].join(' ')}
-                  />
                 </button>
               )
             })}
           </div>
-        </div>
 
-        {tab === 'intake' && <IntakeHistory />}
-        {tab === 'handover' && <HandoverHistory />}
+          <div className="flex-1 flex flex-col min-h-0">
+            {tab === 'intake' && <IntakeHistory />}
+            {tab === 'handover' && <HandoverHistory />}
+          </div>
+        </div>
       </div>
     </StaffLayout>
   )

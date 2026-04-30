@@ -19,10 +19,14 @@ export type OrgReturnReportResult = {
   ownerInfo?: OwnerInfoPayload | null;
   /** Full post payload from BE (`PostResult`); used for history cards. */
   post?: InventoryItem | null;
+  evidenceImageUrls?: string[] | null;
 };
 
 export const returnReportService = {
-  async createOrgReturnReport(orgId: string, payload: { postId: string; ownerInfo?: OwnerInfoPayload | null }) {
+  async createOrgReturnReport(
+    orgId: string,
+    payload: { postId: string; ownerInfo?: OwnerInfoPayload | null; evidenceImageUrls: string[] },
+  ) {
     const { data } = await privateClient.post<ApiResponse<OrgReturnReportResult>>(
       `/api/core/return-reports/org/${orgId}`,
       payload,
@@ -37,7 +41,22 @@ export const returnReportService = {
       { params: { page, pageSize } },
     );
     if (!data.success) throw new Error(data.error?.message ?? 'Failed to fetch return reports');
-    return data.data;
+    // Normalise to our `PagedResponse` contract (some envs return `total` or `totalItems`).
+    const payload = data.data as unknown as {
+      items?: OrgReturnReportResult[]
+      page?: number
+      pageSize?: number
+      totalCount?: number
+      total?: number
+      totalItems?: number
+    }
+
+    return {
+      items: payload.items ?? [],
+      page: payload.page ?? page,
+      pageSize: payload.pageSize ?? pageSize,
+      totalCount: payload.totalCount ?? payload.total ?? payload.totalItems ?? 0,
+    }
   },
 };
 

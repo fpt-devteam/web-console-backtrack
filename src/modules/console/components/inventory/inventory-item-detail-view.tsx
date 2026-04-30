@@ -274,7 +274,6 @@ export function InventoryItemDetailView({
                 <div className="mt-2">
                   <DetailRow label="Created at" value={formatDateTimeOrDash(item.createdAt)} />
                   <DetailRow label="Receiving staff" value={formatOrDash(item.author?.displayName)} />
-                  <DetailRow label="Receiving staff ID" value={formatOrDash(item.author?.id)} />
                 </div>
               </div>
             ) : null}
@@ -300,8 +299,33 @@ export function InventoryItemDetailView({
                     <div className="mt-2">
                       <DetailRow label="Created at" value={formatDateTimeOrDash(returnReportForPost?.createdAt)} />
                       <DetailRow label="Releasing staff" value={formatOrDash(returnReportForPost?.staff?.displayName)} />
-                      <DetailRow label="Releasing staff ID" value={formatOrDash(returnReportForPost?.staff?.id)} />
                     </div>
+
+                    {(returnReportForPost?.evidenceImageUrls?.length ?? 0) > 0 ? (
+                      <>
+                        <SectionTitle title="Evidence photos" />
+                        <div className="mt-2 grid grid-cols-2 sm:grid-cols-3 gap-3">
+                          {(returnReportForPost.evidenceImageUrls ?? []).map((url: string, idx: number) => (
+                            <a
+                              key={`${url}:${idx}`}
+                              href={url}
+                              target="_blank"
+                              rel="noreferrer"
+                              className="block rounded-[10px] overflow-hidden border border-[#dddddd] hover:border-[#b0b0b0] transition-colors"
+                              title="Open image"
+                            >
+                              <img
+                                src={url}
+                                alt={`Evidence ${idx + 1}`}
+                                className="w-full h-28 object-contain bg-white"
+                                loading="lazy"
+                                decoding="async"
+                              />
+                            </a>
+                          ))}
+                        </div>
+                      </>
+                    ) : null}
                   </>
                 ) : (
                   <>

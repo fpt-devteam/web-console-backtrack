@@ -98,7 +98,7 @@ export function HandoverHistory() {
   }, [currentPage, totalPages])
 
   return (
-    <div className="space-y-6">
+    <div className="flex flex-col gap-6 min-h-full">
       <div className="flex items-center gap-2 flex-nowrap text-sm">
         <div className="relative flex-1 min-w-0">
           <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-[#b0b0b0]" />
@@ -152,9 +152,11 @@ export function HandoverHistory() {
         }}
       />
 
-      {!isLoading && totalCount > pageSize && (
-        <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={setCurrentPage} />
-      )}
+      <div className="mt-auto pt-2">
+        {!isLoading && totalCount > pageSize && (
+          <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={setCurrentPage} />
+        )}
+      </div>
 
       {!isLoading && (data?.items?.length ?? 0) >= FETCH_PAGE_SIZE && (
         <p className="text-xs text-amber-700 text-center">

@@ -22,6 +22,7 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
+  SidebarRail,
 } from '@/components/ui/sidebar'
 import {
   DropdownMenu,
@@ -108,7 +109,7 @@ function StaffSidebarInner() {
     <>
       {/* Header — org logo + name (dashboard-01 SidebarMenu pattern) */}
       <SidebarHeader className="border-b border-hairline py-4">
-        <SidebarMenu>
+        <SidebarMenu className="px-2">
           <SidebarMenuItem>
             <SidebarMenuButton
               size="lg"
@@ -123,10 +124,7 @@ function StaffSidebarInner() {
                   className="h-11 w-11 flex-shrink-0"
                 />
                 <div className="flex flex-col min-w-0">
-                  <span
-                    className="font-semibold text-base text-ink leading-tight"
-                    title={org?.name}
-                  >
+                  <span className="font-semibold text-base text-ink leading-tight" title={org?.name}>
                     {org?.name ?? 'Staff'}
                   </span>
                 </div>
@@ -222,6 +220,7 @@ export function StaffSidebar() {
   return (
     <Sidebar collapsible="icon" className="border-r border-[#dddddd] bg-white">
       <StaffSidebarInner />
+      <SidebarRail />
     </Sidebar>
   )
 }

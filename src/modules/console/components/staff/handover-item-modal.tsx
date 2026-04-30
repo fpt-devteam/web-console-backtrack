@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -8,6 +8,9 @@ import { showToast } from '@/lib/toast'
 import { AdminModal } from '@/modules/console/components/admin/AdminModal'
 import { useOrganization } from '@/hooks/use-org'
 import type { FinderContactField } from '@/types/organization.types'
+import { InventoryPhotosPicker } from '@/modules/console/components/inventory/inventory-photos-picker'
+import { collectInventoryImageUrls, reorderList, revokeObjectUrls, type InventoryPhotoPreview } from '@/utils/inventory-photos'
+import { uploadInventoryImage } from '@/services/storage.service'
 
 export function HandoverItemModal({
   open,
@@ -32,6 +35,11 @@ export function HandoverItemModal({
   const [recipientInternalId, setRecipientInternalId] = useState('')
   const [recipientPhone, setRecipientPhone] = useState('')
 
+  const MAX_EVIDENCE_PHOTOS = 4
+  const [evidencePreviews, setEvidencePreviews] = useState<InventoryPhotoPreview[]>([])
+  const evidencePreviewsRef = useRef<InventoryPhotoPreview[]>([])
+  const uploadedUrlByFileKeyRef = useRef<Map<string, string>>(new Map())
+
   const staffName = me?.name ?? me?.displayName ?? me?.email ?? '—'
   const staffId = me?.id ?? '—'
 
@@ -46,10 +54,49 @@ export function HandoverItemModal({
     return null
   }
 
+  useEffect(() => {
+    evidencePreviewsRef.current = evidencePreviews
+  }, [evidencePreviews])
+
+  useEffect(() => {
+    return () => {
+      revokeObjectUrls(evidencePreviewsRef.current)
+    }
+  }, [])
+
+  const handlePickEvidencePhotos = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files
+    if (!files) return
+
+    const remaining = MAX_EVIDENCE_PHOTOS - evidencePreviews.length
+    if (remaining <= 0) return
+
+    const next = Array.from(files)
+      .slice(0, remaining)
+      .map((file) => ({ file, url: URL.createObjectURL(file), isExisting: false }))
+
+    setEvidencePreviews((prev) => [...prev, ...next])
+    e.target.value = ''
+  }
+
+  const removeEvidencePhoto = (index: number) => {
+    setEvidencePreviews((prev) => {
+      const target = prev[index]
+      if (target && !target.isExisting) {
+        try {
+          URL.revokeObjectURL(target.url)
+        } catch {
+          // ignore
+        }
+      }
+      return prev.filter((_, i) => i !== index)
+    })
+  }
+
   return (
     <AdminModal open={open} title={title} onClose={onClose}>
       <form
-        className="space-y-4"
+        className="space-y-3"
         onSubmit={(e) => {
           e.preventDefault()
           if (!orgId) {
@@ -63,30 +110,58 @@ export function HandoverItemModal({
             return
           }
 
-          createReturnReport.mutate(
-            {
-              orgId,
-              postId,
-              ownerInfo: {
-                ownerName: recipientFullName.trim() || null,
-                email: recipientEmail.trim() || null,
-                phone: recipientPhone.trim() || null,
-                nationalId: recipientNationalId.trim() || null,
-                orgMemberId: recipientInternalId.trim() || null,
-              },
-            },
-            {
-              onSuccess: () => {
-                showToast.success('Handover saved')
-                onClose()
-              },
-              onError: (err) => {
-                showToast.error(err instanceof Error ? err.message : 'Failed to save handover')
-              },
-            },
-          )
+          ;(async () => {
+            try {
+              const evidenceImageUrls = await collectInventoryImageUrls({
+                previews: evidencePreviews,
+                cacheByFileKey: uploadedUrlByFileKeyRef.current,
+                upload: (file) => uploadInventoryImage(orgId, file),
+              })
+
+              createReturnReport.mutate(
+                {
+                  orgId,
+                  postId,
+                  evidenceImageUrls,
+                  ownerInfo: {
+                    ownerName: recipientFullName.trim() || null,
+                    email: recipientEmail.trim() || null,
+                    phone: recipientPhone.trim() || null,
+                    nationalId: recipientNationalId.trim() || null,
+                    orgMemberId: recipientInternalId.trim() || null,
+                  },
+                },
+                {
+                  onSuccess: () => {
+                    showToast.success('Handover saved')
+                    onClose()
+                  },
+                  onError: (err) => {
+                    showToast.error(err instanceof Error ? err.message : 'Failed to save handover')
+                  },
+                },
+              )
+            } catch (err) {
+              showToast.error(err instanceof Error ? err.message : 'Failed to upload evidence photos')
+            }
+          })()
         }}
       >
+        <div className="space-y-1">
+          <div className="text-sm font-semibold text-[#222222]">EVIDENCE PHOTOS</div>
+        </div>
+
+        <InventoryPhotosPicker
+          photoPreviews={evidencePreviews}
+          maxPhotos={MAX_EVIDENCE_PHOTOS}
+          onPickPhotos={handlePickEvidencePhotos}
+          onRemovePhoto={removeEvidencePhoto}
+          onReorderPhotos={(from, to) => setEvidencePreviews((prev) => reorderList(prev, from, to))}
+          isAnalyzing={false}
+          onAnalyze={() => {}}
+          showAnalyze={false}
+        />
+
         <div className="space-y-1">
           <div className="text-sm font-semibold text-[#222222]">RECIPIENT INFORMATION</div>
         </div>

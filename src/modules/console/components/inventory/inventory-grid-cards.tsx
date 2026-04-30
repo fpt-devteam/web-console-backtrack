@@ -108,16 +108,6 @@ export function InventoryGridCards({
                   <span className="text-xs font-medium">No image</span>
                 </div>
               )}
-              {/* Post type badge */}
-              <span
-                className={`absolute top-2.5 left-2.5 px-2 py-0.5 rounded-full text-[11px] font-semibold ${
-                  item.postType === 'Lost'
-                    ? 'bg-[#fff3e0] text-[#e65100]'
-                    : 'bg-[#e8f5e9] text-[#2e7d32]'
-                }`}
-              >
-                {item.postType === 'Lost' ? 'Lost' : 'Found'}
-              </span>
             </div>
 
             {/* Body */}

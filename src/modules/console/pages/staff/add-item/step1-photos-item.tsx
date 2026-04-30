@@ -6,6 +6,22 @@ import type { InventorySubcategory, ItemCategory } from '@/services/inventory.se
 import { ChevronRight } from 'lucide-react'
 import { InventoryPhotosPicker } from '@/modules/console/components/inventory/inventory-photos-picker'
 
+function toDateTimeLocalFromIso(iso: string): string {
+  try {
+    const d = new Date(iso)
+    if (Number.isNaN(d.getTime())) return ''
+    const pad = (n: number) => String(n).padStart(2, '0')
+    const yyyy = d.getFullYear()
+    const mm = pad(d.getMonth() + 1)
+    const dd = pad(d.getDate())
+    const hh = pad(d.getHours())
+    const min = pad(d.getMinutes())
+    return `${yyyy}-${mm}-${dd}T${hh}:${min}`
+  } catch {
+    return ''
+  }
+}
+
 function categoryLabel(c: ItemCategory): string {
   switch (c) {
     case 'PersonalBelongings':
@@ -238,7 +254,7 @@ export function Step1PhotosAndItem({
             <Input
               id="eventTime"
               type="datetime-local"
-              value={eventTime ? new Date(eventTime).toISOString().slice(0, 16) : ''}
+              value={eventTime ? toDateTimeLocalFromIso(eventTime) : ''}
               onChange={(e) => {
                 const v = e.target.value
                 if (!v) {

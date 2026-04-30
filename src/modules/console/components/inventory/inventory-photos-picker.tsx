@@ -16,6 +16,7 @@ export function InventoryPhotosPicker({
   onAnalyze,
   analyzeDisabled,
   analyzeHint,
+  showAnalyze = true,
 }: {
   photoPreviews: InventoryPhotosPickerPreview[]
   maxPhotos: number
@@ -26,6 +27,7 @@ export function InventoryPhotosPicker({
   onAnalyze: () => void
   analyzeDisabled?: boolean
   analyzeHint?: string
+  showAnalyze?: boolean
 }) {
   return (
     <div>
@@ -90,21 +92,23 @@ export function InventoryPhotosPicker({
         ) : null}
       </div>
 
-      <div className="mt-4">
-        <button
-          type="button"
-          onClick={onAnalyze}
-          disabled={Boolean(analyzeDisabled) || isAnalyzing}
-          title={analyzeHint}
-          className={cx(
-            'flex w-full sm:w-auto items-center justify-center gap-2 px-4 py-1.5 border border-[#dddddd] rounded-[8px] text-[#222222] transition-all font-medium text-sm hover:bg-[#f7f7f7] hover:scale-[1.03] active:scale-[0.92]',
-            'disabled:opacity-50 disabled:pointer-events-none disabled:hover:scale-100',
-          )}
-        >
-          {isAnalyzing ? <Loader2 className="h-4 w-4 animate-spin shrink-0" /> : <Sparkles className="h-4 w-4 shrink-0" />}
-          Analyze
-        </button>
-      </div>
+      {showAnalyze ? (
+        <div className="mt-4">
+          <button
+            type="button"
+            onClick={onAnalyze}
+            disabled={Boolean(analyzeDisabled) || isAnalyzing}
+            title={analyzeHint}
+            className={cx(
+              'flex w-full sm:w-auto items-center justify-center gap-2 px-4 py-1.5 border border-[#dddddd] rounded-[8px] text-[#222222] transition-all font-medium text-sm hover:bg-[#f7f7f7] hover:scale-[1.03] active:scale-[0.92]',
+              'disabled:opacity-50 disabled:pointer-events-none disabled:hover:scale-100',
+            )}
+          >
+            {isAnalyzing ? <Loader2 className="h-4 w-4 animate-spin shrink-0" /> : <Sparkles className="h-4 w-4 shrink-0" />}
+            Analyze
+          </button>
+        </div>
+      ) : null}
     </div>
   )
 }

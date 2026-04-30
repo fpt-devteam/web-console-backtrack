@@ -43,8 +43,8 @@ export function StaffInventoryPage() {
 
   return (
     <StaffLayout>
-      <div className="h-full overflow-y-auto">
-        <div className="p-4 sm:p-6 lg:p-8 space-y-4">
+      <div className="h-full overflow-y-auto flex flex-col">
+        <div className="p-4 sm:p-6 lg:p-8 flex-1 flex flex-col gap-4">
 
           {/* Header */}
           <h1 className="text-2xl font-bold text-black">Inventory</h1>
@@ -100,13 +100,15 @@ export function StaffInventoryPage() {
           />
 
           {/* Pagination */}
-          {!isLoading && totalCount > pageSize && (
-            <Pagination
-              currentPage={listState.currentPage}
-              totalPages={totalPages}
-              onPageChange={listState.setCurrentPage}
-            />
-          )}
+          <div className="mt-auto pt-2">
+            {!isLoading && totalCount > pageSize && (
+              <Pagination
+                currentPage={listState.currentPage}
+                totalPages={totalPages}
+                onPageChange={listState.setCurrentPage}
+              />
+            )}
+          </div>
 
         </div>
       </div>

@@ -414,7 +414,22 @@ export const inventoryService = {
       body,
     )
     if (!data.success) throw new Error(data.error?.message ?? 'Failed to fetch inventory')
-    return data.data
+
+    const payload = data.data as unknown as {
+      items?: InventoryListItem[]
+      page?: number
+      pageSize?: number
+      totalCount?: number
+      total?: number
+      totalItems?: number
+    }
+
+    return {
+      items: payload.items ?? [],
+      page: payload.page ?? body.page ?? 1,
+      pageSize: payload.pageSize ?? body.pageSize ?? 10,
+      totalCount: payload.totalCount ?? payload.total ?? payload.totalItems ?? 0,
+    }
   },
 
   async getById(orgId: string, id: string): Promise<InventoryItem> {

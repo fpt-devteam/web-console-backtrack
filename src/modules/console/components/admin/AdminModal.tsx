@@ -37,7 +37,7 @@ export function AdminModal({
           role="dialog"
           aria-modal="true"
           aria-label={title}
-          className="w-full max-w-lg sm:max-w-xl lg:max-w-2xl xl:max-w-3xl 2xl:max-w-4xl bg-white rounded-[14px] border border-[#dddddd] overflow-hidden"
+          className="w-full max-w-lg sm:max-w-xl lg:max-w-2xl xl:max-w-4xl 2xl:max-w-6xl bg-white rounded-[14px] border border-[#dddddd] overflow-hidden"
         >
           <div className="px-5 py-4 sm:px-6 border-b border-[#ebebeb] flex items-center justify-between">
             <h2 className="text-base sm:text-lg font-semibold text-[#222222]">{title}</h2>
