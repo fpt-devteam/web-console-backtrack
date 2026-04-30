@@ -9,7 +9,6 @@ export type InventoryAuthorOption = ChipOption
 const POST_TYPE_OPTIONS: Array<ChipOption> = [
   { value: 'All', label: 'All types' },
   { value: 'Found', label: 'Found' },
-  { value: 'Lost', label: 'Lost' },
 ]
 
 const CATEGORY_OPTIONS: Array<ChipOption> = [

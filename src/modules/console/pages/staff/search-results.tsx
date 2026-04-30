@@ -28,6 +28,7 @@ export function SearchResultsPage() {
     query: searchTerm,
     page: currentPage,
     pageSize,
+    postType: 'Found',
   })
   const { data: subcategories } = useSubcategories()
   const subcategoryNameById = (subcategories ?? []).reduce<Record<string, string>>((acc, s) => {

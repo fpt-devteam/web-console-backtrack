@@ -20,11 +20,8 @@ const STATUSES: Array<{ key: PostStatus; label: string }> = [
 ]
 
 // Dark = org-wide  /  Light = personal
-// Orange family = Lost  /  Blue family = Found
 const SERIES = [
-  { key: 'orgLost',   name: 'Org · Lost',   color: '#e65100' },
   { key: 'orgFound',  name: 'Org · Found',  color: '#1976D2' },
-  { key: 'mineLost',  name: 'Mine · Lost',  color: '#FF8A65' },
   { key: 'mineFound', name: 'Mine · Found', color: '#64B5F6' },
 ] as const
 
@@ -43,14 +40,10 @@ interface Props {
 export function PostStatusBreakdownChart({ data }: Props) {
   const chartData = STATUSES.map(({ key, label }) => ({
     status: label,
-    orgLost:   pct(data.org.lost,   key),
     orgFound:  pct(data.org.found,  key),
-    mineLost:  pct(data.mine.lost,  key),
     mineFound: pct(data.mine.found, key),
     // raw counts for tooltip
-    orgLostCount:   count(data.org.lost,   key),
     orgFoundCount:  count(data.org.found,  key),
-    mineLostCount:  count(data.mine.lost,  key),
     mineFoundCount: count(data.mine.found, key),
   }))
 
@@ -59,7 +52,7 @@ export function PostStatusBreakdownChart({ data }: Props) {
       <div className="mb-4">
         <h2 className="text-sm font-semibold text-[#222222]">Post Status Breakdown</h2>
         <p className="text-xs text-[#929292] mt-0.5">
-          % of Lost &amp; Found posts per status — org-wide vs. mine
+          % of Found posts per status — org-wide vs. mine
         </p>
       </div>
 

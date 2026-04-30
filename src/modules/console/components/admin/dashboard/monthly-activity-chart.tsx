@@ -14,7 +14,6 @@ interface MonthlyActivityChartProps {
 }
 
 const SERIES = [
-  { key: 'lost',     label: 'Lost',     color: '#c97a00', gradientId: 'gLost'     },
   { key: 'found',    label: 'Found',    color: '#2471A3', gradientId: 'gFound'    },
   { key: 'returned', label: 'Returned', color: '#06c167', gradientId: 'gReturned' },
 ] as const
@@ -24,7 +23,7 @@ export function MonthlyActivityChart({ data }: MonthlyActivityChartProps) {
     <div className="bg-white rounded-2xl border border-[#dddddd] p-5">
       <div className="mb-4">
         <h2 className="text-sm font-semibold text-[#222222]">Monthly Activity — Last 12 Months</h2>
-        <p className="text-xs text-[#929292] mt-0.5">Lost &amp; Found posts logged vs items returned</p>
+        <p className="text-xs text-[#929292] mt-0.5">Found posts logged vs items returned</p>
       </div>
 
       <ResponsiveContainer width="100%" height={220}>

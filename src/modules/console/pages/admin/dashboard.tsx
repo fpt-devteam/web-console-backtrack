@@ -77,9 +77,9 @@ export function AdminDashboardPage() {
             iconColor="text-[#06c167]"
           />
           <StatCard
-            label="Lost Posts"
-            value={stats?.lostPosts ?? '—'}
-            sub={`${stats?.foundPosts ?? 0} found posts`}
+            label="Found Posts"
+            value={stats?.foundPosts ?? '—'}
+            sub={`${stats?.lostPosts ?? 0} lost posts`}
             icon={MapPin}
             iconBg="bg-[#fff8e6]"
             iconColor="text-[#c97a00]"

@@ -1,7 +1,7 @@
 import { StaffLayout } from '../../components/staff/layout'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { ChevronRight, Check } from 'lucide-react'
-import { Link, useNavigate, useParams, useSearch } from '@tanstack/react-router'
+import { Link, useNavigate, useParams } from '@tanstack/react-router'
 import { useCurrentOrgId } from '@/contexts/current-org.context'
 import { inventoryService } from '@/services/inventory.service'
 import type { ItemCategory, PostType } from '@/services/inventory.service'
@@ -135,7 +135,7 @@ function Stepper({
 export function AddItemPage() {
   const navigate = useNavigate()
   const { slug } = useParams({ strict: false }) as { slug: string }
-  const { type: postType = 'Found' } = useSearch({ strict: false }) as { type?: PostType }
+  const postType: PostType = 'Found'
   const { currentOrgId } = useCurrentOrgId()
   const createItem = useCreateInventoryItem(currentOrgId)
   const { data: me } = useUser()
@@ -686,14 +686,14 @@ export function AddItemPage() {
             </Link>
             <ChevronRight className="w-4 h-4" />
             <span className="text-[#222222] font-medium">
-              {postType === 'Lost' ? 'Add Lost Item' : 'Add Found Item'}
+              Add Found Item
             </span>
           </div>
 
           {/* Header */}
           <div className="mb-6">
             <h1 className="text-3xl font-bold text-[#222222]">
-              {postType === 'Lost' ? 'Add Lost Item' : 'Add Found Item'}
+              Add Found Item
             </h1>
           </div>
         </div>
