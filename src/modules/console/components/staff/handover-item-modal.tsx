@@ -174,7 +174,7 @@ export function HandoverItemModal({
             <Input
               id="recipientFullName"
               type="text"
-              placeholder="e.g. Morgan Lee"
+              placeholder="Morgan Lee"
               value={recipientFullName}
               onChange={(e) => setRecipientFullName(e.target.value)}
               className="mt-1 h-8 text-xs"
@@ -200,7 +200,7 @@ export function HandoverItemModal({
             <Input
               id="recipientNationalId"
               type="text"
-              placeholder="e.g. 079092******441"
+              placeholder="079092******441"
               value={recipientNationalId}
               onChange={(e) => setRecipientNationalId(e.target.value)}
               className="mt-1 h-8 text-xs"
@@ -213,7 +213,7 @@ export function HandoverItemModal({
             <Input
               id="recipientInternalId"
               type="text"
-              placeholder="e.g. STF-88012"
+              placeholder="STF-88012"
               value={recipientInternalId}
               onChange={(e) => setRecipientInternalId(e.target.value)}
               className="mt-1 h-8 text-xs"
@@ -228,7 +228,7 @@ export function HandoverItemModal({
           <Input
             id="recipientPhone"
             type="tel"
-            placeholder="e.g. +1 415 000 9021"
+            placeholder="+1 415 000 9021"
             value={recipientPhone}
             onChange={(e) => setRecipientPhone(e.target.value)}
             className="mt-1 h-8 text-xs"

@@ -830,6 +830,9 @@ export function AddItemPage() {
                 description,
                 distinctiveMarks,
                 category,
+                subcategory:
+                  (allSubcategories ?? []).find((s) => s.code === subcategoryCode)?.name ??
+                  subcategoryCode,
                 internalLocation,
                 eventTime,
                 color,

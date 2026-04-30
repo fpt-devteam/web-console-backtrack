@@ -29,6 +29,7 @@ import {
   SidebarMenuSub,
   SidebarMenuSubButton,
   SidebarMenuSubItem,
+  SidebarRail,
   useSidebar,
 } from '@/components/ui/sidebar'
 import {
@@ -295,6 +296,7 @@ export function AdminSidebar() {
   return (
     <Sidebar collapsible="icon" className="border-r border-[#dddddd] bg-white">
       <AdminSidebarInner />
+      <SidebarRail />
     </Sidebar>
   )
 }

@@ -13,7 +13,6 @@ import { InventoryListFiltersBar } from '../../components/inventory/inventory-li
 import { InventoryGridCards } from '../../components/inventory/inventory-grid-cards'
 import { InventoryStatusTabs } from '../../components/inventory/inventory-status-tabs'
 import { useSubcategories } from '@/hooks/use-subcategories'
-import { SiteHeader } from '@/components/layout/site-header'
 
 const pageSize = 8
 
@@ -52,17 +51,15 @@ export function AdminInventoryMonitorPage() {
 
   return (
     <Layout>
-      <SiteHeader
-        crumbs={[{ label: 'Inventory' }, { label: 'Dashboard' }]}
-        actions={
+      <div className="p-4 sm:p-6 lg:p-8">
+        <div className="flex items-center justify-between gap-3 mb-4">
+          <h1 className="text-2xl font-bold text-black">Inventory</h1>
           <Button variant="outline" size="sm" className="rounded-[20px] border-[#dddddd] text-[#6a6a6a] hover:bg-[#f7f7f7] gap-1.5">
             <Download className="w-4 h-4" />
             Export
           </Button>
-        }
-      />
+        </div>
 
-      <div className="p-4 sm:p-6 lg:p-8">
         <InventoryStatusTabs
           value={listState.statusFilter}
           onChange={listState.setStatusFilter}

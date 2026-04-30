@@ -6,7 +6,6 @@ import { MonthlyActivityChart } from '../../components/admin/dashboard/monthly-a
 import { StaffPerformancePanel } from '../../components/admin/dashboard/staff-performance-panel'
 // import { OrgItemStatsPanel } from '../../components/admin/dashboard/org-item-stats-panel'
 import { RecentInventoryPanel } from '../../components/admin/dashboard/recent-inventory-panel'
-import { SiteHeader } from '@/components/layout/site-header'
 import { useCurrentUser } from '@/hooks/use-auth'
 import {
   useAdminDashboardStats,
@@ -36,8 +35,6 @@ export function AdminDashboardPage() {
 
   return (
     <Layout>
-      <SiteHeader crumbs={[{ label: 'Dashboard' }]} />
-
       <div className="h-full overflow-y-auto p-4 sm:p-6 lg:p-8 space-y-6">
 
         {/* Greeting */}

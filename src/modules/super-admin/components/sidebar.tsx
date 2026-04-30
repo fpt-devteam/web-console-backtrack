@@ -19,6 +19,7 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
+  SidebarRail,
 } from '@/components/ui/sidebar'
 import {
   DropdownMenu,
@@ -162,6 +163,7 @@ export function SuperAdminSidebar() {
   return (
     <Sidebar collapsible="icon" className="border-r border-[#dddddd] bg-white">
       <SuperAdminSidebarInner />
+      <SidebarRail />
     </Sidebar>
   )
 }
