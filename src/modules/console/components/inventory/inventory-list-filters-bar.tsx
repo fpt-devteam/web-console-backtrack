@@ -106,12 +106,12 @@ export function InventoryListFiltersBar({
       <div className="flex items-center gap-2 flex-nowrap text-sm">
         {/* Search — flex-1 so it fills remaining space */}
         <div className="relative flex-1 min-w-0">
-          <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-[#b0b0b0]" />
+          <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-silver" />
           <input
             value={searchTerm}
             onChange={(e) => onSearchTermChange(e.target.value)}
             placeholder="Search by name, details..."
-            className="w-full h-10 bg-white pl-10 pr-4 border border-[#dddddd] rounded-full focus:outline-none focus:border-[#222222] text-[#222222] placeholder:text-[#b0b0b0] transition-colors hover:border-[#b0b0b0]"
+            className="w-full h-10 bg-white pl-10 pr-2 border border-hairline rounded-lg focus:outline-none focus:border-ink text-ink placeholder:text-silver transition-colors hover:border-silver"
           />
         </div>
 
@@ -146,7 +146,7 @@ export function InventoryListFiltersBar({
           <button
             type="button"
             onClick={onClear}
-            className="shrink-0 flex items-center gap-1.5 h-10 px-3.5 rounded-full text-sm text-[#999999] hover:text-[#c13515] hover:bg-[#fff0f0] border border-transparent hover:border-[#fdd] transition-all font-medium"
+            className="shrink-0 flex items-center gap-1.5 h-10 px-3.5 rounded-lg text-sm text-mute hover:text-danger hover:bg-[#fff0f0] border border-transparent hover:border-[#fdd] transition-all font-medium"
           >
             <X className="w-3.5 h-3.5" />
             Clear
@@ -166,19 +166,19 @@ export function InventoryListFiltersBar({
       {/* Row 1: search + clear */}
       <div className="flex items-center gap-3">
         <div className="relative w-full md:w-2/3">
-          <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-[#b0b0b0]" />
+          <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-silver" />
           <input
             value={searchTerm}
             onChange={(e) => onSearchTermChange(e.target.value)}
             placeholder="Search by name/details..."
-            className="w-full bg-white pl-10 pr-4 py-2 border border-[#dddddd] rounded-xl focus:outline-none focus:border-[#222222] text-[#222222] transition-colors hover:border-[#b0b0b0]"
+            className="w-full bg-white pl-10 pr-4 py-2 border border-hairline rounded-lg focus:outline-none focus:border-ink text-ink transition-colors hover:border-silver"
           />
         </div>
         {showClear && (
           <button
             type="button"
             onClick={onClear}
-            className="flex items-center gap-1.5 text-sm text-[#999999] hover:text-[#c13515] font-medium transition-colors"
+            className="flex items-center gap-1.5 text-sm text-mute hover:text-danger font-medium transition-colors"
           >
             <X className="w-3.5 h-3.5" />
             Clear
@@ -196,27 +196,27 @@ export function InventoryListFiltersBar({
             value={fromDate}
             onChange={(e) => onFromDateChange(e.target.value)}
             max={toDate || undefined}
-            className="w-full rounded-xl border border-[#dddddd] bg-white px-3 py-1.5 text-sm text-[#222222] focus:outline-none focus:border-[#222222] transition-colors"
+            className="w-full rounded-lg border border-hairline bg-white px-3 py-1.5 text-sm text-ink focus:outline-none focus:border-ink transition-colors"
           />
-          <span className="text-[#999999] text-xs shrink-0">to</span>
+          <span className="text-mute text-xs shrink-0">to</span>
           <input
             type="date"
             lang="vi-VN"
             value={toDate}
             onChange={(e) => onToDateChange(e.target.value)}
             min={fromDate || undefined}
-            className="w-full rounded-xl border border-[#dddddd] bg-white px-3 py-1.5 text-sm text-[#222222] focus:outline-none focus:border-[#222222] transition-colors"
+            className="w-full rounded-lg border border-hairline bg-white px-3 py-1.5 text-sm text-ink focus:outline-none focus:border-ink transition-colors"
           />
         </div>
 
         {/* Status filter */}
         {showStatusFilter && (
           <div className={`w-full ${categoryWidth} flex items-center gap-2`}>
-            <span className="text-sm text-[#222222] font-medium whitespace-nowrap">Status</span>
+            <span className="text-sm text-ink font-medium whitespace-nowrap">Status</span>
             <select
               value={statusFilter}
               onChange={(e) => onStatusChange(e.target.value as StatusFilter)}
-              className="w-full pl-3 pr-6 py-1.5 border border-[#dddddd] rounded-xl focus:outline-none focus:border-[#222222] bg-white text-sm text-[#222222] transition-colors"
+              className="w-full pl-3 pr-6 py-1.5 border border-hairline rounded-lg focus:outline-none focus:border-ink bg-white text-sm text-ink transition-colors"
             >
               {STATUS_OPTIONS.map((o) => (
                 <option key={o.value} value={o.value}>{o.label}</option>
@@ -227,11 +227,11 @@ export function InventoryListFiltersBar({
 
         {/* Category */}
         <div className={`w-full ${categoryWidth} flex items-center gap-2`}>
-          <span className="text-sm text-[#222222] font-medium whitespace-nowrap">Category</span>
+          <span className="text-sm text-ink font-medium whitespace-nowrap">Category</span>
           <select
             value={categoryFilter}
             onChange={(e) => onCategoryChange(e.target.value as CategoryFilter)}
-            className="w-full pl-3 pr-6 py-1.5 border border-[#dddddd] rounded-xl focus:outline-none focus:border-[#222222] bg-white text-sm text-[#222222] transition-colors"
+            className="w-full pl-3 pr-6 py-1.5 border border-hairline rounded-lg focus:outline-none focus:border-ink bg-white text-sm text-ink transition-colors"
           >
             {CATEGORY_OPTIONS.map((o) => (
               <option key={o.value} value={o.value}>{o.label}</option>
@@ -242,11 +242,11 @@ export function InventoryListFiltersBar({
         {/* Author */}
         {showAuthorFilter && (
           <div className="w-full md:w-1/4 flex items-center gap-2">
-            <span className="text-sm text-[#222222] font-medium whitespace-nowrap">Author</span>
+            <span className="text-sm text-ink font-medium whitespace-nowrap">Author</span>
             <select
               value={authorValue ?? ''}
               onChange={(e) => onAuthorChange?.(e.target.value)}
-              className="w-full pl-3 pr-6 py-1.5 border border-[#dddddd] rounded-xl focus:outline-none focus:border-[#222222] text-sm text-[#222222] bg-white transition-colors"
+              className="w-full pl-3 pr-6 py-1.5 border border-hairline rounded-lg focus:outline-none focus:border-ink text-sm text-ink bg-white transition-colors"
             >
               <option value="">All staff</option>
               {(authorOptions ?? []).map((o) => (

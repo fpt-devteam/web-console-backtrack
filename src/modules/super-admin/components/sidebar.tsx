@@ -30,7 +30,7 @@ import {
 } from '@/components/ui/dropdown-menu'
 
 const MENU_ITEM_CLS =
-  'text-[#6a6a6a] hover:bg-[#f7f7f7] hover:text-[#222222] data-[active=true]:bg-[#fff0f2] data-[active=true]:text-[#ff385c]'
+  'text-base text-charcoal hover:bg-cloud data-[active=true]:bg-[#fff0f2] data-[active=true]:text-rausch'
 
 const navItems = [
   { name: 'Dashboard',                  icon: LayoutGrid, path: '/super-admin/dashboard' },
@@ -109,7 +109,7 @@ function SuperAdminSidebarInner() {
       </SidebarContent>
 
       {/* Footer — NavUser dropdown (dashboard-01 pattern) */}
-      <SidebarFooter className="border-t border-[#dddddd]">
+      <SidebarFooter className="border-t border-[#dddddd] py-4">
         <SidebarMenu>
           <SidebarMenuItem>
             <DropdownMenu>
@@ -123,10 +123,10 @@ function SuperAdminSidebarInner() {
                     {userInitials}
                   </div>
                   <div className="flex flex-col min-w-0 flex-1">
-                    <span className="text-sm font-medium text-[#222222] truncate leading-tight">
+                    <span className="text-base font-medium text-ink truncate leading-tight">
                       {userDisplayName}
                     </span>
-                    <span className="text-xs text-[#929292]">Super Admin</span>
+                    <span className="text-sm text-mute">Super Admin</span>
                   </div>
                   <ChevronsUpDown className="ml-auto w-4 h-4 text-[#929292] flex-shrink-0" />
                 </SidebarMenuButton>
@@ -134,8 +134,8 @@ function SuperAdminSidebarInner() {
               <DropdownMenuContent
                 side="top"
                 align="end"
-                sideOffset={4}
-                className="w-56 rounded-xl"
+                sideOffset={16}
+                className="w-56 rounded-xl border-hairline"
               >
                 <DropdownMenuLabel className="text-sm font-medium text-[#222222] truncate">
                   {userDisplayName}

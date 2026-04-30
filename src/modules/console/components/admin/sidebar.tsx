@@ -46,7 +46,7 @@ import {
 } from '@/components/ui/dropdown-menu'
 
 const MENU_ITEM_CLS =
-  'text-[#6a6a6a] hover:bg-[#f7f7f7] hover:text-[#222222] data-[active=true]:bg-[#fff0f2] data-[active=true]:text-[#ff385c]'
+  'text-base text-charcoal hover:bg-cloud data-[active=true]:bg-[#fff0f2] data-[active=true]:text-rausch'
 
 function getInitials(name: string | null | undefined): string {
   if (!name?.trim()) return 'U'
@@ -116,33 +116,28 @@ function AdminSidebarInner() {
   return (
     <>
       {/* Header — org logo + name (dashboard-01 SidebarMenu pattern) */}
-      <SidebarHeader className="border-b border-[#dddddd]">
+      <SidebarHeader className="border-b border-hairline py-4">
         <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton
               size="lg"
               tooltip={org?.name ?? 'Admin'}
               asChild
-              className="hover:bg-[#f7f7f7] text-[#222222]"
+              className="hover:bg-cloud text-ink"
             >
               <Link to="/console/$slug/admin/dashboard" params={{ slug }}>
                 <OrgLogo
                   logoUrl={org?.logoUrl}
                   alt={org?.name ?? 'Organization'}
-                  className="h-8 w-8 flex-shrink-0"
+                  className="h-11 w-11 flex-shrink-0"
                 />
                 <div className="flex flex-col min-w-0">
                   <span
-                    className="font-semibold text-[15px] text-[#222222] truncate leading-tight"
+                    className="font-semibold text-base text-ink leading-tight"
                     title={org?.name}
                   >
                     {org?.name ?? 'Admin'}
                   </span>
-                  {org && (
-                    <span className="text-xs text-[#929292] truncate" title={org.slug}>
-                      {org.slug}
-                    </span>
-                  )}
                 </div>
               </Link>
             </SidebarMenuButton>
@@ -211,7 +206,7 @@ function AdminSidebarInner() {
                       <SidebarMenuSubButton
                         asChild
                         isActive={isSettingChildActive('organization')}
-                        className="text-[#6a6a6a] hover:bg-[#f7f7f7] hover:text-[#222222] data-[active=true]:bg-[#fff0f2] data-[active=true]:text-[#ff385c]"
+                        className="text-base text-ash hover:bg-cloud hover:text-ink data-[active=true]:bg-[#fff0f2] data-[active=true]:text-rausch"
                       >
                         <Link to="/console/$slug/admin/setting/organization" params={{ slug }}>
                           <ChevronRight className="w-3 h-3 opacity-40" />
@@ -223,7 +218,7 @@ function AdminSidebarInner() {
                       <SidebarMenuSubButton
                         asChild
                         isActive={isSettingChildActive('security')}
-                        className="text-[#6a6a6a] hover:bg-[#f7f7f7] hover:text-[#222222] data-[active=true]:bg-[#fff0f2] data-[active=true]:text-[#ff385c]"
+                        className="text-base text-ash hover:bg-cloud hover:text-ink data-[active=true]:bg-[#fff0f2] data-[active=true]:text-rausch"
                       >
                         <Link to="/console/$slug/account/security" params={{ slug }}>
                           <ChevronRight className="w-3 h-3 opacity-40" />
@@ -240,7 +235,7 @@ function AdminSidebarInner() {
       </SidebarContent>
 
       {/* Footer — NavUser dropdown (dashboard-01 pattern) */}
-      <SidebarFooter className="border-t border-[#dddddd]">
+      <SidebarFooter className="border-t border-[#dddddd] py-4">
         <SidebarMenu>
           <SidebarMenuItem>
             <DropdownMenu>
@@ -254,10 +249,10 @@ function AdminSidebarInner() {
                     {userInitials}
                   </div>
                   <div className="flex flex-col min-w-0 flex-1">
-                    <span className="text-sm font-medium text-[#222222] truncate leading-tight">
+                    <span className="text-base font-medium text-ink truncate leading-tight">
                       {userDisplayName}
                     </span>
-                    <span className="text-xs text-[#929292]">Admin</span>
+                    <span className="text-sm text-mute">Admin</span>
                   </div>
                   <ChevronsUpDown className="ml-auto w-4 h-4 text-[#929292] flex-shrink-0" />
                 </SidebarMenuButton>
@@ -265,8 +260,8 @@ function AdminSidebarInner() {
               <DropdownMenuContent
                 side="top"
                 align="end"
-                sideOffset={4}
-                className="w-56 rounded-xl"
+                sideOffset={16}
+                className="w-56 rounded-xl border-hairline"
               >
                 <DropdownMenuLabel className="text-sm font-medium text-[#222222] truncate">
                   {userDisplayName}

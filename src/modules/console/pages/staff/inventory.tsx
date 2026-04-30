@@ -1,7 +1,5 @@
 import { StaffLayout } from '../../components/staff'
-import { Download, Plus } from 'lucide-react'
 import { Pagination } from '@/components/ui/pagination'
-import { useNavigate, useParams } from '@tanstack/react-router'
 import { useInventoryItems } from '@/hooks/use-inventory'
 import { useCurrentOrgId } from '@/contexts/current-org.context'
 import { useSubcategories } from '@/hooks/use-subcategories'
@@ -10,13 +8,16 @@ import { useInventoryListState } from '../../components/inventory/use-inventory-
 import { InventoryListFiltersBar } from '../../components/inventory/inventory-list-filters-bar'
 import { InventoryGridCards } from '../../components/inventory/inventory-grid-cards'
 import { InventoryStatusTabs } from '../../components/inventory/inventory-status-tabs'
+import { useParams } from '@tanstack/react-router'
+import { InventoryCtaButton } from '../../components/inventory/inventory-cta-button'
 
 const pageSize = 8
 
 export function StaffInventoryPage() {
-  const { slug } = useParams({ strict: false }) as { slug: string }
-  const navigate = useNavigate()
+  const { slug } = useParams({ strict: false })
+  if (!slug) return;
   const { currentOrgId } = useCurrentOrgId()
+  const addItemUrl = `/console/${slug}/staff/inventory-add-item`
 
   const listState = useInventoryListState({
     pageSize,
@@ -46,40 +47,21 @@ export function StaffInventoryPage() {
         <div className="p-4 sm:p-6 lg:p-8 space-y-4">
 
           {/* Header */}
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2.5">
-              <h1 className="text-xl font-bold text-[#222222]">Inventory</h1>
-              {totalCount > 0 && (
-                <span className="px-2 py-0.5 rounded-full bg-[#f0f0f0] text-xs font-semibold text-[#6a6a6a]">
-                  {totalCount}
-                </span>
-              )}
-            </div>
-            <div className="flex items-center gap-2">
-              <button className="flex items-center gap-1.5 px-3.5 py-2 border border-[#dddddd] text-[#6a6a6a] rounded-xl bg-white hover:bg-[#f0f0f0] transition-all font-medium text-sm active:scale-[0.97]">
-                <Download className="w-3.5 h-3.5" />
-                Export
-              </button>
-              <button
-                onClick={() => {
-                  void navigate({ to: '/console/$slug/staff/inventory-add-item', params: { slug }, search: { type: 'Found' } })
-                }}
-                className="flex items-center gap-1.5 px-3.5 py-2 bg-[#ff385c] text-white rounded-xl hover:bg-[#e00b41] transition-all font-medium text-sm active:scale-[0.97]"
-              >
-                <Plus className="w-3.5 h-3.5" />
-                Add Item
-              </button>
-            </div>
-          </div>
+          <h1 className="text-2xl font-bold text-black">Inventory</h1>
 
-          {/* Status tabs */}
-          <InventoryStatusTabs
-            value={listState.statusFilter}
-            onChange={(v) => {
-              listState.setStatusFilter(v)
-              listState.setCurrentPage(1)
-            }}
-          />
+          <div className='flex justify-between'>
+            {/* Status tabs */}
+            <InventoryStatusTabs
+              value={listState.statusFilter}
+              onChange={(v) => {
+                listState.setStatusFilter(v)
+                listState.setCurrentPage(1)
+              }}
+            />
+
+            {/* CTA */}
+            <InventoryCtaButton addItemUrl={addItemUrl} />
+          </div>
 
           {/* Filter chips */}
           <InventoryListFiltersBar

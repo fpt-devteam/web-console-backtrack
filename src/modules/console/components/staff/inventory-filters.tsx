@@ -96,7 +96,7 @@ export function InventoryFilters({
             placeholder={searchPlaceholder}
           />
         </div>
-        <button className="p-2 border border-[#dddddd] rounded-[8px] hover:bg-[#f7f7f7] flex-shrink-0 active:scale-[0.92]">
+        <button className="p-2 border border-[#dddddd] rounded-md hover:bg-[#f7f7f7] shrink-0 active:scale-[0.92]">
           <Calendar className="w-5 h-5 text-[#6a6a6a]" />
         </button>
       </div>

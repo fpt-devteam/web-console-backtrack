@@ -4,8 +4,7 @@
 
 @custom-variant dark (&:is(.dark *));
 
-/* Airbnb-inspired design tokens */
-/* Rausch #ff385c | Ink Black #222222 | Hairline Gray #dddddd | Canvas White #ffffff | Soft Cloud #f7f7f7 */
+/* Rausch #ff385c | Ink #222222 | Hairline #dddddd | Canvas #ffffff | Cloud #f7f7f7 */
 
 html,
 body,
@@ -20,45 +19,46 @@ code {
 }
 
 :root {
-  /* Airbnb palette */
-  --airbnb-rausch: #ff385c;
-  --airbnb-rausch-deep: #e00b41;
-  --airbnb-ink: #222222;
-  --airbnb-charcoal: #3f3f3f;
-  --airbnb-ash: #6a6a6a;
-  --airbnb-mute: #929292;
-  --airbnb-stone: #c1c1c1;
-  --airbnb-hairline: #dddddd;
-  --airbnb-cloud: #f7f7f7;
-  --airbnb-canvas: #ffffff;
-  --airbnb-error: #c13515;
+  /* Palette */
+  --rausch: #ff385c;
+  --rausch-deep: #e00b41;
+  --ink: #222222;
+  --charcoal: #3f3f3f;
+  --ash: #6a6a6a;
+  --mute: #929292;
+  --silver: #b0b0b0;
+  --stone: #c1c1c1;
+  --hairline: #dddddd;
+  --cloud: #f7f7f7;
+  --canvas: #ffffff;
+  --danger: #c13515;
 
-  /* shadcn/ui tokens remapped to Airbnb palette */
-  --background: 0 0% 100%;           /* Canvas White */
-  --foreground: 0 0% 13.3%;          /* Ink Black #222222 */
+  /* shadcn/ui tokens remapped to palette */
+  --background: 0 0% 100%;
+  --foreground: 0 0% 13.3%;
   --card: 0 0% 100%;
   --card-foreground: 0 0% 13.3%;
   --popover: 0 0% 100%;
   --popover-foreground: 0 0% 13.3%;
-  --primary: 349 100% 60%;           /* Rausch #ff385c */
+  --primary: 349 100% 60%;
   --primary-foreground: 0 0% 100%;
-  --secondary: 0 0% 96.9%;           /* Soft Cloud #f7f7f7 */
+  --secondary: 0 0% 96.9%;
   --secondary-foreground: 0 0% 13.3%;
   --muted: 0 0% 96.9%;
-  --muted-foreground: 0 0% 41.6%;    /* Ash Gray #6a6a6a */
+  --muted-foreground: 0 0% 41.6%;
   --accent: 0 0% 96.9%;
   --accent-foreground: 0 0% 13.3%;
-  --destructive: 15 78% 42%;         /* Error Red #c13515 */
+  --destructive: 15 78% 42%;
   --destructive-foreground: 0 0% 100%;
-  --border: 0 0% 86.7%;              /* Hairline Gray #dddddd */
+  --border: 0 0% 86.7%;
   --input: 0 0% 86.7%;
-  --ring: 349 100% 60%;              /* Rausch for focus rings */
+  --ring: 349 100% 60%;
   --chart-1: 349 100% 60%;
   --chart-2: 142 71% 45%;
   --chart-3: 217 91% 60%;
   --chart-4: 43 96% 56%;
   --chart-5: 271 81% 56%;
-  --radius: 0.5rem;                  /* 8px base — Airbnb default button radius */
+  --radius: 0.5rem;
   --sidebar: 0 0% 100%;
   --sidebar-foreground: 0 0% 13.3%;
   --sidebar-primary: 349 100% 60%;
@@ -77,8 +77,8 @@ code {
   --color-card-foreground: var(--card-foreground);
   --color-popover: var(--popover);
   --color-popover-foreground: var(--popover-foreground);
-  --color-primary: var(--primary);
-  --color-primary-foreground: var(--primary-foreground);
+  --color-primary: hsl(var(--primary));
+  --color-primary-foreground: hsl(var(--primary-foreground));
   --color-secondary: var(--secondary);
   --color-secondary-foreground: var(--secondary-foreground);
   --color-muted: var(--muted);
@@ -108,6 +108,20 @@ code {
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-ring: var(--sidebar-ring);
+
+  /* Palette tokens — hex values, no hsl() needed */
+  --color-rausch: var(--rausch);
+  --color-rausch-deep: var(--rausch-deep);
+  --color-ink: var(--ink);
+  --color-charcoal: var(--charcoal);
+  --color-ash: var(--ash);
+  --color-mute: var(--mute);
+  --color-silver: var(--silver);
+  --color-stone: var(--stone);
+  --color-hairline: var(--hairline);
+  --color-cloud: var(--cloud);
+  --color-canvas: var(--canvas);
+  --color-danger: var(--danger);
 }
 
 @layer base {
@@ -116,49 +130,23 @@ code {
   }
   body {
     @apply bg-background font-sans text-foreground antialiased;
-    color: var(--airbnb-ink);
-    font-weight: 500; /* Airbnb Cereal — 500 is their "regular" */
+    color: var(--ink);
+    font-weight: 500;
   }
 }
 
-/* Airbnb utility classes */
-.airbnb-rausch { color: var(--airbnb-rausch); }
-.airbnb-bg-rausch { background-color: var(--airbnb-rausch); }
-.airbnb-border-hairline { border-color: var(--airbnb-hairline); }
-
-/* Airbnb focus ring — 2px Ink Black */
-.airbnb-focus:focus-visible {
-  outline: none;
-  box-shadow: 0 0 0 2px var(--airbnb-ink);
-}
-
-/* Airbnb booking-panel elevation — 3-layer shadow */
-.airbnb-elevation {
+/* Elevation shadow */
+.elevation {
   box-shadow:
     rgba(0, 0, 0, 0.02) 0 0 0 1px,
     rgba(0, 0, 0, 0.04) 0 2px 6px 0,
     rgba(0, 0, 0, 0.1) 0 4px 8px 0;
 }
 
-/* Active pressed scale */
-.airbnb-press:active {
-  transform: scale(0.92);
-}
-
-/* Hide scrollbars (keep scroll interaction) */
+/* Hide scrollbar, keep scroll interaction */
 .scrollbar-none {
   scrollbar-width: none;
   -ms-overflow-style: none;
-}
-.scrollbar-none::-webkit-scrollbar {
-  width: 0;
-  height: 0;
-}
-
-/* Hide scrollbars (keep scroll interaction) */
-.scrollbar-none {
-  scrollbar-width: none; /* Firefox */
-  -ms-overflow-style: none; /* IE/Edge legacy */
 }
 .scrollbar-none::-webkit-scrollbar {
   width: 0;
