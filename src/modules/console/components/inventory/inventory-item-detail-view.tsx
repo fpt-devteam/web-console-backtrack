@@ -254,7 +254,13 @@ export function InventoryItemDetailView({
           </div>
 
           <div className="lg:col-span-4 py-6 px-8 space-y-6 text-sm">
-            {activeStep === 0 ? <InventoryDetailAttributeGrid item={item} subcategoryNameById={subcategoryNameById} /> : null}
+            {activeStep === 0 ? (
+              <InventoryDetailAttributeGrid
+                item={item}
+                subcategoryNameById={subcategoryNameById}
+                orgSlug={item.organization?.slug}
+              />
+            ) : null}
             {activeStep === 1 ? (
               <div className="space-y-5">
                 <SectionTitle title="Finder — contact & ID" />

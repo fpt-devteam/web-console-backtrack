@@ -116,10 +116,10 @@ export function Step1PhotosAndItem({
   itemName,
   setItemName,
   category,
-  setCategory,
+  setCategory: _setCategory,
   subcategories,
   subcategoryCode,
-  setSubcategoryCode,
+  setSubcategoryCode: _setSubcategoryCode,
   internalLocation,
   setInternalLocation,
   eventTime,
@@ -160,23 +160,13 @@ export function Step1PhotosAndItem({
   setExpiryDate,
   onNext,
 }: Step1PhotosAndItemProps) {
+  const subcategoryLabel =
+    (subcategories ?? []).find((s) => s.code === subcategoryCode)?.name ?? subcategoryCode
+
   return (
     <div className="space-y-6 mt-3">
-      {/* Photos Section */}
-      <InventoryPhotosPicker
-        photoPreviews={photoPreviews}
-        maxPhotos={maxPhotos}
-        onPickPhotos={onPickPhotos}
-        onRemovePhoto={onRemovePhoto}
-        onReorderPhotos={onReorderPhotos}
-        isAnalyzing={isAnalyzing}
-        onAnalyze={onAnalyze}
-        analyzeDisabled={analyzeDisabled}
-        analyzeHint={analyzeHint}
-      />
-
       {/* Item fields */}
-      <div className="rounded-[14px] border border-[#dddddd] p-5 space-y-6">
+      <div className="space-y-6">
         <div className="text-base font-semibold text-[#222222]">Item information</div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -198,40 +188,24 @@ export function Step1PhotosAndItem({
             <Label htmlFor="category" className="text-sm font-semibold text-[#222222]">
               Category <span className="text-[#c13515]">*</span>
             </Label>
-            <select
+            <Input
               id="category"
-              value={category}
-              onChange={(e) => setCategory(e.target.value as ItemCategory)}
-              className="mt-1 w-full px-3 py-2 border border-[#dddddd] rounded-lg bg-white text-[#222222] font-medium text-sm"
-            >
-              {(['PersonalBelongings', 'Cards', 'Electronics', 'Others'] as ItemCategory[]).map((c) => (
-                <option key={c} value={c}>
-                  {categoryLabel(c)}
-                </option>
-              ))}
-            </select>
+              value={categoryLabel(category)}
+              readOnly
+              className="mt-1 bg-[#f7f7f7]"
+            />
           </div>
 
           <div>
             <Label htmlFor="subcategory" className="text-sm font-semibold text-[#222222]">
               Subcategory <span className="text-[#c13515]">*</span>
             </Label>
-            <select
+            <Input
               id="subcategory"
-              value={subcategoryCode}
-              onChange={(e) => setSubcategoryCode(e.target.value)}
-              className="mt-1 w-full px-3 py-2 border border-[#dddddd] rounded-lg bg-white text-[#222222] font-medium text-sm"
-              disabled={!subcategories || subcategories.length === 0}
-            >
-              {(subcategories ?? []).map((s) => (
-                <option key={s.code} value={s.code}>
-                  {s.name}
-                </option>
-              ))}
-            </select>
-            {!subcategories || subcategories.length === 0 ? (
-              <div className="mt-1 text-xs text-[#929292]">No subcategories available for this category.</div>
-            ) : null}
+              value={subcategoryLabel}
+              readOnly
+              className="mt-1 bg-[#f7f7f7]"
+            />
           </div>
 
           <div className="md:col-span-2">
@@ -268,6 +242,21 @@ export function Step1PhotosAndItem({
               className="mt-1"
             />
             <div className="mt-1 text-xs text-[#929292]">When the item was found or handed to staff.</div>
+          </div>
+
+          {/* Photos Section (moved below basic info) */}
+          <div className="md:col-span-2">
+            <InventoryPhotosPicker
+              photoPreviews={photoPreviews}
+              maxPhotos={maxPhotos}
+              onPickPhotos={onPickPhotos}
+              onRemovePhoto={onRemovePhoto}
+              onReorderPhotos={onReorderPhotos}
+              isAnalyzing={isAnalyzing}
+              onAnalyze={onAnalyze}
+              analyzeDisabled={analyzeDisabled}
+              analyzeHint={analyzeHint}
+            />
           </div>
 
           {category !== 'Others' ? (
