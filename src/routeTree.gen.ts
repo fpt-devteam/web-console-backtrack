@@ -17,6 +17,7 @@ import { Route as SuperAdminUsersRouteImport } from './routes/super-admin/users'
 import { Route as SuperAdminServicePackagesRouteImport } from './routes/super-admin/service-packages'
 import { Route as SuperAdminRevenueRouteImport } from './routes/super-admin/revenue'
 import { Route as SuperAdminOrganizationRouteImport } from './routes/super-admin/organization'
+import { Route as SuperAdminMatchingEvaluationRouteImport } from './routes/super-admin/matching-evaluation'
 import { Route as SuperAdminDashboardRouteImport } from './routes/super-admin/dashboard'
 import { Route as ConsoleWelcomeRouteImport } from './routes/console/welcome'
 import { Route as ConsoleProcessingRouteImport } from './routes/console/processing'
@@ -101,6 +102,12 @@ const SuperAdminOrganizationRoute = SuperAdminOrganizationRouteImport.update({
   path: '/organization',
   getParentRoute: () => SuperAdminRoute,
 } as any)
+const SuperAdminMatchingEvaluationRoute =
+  SuperAdminMatchingEvaluationRouteImport.update({
+    id: '/matching-evaluation',
+    path: '/matching-evaluation',
+    getParentRoute: () => SuperAdminRoute,
+  } as any)
 const SuperAdminDashboardRoute = SuperAdminDashboardRouteImport.update({
   id: '/dashboard',
   path: '/dashboard',
@@ -358,6 +365,7 @@ export interface FileRoutesByFullPath {
   '/console/processing': typeof ConsoleProcessingRoute
   '/console/welcome': typeof ConsoleWelcomeRoute
   '/super-admin/dashboard': typeof SuperAdminDashboardRoute
+  '/super-admin/matching-evaluation': typeof SuperAdminMatchingEvaluationRoute
   '/super-admin/organization': typeof SuperAdminOrganizationRoute
   '/super-admin/revenue': typeof SuperAdminRevenueRoute
   '/super-admin/service-packages': typeof SuperAdminServicePackagesRoute
@@ -410,6 +418,7 @@ export interface FileRoutesByTo {
   '/console/processing': typeof ConsoleProcessingRoute
   '/console/welcome': typeof ConsoleWelcomeRoute
   '/super-admin/dashboard': typeof SuperAdminDashboardRoute
+  '/super-admin/matching-evaluation': typeof SuperAdminMatchingEvaluationRoute
   '/super-admin/organization': typeof SuperAdminOrganizationRoute
   '/super-admin/revenue': typeof SuperAdminRevenueRoute
   '/super-admin/service-packages': typeof SuperAdminServicePackagesRoute
@@ -461,6 +470,7 @@ export interface FileRoutesById {
   '/console/processing': typeof ConsoleProcessingRoute
   '/console/welcome': typeof ConsoleWelcomeRoute
   '/super-admin/dashboard': typeof SuperAdminDashboardRoute
+  '/super-admin/matching-evaluation': typeof SuperAdminMatchingEvaluationRoute
   '/super-admin/organization': typeof SuperAdminOrganizationRoute
   '/super-admin/revenue': typeof SuperAdminRevenueRoute
   '/super-admin/service-packages': typeof SuperAdminServicePackagesRoute
@@ -515,6 +525,7 @@ export interface FileRouteTypes {
     | '/console/processing'
     | '/console/welcome'
     | '/super-admin/dashboard'
+    | '/super-admin/matching-evaluation'
     | '/super-admin/organization'
     | '/super-admin/revenue'
     | '/super-admin/service-packages'
@@ -567,6 +578,7 @@ export interface FileRouteTypes {
     | '/console/processing'
     | '/console/welcome'
     | '/super-admin/dashboard'
+    | '/super-admin/matching-evaluation'
     | '/super-admin/organization'
     | '/super-admin/revenue'
     | '/super-admin/service-packages'
@@ -617,6 +629,7 @@ export interface FileRouteTypes {
     | '/console/processing'
     | '/console/welcome'
     | '/super-admin/dashboard'
+    | '/super-admin/matching-evaluation'
     | '/super-admin/organization'
     | '/super-admin/revenue'
     | '/super-admin/service-packages'
@@ -722,6 +735,13 @@ declare module '@tanstack/react-router' {
       path: '/organization'
       fullPath: '/super-admin/organization'
       preLoaderRoute: typeof SuperAdminOrganizationRouteImport
+      parentRoute: typeof SuperAdminRoute
+    }
+    '/super-admin/matching-evaluation': {
+      id: '/super-admin/matching-evaluation'
+      path: '/matching-evaluation'
+      fullPath: '/super-admin/matching-evaluation'
+      preLoaderRoute: typeof SuperAdminMatchingEvaluationRouteImport
       parentRoute: typeof SuperAdminRoute
     }
     '/super-admin/dashboard': {
@@ -1052,6 +1072,7 @@ const MarketingRouteWithChildren = MarketingRoute._addFileChildren(
 
 interface SuperAdminRouteChildren {
   SuperAdminDashboardRoute: typeof SuperAdminDashboardRoute
+  SuperAdminMatchingEvaluationRoute: typeof SuperAdminMatchingEvaluationRoute
   SuperAdminOrganizationRoute: typeof SuperAdminOrganizationRoute
   SuperAdminRevenueRoute: typeof SuperAdminRevenueRoute
   SuperAdminServicePackagesRoute: typeof SuperAdminServicePackagesRoute
@@ -1060,6 +1081,7 @@ interface SuperAdminRouteChildren {
 
 const SuperAdminRouteChildren: SuperAdminRouteChildren = {
   SuperAdminDashboardRoute: SuperAdminDashboardRoute,
+  SuperAdminMatchingEvaluationRoute: SuperAdminMatchingEvaluationRoute,
   SuperAdminOrganizationRoute: SuperAdminOrganizationRoute,
   SuperAdminRevenueRoute: SuperAdminRevenueRoute,
   SuperAdminServicePackagesRoute: SuperAdminServicePackagesRoute,

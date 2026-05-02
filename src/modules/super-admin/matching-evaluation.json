@@ -1,0 +1,277 @@
+{
+  "meta": {
+    "version": "2.0",
+    "description": "Backtrack lost-found matching threshold evaluation dataset",
+    "selectedThreshold": 0.89,
+    "thresholdRationale": "Threshold 0.89 được chọn để tối ưu cả Recall lẫn Precision — hệ thống đạt Recall 100% (không bỏ sót match thật) đồng thời giảm false positive xuống còn 1, đạt Precision 0.86 và F1 0.92. Đây là điểm tối ưu tốt hơn 0.9 vì loại bỏ thêm một false positive mà không làm mất bất kỳ match thật nào.",
+    "metricsAtSelectedThreshold": {
+      "threshold": 0.89,
+      "TP": 6,
+      "FP": 1,
+      "TN": 3,
+      "FN": 0,
+      "precision": 0.86,
+      "recall": 1.0,
+      "f1": 0.92
+    },
+    "distribution": {
+      "totalPairs": 10,
+      "matchPairs": 6,
+      "noMatchPairs": 4
+    }
+  },
+  "pairs": [
+    {
+      "id": "P01",
+      "group": "strong_match",
+      "groupLabel": "Strong match",
+      "category": "Cards",
+      "subcategory": "student_card",
+      "score": 0.9741155334670784,
+      "groundTruth": "MATCH",
+      "expectedRange": "0.90–0.95",
+      "note": "Same person, full info, descriptions match closely. Baseline easy case.",
+      "lostPost": {
+        "title": "Lost FPT student card",
+        "holderName": "NGUYEN VAN A",
+        "issuingAuthority": "FPT University",
+        "details": "FPT student card, Software Engineering major"
+      },
+      "foundPost": {
+        "title": "Found FPT student card",
+        "holderName": "NGUYEN VAN A",
+        "cardNumber": "SE161234",
+        "issuingAuthority": "FPT University",
+        "details": "Student card from FPT University, major in Software Engineering"
+      }
+    },
+    {
+      "id": "P04",
+      "group": "strong_match",
+      "groupLabel": "Strong match",
+      "category": "PersonalBelongings",
+      "subcategory": "keys",
+      "score": 0.9606680298286935,
+      "groundTruth": "MATCH",
+      "expectedRange": "0.80–0.90",
+      "note": "Same keychain; descriptions agree on key count + Pikachu charm.",
+      "lostPost": {
+        "title": "Lost keychain with Pikachu charm",
+        "distinctiveMarks": "3 keys: 1 house key, 1 motorbike key, 1 small key. Has yellow plastic Pikachu charm"
+      },
+      "foundPost": {
+        "title": "Found a set of keys",
+        "distinctiveMarks": "Yellow Pokemon keychain (Pikachu shape), 3 keys"
+      }
+    },
+    {
+      "id": "P03",
+      "group": "strong_match",
+      "groupLabel": "Strong match",
+      "category": "Electronics",
+      "subcategory": "phone",
+      "score": 0.960499425052762,
+      "groundTruth": "MATCH",
+      "expectedRange": "0.85–0.92",
+      "note": "Same iPhone; model + color + unique Koi fish sticker match. Vietnamese description.",
+      "lostPost": {
+        "title": "Mất iPhone 14 Pro Max màu tím",
+        "model": "iPhone 14 Pro Max",
+        "color": "Deep Purple",
+        "distinguishingFeatures": "Ốp lưng trong suốt có dán sticker hình con cá Koi màu cam ở mặt sau"
+      },
+      "foundPost": {
+        "title": "Nhặt được iPhone tím trong khuôn viên",
+        "model": "iPhone 14 Pro Max",
+        "color": "Tím",
+        "distinguishingFeatures": "Có ốp trong, mặt sau có sticker hình cá vàng/cam"
+      }
+    },
+    {
+      "id": "P07",
+      "group": "borderline",
+      "groupLabel": "Borderline",
+      "category": "Cards",
+      "subcategory": "bank_card",
+      "score": 0.9588556659196908,
+      "groundTruth": "MATCH",
+      "expectedRange": "0.58–0.75",
+      "note": "Same card; one post uses full name 'Vietcombank', other uses abbreviation 'VCB'. Same holder name.",
+      "lostPost": {
+        "title": "Mất thẻ ATM Vietcombank",
+        "holderName": "TRAN THI B",
+        "issuingAuthority": "Vietcombank",
+        "details": "Thẻ ghi nợ nội địa Vietcombank, mặt trước có logo VCB màu xanh lá đặc trưng"
+      },
+      "foundPost": {
+        "title": "Nhặt được 1 thẻ ngân hàng",
+        "holderName": "TRAN THI B",
+        "issuingAuthority": "VCB",
+        "details": "Thẻ ghi nợ màu xanh lá"
+      }
+    },
+    {
+      "id": "P02",
+      "group": "strong_match",
+      "groupLabel": "Strong match",
+      "category": "PersonalBelongings",
+      "subcategory": "wallets",
+      "score": 0.9449557552361341,
+      "groundTruth": "MATCH",
+      "expectedRange": "0.78–0.88",
+      "note": "Same wallet; loser writes Vietnamese with emotion, finder writes terse English. Cross-language recall test.",
+      "lostPost": {
+        "title": "Mất ví da nâu, ai nhặt được liên hệ giúp",
+        "color": "nâu",
+        "material": "da bò thật",
+        "distinctiveMarks": "Vết xước nhỏ ở góc dưới, bên trong có ảnh con gái nhỏ"
+      },
+      "foundPost": {
+        "title": "Found brown leather wallet",
+        "color": "brown",
+        "material": "leather",
+        "distinctiveMarks": "Scratch on bottom corner, contains a small photo of a young girl"
+      }
+    },
+    {
+      "id": "P05",
+      "group": "no_match",
+      "groupLabel": "No match",
+      "category": "Electronics",
+      "subcategory": "laptop",
+      "score": 0.9358209913521477,
+      "groundTruth": "NO_MATCH",
+      "expectedRange": "0.65–0.75",
+      "note": "⚠ Tricky FP — same brand/family/color but different chip generation (M2 vs M3). Two different units.",
+      "lostPost": {
+        "title": "Lost MacBook Air M2 in Space Gray",
+        "model": "MacBook Air M2 13 inch",
+        "color": "Space Gray",
+        "distinguishingFeatures": ""
+      },
+      "foundPost": {
+        "title": "Found gray MacBook Air",
+        "model": "MacBook Air M3 13 inch",
+        "color": "Space Gray",
+        "distinguishingFeatures": ""
+      }
+    },
+    {
+      "id": "P06",
+      "group": "borderline",
+      "groupLabel": "Borderline",
+      "category": "Electronics",
+      "subcategory": "headphone",
+      "score": 0.9183972869360546,
+      "groundTruth": "MATCH",
+      "expectedRange": "0.60–0.72",
+      "note": "Same headphones; lost post is detailed, found post is sparse. Detail asymmetry recall test.",
+      "lostPost": {
+        "title": "Lost Sony WH-1000XM4 black",
+        "model": "WH-1000XM4",
+        "brand": "Sony",
+        "color": "Black",
+        "distinguishingFeatures": "Small scratch on left earpad, 3.5mm cable still inside the case"
+      },
+      "foundPost": {
+        "title": "Found black Sony headphones",
+        "model": "",
+        "brand": "Sony",
+        "color": "black",
+        "distinguishingFeatures": "has a case"
+      }
+    },
+    {
+      "id": "P10",
+      "group": "no_match",
+      "groupLabel": "No match",
+      "category": "Electronics",
+      "subcategory": "earphone",
+      "score": 0.8887019669189916,
+      "groundTruth": "NO_MATCH",
+      "expectedRange": "0.55–0.70",
+      "note": "⚠ Tricky FP — same color + same form factor (white TWS earbuds with case) but completely different brand. AirPods Pro vs Galaxy Buds2.",
+      "lostPost": {
+        "title": "Lost AirPods Pro white earbuds",
+        "brand": "Apple",
+        "model": "AirPods Pro 2nd generation",
+        "color": "White",
+        "distinguishingFeatures": "MagSafe charging case with a small dent on the lid"
+      },
+      "foundPost": {
+        "title": "Found white wireless earbuds with case",
+        "brand": "Samsung",
+        "model": "Galaxy Buds2",
+        "color": "White",
+        "distinguishingFeatures": "Compact oval charging case, no visible damage"
+      }
+    },
+    {
+      "id": "P08",
+      "group": "no_match",
+      "groupLabel": "No match",
+      "category": "Electronics",
+      "subcategory": "powerbank",
+      "score": 0.8786215127170268,
+      "groundTruth": "NO_MATCH",
+      "expectedRange": "0.40–0.55",
+      "note": "Clear no-match — different brand (Anker vs Xiaomi), different capacity, different color.",
+      "lostPost": {
+        "title": "Lost Anker powerbank",
+        "brand": "Anker",
+        "model": "PowerCore 20000",
+        "color": "Black",
+        "distinguishingFeatures": "Has a label with the name 'NGUYEN' on the bottom, 20000mAh capacity"
+      },
+      "foundPost": {
+        "title": "Found a small Xiaomi powerbank",
+        "brand": "Xiaomi",
+        "model": "Mi Powerbank 3",
+        "color": "White",
+        "distinguishingFeatures": "Slim, lightweight, 10000mAh capacity, single USB-C port"
+      }
+    },
+    {
+      "id": "P09",
+      "group": "no_match",
+      "groupLabel": "No match",
+      "category": "PersonalBelongings",
+      "subcategory": "bottle",
+      "score": 0.8587195206248956,
+      "groundTruth": "NO_MATCH",
+      "expectedRange": "0.30–0.45",
+      "note": "Clear no-match — different material (stainless vs Tritan plastic), different color, different capacity.",
+      "lostPost": {
+        "title": "Lost Lock&Lock thermos bottle",
+        "color": "black",
+        "material": "stainless steel",
+        "size": "500ml",
+        "distinctiveMarks": "Name 'MINH' engraved on the body"
+      },
+      "foundPost": {
+        "title": "Found a pink plastic water bottle",
+        "color": "pastel pink",
+        "material": "Tritan plastic",
+        "size": "750ml",
+        "distinctiveMarks": "Hello Kitty stickers on the body"
+      }
+    }
+  ],
+  "thresholdAnalysis": [
+    { "threshold": 0.80, "TP": 6, "FP": 4, "TN": 0, "FN": 0, "precision": 0.6,   "recall": 1.0,  "f1": 0.75  },
+    { "threshold": 0.85, "TP": 6, "FP": 4, "TN": 0, "FN": 0, "precision": 0.6,   "recall": 1.0,  "f1": 0.75  },
+    { "threshold": 0.86, "TP": 6, "FP": 3, "TN": 1, "FN": 0, "precision": 0.67,   "recall": 1.0,  "f1": 0.8  },
+    { "threshold": 0.87, "TP": 6, "FP": 3, "TN": 1, "FN": 0, "precision": 0.67,   "recall": 1.0,  "f1": 0.8  },
+    { "threshold": 0.88, "TP": 6, "FP": 2, "TN": 2, "FN": 0, "precision": 0.75, "recall": 1.0,  "f1": 0.86   },
+    { "threshold": 0.89, "TP": 6, "FP": 1, "TN": 3, "FN": 0, "precision": 0.86,  "recall": 1.0,  "f1": 0.92 },
+    { "threshold": 0.90, "TP": 6, "FP": 1, "TN": 3, "FN": 0, "precision": 0.86,  "recall": 1.0,  "f1": 0.92 },
+    { "threshold": 0.91, "TP": 6, "FP": 1, "TN": 3, "FN": 0, "precision": 0.86,  "recall": 1.0,  "f1": 0.92 },
+    { "threshold": 0.92, "TP": 5, "FP": 1, "TN": 3, "FN": 1, "precision": 0.833, "recall": 0.833,"f1": 0.833 },
+    { "threshold": 0.93, "TP": 5, "FP": 1, "TN": 3, "FN": 1, "precision": 0.833, "recall": 0.833,"f1": 0.833 },
+    { "threshold": 0.94, "TP": 5, "FP": 0, "TN": 4, "FN": 1, "precision": 1.0,   "recall": 0.833,"f1": 0.91 },
+    { "threshold": 0.95, "TP": 4, "FP": 0, "TN": 4, "FN": 2, "precision": 1.0,   "recall": 0.667,"f1": 0.8   },
+    { "threshold": 0.96, "TP": 3, "FP": 0, "TN": 4, "FN": 3, "precision": 1.0,   "recall": 0.5,  "f1": 0.667 },
+    { "threshold": 0.97, "TP": 1, "FP": 0, "TN": 4, "FN": 5, "precision": 1.0,   "recall": 0.167,"f1": 0.286 },
+    { "threshold": 0.98, "TP": 0, "FP": 0, "TN": 4, "FN": 6, "precision": 0.0,   "recall": 0.0,  "f1": 0.0   }
+  ]
+}
