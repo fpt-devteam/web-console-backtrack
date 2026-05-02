@@ -1,5 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { orgService } from '@/services/org.service';
+import { inventoryService } from '@/services/inventory.service';
 import type { CreateOrganizationPayload, UpdateOrganizationPayload } from '@/types/organization.types';
 
 export const ORG_KEYS = {
@@ -33,6 +34,16 @@ export function useOrgBySlug(slug: string | undefined) {
     enabled: !!slug,
     staleTime: 5 * 60 * 1000,
   });
+}
+
+export function useGetOrgInventory(orgSlug: string | null, enabled = true) {
+  const orgQuery = useOrgBySlug(orgSlug ?? undefined)
+  const orgId = orgQuery.data?.id ?? null
+  return useQuery({
+    queryKey: ['inventory', 'bySlug', orgSlug, 'picker'],
+    queryFn: () => inventoryService.search(orgId!, { pageSize: 100 }),
+    enabled: enabled && !!orgId,
+  })
 }
 
 export function useOrgMembers(orgId: string | null, page = 1, pageSize = 20) {

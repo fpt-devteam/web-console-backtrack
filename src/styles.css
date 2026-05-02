@@ -122,6 +122,16 @@ code {
   --color-cloud: var(--cloud);
   --color-canvas: var(--canvas);
   --color-danger: var(--danger);
+
+  /* Brand color scale (derived from --rausch / primary hsl 349 100%) */
+  --color-brand-50: hsl(349 100% 97%);
+  --color-brand-100: hsl(349 100% 93%);
+  --color-brand-200: hsl(349 100% 86%);
+  --color-brand-300: hsl(349 100% 76%);
+  --color-brand-400: hsl(349 100% 68%);
+  --color-brand-500: hsl(349 100% 60%);
+  --color-brand-600: hsl(349 100% 50%);
+  --color-brand-primary: var(--rausch);
 }
 
 @layer base {

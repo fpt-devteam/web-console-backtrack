@@ -16,3 +16,5 @@ export const showToast = {
     return toast.error(msg, opts)
   }
 }
+
+export { showToast as toast }
