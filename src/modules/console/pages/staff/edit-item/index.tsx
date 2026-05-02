@@ -37,7 +37,8 @@ export function EditItemPage() {
 
   const [status, setStatus] = useState<PostStatus>('Active')
   const [eventTimeLocal, setEventTimeLocal] = useState<string>('') // datetime-local
-  const [internalLocation, setInternalLocation] = useState<string>('')
+  const [organizationStorageLocation, setOrganizationStorageLocation] = useState<string>('')
+  const [organizationFoundLocation, setOrganizationFoundLocation] = useState<string>('')
 
   const [detailItemName, setDetailItemName] = useState<string>('') // required for non-Others
   const [description, setDescription] = useState<string>('')
@@ -93,7 +94,8 @@ export function EditItemPage() {
     initRef.current = true
 
     setStatus(item.status)
-    setInternalLocation(item.internalLocation ?? '')
+    setOrganizationStorageLocation(item.organizationStorageLocation ?? '')
+    setOrganizationFoundLocation(item.organizationFoundLocation ?? '')
     setPhotoPreviews((item.imageUrls ?? []).map((url) => ({ url, isExisting: true })))
     if (item.eventTime) setEventTimeLocal(item.eventTime.slice(0, 16))
 
@@ -425,9 +427,13 @@ export function EditItemPage() {
                   <Label className="text-sm font-semibold">Created at</Label>
                   <Input value={item?.createdAt ? new Date(item.createdAt).toLocaleString() : '—'} readOnly className="mt-1 bg-[#f7f7f7]" />
                 </div>
-                <div className="md:col-span-2">
-                  <Label className="text-sm font-semibold">Internal location</Label>
-                  <Input value={internalLocation} readOnly className="mt-1 bg-[#f7f7f7]" />
+                <div>
+                  <Label className="text-sm font-semibold">Storage location</Label>
+                  <Input value={organizationStorageLocation} readOnly className="mt-1 bg-[#f7f7f7]" />
+                </div>
+                <div>
+                  <Label className="text-sm font-semibold">Found location</Label>
+                  <Input value={organizationFoundLocation} readOnly className="mt-1 bg-[#f7f7f7]" />
                 </div>
               </div>
             </section>

@@ -75,7 +75,7 @@ export interface DashboardInventoryItem {
   category: string
   subcategoryName: string
   status: 'InStorage' | 'Active' | 'ReturnScheduled' | 'Returned' | 'Archived' | 'Expired'
-  internalLocation: string
+  organizationStorageLocation: string
   imageUrl: string | null
   createdAt: string
 }
@@ -95,7 +95,7 @@ export const mockRecentItems: ApiSuccess<{ items: Array<DashboardInventoryItem>;
         category: 'PersonalBelongings',
         subcategoryName: 'Backpack',
         status: 'InStorage',
-        internalLocation: 'Shelf A-03',
+        organizationStorageLocation: 'Shelf A-03',
         imageUrl: null,
         createdAt: '2026-04-27T09:14:00Z',
       },
@@ -105,7 +105,7 @@ export const mockRecentItems: ApiSuccess<{ items: Array<DashboardInventoryItem>;
         category: 'Electronics',
         subcategoryName: 'Phone',
         status: 'ReturnScheduled',
-        internalLocation: 'Shelf B-01',
+        organizationStorageLocation: 'Shelf B-01',
         imageUrl: null,
         createdAt: '2026-04-26T14:32:00Z',
       },
@@ -115,7 +115,7 @@ export const mockRecentItems: ApiSuccess<{ items: Array<DashboardInventoryItem>;
         category: 'PersonalBelongings',
         subcategoryName: 'Wallet',
         status: 'InStorage',
-        internalLocation: 'Drawer D-02',
+        organizationStorageLocation: 'Drawer D-02',
         imageUrl: null,
         createdAt: '2026-04-26T11:05:00Z',
       },
@@ -125,7 +125,7 @@ export const mockRecentItems: ApiSuccess<{ items: Array<DashboardInventoryItem>;
         category: 'Cards',
         subcategoryName: 'Student ID',
         status: 'Returned',
-        internalLocation: 'Shelf A-01',
+        organizationStorageLocation: 'Shelf A-01',
         imageUrl: null,
         createdAt: '2026-04-25T16:20:00Z',
       },
@@ -135,7 +135,7 @@ export const mockRecentItems: ApiSuccess<{ items: Array<DashboardInventoryItem>;
         category: 'Electronics',
         subcategoryName: 'Earphones',
         status: 'InStorage',
-        internalLocation: 'Shelf B-02',
+        organizationStorageLocation: 'Shelf B-02',
         imageUrl: null,
         createdAt: '2026-04-25T10:45:00Z',
       },

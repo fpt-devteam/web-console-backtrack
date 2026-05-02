@@ -6,7 +6,6 @@ import {
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
   signOut as firebaseSignOut,
-  onAuthStateChanged,
   sendEmailVerification,
   type User as FirebaseUser,
 } from 'firebase/auth';
@@ -125,32 +124,22 @@ class RealAuthService implements IAuthService {
   }
 
   async getCurrentUser(): Promise<AuthUser | null> {
-    return new Promise((resolve, reject) => {
-      const unsubscribe = onAuthStateChanged(
-        auth,
-        async (firebaseUser) => {
-          unsubscribe();
-          if (!firebaseUser) {
-            resolve(null);
-            return;
-          }
+    await auth.authStateReady();
 
-          const baseUser = firebaseUserToAuthUser(firebaseUser);
+    const firebaseUser = auth.currentUser;
+    if (!firebaseUser) {
+      return null;
+    }
 
-          try {
-            const profile = await userService.getMe();
-            resolve({ ...baseUser, globalRole: profile.globalRole });
-          } catch {
-            // Fallback: if BE is unreachable or token invalid, keep USER.
-            resolve(baseUser);
-          }
-        },
-        (error) => {
-          unsubscribe();
-          reject(createAuthError(error));
-        }
-      );
-    });
+    const baseUser = firebaseUserToAuthUser(firebaseUser);
+
+    try {
+      const profile = await userService.getMe();
+      return { ...baseUser, globalRole: profile.globalRole };
+    } catch {
+      // Fallback: if BE is unreachable or token invalid, keep USER.
+      return baseUser;
+    }
   }
 
   async signOut(): Promise<void> {

@@ -118,7 +118,8 @@ export type PreviewItem = {
   distinctiveMarks: string
   category: ItemCategory
   subcategory: string
-  internalLocation: string
+  organizationStorageLocation: string
+  organizationFoundLocation: string
   eventTime: string
   color: string
   brand: string
@@ -226,12 +227,19 @@ export function Step3Preview({
                   <h2 className="text-2xl font-bold text-[#222222] leading-tight">
                     {formatOrDash(item.postTitle)}
                   </h2>
-                  <div className="mt-2 flex flex-wrap items-center gap-2">
-                    <CategoryPill category={item.category} subcategory={item.subcategory} />
+                  <div className="mt-2 grid grid-cols-1 sm:grid-cols-2 gap-x-10 gap-y-2">
+                    <div className="flex items-start min-w-0">
+                      <CategoryPill category={item.category} subcategory={item.subcategory} />
+                    </div>
+                    <InlineMetaRow
+                      icon={MapPin}
+                      label="Storage"
+                      value={formatOrDash(item.organizationStorageLocation)}
+                    />
                   </div>
                   <div className="mt-3 grid grid-cols-1 sm:grid-cols-2 gap-x-10 gap-y-2">
                     <InlineMetaRow icon={Calendar} label="Found time" value={formatFoundTime(item.eventTime)} />
-                    <InlineMetaRow icon={MapPin} label="Location" value={formatOrDash(item.internalLocation)} />
+                    <InlineMetaRow icon={MapPin} label="Found location" value={formatOrDash(item.organizationFoundLocation)} />
                   </div>
                 </div>
 

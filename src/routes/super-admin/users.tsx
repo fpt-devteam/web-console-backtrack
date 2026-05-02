@@ -1,18 +1,12 @@
 import { UsersPage } from '@/modules/super-admin/pages/users';
-import { Outlet, createFileRoute, useLocation } from '@tanstack/react-router';
+import { createFileRoute } from '@tanstack/react-router';
+import { z } from 'zod';
 
-export const Route = createFileRoute('/super-admin/users')({
-  component: RouteComponent,
+const usersSearchSchema = z.object({
+  userId: z.string().optional(),
 });
 
-function RouteComponent() {
-  const location = useLocation();
-  const isIndexRoute = location.pathname === '/super-admin/users';
-
-  return (
-    <>
-      {isIndexRoute ? <UsersPage /> : null}
-      <Outlet />
-    </>
-  );
-}
+export const Route = createFileRoute('/super-admin/users')({
+  validateSearch: usersSearchSchema,
+  component: UsersPage,
+});

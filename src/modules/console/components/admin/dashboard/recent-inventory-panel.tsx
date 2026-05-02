@@ -29,7 +29,8 @@ function InventoryRow({ item }: { item: AdminInventoryItem }) {
       <div className="flex-1 min-w-0">
         <p className="text-sm font-medium text-[#222222] truncate">{item.postTitle}</p>
         <p className="text-xs text-[#929292] truncate">
-          {item.subcategoryName} · {item.internalLocation} · <span className="text-[#6a6a6a]">{item.staffName}</span>
+          {item.subcategoryName} · {item.organizationStorageLocation} ·{' '}
+          <span className="text-[#6a6a6a]">{item.staffName}</span>
         </p>
       </div>
       <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full flex-shrink-0 ${STATUS_STYLE[item.status]}`}>

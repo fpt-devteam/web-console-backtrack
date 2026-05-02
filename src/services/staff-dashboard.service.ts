@@ -37,7 +37,7 @@ export interface DashboardInventoryItem {
   category: string
   subcategoryName: string
   status: 'InStorage' | 'Active' | 'ReturnScheduled' | 'Returned' | 'Archived' | 'Expired'
-  internalLocation: string
+  organizationStorageLocation: string
   imageUrl: string | null
   createdAt: string
 }

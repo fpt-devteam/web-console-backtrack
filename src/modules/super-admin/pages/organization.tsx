@@ -1,6 +1,11 @@
 import { Layout } from '../components/layout';
 import { useState } from 'react';
-import { useRouter } from '@tanstack/react-router';
+import { useRouter, useSearch } from '@tanstack/react-router';
+import {
+  Sheet,
+  SheetContent,
+} from '@/components/ui/sheet';
+import { OrganizationDetailPanel } from './organization-detail';
 import type { OrgStatus } from '@/services/super-admin.service';
 import { SEARCH_DEBOUNCE_MS, useDebouncedValue } from '@/hooks/use-debounce';
 import { useSuperAdminOrganizations } from '@/hooks/use-super-admin';
@@ -58,6 +63,7 @@ function formatDate(iso: string) {
 
 export function OrganizationPage() {
   const router = useRouter();
+  const { tenantId } = useSearch({ from: '/super-admin/organization' });
   const [currentPage, setCurrentPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState('');
   const debouncedSearch = useDebouncedValue(searchTerm.trim(), SEARCH_DEBOUNCE_MS);
@@ -96,8 +102,15 @@ export function OrganizationPage() {
     setCurrentPage(1);
   };
 
+  const closeOrgDetail = () => {
+    router.navigate({ to: '/super-admin/organization', search: {} });
+  };
+
   const handleViewOrg = (orgId: string) => {
-    router.navigate({ to: '/super-admin/organization/$tenantId', params: { tenantId: orgId } });
+    router.navigate({
+      to: '/super-admin/organization',
+      search: { tenantId: orgId },
+    });
   };
 
   const statusOptions = [
@@ -114,18 +127,26 @@ export function OrganizationPage() {
 
   return (
     <Layout>
-      <div className="p-8 bg-[#f7f7f7] min-h-screen">
-        <div className="mb-5">
-          <nav className="text-sm text-[#6a6a6a]">
-            <span className="hover:text-[#222222] cursor-pointer">Organization</span>
-            <span className="mx-2">/</span>
-            <span className="text-[#222222] font-medium">Tenants</span>
-          </nav>
-        </div>
+      <Sheet open={Boolean(tenantId)} onOpenChange={(open) => !open && closeOrgDetail()}>
+        <SheetContent
+          side="right"
+          showCloseButton
+          className="flex h-full w-full max-h-screen flex-col gap-0 overflow-hidden border-l p-0 sm:max-w-3xl lg:max-w-4xl"
+        >
+          {tenantId ? (
+            <OrganizationDetailPanel
+              tenantId={tenantId}
+              onClose={closeOrgDetail}
+              variant="drawer"
+            />
+          ) : null}
+        </SheetContent>
+      </Sheet>
 
-        <div className="flex items-start justify-between mb-4">
+      <div className="p-8 bg-[#f7f7f7] min-h-screen">
+        <div className="flex items-start justify-between mb-8">
           <div>
-            <h1 className="text-3xl font-bold text-[#222222] mb-2">Tenants</h1>
+            <h1 className="text-3xl font-bold text-[#222222] mb-1">Organization</h1>
             <p className="text-[#6a6a6a]">Manage and monitor all active tenant accounts and subscriptions.</p>
           </div>
         </div>
@@ -253,3 +274,4 @@ export function OrganizationPage() {
     </Layout>
   );
 }
+

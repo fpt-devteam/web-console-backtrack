@@ -32,7 +32,9 @@ function RecentItemRow({ item, slug }: { item: DashboardInventoryItem; slug: str
       </div>
       <div className="flex-1 min-w-0">
         <p className="text-sm font-medium text-[#222222] truncate">{item.postTitle}</p>
-        <p className="text-xs text-[#929292] truncate">{item.subcategoryName} · {item.internalLocation}</p>
+        <p className="text-xs text-[#929292] truncate">
+          {item.subcategoryName} · {item.organizationStorageLocation}
+        </p>
       </div>
       <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full flex-shrink-0 ${STATUS_STYLE[item.status]}`}>
         {STATUS_LABEL[item.status]}

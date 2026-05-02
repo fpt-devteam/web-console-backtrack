@@ -1,5 +1,5 @@
 import { Layout } from '../components/layout';
-import { useRouter, useParams } from '@tanstack/react-router';
+import { useRouter } from '@tanstack/react-router';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft, Calendar, Phone, Mail } from 'lucide-react';
 import { useAdminUserDetail } from '@/hooks/use-admin-users';
@@ -36,12 +36,23 @@ function getPaymentStatusBadgeClass(status: string | null | undefined) {
   return 'bg-[#f7f7f7] text-[#6a6a6a] border-[#dddddd]';
 }
 
-export function UserDetailPage() {
+export type UserDetailVariant = 'page' | 'drawer';
+
+export type UserDetailPanelProps = {
+  userId: string;
+  onClose: () => void;
+  variant?: UserDetailVariant;
+};
+
+export function UserDetailPanel({ userId, onClose, variant = 'drawer' }: UserDetailPanelProps) {
   const router = useRouter();
-  const { userId } = useParams({ from: '/super-admin/users/$userId' });
   const { data, isLoading, isError, error } = useAdminUserDetail(userId);
 
   const handleBack = () => {
+    if (variant === 'drawer') {
+      onClose();
+      return;
+    }
     router.navigate({ to: '/super-admin/users' });
   };
 
@@ -56,49 +67,48 @@ export function UserDetailPage() {
   const notFound =
     isAxiosError(error) && error.response?.status === 404;
 
+  const shellPadding = variant === 'drawer' ? 'p-6' : 'p-8 bg-[#f7f7f7] min-h-screen';
+
   if (isLoading) {
-    return (
-      <Layout>
-        <div className="p-8 bg-[#f7f7f7] min-h-screen flex items-center justify-center">
-          <p className="text-[#6a6a6a]">Loading user…</p>
-        </div>
-      </Layout>
+    const inner = (
+      <div className={`${shellPadding} flex items-center justify-center`}>
+        <p className="text-[#6a6a6a]">Loading user…</p>
+      </div>
     );
+    return variant === 'page' ? <Layout>{inner}</Layout> : inner;
   }
 
   if (isError && notFound) {
-    return (
-      <Layout>
-        <div className="p-8 bg-[#f7f7f7] min-h-screen">
-          <div className="bg-white rounded-[14px] border border-[#dddddd] p-8 text-center">
-            <h2 className="text-2xl font-bold text-[#222222] mb-2">User Not Found</h2>
-            <p className="text-[#6a6a6a] mb-6">The requested user could not be found.</p>
-            <Button onClick={handleBack} variant="outline">
-              <ArrowLeft className="w-4 h-4 mr-2" />
-              Back to Users
-            </Button>
-          </div>
+    const inner = (
+      <div className={shellPadding}>
+        <div className="bg-white rounded-[14px] border border-[#dddddd] p-8 text-center">
+          <h2 className="text-2xl font-bold text-[#222222] mb-2">User Not Found</h2>
+          <p className="text-[#6a6a6a] mb-6">The requested user could not be found.</p>
+          <Button onClick={handleBack} variant="outline">
+            <ArrowLeft className="w-4 h-4 mr-2" />
+            Back to Users
+          </Button>
         </div>
-      </Layout>
+      </div>
     );
+    return variant === 'page' ? <Layout>{inner}</Layout> : inner;
   }
 
   if (isError || !data) {
     const msg = error instanceof Error ? error.message : 'Something went wrong';
-    return (
-      <Layout>
-        <div className="p-8 bg-[#f7f7f7] min-h-screen">
-          <div className="bg-white rounded-[14px] border border-[#dddddd] p-8 text-center max-w-lg mx-auto">
-            <h2 className="text-2xl font-bold text-[#222222] mb-2">Could not load user</h2>
-            <p className="text-[#6a6a6a] mb-6">{msg}</p>
-            <Button onClick={handleBack} variant="outline">
-              <ArrowLeft className="w-4 h-4 mr-2" />
-              Back to Users
-            </Button>
-          </div>
+    const inner = (
+      <div className={shellPadding}>
+        <div className="bg-white rounded-[14px] border border-[#dddddd] p-8 text-center max-w-lg mx-auto">
+          <h2 className="text-2xl font-bold text-[#222222] mb-2">Could not load user</h2>
+          <p className="text-[#6a6a6a] mb-6">{msg}</p>
+          <Button onClick={handleBack} variant="outline">
+            <ArrowLeft className="w-4 h-4 mr-2" />
+            Back to Users
+          </Button>
         </div>
-      </Layout>
+      </div>
     );
+    return variant === 'page' ? <Layout>{inner}</Layout> : inner;
   }
 
   const user = data.basicInfo;
@@ -122,19 +132,14 @@ export function UserDetailPage() {
         includedFeatures: [] as string[],
       };
 
-  return (
-    <Layout>
-      <div className="p-8 bg-[#f7f7f7] min-h-screen">
-        <div className="mb-6">
-          <nav className="text-sm text-[#929292]">
-            <button type="button" onClick={handleBack} className="hover:text-[#6a6a6a] cursor-pointer">
-              User Management
-            </button>
-            <span className="mx-2">/</span>
-            <span className="text-[#222222] font-medium">{name}</span>
-          </nav>
-        </div>
-
+  const content = (
+      <div
+        className={
+          variant === 'drawer'
+            ? 'flex min-h-0 flex-1 flex-col overflow-y-auto bg-[#f7f7f7] p-6 pb-8'
+            : 'p-8 bg-[#f7f7f7] min-h-screen'
+        }
+      >
         <div className="bg-white rounded-[14px] border border-[#dddddd] p-8 mb-6">
           <div className="space-y-6">
             <div className="flex items-center gap-3 mb-4">
@@ -331,6 +336,7 @@ export function UserDetailPage() {
           </Button>
         </div>
       </div>
-    </Layout>
   );
+
+  return variant === 'page' ? <Layout>{content}</Layout> : content;
 }

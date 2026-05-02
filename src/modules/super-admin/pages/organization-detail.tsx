@@ -1,5 +1,5 @@
 import { Layout } from '../components/layout';
-import { useRouter, useParams } from '@tanstack/react-router';
+import { useRouter } from '@tanstack/react-router';
 import { Calendar, ArrowLeft, Phone, Mail } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { OrgLogo } from '@/components/org-logo';
@@ -26,22 +26,23 @@ const INDUSTRY_OPTIONS: Record<string, string> = {
   other: 'Other',
 };
 
+export type OrganizationDetailVariant = 'page' | 'drawer';
+
+export type OrganizationDetailPanelProps = {
+  tenantId: string;
+  onClose: () => void;
+  variant?: OrganizationDetailVariant;
+};
+
 /**
- * Organization Detail Page
- *
- * Displays comprehensive information about a specific tenant organization,
- * including subscription plan, usage statistics, and enabled modules.
- *
- * Features:
- * - Organization header with status and basic info
- * - Public data view banner (for restricted data viewing)
- * - Subscription plan details with renewal date
- * - Usage overview with progress bars
- * - Enabled modules display
+ * Organization detail content (full page or right-hand drawer).
  */
-export function OrganizationDetailPage() {
+export function OrganizationDetailPanel({
+  tenantId,
+  onClose,
+  variant = 'drawer',
+}: OrganizationDetailPanelProps) {
   const router = useRouter();
-  const { tenantId } = useParams({ from: '/super-admin/organization/$tenantId' });
 
   const { data, isLoading, isError, error } = useSuperAdminOrgDetail(tenantId, { billingPage: 1, billingPageSize: 20 })
 
@@ -53,7 +54,7 @@ export function OrganizationDetailPage() {
         id: org.id,
         name: org.name,
         slug: org.slug,
-        logoUrl: org.logoUrl ?? null,
+        logoUrl: org.logoUrl,
         status: org.status,
         industryType: org.industryType,
         taxIdentificationNumber: org.taxIdentificationNumber,
@@ -68,8 +69,8 @@ export function OrganizationDetailPage() {
               billingCycle: sub.planSnapshot.billingInterval,
               price: { amount: sub.planSnapshot.price, period: sub.planSnapshot.billingInterval === 'Yearly' ? 'yr' : 'mo' },
               quotasSummary: undefined,
-              description: (sub.planSnapshot.features ?? []).join(', '),
-              includedFeatures: sub.planSnapshot.features ?? [],
+              description: sub.planSnapshot.features.join(', '),
+              includedFeatures: sub.planSnapshot.features,
             }
           : {
               tier: 'Free',
@@ -82,7 +83,7 @@ export function OrganizationDetailPage() {
               includedFeatures: [],
             },
         usageOverview: undefined,
-        billingHistory: (data?.billingHistory ?? []).map((p) => ({
+        billingHistory: data.billingHistory.map((p) => ({
           id: p.providerInvoiceId || p.id,
           invoiceDate: new Date(p.paymentDate),
           amount: Number(p.amount),
@@ -95,13 +96,16 @@ export function OrganizationDetailPage() {
       }
     : null
 
-  const industryLabel = tenant?.industryType ? (INDUSTRY_OPTIONS[tenant.industryType] ?? tenant.industryType) : null;
+  const industryLabel = tenant?.industryType
+    ? (INDUSTRY_OPTIONS[tenant.industryType] || tenant.industryType)
+    : null;
   const taxId = tenant?.taxIdentificationNumber ?? null;
 
-  /**
-   * Handles navigation back to organization list
-   */
   const handleBack = () => {
+    if (variant === 'drawer') {
+      onClose();
+      return;
+    }
     router.navigate({ to: '/super-admin/organization' });
   };
 
@@ -212,72 +216,61 @@ export function OrganizationDetailPage() {
     return `${gb}GB`;
   };
 
+  const shellPadding = variant === 'drawer' ? 'p-6' : 'p-8 bg-[#f7f7f7] min-h-screen';
+
   if (isLoading) {
-    return (
-      <Layout>
-        <div className="p-8 bg-[#f7f7f7] min-h-screen">
-          <div className="bg-white rounded-[14px] border border-[#dddddd] p-8 text-center text-[#6a6a6a]">
-            Loading...
-          </div>
+    const inner = (
+      <div className={shellPadding}>
+        <div className="bg-white rounded-[14px] border border-[#dddddd] p-8 text-center text-[#6a6a6a]">
+          Loading...
         </div>
-      </Layout>
+      </div>
     );
+    return variant === 'page' ? <Layout>{inner}</Layout> : inner;
   }
 
   if (isError) {
-    return (
-      <Layout>
-        <div className="p-8 bg-[#f7f7f7] min-h-screen">
-          <div className="bg-white rounded-[14px] border border-[#dddddd] p-8 text-center">
-            <h2 className="text-2xl font-bold text-[#222222] mb-2">Failed to load organization</h2>
-            <p className="text-[#6a6a6a] mb-6">{error instanceof Error ? error.message : 'Please try again.'}</p>
-            <Button onClick={handleBack} variant="outline">
-              <ArrowLeft className="w-4 h-4 mr-2" />
-              Back to Organizations
-            </Button>
-          </div>
+    const inner = (
+      <div className={shellPadding}>
+        <div className="bg-white rounded-[14px] border border-[#dddddd] p-8 text-center">
+          <h2 className="text-2xl font-bold text-[#222222] mb-2">Failed to load organization</h2>
+          <p className="text-[#6a6a6a] mb-6">{error instanceof Error ? error.message : 'Please try again.'}</p>
+          <Button onClick={handleBack} variant="outline">
+            <ArrowLeft className="w-4 h-4 mr-2" />
+            Back to Organizations
+          </Button>
         </div>
-      </Layout>
+      </div>
     );
+    return variant === 'page' ? <Layout>{inner}</Layout> : inner;
   }
 
-  // Handle tenant not found
   if (!tenant) {
-    return (
-      <Layout>
-        <div className="p-8 bg-[#f7f7f7] min-h-screen">
-          <div className="bg-white rounded-[14px] border border-[#dddddd] p-8 text-center">
-            <h2 className="text-2xl font-bold text-[#222222] mb-2">Organization Not Found</h2>
-            <p className="text-[#6a6a6a] mb-6">The requested organization could not be found.</p>
-            <Button onClick={handleBack} variant="outline">
-              <ArrowLeft className="w-4 h-4 mr-2" />
-              Back to Organizations
-            </Button>
-          </div>
+    const inner = (
+      <div className={shellPadding}>
+        <div className="bg-white rounded-[14px] border border-[#dddddd] p-8 text-center">
+          <h2 className="text-2xl font-bold text-[#222222] mb-2">Organization Not Found</h2>
+          <p className="text-[#6a6a6a] mb-6">The requested organization could not be found.</p>
+          <Button onClick={handleBack} variant="outline">
+            <ArrowLeft className="w-4 h-4 mr-2" />
+            Back to Organizations
+          </Button>
         </div>
-      </Layout>
+      </div>
     );
+    return variant === 'page' ? <Layout>{inner}</Layout> : inner;
   }
 
   const statusStyle = getSystemStatusStyle(tenant.usageOverview?.systemStatus || 'Operational');
 
-  return (
-    <Layout>
-      <div className="p-8 bg-[#f7f7f7] min-h-screen">
-        {/* Breadcrumbs + Back */}
-        <div className="mb-6 flex items-center justify-between gap-4">
-          <nav className="text-sm text-[#929292]">
-            <button
-              onClick={handleBack}
-              className="hover:text-[#6a6a6a] cursor-pointer"
-            >
-              Organization
-            </button>
-            <span className="mx-2">/</span>
-            <span className="text-[#222222] font-medium">{tenant.name}</span>
-          </nav>
-        </div>
-
+  const content = (
+      <div
+        className={
+          variant === 'drawer'
+            ? 'flex min-h-0 flex-1 flex-col overflow-y-auto bg-[#f7f7f7] p-6 pb-8'
+            : 'p-8 bg-[#f7f7f7] min-h-screen'
+        }
+      >
         {/* Organization Information (Org Admin card style) */}
         <div className="bg-white rounded-[14px] border border-[#dddddd] p-8 mb-6">
           <div className="space-y-6">
@@ -652,6 +645,7 @@ export function OrganizationDetailPage() {
           </Button>
         </div>
       </div>
-    </Layout>
   );
+
+  return variant === 'page' ? <Layout>{content}</Layout> : content;
 }

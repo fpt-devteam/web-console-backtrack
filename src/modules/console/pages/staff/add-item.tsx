@@ -25,7 +25,7 @@ function cx(...classes: Array<string | false | null | undefined>) {
 }
 
 type AddInventoryDraft = {
-  v: 3
+  v: 4
   step: StepId
   item: {
     postTitle: string
@@ -35,7 +35,8 @@ type AddInventoryDraft = {
     distinctiveMarks: string
     category: ItemCategory | null
     subcategoryCode: string
-    internalLocation: string
+    organizationStorageLocation: string
+    organizationFoundLocation: string
     eventTime: string
     color: string
     brand: string
@@ -156,7 +157,8 @@ export function AddItemPage() {
   const { data: allSubcategories } = useSubcategories()
   const { data: subcategories } = useSubcategories(category ?? undefined)
   const [subcategoryCode, setSubcategoryCode] = useState<string>('') // required by BE
-  const [internalLocation, setInternalLocation] = useState<string>('')
+  const [organizationStorageLocation, setOrganizationStorageLocation] = useState<string>('')
+  const [organizationFoundLocation, setOrganizationFoundLocation] = useState<string>('')
   const [eventTime, setEventTime] = useState<string>('')
   const [color, setColor] = useState<string>('')
   const [brand, setBrand] = useState<string>('')
@@ -230,7 +232,7 @@ export function AddItemPage() {
 
     draftSaveTimerRef.current = window.setTimeout(() => {
       const draft: AddInventoryDraft = {
-        v: 3,
+        v: 4,
         step,
         item: {
           postTitle,
@@ -240,7 +242,8 @@ export function AddItemPage() {
           distinctiveMarks,
           category,
           subcategoryCode,
-          internalLocation,
+          organizationStorageLocation,
+          organizationFoundLocation,
           eventTime,
           color,
           brand,
@@ -283,6 +286,8 @@ export function AddItemPage() {
     distinctiveMarks,
     category,
     subcategoryCode,
+    organizationStorageLocation,
+    organizationFoundLocation,
     color,
     brand,
     condition,
@@ -434,7 +439,8 @@ export function AddItemPage() {
     distinctiveMarks: distinctiveMarks.trim() || undefined,
     category,
     subcategoryCode: subcategoryCode,
-    internalLocation: internalLocation.trim(),
+    organizationStorageLocation: organizationStorageLocation.trim(),
+    organizationFoundLocation: organizationFoundLocation.trim(),
     eventTime,
     color: color.trim() || undefined,
     brand: brand.trim() || undefined,
@@ -468,7 +474,8 @@ export function AddItemPage() {
     if (category === 'Others' && !itemName.trim()) return 'Item identifier is required.'
     if (photoPreviews.length === 0) return 'At least one photo is required.'
     if (!subcategoryCode.trim()) return 'Subcategory is required.'
-    if (!internalLocation.trim()) return 'Internal location is required.'
+    if (!organizationStorageLocation.trim()) return 'Storage location is required.'
+    if (!organizationFoundLocation.trim()) return 'Found location is required.'
     if (!eventTime.trim()) return 'Event time is required.'
     return null
   }
@@ -512,7 +519,8 @@ export function AddItemPage() {
     })
     setCategory(null)
     setSubcategoryCode('')
-    setInternalLocation('')
+    setOrganizationStorageLocation('')
+    setOrganizationFoundLocation('')
     setEventTime('')
     setColor('')
     setBrand('')
@@ -768,8 +776,10 @@ export function AddItemPage() {
               subcategories={subcategories ?? []}
               subcategoryCode={subcategoryCode}
               setSubcategoryCode={setSubcategoryCode}
-              internalLocation={internalLocation}
-              setInternalLocation={setInternalLocation}
+              organizationStorageLocation={organizationStorageLocation}
+              setOrganizationStorageLocation={setOrganizationStorageLocation}
+              organizationFoundLocation={organizationFoundLocation}
+              setOrganizationFoundLocation={setOrganizationFoundLocation}
               eventTime={eventTime}
               setEventTime={setEventTime}
               holderName={holderName}
@@ -833,7 +843,8 @@ export function AddItemPage() {
                 subcategory:
                   (allSubcategories ?? []).find((s) => s.code === subcategoryCode)?.name ??
                   subcategoryCode,
-                internalLocation,
+                organizationStorageLocation,
+                organizationFoundLocation,
                 eventTime,
                 color,
                 brand,

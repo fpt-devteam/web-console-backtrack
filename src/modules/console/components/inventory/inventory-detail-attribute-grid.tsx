@@ -119,11 +119,20 @@ export function InventoryDetailAttributeGrid({
     <>
       <div className="space-y-4">
         <div>
-          <div className="">
-            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-[#fff0f2] text-[#ff385c]">
-              <Tag className="w-3.5 h-3.5" />
-              {`${categoryLabel(item.category)}${subName.trim() ? ` - ${subName.trim()}` : ''}`}
-            </span>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-10 gap-y-2">
+            <div className="flex items-start min-w-0">
+              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-[#fff0f2] text-[#ff385c]">
+                <Tag className="w-3.5 h-3.5 shrink-0" />
+                <span className="break-words text-left">
+                  {`${categoryLabel(item.category)}${subName.trim() ? ` - ${subName.trim()}` : ''}`}
+                </span>
+              </span>
+            </div>
+            <InlineMetaRow
+              icon={MapPin}
+              label="Storage"
+              value={item.organizationStorageLocation ?? undefined}
+            />
           </div>
           <div className="mt-3 grid grid-cols-1 sm:grid-cols-2 gap-x-10 gap-y-2">
             <InlineMetaRow
@@ -131,7 +140,11 @@ export function InventoryDetailAttributeGrid({
               label="Found time"
               value={formatFoundTime24h(item.eventTime)}
             />
-            <InlineMetaRow icon={MapPin} label="Location" value={item.internalLocation} />
+            <InlineMetaRow
+              icon={MapPin}
+              label="Found location"
+              value={item.organizationFoundLocation ?? undefined}
+            />
           </div>
         </div>
 
@@ -242,7 +255,7 @@ function ItemQrCard({ orgSlug, itemId }: { orgSlug: string; itemId: string }) {
     <div className="mt-3 flex items-start justify-between gap-3">
       <div className="min-w-0 flex-1">
         <div className="text-xs text-[#a8a8a8]">
-          Scan to open this item. Users will be asked to sign in and must be a member of the organization.
+          Scan to open this item. 
         </div>
       </div>
 

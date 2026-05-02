@@ -34,8 +34,6 @@ import { Route as MarketingFeaturesRouteImport } from './routes/_marketing/featu
 import { Route as MarketingContactRouteImport } from './routes/_marketing/contact'
 import { Route as MarketingApplyRouteImport } from './routes/_marketing/apply'
 import { Route as MarketingAboutRouteImport } from './routes/_marketing/about'
-import { Route as SuperAdminUsersUserIdRouteImport } from './routes/super-admin/users/$userId'
-import { Route as SuperAdminOrganizationTenantIdRouteImport } from './routes/super-admin/organization/$tenantId'
 import { Route as ConsoleSlugStaffRouteImport } from './routes/console/$slug/staff'
 import { Route as ConsoleSlugAdminRouteImport } from './routes/console/$slug/admin'
 import { Route as ConsoleSlugStaffNotificationRouteImport } from './routes/console/$slug/staff/notification'
@@ -189,17 +187,6 @@ const MarketingAboutRoute = MarketingAboutRouteImport.update({
   path: '/about',
   getParentRoute: () => MarketingRoute,
 } as any)
-const SuperAdminUsersUserIdRoute = SuperAdminUsersUserIdRouteImport.update({
-  id: '/$userId',
-  path: '/$userId',
-  getParentRoute: () => SuperAdminUsersRoute,
-} as any)
-const SuperAdminOrganizationTenantIdRoute =
-  SuperAdminOrganizationTenantIdRouteImport.update({
-    id: '/$tenantId',
-    path: '/$tenantId',
-    getParentRoute: () => SuperAdminOrganizationRoute,
-  } as any)
 const ConsoleSlugStaffRoute = ConsoleSlugStaffRouteImport.update({
   id: '/staff',
   path: '/staff',
@@ -371,14 +358,12 @@ export interface FileRoutesByFullPath {
   '/console/processing': typeof ConsoleProcessingRoute
   '/console/welcome': typeof ConsoleWelcomeRoute
   '/super-admin/dashboard': typeof SuperAdminDashboardRoute
-  '/super-admin/organization': typeof SuperAdminOrganizationRouteWithChildren
+  '/super-admin/organization': typeof SuperAdminOrganizationRoute
   '/super-admin/revenue': typeof SuperAdminRevenueRoute
   '/super-admin/service-packages': typeof SuperAdminServicePackagesRoute
-  '/super-admin/users': typeof SuperAdminUsersRouteWithChildren
+  '/super-admin/users': typeof SuperAdminUsersRoute
   '/console/$slug/admin': typeof ConsoleSlugAdminRouteWithChildren
   '/console/$slug/staff': typeof ConsoleSlugStaffRouteWithChildren
-  '/super-admin/organization/$tenantId': typeof SuperAdminOrganizationTenantIdRoute
-  '/super-admin/users/$userId': typeof SuperAdminUsersUserIdRoute
   '/console/$slug/account/security': typeof ConsoleSlugAccountSecurityRoute
   '/console/$slug/admin/checkout': typeof ConsoleSlugAdminCheckoutRoute
   '/console/$slug/admin/dashboard': typeof ConsoleSlugAdminDashboardRoute
@@ -425,14 +410,12 @@ export interface FileRoutesByTo {
   '/console/processing': typeof ConsoleProcessingRoute
   '/console/welcome': typeof ConsoleWelcomeRoute
   '/super-admin/dashboard': typeof SuperAdminDashboardRoute
-  '/super-admin/organization': typeof SuperAdminOrganizationRouteWithChildren
+  '/super-admin/organization': typeof SuperAdminOrganizationRoute
   '/super-admin/revenue': typeof SuperAdminRevenueRoute
   '/super-admin/service-packages': typeof SuperAdminServicePackagesRoute
-  '/super-admin/users': typeof SuperAdminUsersRouteWithChildren
+  '/super-admin/users': typeof SuperAdminUsersRoute
   '/console/$slug/admin': typeof ConsoleSlugAdminRouteWithChildren
   '/console/$slug/staff': typeof ConsoleSlugStaffRouteWithChildren
-  '/super-admin/organization/$tenantId': typeof SuperAdminOrganizationTenantIdRoute
-  '/super-admin/users/$userId': typeof SuperAdminUsersUserIdRoute
   '/console/$slug/account/security': typeof ConsoleSlugAccountSecurityRoute
   '/console/$slug/admin/checkout': typeof ConsoleSlugAdminCheckoutRoute
   '/console/$slug/admin/dashboard': typeof ConsoleSlugAdminDashboardRoute
@@ -478,14 +461,12 @@ export interface FileRoutesById {
   '/console/processing': typeof ConsoleProcessingRoute
   '/console/welcome': typeof ConsoleWelcomeRoute
   '/super-admin/dashboard': typeof SuperAdminDashboardRoute
-  '/super-admin/organization': typeof SuperAdminOrganizationRouteWithChildren
+  '/super-admin/organization': typeof SuperAdminOrganizationRoute
   '/super-admin/revenue': typeof SuperAdminRevenueRoute
   '/super-admin/service-packages': typeof SuperAdminServicePackagesRoute
-  '/super-admin/users': typeof SuperAdminUsersRouteWithChildren
+  '/super-admin/users': typeof SuperAdminUsersRoute
   '/console/$slug/admin': typeof ConsoleSlugAdminRouteWithChildren
   '/console/$slug/staff': typeof ConsoleSlugStaffRouteWithChildren
-  '/super-admin/organization/$tenantId': typeof SuperAdminOrganizationTenantIdRoute
-  '/super-admin/users/$userId': typeof SuperAdminUsersUserIdRoute
   '/console/$slug/account/security': typeof ConsoleSlugAccountSecurityRoute
   '/console/$slug/admin/checkout': typeof ConsoleSlugAdminCheckoutRoute
   '/console/$slug/admin/dashboard': typeof ConsoleSlugAdminDashboardRoute
@@ -540,8 +521,6 @@ export interface FileRouteTypes {
     | '/super-admin/users'
     | '/console/$slug/admin'
     | '/console/$slug/staff'
-    | '/super-admin/organization/$tenantId'
-    | '/super-admin/users/$userId'
     | '/console/$slug/account/security'
     | '/console/$slug/admin/checkout'
     | '/console/$slug/admin/dashboard'
@@ -594,8 +573,6 @@ export interface FileRouteTypes {
     | '/super-admin/users'
     | '/console/$slug/admin'
     | '/console/$slug/staff'
-    | '/super-admin/organization/$tenantId'
-    | '/super-admin/users/$userId'
     | '/console/$slug/account/security'
     | '/console/$slug/admin/checkout'
     | '/console/$slug/admin/dashboard'
@@ -646,8 +623,6 @@ export interface FileRouteTypes {
     | '/super-admin/users'
     | '/console/$slug/admin'
     | '/console/$slug/staff'
-    | '/super-admin/organization/$tenantId'
-    | '/super-admin/users/$userId'
     | '/console/$slug/account/security'
     | '/console/$slug/admin/checkout'
     | '/console/$slug/admin/dashboard'
@@ -868,20 +843,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof MarketingAboutRouteImport
       parentRoute: typeof MarketingRoute
     }
-    '/super-admin/users/$userId': {
-      id: '/super-admin/users/$userId'
-      path: '/$userId'
-      fullPath: '/super-admin/users/$userId'
-      preLoaderRoute: typeof SuperAdminUsersUserIdRouteImport
-      parentRoute: typeof SuperAdminUsersRoute
-    }
-    '/super-admin/organization/$tenantId': {
-      id: '/super-admin/organization/$tenantId'
-      path: '/$tenantId'
-      fullPath: '/super-admin/organization/$tenantId'
-      preLoaderRoute: typeof SuperAdminOrganizationTenantIdRouteImport
-      parentRoute: typeof SuperAdminOrganizationRoute
-    }
     '/console/$slug/staff': {
       id: '/console/$slug/staff'
       path: '/staff'
@@ -1089,46 +1050,20 @@ const MarketingRouteWithChildren = MarketingRoute._addFileChildren(
   MarketingRouteChildren,
 )
 
-interface SuperAdminOrganizationRouteChildren {
-  SuperAdminOrganizationTenantIdRoute: typeof SuperAdminOrganizationTenantIdRoute
-}
-
-const SuperAdminOrganizationRouteChildren: SuperAdminOrganizationRouteChildren =
-  {
-    SuperAdminOrganizationTenantIdRoute: SuperAdminOrganizationTenantIdRoute,
-  }
-
-const SuperAdminOrganizationRouteWithChildren =
-  SuperAdminOrganizationRoute._addFileChildren(
-    SuperAdminOrganizationRouteChildren,
-  )
-
-interface SuperAdminUsersRouteChildren {
-  SuperAdminUsersUserIdRoute: typeof SuperAdminUsersUserIdRoute
-}
-
-const SuperAdminUsersRouteChildren: SuperAdminUsersRouteChildren = {
-  SuperAdminUsersUserIdRoute: SuperAdminUsersUserIdRoute,
-}
-
-const SuperAdminUsersRouteWithChildren = SuperAdminUsersRoute._addFileChildren(
-  SuperAdminUsersRouteChildren,
-)
-
 interface SuperAdminRouteChildren {
   SuperAdminDashboardRoute: typeof SuperAdminDashboardRoute
-  SuperAdminOrganizationRoute: typeof SuperAdminOrganizationRouteWithChildren
+  SuperAdminOrganizationRoute: typeof SuperAdminOrganizationRoute
   SuperAdminRevenueRoute: typeof SuperAdminRevenueRoute
   SuperAdminServicePackagesRoute: typeof SuperAdminServicePackagesRoute
-  SuperAdminUsersRoute: typeof SuperAdminUsersRouteWithChildren
+  SuperAdminUsersRoute: typeof SuperAdminUsersRoute
 }
 
 const SuperAdminRouteChildren: SuperAdminRouteChildren = {
   SuperAdminDashboardRoute: SuperAdminDashboardRoute,
-  SuperAdminOrganizationRoute: SuperAdminOrganizationRouteWithChildren,
+  SuperAdminOrganizationRoute: SuperAdminOrganizationRoute,
   SuperAdminRevenueRoute: SuperAdminRevenueRoute,
   SuperAdminServicePackagesRoute: SuperAdminServicePackagesRoute,
-  SuperAdminUsersRoute: SuperAdminUsersRouteWithChildren,
+  SuperAdminUsersRoute: SuperAdminUsersRoute,
 }
 
 const SuperAdminRouteWithChildren = SuperAdminRoute._addFileChildren(

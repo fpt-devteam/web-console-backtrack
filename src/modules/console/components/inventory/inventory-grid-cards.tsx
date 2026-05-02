@@ -83,7 +83,8 @@ export function InventoryGridCards({
                 day: '2-digit',
               })
             : '—'
-        const foundLocation = item.internalLocation?.trim() || '—'
+        const storageTrimmed = item.organizationStorageLocation?.trim()
+        const locationLine = storageTrimmed || '—'
 
         return (
           <Link
@@ -124,7 +125,7 @@ export function InventoryGridCards({
               <div className="space-y-1.5">
                 <div className="flex items-center gap-1.5 text-xs text-[#6a6a6a]">
                   <MapPin className="w-3.5 h-3.5 flex-shrink-0 text-[#b0b0b0]" />
-                  <span className="truncate">{foundLocation}</span>
+                  <span className="truncate">{locationLine}</span>
                 </div>
                 <div className="flex items-center justify-between text-xs text-[#929292]">
                   {subName.trim() ? (

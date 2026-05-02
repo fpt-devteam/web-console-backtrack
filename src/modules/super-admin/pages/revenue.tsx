@@ -1,33 +1,33 @@
 import { Download } from 'lucide-react'
 import { Layout } from '../components/layout'
 import { RevenueChart, RevenueStatCards, RevenueTransactionsTable } from '../components'
-import { SiteHeader } from '@/components/layout/site-header'
-import { Button } from '@/components/ui/button'
 
 export function RevenuePage() {
   const handleExport = () => console.log('Export revenue data')
 
   return (
     <Layout>
-      <SiteHeader
-        crumbs={[{ label: 'Revenue Management' }]}
-        actions={
-          <Button
+      <div className="p-8 bg-[#f7f7f7] min-h-screen space-y-8">
+        <div className="flex items-start justify-between gap-4">
+          <div>
+            <h1 className="text-3xl font-bold text-[#222222] mb-1">Revenue</h1>
+            <p className="text-[#6a6a6a]">Track platform revenue, subscriptions, and transactions.</p>
+          </div>
+          <button
+            type="button"
             onClick={handleExport}
-            variant="outline"
-            size="sm"
-            className="rounded-[20px] border-[#dddddd] text-[#6a6a6a] hover:bg-[#f7f7f7] gap-1.5"
+            className="flex shrink-0 items-center gap-2 px-5 py-2.5 rounded-[20px] text-sm font-medium bg-[#ff385c] text-white border border-transparent hover:bg-white hover:text-[#ff385c] hover:border-[#ff385c] transition-colors active:scale-[0.96]"
           >
             <Download className="w-4 h-4" />
             Export
-          </Button>
-        }
-      />
+          </button>
+        </div>
 
-      <div className="p-4 sm:p-6 lg:p-8 space-y-6">
-        <RevenueStatCards />
-        <RevenueChart />
-        <RevenueTransactionsTable />
+        <div className="space-y-6">
+          <RevenueStatCards />
+          <RevenueChart />
+          <RevenueTransactionsTable />
+        </div>
       </div>
     </Layout>
   )

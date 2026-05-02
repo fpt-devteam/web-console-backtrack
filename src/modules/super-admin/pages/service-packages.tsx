@@ -297,12 +297,13 @@ export function ServicePackagesPage() {
         {/* Header */}
         <div className="flex items-start justify-between mb-8">
           <div>
-            <h1 className="text-3xl font-bold text-[#222222] mb-1">Service Package Management</h1>
+            <h1 className="text-3xl font-bold text-[#222222] mb-1">Service Package</h1>
             <p className="text-[#6a6a6a]">Manage subscription packages, pricing, and features.</p>
           </div>
           <button
+            type="button"
             onClick={openCreate}
-            className="flex items-center gap-2 px-5 py-2.5 bg-[#222222] text-white rounded-[20px] text-sm font-medium hover:bg-[#333333] transition-colors active:scale-[0.96]"
+            className="flex items-center gap-2 px-5 py-2.5 rounded-[20px] text-sm font-medium bg-[#ff385c] text-white border border-transparent hover:bg-white hover:text-[#ff385c] hover:border-[#ff385c] transition-colors active:scale-[0.96]"
           >
             <Plus className="w-4 h-4" />
             Add Package

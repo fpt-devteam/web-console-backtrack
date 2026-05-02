@@ -58,8 +58,10 @@ export type Step1PhotosAndItemProps = {
   subcategories: InventorySubcategory[]
   subcategoryCode: string
   setSubcategoryCode: (v: string) => void
-  internalLocation: string
-  setInternalLocation: (v: string) => void
+  organizationStorageLocation: string
+  setOrganizationStorageLocation: (v: string) => void
+  organizationFoundLocation: string
+  setOrganizationFoundLocation: (v: string) => void
   eventTime: string
   setEventTime: (v: string) => void
   holderName: string
@@ -120,8 +122,10 @@ export function Step1PhotosAndItem({
   subcategories,
   subcategoryCode,
   setSubcategoryCode: _setSubcategoryCode,
-  internalLocation,
-  setInternalLocation,
+  organizationStorageLocation,
+  setOrganizationStorageLocation,
+  organizationFoundLocation,
+  setOrganizationFoundLocation,
   eventTime,
   setEventTime,
   holderName,
@@ -209,14 +213,28 @@ export function Step1PhotosAndItem({
           </div>
 
           <div className="md:col-span-2">
-            <Label htmlFor="internalLocation" className="text-sm font-semibold text-[#222222]">
-              Internal location <span className="text-[#c13515]">*</span>
+            <Label htmlFor="organizationStorageLocation" className="text-sm font-semibold text-[#222222]">
+              Storage location <span className="text-[#c13515]">*</span>
             </Label>
             <Input
-              id="internalLocation"
-              value={internalLocation}
-              onChange={(e) => setInternalLocation(e.target.value)}
-              placeholder="e.g. Front desk shelf A, Security office locker 3"
+              id="organizationStorageLocation"
+              value={organizationStorageLocation}
+              onChange={(e) => setOrganizationStorageLocation(e.target.value)}
+              placeholder="Lost & Found counter, Shelf A-12, Locker 3"
+              className="mt-1"
+            />
+            <div className="mt-1 text-xs text-[#929292]">Where the item is stored inside your organization.</div>
+          </div>
+
+          <div className="md:col-span-2">
+            <Label htmlFor="organizationFoundLocation" className="text-sm font-semibold text-[#222222]">
+              Found location <span className="text-[#c13515]">*</span>
+            </Label>
+            <Input
+              id="organizationFoundLocation"
+              value={organizationFoundLocation}
+              onChange={(e) => setOrganizationFoundLocation(e.target.value)}
+              placeholder="Terminal 2 Gate B, Ground floor restroom, Parking P1"
               className="mt-1"
             />
           </div>
@@ -241,7 +259,6 @@ export function Step1PhotosAndItem({
               }}
               className="mt-1"
             />
-            <div className="mt-1 text-xs text-[#929292]">When the item was found or handed to staff.</div>
           </div>
 
           {/* Photos Section (moved below basic info) */}
@@ -267,7 +284,7 @@ export function Step1PhotosAndItem({
               <Input
                 id="detailItemName"
                 type="text"
-                placeholder="e.g. Apple Watch, Student ID card, Backpack"
+                placeholder="Apple Watch, Student ID card, Backpack"
                 value={detailItemName}
                 onChange={(e) => setDetailItemName(e.target.value)}
                 className="mt-1"
@@ -374,7 +391,7 @@ export function Step1PhotosAndItem({
                 id="primaryColor"
                 value={color}
                 onChange={(e) => setColor(e.target.value)}
-                placeholder="e.g. Moss green"
+                placeholder="Moss green"
                 className="mt-1"
               />
             </div>
@@ -487,7 +504,7 @@ export function Step1PhotosAndItem({
               </Label>
               <Input
                 id="distinctiveMarks"
-                placeholder="e.g. serial number, scratches, stickers"
+                placeholder="serial number, scratches, stickers"
                 value={distinctiveMarks}
                 onChange={(e) => setDistinctiveMarks(e.target.value)}
                 className="mt-1"

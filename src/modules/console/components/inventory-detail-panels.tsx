@@ -54,14 +54,25 @@ export function InventoryDetailPanels({ item }: { item: InventoryItem }) {
   const rows: TableRow[] = [
     { kind: 'section', title: 'Item' },
     { kind: 'field', label: 'Name', value: vOrUnderscore(getInventoryTitle(item)) },
-    { kind: 'field', label: 'Category', value: vOrUnderscore(item.category) },
+    {
+      kind: 'field',
+      label: 'Category',
+      value: (
+        <span className="inline-flex flex-wrap items-center gap-x-2 gap-y-1">
+          <span className="font-medium">{vOrUnderscore(item.category)}</span>
+          <span className="text-[#929292]">·</span>
+          <span className="text-[#6a6a6a]">Storage:</span>
+          <span>{vOrUnderscore(item.organizationStorageLocation ?? undefined)}</span>
+        </span>
+      ),
+    },
     { kind: 'field', label: 'Distinctive marks', value: vOrUnderscore(getInventoryDistinctiveMarks(item) ?? undefined) },
     { kind: 'field', label: 'Details', value: vOrUnderscore(getInventoryDescription(item) ?? undefined) },
     { kind: 'section', title: 'Status & timing' },
     { kind: 'field', label: 'Status', value: vOrUnderscore(item.status) },
     { kind: 'field', label: 'Found time', value: fmtDateTime(item.eventTime) },
     { kind: 'field', label: 'Created at', value: fmtDateTime(item.createdAt) },
-    { kind: 'field', label: 'Internal location', value: vOrUnderscore(item.internalLocation ?? undefined) },
+    { kind: 'field', label: 'Found location', value: vOrUnderscore(item.organizationFoundLocation ?? undefined) },
     { kind: 'section', title: 'Author / organization' },
     {
       kind: 'field',

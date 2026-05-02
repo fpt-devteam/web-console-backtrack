@@ -41,7 +41,6 @@ export function HandoverItemModal({
   const uploadedUrlByFileKeyRef = useRef<Map<string, string>>(new Map())
 
   const staffName = me?.name ?? me?.displayName ?? me?.email ?? '—'
-  const staffId = me?.id ?? '—'
 
   const requiredOwnerFields: FinderContactField[] = org?.requiredOwnerContractFields ?? ['Phone']
   const isRequired = (f: FinderContactField) => requiredOwnerFields.includes(f)
@@ -237,15 +236,8 @@ export function HandoverItemModal({
 
         <div className="pt-2 border-t border-[#ebebeb]">
           <div className="text-sm font-semibold text-[#222222] mb-3">STAFF</div>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <Label className="text-sm font-medium text-[#222222]">Name</Label>
-              <Input value={staffName} readOnly className="mt-1 h-8 text-xs bg-[#f7f7f7]" />
-            </div>
-            <div>
-              <Label className="text-sm font-medium text-[#222222]">ID</Label>
-              <Input value={staffId} readOnly className="mt-1 h-8 text-xs bg-[#f7f7f7]" />
-            </div>
+          <div>
+            <Input value={staffName} readOnly className=" h-8 text-xs bg-[#f7f7f7]" />
           </div>
         </div>
 

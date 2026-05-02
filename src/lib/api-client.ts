@@ -23,6 +23,7 @@ export const privateClient = axios.create({
 
 privateClient.interceptors.request.use(
   async (config) => {
+    await auth.authStateReady();
     const user = auth.currentUser;
     if (user) {
       const token = await user.getIdToken();

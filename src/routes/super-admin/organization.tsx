@@ -1,18 +1,12 @@
 import { OrganizationPage } from '@/modules/super-admin/pages/organization';
-import { Outlet, createFileRoute, useLocation } from '@tanstack/react-router';
+import { createFileRoute } from '@tanstack/react-router';
+import { z } from 'zod';
 
-export const Route = createFileRoute('/super-admin/organization')({
-  component: RouteComponent,
+const organizationSearchSchema = z.object({
+  tenantId: z.string().optional(),
 });
 
-function RouteComponent() {
-  const location = useLocation();
-  const isIndexRoute = location.pathname === '/super-admin/organization';
-
-  return (
-    <>
-      {isIndexRoute ? <OrganizationPage /> : null}
-      <Outlet />
-    </>
-  );
-}
+export const Route = createFileRoute('/super-admin/organization')({
+  validateSearch: organizationSearchSchema,
+  component: OrganizationPage,
+});

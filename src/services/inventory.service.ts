@@ -103,8 +103,8 @@ export interface InventoryItem {
   location: GeoPoint
   displayAddress?: string | null
   externalPlaceId?: string | null
-  /** Storage / intake location inside the organization (if provided by BE). */
-  internalLocation?: string | null
+  organizationStorageLocation?: string | null
+  organizationFoundLocation?: string | null
   eventTime: string
   createdAt: string
   author?: PostAuthorResult | null
@@ -128,17 +128,15 @@ export interface InventorySubcategory {
 export interface CreateInventoryPayload {
   postTitle: string
   postType?: PostType
-  /** Maps to BE `*DetailInput.ItemName` (Personal/Cards/Electronics). */
   detailItemName?: string
-  /** Maps to `OtherDetail.itemIdentifier` only; not a stored field for other categories. */
   itemName: string
   description: string
   distinctiveMarks?: string | null
   imageUrls?: Array<string>
   category: ItemCategory
   subcategoryCode: string
-  /** Required by BE for org inventory items. */
-  internalLocation: string
+  organizationStorageLocation: string
+  organizationFoundLocation: string
   /** ISO-8601 timestamp (DateTimeOffset) */
   eventTime: string
   color?: string | null
@@ -175,6 +173,8 @@ export interface UpdateInventoryPayload {
   externalPlaceId?: string | null
   /** UpdatePostCommand.Location */
   location?: GeoPoint | null
+  organizationStorageLocation?: string | null
+  organizationFoundLocation?: string | null
 
   personalBelongingDetail?: {
     itemName: string
@@ -287,7 +287,8 @@ export const inventoryService = {
             postTitle,
             category: payload.category,
             subcategoryCode: payload.subcategoryCode,
-            internalLocation: payload.internalLocation,
+            organizationStorageLocation: payload.organizationStorageLocation,
+            organizationFoundLocation: payload.organizationFoundLocation,
             eventTime: payload.eventTime,
             personalBelongingDetail: {
               itemName: detailItemName,
@@ -308,7 +309,8 @@ export const inventoryService = {
               postTitle,
               category: payload.category,
               subcategoryCode: payload.subcategoryCode,
-              internalLocation: payload.internalLocation,
+              organizationStorageLocation: payload.organizationStorageLocation,
+              organizationFoundLocation: payload.organizationFoundLocation,
               eventTime: payload.eventTime,
               electronicDetail: {
                 itemName: detailItemName,
@@ -331,7 +333,8 @@ export const inventoryService = {
               postTitle,
               category: payload.category,
               subcategoryCode: payload.subcategoryCode,
-              internalLocation: payload.internalLocation,
+              organizationStorageLocation: payload.organizationStorageLocation,
+              organizationFoundLocation: payload.organizationFoundLocation,
               eventTime: payload.eventTime,
               cardDetail: {
                 itemName: detailItemName,
@@ -353,7 +356,8 @@ export const inventoryService = {
                 postTitle,
                 category: payload.category,
                 subcategoryCode: payload.subcategoryCode,
-                internalLocation: payload.internalLocation,
+                organizationStorageLocation: payload.organizationStorageLocation,
+                organizationFoundLocation: payload.organizationFoundLocation,
                 eventTime: payload.eventTime,
                 otherDetail: {
                   itemName: payload.itemName.trim(),
@@ -368,7 +372,8 @@ export const inventoryService = {
                 postTitle,
                 category: payload.category,
                 subcategoryCode: payload.subcategoryCode,
-                internalLocation: payload.internalLocation,
+                organizationStorageLocation: payload.organizationStorageLocation,
+                organizationFoundLocation: payload.organizationFoundLocation,
                 eventTime: payload.eventTime,
                 otherDetail: {
                   itemName: payload.itemName.trim(),

@@ -157,7 +157,7 @@ export interface AdminInventoryItem {
   category: string
   subcategoryName: string
   status: ItemStatus
-  internalLocation: string
+  organizationStorageLocation: string
   imageUrl: string | null
   staffName: string
   createdAt: string
@@ -174,42 +174,42 @@ export const mockRecentInventory: ApiSuccess<{ items: Array<AdminInventoryItem>;
     items: [
       {
         id: 'item-001', postTitle: 'Blue Backpack with laptop inside', category: 'Bags',
-        subcategoryName: 'Backpack', status: 'InStorage', internalLocation: 'Shelf A-03',
+        subcategoryName: 'Backpack', status: 'InStorage', organizationStorageLocation: 'Shelf A-03',
         imageUrl: null, staffName: 'Nguyen Van A', createdAt: '2026-04-27T09:14:00Z',
       },
       {
         id: 'item-002', postTitle: 'iPhone 14 Pro – black', category: 'Electronics',
-        subcategoryName: 'Phone', status: 'ReturnScheduled', internalLocation: 'Shelf B-01',
+        subcategoryName: 'Phone', status: 'ReturnScheduled', organizationStorageLocation: 'Shelf B-01',
         imageUrl: null, staffName: 'Tran Thi B', createdAt: '2026-04-26T14:32:00Z',
       },
       {
         id: 'item-003', postTitle: 'Leather wallet (brown)', category: 'Personal Belongings',
-        subcategoryName: 'Wallet', status: 'InStorage', internalLocation: 'Drawer D-02',
+        subcategoryName: 'Wallet', status: 'InStorage', organizationStorageLocation: 'Drawer D-02',
         imageUrl: null, staffName: 'Le Van C', createdAt: '2026-04-26T11:05:00Z',
       },
       {
         id: 'item-004', postTitle: 'Student ID – Nguyen Van A', category: 'Cards & Documents',
-        subcategoryName: 'Student ID', status: 'Returned', internalLocation: 'Shelf A-01',
+        subcategoryName: 'Student ID', status: 'Returned', organizationStorageLocation: 'Shelf A-01',
         imageUrl: null, staffName: 'Nguyen Van A', createdAt: '2026-04-25T16:20:00Z',
       },
       {
         id: 'item-005', postTitle: 'AirPods Pro (2nd gen) with case', category: 'Electronics',
-        subcategoryName: 'Earphones', status: 'InStorage', internalLocation: 'Shelf B-02',
+        subcategoryName: 'Earphones', status: 'InStorage', organizationStorageLocation: 'Shelf B-02',
         imageUrl: null, staffName: 'Tran Thi B', createdAt: '2026-04-25T10:45:00Z',
       },
       {
         id: 'item-006', postTitle: 'Black umbrella', category: 'Accessories',
-        subcategoryName: 'Umbrella', status: 'Active', internalLocation: 'Shelf C-01',
+        subcategoryName: 'Umbrella', status: 'Active', organizationStorageLocation: 'Shelf C-01',
         imageUrl: null, staffName: 'Le Van C', createdAt: '2026-04-24T08:30:00Z',
       },
       {
         id: 'item-007', postTitle: 'MacBook Pro 14" silver', category: 'Electronics',
-        subcategoryName: 'Laptop', status: 'InStorage', internalLocation: 'Cabinet E-01',
+        subcategoryName: 'Laptop', status: 'InStorage', organizationStorageLocation: 'Cabinet E-01',
         imageUrl: null, staffName: 'Pham Thi D', createdAt: '2026-04-24T07:15:00Z',
       },
       {
         id: 'item-008', postTitle: 'Ray-Ban sunglasses', category: 'Accessories',
-        subcategoryName: 'Sunglasses', status: 'Expired', internalLocation: 'Shelf A-05',
+        subcategoryName: 'Sunglasses', status: 'Expired', organizationStorageLocation: 'Shelf A-05',
         imageUrl: null, staffName: 'Hoang Van E', createdAt: '2026-04-23T14:00:00Z',
       },
     ],

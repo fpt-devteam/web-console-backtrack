@@ -6,7 +6,12 @@ import type { AdminUserStatus, AdminUserSummary } from '@/types/admin-user.types
 import { TableFiltersBar } from '@/components/filters/table-filters-bar';
 import { Pagination } from '@/components/ui/pagination';
 import { useAdminUsers } from '@/hooks/use-admin-users';
-import { useRouter } from '@tanstack/react-router';
+import { useRouter, useSearch } from '@tanstack/react-router';
+import {
+  Sheet,
+  SheetContent,
+} from '@/components/ui/sheet';
+import { UserDetailPanel } from './user-detail';
 
 function rowDisplayName(u: AdminUserSummary): string {
   return (u.displayName || u.email || 'Unknown').trim();
@@ -30,6 +35,11 @@ function formatDate(iso: string) {
 
 export function UsersPage() {
   const router = useRouter();
+  const { userId } = useSearch({ from: '/super-admin/users' });
+
+  const closeUserDetail = () => {
+    router.navigate({ to: '/super-admin/users', search: {} });
+  };
   const [currentPage, setCurrentPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState('');
   const debouncedSearch = useDebouncedValue(searchTerm.trim(), SEARCH_DEBOUNCE_MS);
@@ -62,14 +72,20 @@ export function UsersPage() {
 
   return (
     <Layout>
-      <div className="p-8 bg-[#f7f7f7] min-h-screen">
-        <div className="mb-4">
-          <nav className="text-sm text-[#6a6a6a]">
-            <span>User Management</span>
-          </nav>
-        </div>
+      <Sheet open={Boolean(userId)} onOpenChange={(open) => !open && closeUserDetail()}>
+        <SheetContent
+          side="right"
+          showCloseButton
+          className="flex h-full w-full max-h-screen flex-col gap-0 overflow-hidden border-l p-0 sm:max-w-3xl lg:max-w-4xl"
+        >
+          {userId ? (
+            <UserDetailPanel userId={userId} onClose={closeUserDetail} variant="drawer" />
+          ) : null}
+        </SheetContent>
+      </Sheet>
 
-        <div className="flex items-start justify-between mb-6">
+      <div className="p-8 bg-[#f7f7f7] min-h-screen">
+        <div className="flex items-start justify-between mb-8">
           <div>
             <h1 className="text-3xl font-bold text-[#222222] mb-1">Users</h1>
             <p className="text-[#6a6a6a]">Manage and monitor all user accounts, roles, and permissions.</p>
@@ -147,7 +163,10 @@ export function UsersPage() {
                         key={user.id}
                         className="hover:bg-[#f7f7f7] transition-colors cursor-pointer"
                         onClick={() => {
-                          router.navigate({ to: '/super-admin/users/$userId', params: { userId: user.id } });
+                          router.navigate({
+                            to: '/super-admin/users',
+                            search: { userId: user.id },
+                          });
                         }}
                       >
                         <td className="px-6 py-4 whitespace-nowrap">

@@ -34,11 +34,11 @@ const MENU_ITEM_CLS =
   'text-base text-charcoal hover:bg-cloud data-[active=true]:bg-[#fff0f2] data-[active=true]:text-rausch'
 
 const navItems = [
-  { name: 'Dashboard',                  icon: LayoutGrid, path: '/super-admin/dashboard' },
-  { name: 'Organization',               icon: Building2,  path: '/super-admin/organization' },
-  { name: 'User Management',            icon: Users,      path: '/super-admin/users' },
-  { name: 'Revenue Management',         icon: DollarSign, path: '/super-admin/revenue' },
-  { name: 'Service Package Management', icon: Package,    path: '/super-admin/service-packages' },
+  { name: 'Dashboard',         icon: LayoutGrid, path: '/super-admin/dashboard' },
+  { name: 'Organization',      icon: Building2,  path: '/super-admin/organization' },
+  { name: 'Users',             icon: Users,        path: '/super-admin/users' },
+  { name: 'Revenue',           icon: DollarSign,   path: '/super-admin/revenue' },
+  { name: 'Service Package',   icon: Package,      path: '/super-admin/service-packages' },
 ]
 
 function getInitials(name: string | null | undefined): string {
