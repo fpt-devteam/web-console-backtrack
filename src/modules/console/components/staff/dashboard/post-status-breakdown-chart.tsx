@@ -13,7 +13,7 @@ import type { PostStatus } from '@/services/inventory.service'
 
 const STATUSES: Array<{ key: PostStatus; label: string }> = [
   { key: 'InStorage',       label: 'In Storage'       },
-  { key: 'ReturnScheduled', label: 'Return Scheduled' },
+  // { key: 'ReturnScheduled', label: 'Return Scheduled' },
   { key: 'Returned',        label: 'Returned'         },
   { key: 'Archived',        label: 'Archived'         },
   { key: 'Expired',         label: 'Expired'          },
