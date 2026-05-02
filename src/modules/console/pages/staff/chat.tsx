@@ -5,6 +5,7 @@ import { AssignConfirmDialog } from '../../components/staff/chat/assign-confirm-
 import { ChatHeader } from '../../components/staff/chat/chat-header'
 import { ChatSidebar } from '../../components/staff/chat/chat-sidebar'
 import { MessagePanel } from '../../components/staff/chat/message-panel'
+import { PinnedPostCard } from '../../components/staff/chat/pinned-post-card'
 import type { IConversation } from '@/types/chat.types'
 import { useChatContext } from '@/contexts/chat.context'
 import { useCurrentOrgId } from '@/contexts/current-org.context'
@@ -115,6 +116,12 @@ export function StaffChatPage() {
                 isResolvePending={resolveMutation.isPending}
                 onResolve={handleResolve}
               />
+              {activeConv.postId && (
+                <PinnedPostCard
+                  postId={activeConv.postId}
+                  orgSlug={activeConv.orgSlug ?? ''}
+                />
+              )}
               <MessagePanel
                 conversationId={activeConversationId}
                 partner={activeConv.partner}
