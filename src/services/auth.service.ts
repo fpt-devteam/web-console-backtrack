@@ -135,7 +135,7 @@ class RealAuthService implements IAuthService {
 
     try {
       const profile = await userService.getMe();
-      return { ...baseUser, globalRole: profile.globalRole };
+      return { ...baseUser, globalRole: profile.globalRole, avatarUrl: profile.avatarUrl };
     } catch {
       // Fallback: if BE is unreachable or token invalid, keep USER.
       return baseUser;

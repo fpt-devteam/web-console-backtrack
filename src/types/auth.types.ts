@@ -8,6 +8,7 @@ export interface AuthUser {
   email: string;
   emailVerified: boolean;
   name: string;
+  avatarUrl?: string | null;
   globalRole: UserGlobalRoleType;
   status: 'ACTIVE' | 'SUSPENDED';
   createdAt: string;
