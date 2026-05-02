@@ -20,10 +20,10 @@ export const adminPlanService = {
     return data.data;
   },
 
-  async updateFeatures(planId: string, features: Array<string>): Promise<AdminPlan> {
+  async updateFeatures(planId: string, features: Array<string>, name?: string): Promise<AdminPlan> {
     const { data } = await privateClient.patch<ApiResponse<AdminPlan>>(
       `/api/core/admin/subscription-plans/${planId}/features`,
-      { features },
+      { features, ...(name !== undefined && { name }) },
     );
     if (!data.success) throw new Error(data.error?.message ?? 'Failed to update features');
     return data.data;

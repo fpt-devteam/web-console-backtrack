@@ -198,6 +198,7 @@ export function ServicePackagesPage() {
 
   // edit-features state
   const [editFeatures, setEditFeatures] = useState<string[]>([]);
+  const [editName, setEditName] = useState('');
 
   const loadPlans = async () => {
     setIsLoading(true);
@@ -223,6 +224,7 @@ export function ServicePackagesPage() {
 
   const openEditFeatures = (plan: AdminPlan) => {
     setEditFeatures(plan.features.length ? [...plan.features] : ['']);
+    setEditName(plan.name);
     setDialog({ type: 'edit-features', plan });
   };
 
@@ -254,18 +256,23 @@ export function ServicePackagesPage() {
 
   const handleEditFeatures = async () => {
     if (dialog.type !== 'edit-features') return;
+    const trimmedName = editName.trim();
+    if (!trimmedName) {
+      showToast.error('Name is required.');
+      return;
+    }
     const features = editFeatures.map((f) => f.trim()).filter(Boolean);
     setIsSaving(true);
     try {
-      const updated = await adminPlanService.updateFeatures(dialog.plan.id, features);
+      const updated = await adminPlanService.updateFeatures(dialog.plan.id, features, trimmedName);
       const updater = (plans: AdminPlan[]) =>
-        plans.map((p) => (p.id === updated.id ? { ...p, features: updated.features } : p));
+        plans.map((p) => (p.id === updated.id ? { ...p, name: updated.name, features: updated.features } : p));
       setOrgPlans(updater);
       setUserPlans(updater);
       closeDialog();
-      showToast.success('Features updated.');
+      showToast.success('Plan updated.');
     } catch (err: any) {
-      showToast.error(err?.response?.data?.error?.message ?? err.message ?? 'Failed to update features.');
+      showToast.error(err?.response?.data?.error?.message ?? err.message ?? 'Failed to update plan.');
     } finally {
       setIsSaving(false);
     }
@@ -415,10 +422,22 @@ export function ServicePackagesPage() {
 
       {/* ── Edit Features Dialog ── */}
       {dialog.type === 'edit-features' && (
-        <DialogShell title={`Edit Features — ${dialog.plan.name}`} onClose={closeDialog}>
-          <FeatureListEditor features={editFeatures} onChange={setEditFeatures} />
+        <DialogShell title={`Edit Plan — ${dialog.plan.name}`} onClose={closeDialog}>
+          <div className="space-y-4">
+            <Field label="Name">
+              <input
+                value={editName}
+                onChange={(e) => setEditName(e.target.value)}
+                placeholder="Plan name"
+                className="w-full border border-[#dddddd] rounded-[10px] px-3 py-2 text-sm focus:outline-none focus:border-[#222222]"
+              />
+            </Field>
+            <Field label="Features">
+              <FeatureListEditor features={editFeatures} onChange={setEditFeatures} />
+            </Field>
+          </div>
           <DialogActions
-            confirmLabel="Save Features"
+            confirmLabel="Save"
             onConfirm={() => void handleEditFeatures()}
             onCancel={closeDialog}
             isLoading={isSaving}
