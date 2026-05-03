@@ -52,6 +52,10 @@ export interface JoinByInvitationResult {
 }
 
 export const invitationService = {
+  _error(message: string, code?: string) {
+    return Object.assign(new Error(message), { code });
+  },
+
   async create(payload: CreateInvitationPayload): Promise<CreateInvitationResult> {
     const { data } = await privateClient.post<ApiResponse<CreateInvitationResult>>('/api/core/invitations', {
       orgId: payload.orgId,
@@ -84,11 +88,24 @@ export const invitationService = {
 
   /** POST /api/core/invitations/join */
   async join(payload: JoinByInvitationPayload): Promise<JoinByInvitationResult> {
-    const { data } = await privateClient.post<ApiResponse<JoinByInvitationResult>>(
-      '/api/core/invitations/join',
-      payload,
-    );
-    if (!data.success) throw new Error(data.error?.message ?? 'Failed to join organization');
-    return data.data;
+    try {
+      const { data } = await privateClient.post<ApiResponse<JoinByInvitationResult>>(
+        '/api/core/invitations/join',
+        payload,
+      );
+      if (!data.success) throw invitationService._error(
+        data.error?.message ?? 'Failed to join organization',
+        data.error?.code,
+      );
+      return data.data;
+    } catch (err: unknown) {
+      // Axios non-2xx errors come here with response body (ApiResponse).
+      const ax = err as { response?: { data?: ApiResponse<unknown> } };
+      const body = ax.response?.data;
+      const backendMessage = body?.error?.message;
+      const backendCode = body?.error?.code;
+      if (backendMessage) throw invitationService._error(backendMessage, backendCode);
+      throw err;
+    }
   },
 };

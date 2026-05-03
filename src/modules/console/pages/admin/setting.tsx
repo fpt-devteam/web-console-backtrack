@@ -1,5 +1,15 @@
 import { Layout } from '../../components/admin/layout'
-import { Clock3, Copy, Info, Link2, Mail, MapPin, Phone } from 'lucide-react'
+import {
+  Camera,
+  Clock3,
+  Copy,
+  Info,
+  Link2,
+  Loader2,
+  Mail,
+  MapPin,
+  Phone,
+} from 'lucide-react'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { useRouter, useParams } from '@tanstack/react-router'
 import { Button } from '@/components/ui/button'
@@ -22,6 +32,7 @@ import {
 import { Spinner } from '@/components/ui/spinner'
 import { useCurrentOrgId } from '@/contexts/current-org.context'
 import { useOrganization, useUpdateOrganization } from '@/hooks/use-org'
+import { uploadOrgCoverImage, uploadOrgLogo } from '@/services/storage.service'
 import type { DailySchedule, OrgWeekDay } from '@/types/organization.types'
 
 const INDUSTRY_OPTIONS: { value: string; label: string }[] = [
@@ -193,6 +204,10 @@ export function SettingPage() {
     longitude: number
   } | null>(null)
   const [externalPlaceId, setExternalPlaceId] = useState<string | null>(null)
+  const [logoUrl, setLogoUrl] = useState('')
+  const [isUploadingLogo, setIsUploadingLogo] = useState(false)
+  const [coverImageUrl, setCoverImageUrl] = useState('')
+  const [isUploadingCover, setIsUploadingCover] = useState(false)
   const [saveError, setSaveError] = useState<string | null>(null)
 
   useEffect(() => {
@@ -220,6 +235,8 @@ export function SettingPage() {
         : null,
     )
     setExternalPlaceId(org.externalPlaceId ?? null)
+    setLogoUrl(org.logoUrl?.trim() ?? '')
+    setCoverImageUrl(org.coverImageUrl?.trim() ?? '')
     setFormReady(true)
     setSaveError(null)
   }, [org])
@@ -243,6 +260,52 @@ export function SettingPage() {
 
   const mapCoords = location
   const showMap = isValidOrgMapLocation(mapCoords)
+  const coverPreview = coverImageUrl.trim()
+  const logoPreview = logoUrl.trim()
+
+  const handleLogoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+    if (!file.type.startsWith('image/')) {
+      setSaveError('Logo must be an image file.')
+      return
+    }
+    setSaveError(null)
+    setIsUploadingLogo(true)
+    try {
+      const url = await uploadOrgLogo(file)
+      setLogoUrl(url)
+    } catch (err) {
+      setSaveError(
+        err instanceof Error ? err.message : 'Failed to upload organization logo.',
+      )
+    } finally {
+      setIsUploadingLogo(false)
+      e.target.value = ''
+    }
+  }
+
+  const handleCoverUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+    if (!file.type.startsWith('image/')) {
+      setSaveError('Cover image must be an image file.')
+      return
+    }
+    setSaveError(null)
+    setIsUploadingCover(true)
+    try {
+      const url = await uploadOrgCoverImage(file)
+      setCoverImageUrl(url)
+    } catch (err) {
+      setSaveError(
+        err instanceof Error ? err.message : 'Failed to upload cover image.',
+      )
+    } finally {
+      setIsUploadingCover(false)
+      e.target.value = ''
+    }
+  }
 
   const handleSave = () => {
     if (!currentOrgId || !org) return
@@ -261,6 +324,15 @@ export function SettingPage() {
       setSaveError('Please enter a valid contact email.')
       return
     }
+
+    const effectiveLogo = logoUrl.trim() || org.logoUrl?.trim() || ''
+    if (!effectiveLogo) {
+      setSaveError(
+        'Organization logo is required. Upload an image or paste a logo URL.',
+      )
+      return
+    }
+
     const coords =
       location ??
       (org.location
@@ -277,6 +349,7 @@ export function SettingPage() {
       }
     }
 
+    const coverTrim = coverImageUrl.trim()
     updateOrg.mutate(
       {
         orgId: currentOrgId,
@@ -292,6 +365,8 @@ export function SettingPage() {
           taxIdentificationNumber: taxId.trim(),
           locationNote: deskNote.trim(),
           businessHours: apiHours,
+          logoUrl: effectiveLogo,
+          coverImageUrl: coverTrim || '',
         },
       },
       {
@@ -390,25 +465,75 @@ export function SettingPage() {
 
           <section className="overflow-hidden rounded-[14px] border border-[#dddddd] bg-white">
             <div
-              className={`h-28 sm:h-40 xl:h-48 ${!org.coverImageUrl?.trim() ? 'bg-[#f7f7f7]' : ''}`}
+              className={`relative h-28 sm:h-40 xl:h-48 ${!coverPreview ? 'bg-[linear-gradient(120deg,#fff0f2,#f7f7f7,#fff0f2)]' : ''}`}
               style={
-                org.coverImageUrl?.trim()
+                coverPreview
                   ? {
-                      backgroundImage: `url(${org.coverImageUrl.trim()})`,
+                      backgroundImage: `url(${coverPreview})`,
                       backgroundSize: 'cover',
                       backgroundPosition: 'center',
                     }
                   : undefined
               }
-            />
-            <div className="relative px-4 pb-4 pt-3 sm:px-6 sm:pb-5 sm:pt-4 xl:px-8 xl:pb-6 xl:pt-5">
-              <div className="absolute -top-8 flex h-16 w-16 items-center justify-center overflow-hidden rounded-full border-4 border-white bg-[#f7f7f7] sm:-top-10 sm:h-20 sm:w-20">
-                <OrgLogo
-                  logoUrl={org.logoUrl}
-                  alt={name}
-                  className="h-full w-full"
-                  rounded="full"
+            >
+              {isUploadingCover ? (
+                <div className="absolute inset-0 flex items-center justify-center bg-black/25">
+                  <Loader2 className="h-8 w-8 animate-spin text-white" aria-hidden />
+                </div>
+              ) : null}
+              <label
+                className={[
+                  'absolute bottom-2 right-2 flex h-9 w-9 cursor-pointer items-center justify-center rounded-full border border-[#dddddd] bg-white shadow transition-colors hover:bg-[#f7f7f7]',
+                  updateOrg.isPending || isUploadingCover || isUploadingLogo
+                    ? 'pointer-events-none opacity-50'
+                    : '',
+                ].join(' ')}
+                aria-label="Change cover image"
+              >
+                <input
+                  type="file"
+                  accept="image/*"
+                  className="sr-only"
+                  disabled={updateOrg.isPending || isUploadingCover || isUploadingLogo}
+                  onChange={handleCoverUpload}
                 />
+                <Camera className="h-4 w-4 text-[#ff385c]" strokeWidth={1.8} />
+              </label>
+            </div>
+            <div className="relative px-4 pb-4 pt-3 sm:px-6 sm:pb-5 sm:pt-4 xl:px-8 xl:pb-6 xl:pt-5">
+              <div className="absolute -top-8 sm:-top-10">
+                <div className="relative flex h-16 w-16 items-stretch justify-stretch overflow-hidden rounded-full border-4 border-white bg-[#f7f7f7] shadow sm:h-20 sm:w-20">
+                  <OrgLogo
+                    logoUrl={logoPreview || undefined}
+                    alt={name}
+                    className="h-full w-full min-h-0 min-w-0"
+                    rounded="full"
+                  />
+                  {isUploadingLogo ? (
+                    <div className="absolute inset-0 flex items-center justify-center bg-black/40">
+                      <Loader2 className="h-6 w-6 animate-spin text-white" aria-hidden />
+                    </div>
+                  ) : null}
+                  <label
+                    className={[
+                      'absolute bottom-0.5 right-0.5 flex h-8 w-8 cursor-pointer items-center justify-center rounded-full border border-[#dddddd] bg-white shadow',
+                      'transition-colors hover:bg-[#f7f7f7]',
+                      updateOrg.isPending || isUploadingLogo || isUploadingCover
+                        ? 'pointer-events-none opacity-50'
+                        : '',
+                    ].join(' ')}
+                    aria-label="Change organization logo"
+                  >
+                    <input
+                      type="file"
+                      accept="image/*"
+                      className="sr-only"
+                      disabled={updateOrg.isPending || isUploadingLogo || isUploadingCover}
+                      onChange={handleLogoUpload}
+                    />
+                    <Camera className="h-3.5 w-3.5 text-[#333]" strokeWidth={1.8} />
+                  </label>
+                </div>
               </div>
               <div className="ml-20 flex flex-col gap-3 sm:ml-24 sm:flex-row sm:items-start sm:justify-between xl:ml-28">
                 <div className="min-w-0 flex-1 space-y-3"></div>
@@ -500,6 +625,7 @@ export function SettingPage() {
                     />
                   </div>
                 </div>
+
               </div>
 
               <div className="mt-6 rounded-xl border border-[#dddddd] bg-[#f7f7f7] px-4 py-3">

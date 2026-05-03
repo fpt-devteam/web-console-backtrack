@@ -14,6 +14,14 @@ type PageState =
   | { status: 'success' }
   | { status: 'error'; message: string }
 
+function toFriendlyJoinInvitationError(err: unknown): string {
+  const code = (err as { code?: string })?.code
+  if (code === 'StaffLimitReached') {
+    return `This organization has reached its staff limit for the current plan. Ask an admin to upgrade the subscription or remove an existing staff member, then try again.`
+  }
+  return err instanceof Error ? err.message : 'Failed to join organization.'
+}
+
 export function JoinInvitationPage() {
   const router = useRouter()
   const [state, setState] = useState<PageState>({ status: 'joining' })
@@ -53,7 +61,7 @@ export function JoinInvitationPage() {
         clearInvitationCode()
         setState({
           status: 'error',
-          message: err instanceof Error ? err.message : 'Failed to join organization.',
+          message: toFriendlyJoinInvitationError(err),
         })
       }
     })
@@ -103,7 +111,7 @@ export function JoinInvitationPage() {
                 onClick={handleGoToWelcome}
                 className="w-full bg-[#ff385c] hover:bg-[#e00b41] text-white py-5 text-base font-medium mt-4"
               >
-                Go to Dashboard
+                Back to your organization
               </Button>
             </div>
           )}

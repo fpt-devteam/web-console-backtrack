@@ -11,6 +11,7 @@ import {
 import { showToast } from '@/lib/toast';
 import { useCurrentOrgId } from '@/contexts/current-org.context';
 import { useOrganization, useUpdateOrganization } from '@/hooks/use-org';
+import { isOrgOnFreePlan, useOrgSubscription } from '@/hooks/use-org-subscription';
 import type { FinderContactField } from '@/types/organization.types';
 
 const FINDER_FIELDS: { value: FinderContactField; label: string; description: string }[] = [
@@ -42,6 +43,9 @@ export function SecurityPage() {
   const { currentOrgId } = useCurrentOrgId();
   const { data: org } = useOrganization(currentOrgId);
   const updateOrg = useUpdateOrganization();
+  const { data: orgSubscription, isLoading: isSubLoading, isError: isSubError } = useOrgSubscription(currentOrgId);
+  const isFreeLocked =
+    !!currentOrgId && !isSubLoading && !isSubError && isOrgOnFreePlan(orgSubscription ?? null);
   const [checkedFields, setCheckedFields] = useState<FinderContactField[]>(['Phone']);
   const [checkedOwnerFields, setCheckedOwnerFields] = useState<FinderContactField[]>(['Phone']);
   const [policyError, setPolicyError] = useState<string | null>(null);
@@ -328,7 +332,14 @@ export function SecurityPage() {
           </div>
 
           {/* ── Finder Contact Policy ── */}
-          <div className="bg-white rounded-[14px] border border-[#dddddd] p-4 md:p-6 xl:p-8">
+          <div className="relative bg-white rounded-[14px] border border-[#dddddd] p-4 md:p-6 xl:p-8 overflow-hidden">
+            <div
+              className={
+                isFreeLocked
+                  ? 'pointer-events-none select-none blur-[3px] saturate-70 opacity-90'
+                  : ''
+              }
+            >
             <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-2 md:gap-4 mb-2 xl:mb-3">
               <div className="flex items-center gap-2">
                 <ShieldCheck className="w-3.5 h-3.5 xl:w-4 xl:h-4 text-[#ff385c] shrink-0" />
@@ -408,10 +419,26 @@ export function SecurityPage() {
                 {policySaving ? 'Saving…' : 'Save policy'}
               </button>
             </div>
+            </div>
+
+            {isFreeLocked ? (
+              <div className="absolute inset-0 flex items-center justify-center">
+                <div className="flex h-10 w-10 items-center justify-center rounded-full bg-black/10 shadow-sm ring-1 ring-white/25 backdrop-blur-[2px]">
+                  <Lock className="h-5 w-5 text-white" strokeWidth={2.2} aria-hidden />
+                </div>
+              </div>
+            ) : null}
           </div>
 
           {/* ── Owner Contact Policy ── */}
-          <div className="bg-white rounded-[14px] border border-[#dddddd] p-4 md:p-6 xl:p-8">
+          <div className="relative bg-white rounded-[14px] border border-[#dddddd] p-4 md:p-6 xl:p-8 overflow-hidden">
+            <div
+              className={
+                isFreeLocked
+                  ? 'pointer-events-none select-none blur-[3px] saturate-70 opacity-90'
+                  : ''
+              }
+            >
             <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-2 md:gap-4 mb-2 xl:mb-3">
               <div className="flex items-center gap-2">
                 <ShieldCheck className="w-3.5 h-3.5 xl:w-4 xl:h-4 text-[#ff385c] shrink-0" />
@@ -496,6 +523,15 @@ export function SecurityPage() {
                 {ownerPolicySaving ? 'Saving…' : 'Save policy'}
               </button>
             </div>
+            </div>
+
+            {isFreeLocked ? (
+              <div className="absolute inset-0 flex items-center justify-center">
+                <div className="flex h-10 w-10 items-center justify-center rounded-full bg-black/10 shadow-sm ring-1 ring-white/25 backdrop-blur-[2px]">
+                  <Lock className="h-5 w-5 text-white" strokeWidth={2.2} aria-hidden />
+                </div>
+              </div>
+            ) : null}
           </div>
 
         </div>

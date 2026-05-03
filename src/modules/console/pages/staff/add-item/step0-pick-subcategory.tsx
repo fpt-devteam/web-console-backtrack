@@ -1,5 +1,5 @@
 import type { InventorySubcategory, ItemCategory } from '@/services/inventory.service'
-import { ChevronDown } from 'lucide-react'
+import { ChevronDown, Search, X } from 'lucide-react'
 import { useEffect, useMemo, useState } from 'react'
 
 import iconCards from '@/assets/icons/cards/card_icon.png'
@@ -74,13 +74,29 @@ export function Step0PickSubcategory({
 }) {
   const categories: ItemCategory[] = ['PersonalBelongings', 'Cards', 'Electronics', 'Others']
 
-  const byCategory = useMemo(
-    () =>
-      categories.map((c) => ({
-        category: c,
-        items: subcategories.filter((s) => s.category === c),
-      })),
-    [subcategories],
+  const [searchTerm, setSearchTerm] = useState('')
+
+  const normalizedSearch = useMemo(() => searchTerm.trim().toLowerCase(), [searchTerm])
+
+  const byCategory = useMemo(() => {
+    const term = normalizedSearch
+    return categories.map((c) => {
+      const all = subcategories.filter((s) => s.category === c)
+      const items =
+        term.length === 0
+          ? all
+          : all.filter((s) => {
+              const name = s.name?.toLowerCase?.() ?? ''
+              const code = s.code?.toLowerCase?.() ?? ''
+              return name.includes(term) || code.includes(term)
+            })
+      return { category: c, items }
+    })
+  }, [subcategories, normalizedSearch])
+
+  const totalResults = useMemo(
+    () => byCategory.reduce((acc, g) => acc + g.items.length, 0),
+    [byCategory],
   )
 
   const [openByCategory, setOpenByCategory] = useState<Record<ItemCategory, boolean>>(() => ({
@@ -116,15 +132,63 @@ export function Step0PickSubcategory({
 
   return (
     <div className="space-y-6 mt-4">
-      <div>
-        <div className="text-xl font-bold text-[#222222]">Choose an item type</div>
-        <div className="text-xs text-[#6a6a6a] mt-1">
-          Pick the best matching subcategory. This helps AI analyze and the system classify correctly.
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+        <div className="min-w-0">
+          <div className="text-xl font-bold text-[#222222]">Choose an item type</div>
+          <div className="text-xs text-[#6a6a6a] mt-1">
+            Pick the best matching subcategory. This helps AI analyze and the system classify correctly.
+          </div>
+        </div>
+
+        <div className="w-full sm:w-[360px] shrink-0">
+          <div className="relative w-full">
+            <Search
+              className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#929292]"
+              aria-hidden
+            />
+            <input
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              placeholder="Search subcategory (name or code)…"
+              className="w-full rounded-xl border border-[#dddddd] bg-white py-2 pl-10 pr-9 text-sm text-[#222222] placeholder:text-[#929292] focus:border-[#222222] focus:outline-none"
+              autoComplete="off"
+              inputMode="search"
+            />
+            {searchTerm.trim() ? (
+              <button
+                type="button"
+                onClick={() => setSearchTerm('')}
+                className="absolute right-2 top-1/2 -translate-y-1/2 rounded-full p-1 text-[#6a6a6a] hover:bg-[#f7f7f7] hover:text-[#222222]"
+                aria-label="Clear search"
+                title="Clear"
+              >
+                <X className="h-4 w-4" />
+              </button>
+            ) : null}
+          </div>
+
+          {normalizedSearch ? (
+            <div className="mt-1 text-right text-xs text-[#6a6a6a]">
+              Showing <span className="font-semibold text-[#222222]">{totalResults}</span> result
+              {totalResults === 1 ? '' : 's'}
+            </div>
+          ) : null}
         </div>
       </div>
 
       <div className="space-y-8">
-        {byCategory.map(({ category, items }) => (
+        {normalizedSearch && totalResults === 0 ? (
+          <div className="rounded-[14px] border border-[#dddddd] bg-white p-6 text-center">
+            <div className="text-sm font-semibold text-[#222222]">No subcategories found</div>
+            <div className="mt-1 text-xs text-[#6a6a6a]">
+              Try a different keyword (e.g. &quot;wallet&quot; or &quot;passport&quot;).
+            </div>
+          </div>
+        ) : null}
+
+        {byCategory
+          .filter(({ items }) => (normalizedSearch ? items.length > 0 : true))
+          .map(({ category, items }) => (
           <section key={category} className="space-y-3">
             <button
               type="button"
@@ -151,7 +215,7 @@ export function Step0PickSubcategory({
               />
             </button>
 
-            {openByCategory[category] ? (
+            {(normalizedSearch ? true : openByCategory[category]) ? (
               items.length === 0 ? (
                 <div className="text-sm text-[#929292] px-2">No subcategories available.</div>
               ) : (
