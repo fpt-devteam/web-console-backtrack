@@ -38,12 +38,13 @@ export function useCreateInventoryItem(orgId: string | null) {
   })
 }
 
-export function useDeleteInventoryItem(orgId: string | null) {
+export function useArchiveInventoryItem(orgId: string | null) {
   const queryClient = useQueryClient()
   return useMutation({
-    mutationFn: (id: string) => inventoryService.delete(orgId!, id),
-    onSuccess: () => {
+    mutationFn: (id: string) => inventoryService.archive(orgId!, id),
+    onSuccess: (_data, id) => {
       queryClient.invalidateQueries({ queryKey: INVENTORY_KEYS.all(orgId) })
+      queryClient.invalidateQueries({ queryKey: INVENTORY_KEYS.detail(orgId, id) })
     },
   })
 }

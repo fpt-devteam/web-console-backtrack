@@ -6,7 +6,7 @@ import { useCurrentOrgId } from '@/contexts/current-org.context'
 import { useInventoryItem, useUpdateInventoryItem } from '@/hooks/use-inventory'
 import { useSubcategories } from '@/hooks/use-subcategories'
 import { uploadInventoryImage } from '@/services/storage.service'
-import { inventoryService, type ItemCategory, type PostStatus } from '@/services/inventory.service'
+import { inventoryService, type ItemCategory } from '@/services/inventory.service'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -35,7 +35,6 @@ export function EditItemPage() {
   const photoPreviewsRef = useRef<InventoryPhotoPreview[]>([])
   const uploadedUrlByFileKeyRef = useRef<Map<string, string>>(new Map())
 
-  const [status, setStatus] = useState<PostStatus>('Active')
   const [eventTimeLocal, setEventTimeLocal] = useState<string>('') // datetime-local
   const [organizationStorageLocation, setOrganizationStorageLocation] = useState<string>('')
   const [organizationFoundLocation, setOrganizationFoundLocation] = useState<string>('')
@@ -93,7 +92,6 @@ export function EditItemPage() {
     if (!item || initRef.current) return
     initRef.current = true
 
-    setStatus(item.status)
     setOrganizationStorageLocation(item.organizationStorageLocation ?? '')
     setOrganizationFoundLocation(item.organizationFoundLocation ?? '')
     setPhotoPreviews((item.imageUrls ?? []).map((url) => ({ url, isExisting: true })))
@@ -268,7 +266,6 @@ export function EditItemPage() {
 
       const eventTimeIso = toIsoFromDateTimeLocal(eventTimeLocal)
       const payloadBase = {
-        status,
         imageUrls,
         ...(eventTimeIso ? { eventTime: eventTimeIso } : {}),
       }
@@ -395,22 +392,6 @@ export function EditItemPage() {
             {/* Info form (no section titles) */}
             <section className="space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 lg:gap-5 xl:gap-6 2xl:gap-7">
-                <div className="md:col-span-2">
-                  <Label className="text-sm font-semibold">Status</Label>
-                  <select
-                    value={status}
-                    onChange={(e) => setStatus(e.target.value as PostStatus)}
-                    className="mt-1 w-full px-3 py-2 border border-[#dddddd] rounded-lg bg-white text-sm"
-                  >
-                    {/* Only allow changing status to Archived */}
-                    <option value={status}>
-                      {status === 'InStorage'
-                        ? 'In Storage'
-                        : status}
-                    </option>
-                    {status !== 'Archived' ? <option value="Archived">Archived</option> : null}
-                  </select>
-                </div>
                 <div>
                   <Label className="text-sm font-semibold">Category</Label>
                   <Input value={item?.category ?? ''} readOnly className="mt-1 bg-[#f7f7f7]" />

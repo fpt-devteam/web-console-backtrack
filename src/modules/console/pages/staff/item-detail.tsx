@@ -2,7 +2,7 @@ import { StaffLayout } from '../../components/staff/layout'
 import { useState } from 'react'
 import { useParams, useNavigate } from '@tanstack/react-router'
 import { Button } from '@/components/ui/button'
-import { useInventoryItem, useDeleteInventoryItem } from '@/hooks/use-inventory'
+import { useInventoryItem, useArchiveInventoryItem } from '@/hooks/use-inventory'
 import { useCurrentOrgId } from '@/contexts/current-org.context'
 import { HandoverItemModal } from '@/modules/console/components/staff/handover-item-modal'
 import { useOrgReturnReports } from '@/hooks/use-return-report'
@@ -16,7 +16,7 @@ export function ItemDetailPage() {
   const { currentOrgId } = useCurrentOrgId()
   const [mainImageIndex, setMainImageIndex] = useState(0)
   const [handoverOpen, setHandoverOpen] = useState(false)
-  const deleteItem = useDeleteInventoryItem(currentOrgId)
+  const archiveItem = useArchiveInventoryItem(currentOrgId)
 
   const { data: item, isLoading } = useInventoryItem(currentOrgId, itemId)
   const orgIdForHandover = item?.organization?.id ?? currentOrgId
@@ -27,7 +27,7 @@ export function ItemDetailPage() {
     return acc
   }, {})
   const returnReportForPost =
-    returnReports?.items?.find((r) => r.post?.id === item?.id) ?? null
+    returnReports?.items.find((r) => r.post?.id === item?.id) ?? null
 
   return (
     <StaffLayout>
@@ -67,17 +67,17 @@ export function ItemDetailPage() {
                 variant="outline"
                 size="sm"
                 className="text-[#c13515] border-[#c13515] hover:bg-[#c13515] hover:text-white transition-all hover:scale-[1.03] hover:drop-shadow-sm"
-                disabled={deleteItem.isPending}
+                disabled={archiveItem.isPending}
                 onClick={() => {
-                  if (window.confirm('Are you sure you want to delete this item? This cannot be undone.')) {
-                    deleteItem.mutate(item.id, {
+                  if (window.confirm('Are you sure you want to archive this item?')) {
+                    archiveItem.mutate(item.id, {
                       onSuccess: () => navigate({ to: `/console/${slug}/staff/inventory` }),
-                      onError: (err) => alert(err instanceof Error ? err.message : 'Failed to delete item'),
+                      onError: (err) => alert(err instanceof Error ? err.message : 'Failed to archive item'),
                     })
                   }
                 }}
               >
-                {deleteItem.isPending ? 'Deleting...' : 'Delete'}
+                {archiveItem.isPending ? 'Archiving...' : 'Archive'}
               </Button>
             </>
           ) : null
