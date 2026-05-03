@@ -103,57 +103,58 @@ export function InventoryListFiltersBar({
     )
 
     return (
-      <div className="flex items-center gap-2 flex-nowrap text-sm">
-        {/* Search — flex-1 so it fills remaining space */}
-        <div className="relative flex-1 min-w-0">
-          <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-silver" />
+      <div className="flex flex-col gap-2 text-sm md:flex-row md:flex-nowrap md:items-center md:gap-2">
+        {/* Search — full width on mobile */}
+        <div className="relative min-w-0 md:flex-1">
+          <Search className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-silver" />
           <input
             value={searchTerm}
             onChange={(e) => onSearchTermChange(e.target.value)}
             placeholder="Search by name, details..."
-            className="w-full h-10 bg-white pl-10 pr-2 border border-hairline rounded-lg focus:outline-none focus:border-ink text-ink placeholder:text-silver transition-colors hover:border-silver"
+            className="h-10 w-full rounded-lg border border-hairline bg-white pl-10 pr-3 text-ink placeholder:text-silver transition-colors hover:border-silver focus:border-ink focus:outline-none"
           />
         </div>
 
-        {/* Date range + category chips */}
-        {categoryFirst ? CategoryChip : DateRangeChip}
-        {categoryFirst ? DateRangeChip : CategoryChip}
+        {/* Chips wrap on phone; single row on md+ */}
+        <div className="flex min-w-0 flex-wrap items-center gap-2 md:flex-nowrap md:shrink-0">
+          {categoryFirst ? CategoryChip : DateRangeChip}
+          {categoryFirst ? DateRangeChip : CategoryChip}
 
-        {/* Post type chip */}
-        {onPostTypeChange && (
-          <FilterDropdownChip
-            label="Type"
-            value={postTypeFilter ?? 'All'}
-            defaultValue="All"
-            options={POST_TYPE_OPTIONS}
-            onChange={(v) => onPostTypeChange(v as PostTypeFilter)}
-          />
-        )}
+          {onPostTypeChange && (
+            <FilterDropdownChip
+              label="Type"
+              value={postTypeFilter ?? 'All'}
+              defaultValue="All"
+              options={POST_TYPE_OPTIONS}
+              onChange={(v) => onPostTypeChange(v as PostTypeFilter)}
+            />
+          )}
 
-        {/* Author chip */}
-        {showAuthorFilter && (
-          <FilterDropdownChip
-            label="Author"
-            value={authorValue ?? ''}
-            defaultValue=""
-            options={authorChipOptions}
-            onChange={(v) => onAuthorChange?.(v)}
-          />
-        )}
+          {showAuthorFilter && (
+            <FilterDropdownChip
+              label="Author"
+              value={authorValue ?? ''}
+              defaultValue=""
+              options={authorChipOptions}
+              onChange={(v) => onAuthorChange?.(v)}
+            />
+          )}
 
-        {/* Clear */}
-        {showClear && (
-          <button
-            type="button"
-            onClick={onClear}
-            className="shrink-0 flex items-center gap-1.5 h-10 px-3.5 rounded-lg text-sm text-mute hover:text-danger hover:bg-[#fff0f0] border border-transparent hover:border-[#fdd] transition-all font-medium"
-          >
-            <X className="w-3.5 h-3.5" />
-            Clear
-          </button>
-        )}
+          {showClear && (
+            <button
+              type="button"
+              onClick={onClear}
+              className="flex h-10 shrink-0 items-center gap-1.5 rounded-lg border border-transparent px-3.5 text-sm font-medium text-mute transition-all hover:border-[#fdd] hover:bg-[#fff0f0] hover:text-danger"
+            >
+              <X className="h-3.5 w-3.5" />
+              Clear
+            </button>
+          )}
 
-        {rightSlot}
+          {rightSlot ? (
+            <span className="ml-auto text-xs text-[#929292] md:ml-0 md:shrink-0">{rightSlot}</span>
+          ) : null}
+        </div>
       </div>
     )
   }

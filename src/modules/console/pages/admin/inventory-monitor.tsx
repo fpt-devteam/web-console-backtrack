@@ -52,19 +52,25 @@ export function AdminInventoryMonitorPage() {
   return (
     <Layout>
       <div className="p-4 sm:p-6 lg:p-8">
-        <div className="flex items-center justify-between gap-3 mb-4">
-          <h1 className="text-2xl font-bold text-black">Inventory</h1>
-          <Button variant="outline" size="sm" className="rounded-[20px] border-[#dddddd] text-[#6a6a6a] hover:bg-[#f7f7f7] gap-1.5">
-            <Download className="w-4 h-4" />
+        <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <h1 className="text-xl font-bold text-black sm:text-2xl">Inventory</h1>
+          <Button
+            variant="outline"
+            size="sm"
+            className="gap-1.5 rounded-[20px] border-[#dddddd] text-[#6a6a6a] hover:bg-[#f7f7f7] w-full sm:w-auto justify-center sm:justify-start"
+          >
+            <Download className="h-4 w-4" />
             Export
           </Button>
         </div>
 
-        <InventoryStatusTabs
-          value={listState.statusFilter}
-          onChange={listState.setStatusFilter}
-          className="mb-4"
-        />
+        <div className="mb-4 min-w-0 w-full overflow-x-auto overflow-y-hidden pb-1 -mx-1 px-1 sm:mx-0 sm:px-0 sm:overflow-visible [&::-webkit-scrollbar]:h-1.5 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-[#e0e0e0]">
+          <InventoryStatusTabs
+            className="w-max sm:w-auto"
+            value={listState.statusFilter}
+            onChange={listState.setStatusFilter}
+          />
+        </div>
 
         <InventoryListFiltersBar
           searchTerm={listState.searchTerm}
@@ -87,8 +93,8 @@ export function AdminInventoryMonitorPage() {
           onClear={() => listState.clear({ preserveStatus: true })}
         />
 
-        <div className="flex justify-end my-3">
-          <span className="text-sm text-[#6a6a6a] whitespace-nowrap">
+        <div className="my-3 flex justify-start sm:justify-end">
+          <span className="whitespace-nowrap text-xs text-[#6a6a6a] sm:text-sm">
             {items.length > 0
               ? `Showing ${(listState.currentPage - 1) * pageSize + 1}-${Math.min(
                   listState.currentPage * pageSize,

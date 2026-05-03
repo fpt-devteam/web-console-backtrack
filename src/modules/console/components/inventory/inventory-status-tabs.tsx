@@ -31,7 +31,7 @@ export function InventoryStatusTabs({
             type="button"
             onClick={() => onChange(t)}
             className={[
-              'px-4 py-2 rounded-lg border text-sm font-medium transition-all whitespace-nowrap active:scale-[0.97]',
+              'px-3 py-1.5 rounded-lg border text-xs font-medium transition-all whitespace-nowrap active:scale-[0.97] sm:px-4 sm:py-2 sm:text-sm',
               active
                 ? 'border-primary text-primary bg-white shadow-sm'
                 : 'border-hairline text-ash bg-white hover:bg-neutral-50 hover:border-ink hover:text-ink transition-colors',

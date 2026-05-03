@@ -47,20 +47,25 @@ export function StaffInventoryPage() {
         <div className="p-4 sm:p-6 lg:p-8 flex-1 flex flex-col gap-4">
 
           {/* Header */}
-          <h1 className="text-2xl font-bold text-black">Inventory</h1>
+          <div className="flex flex-col gap-1">
+            <h1 className="text-xl font-bold text-black sm:text-2xl">Inventory</h1>
+          </div>
 
-          <div className='flex justify-between'>
-            {/* Status tabs */}
-            <InventoryStatusTabs
-              value={listState.statusFilter}
-              onChange={(v) => {
-                listState.setStatusFilter(v)
-                listState.setCurrentPage(1)
-              }}
-            />
-
-            {/* CTA */}
-            <InventoryCtaButton addItemUrl={addItemUrl} />
+          {/* Tabs scroll on small screens; CTA full-width on mobile */}
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
+            <div className="min-w-0 w-full overflow-x-auto overflow-y-hidden pb-1 -mx-1 px-1 sm:mx-0 sm:px-0 sm:overflow-visible [&::-webkit-scrollbar]:h-1.5 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-[#e0e0e0]">
+              <InventoryStatusTabs
+                className="w-max sm:w-auto"
+                value={listState.statusFilter}
+                onChange={(v) => {
+                  listState.setStatusFilter(v)
+                  listState.setCurrentPage(1)
+                }}
+              />
+            </div>
+            <div className="shrink-0 w-full sm:w-auto">
+              <InventoryCtaButton addItemUrl={addItemUrl} />
+            </div>
           </div>
 
           {/* Filter chips */}

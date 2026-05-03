@@ -8,7 +8,7 @@ import { getInventorySubcategoryName, getInventoryTitle } from '@/utils/inventor
 function SkeletonCard() {
   return (
     <div className="rounded-2xl border border-[#ebebeb] bg-white overflow-hidden">
-      <div className="h-44 bg-[#f0f0f0] animate-pulse" />
+      <div className="h-40 bg-[#f0f0f0] animate-pulse sm:h-44" />
       <div className="p-3 space-y-2">
         <div className="h-4 bg-[#f0f0f0] rounded-full animate-pulse w-3/4" />
         <div className="h-3 bg-[#f0f0f0] rounded-full animate-pulse w-1/3" />
@@ -54,7 +54,7 @@ export function InventoryGridCards({
 
   if (isLoading) {
     return (
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4 lg:grid-cols-3 xl:grid-cols-4">
         {Array.from({ length: 8 }, (_, i) => <SkeletonCard key={i} />)}
       </div>
     )
@@ -65,7 +65,7 @@ export function InventoryGridCards({
   }
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+    <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4 lg:grid-cols-3 xl:grid-cols-4">
       {items.map((item) => {
         const displayTitle = getInventoryTitle(item, subcategoryNameById)
         const subName = getInventorySubcategoryName(item, subcategoryNameById)
@@ -94,7 +94,7 @@ export function InventoryGridCards({
             className="group block rounded-2xl border border-[#ebebeb] bg-white overflow-hidden hover:border-[#b0b0b0] hover:shadow-md transition-all duration-150"
           >
             {/* Image */}
-            <div className="relative h-44 bg-[#f7f7f7] shrink-0">
+            <div className="relative h-40 shrink-0 bg-[#f7f7f7] sm:h-44">
               {item.imageUrls[0] ? (
                 <img
                   src={item.imageUrls[0]}

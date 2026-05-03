@@ -50,10 +50,12 @@ function InlineMetaRow({
   value: string | null | undefined
 }) {
   return (
-    <div className="flex items-center gap-2 text-sm text-[#222222]">
-      <Icon className="w-4 h-4 text-[#a8a8a8]" />
-      <span className="text-[#a8a8a8] font-medium">{label}:</span>
-      <span className="font-semibold">{formatOrDash(value)}</span>
+    <div className="flex flex-col items-start gap-1 text-sm text-[#222222] sm:flex-row sm:items-center sm:gap-2">
+      <div className="flex min-w-0 items-center gap-2">
+        <Icon className="h-4 w-4 shrink-0 text-[#a8a8a8]" />
+        <span className="font-medium text-[#a8a8a8]">{label}:</span>
+      </div>
+      <span className="min-w-0 pl-6 font-semibold break-words sm:pl-0">{formatOrDash(value)}</span>
     </div>
   )
 }
@@ -252,14 +254,12 @@ function ItemQrCard({ orgSlug, itemId }: { orgSlug: string; itemId: string }) {
   }
 
   return (
-    <div className="mt-3 flex items-start justify-between gap-3">
+    <div className="mt-3 flex flex-col items-stretch gap-4 sm:flex-row sm:items-start sm:justify-between">
       <div className="min-w-0 flex-1">
-        <div className="text-xs text-[#a8a8a8]">
-          Scan to open this item. 
-        </div>
+        <div className="text-xs text-[#a8a8a8]">Scan to open this item.</div>
       </div>
 
-      <div className="shrink-0 -mt-10 rounded-[12px] border border-[#dddddd] bg-white p-3 flex flex-col items-center justify-center gap-2">
+      <div className="flex shrink-0 flex-col items-center justify-center gap-2 self-center rounded-[12px] border border-[#dddddd] bg-white p-3 sm:-mt-6 sm:self-start md:-mt-10">
         <div ref={qrWrapRef}>
           <QRCode value={itemUrl} size={88} />
         </div>

@@ -9,9 +9,9 @@ import { InventoryDetailAttributeGrid } from './inventory-detail-attribute-grid'
 
 function DetailRow({ label, value }: { label: string; value: string }) {
   return (
-    <div className="grid grid-cols-2 gap-4 py-2 border-b border-[#ebebeb] last:border-0">
-      <div className="text-sm text-[#6a6a6a]">{label}</div>
-      <div className="text-sm text-[#222222] text-right">{value}</div>
+    <div className="flex flex-col gap-0.5 border-b border-[#ebebeb] py-3 last:border-0 sm:grid sm:grid-cols-2 sm:items-baseline sm:gap-4 sm:py-2">
+      <div className="text-xs text-[#6a6a6a] sm:text-sm">{label}</div>
+      <div className="text-sm text-[#222222] break-words sm:text-right">{value}</div>
     </div>
   )
 }
@@ -104,7 +104,7 @@ export function InventoryItemDetailView({
 }) {
   if (isLoading) {
     return (
-      <div className="p-8 min-h-screen flex items-center justify-center">
+      <div className="flex min-h-screen items-center justify-center p-6 sm:p-8">
         <Spinner size="lg" />
       </div>
     )
@@ -112,7 +112,7 @@ export function InventoryItemDetailView({
 
   if (!item) {
     return (
-      <div className="p-8">
+      <div className="p-4 sm:p-8">
         <div className="text-center py-12">
           <h2 className="text-2xl font-bold text-[#222222] mb-2">Item Not Found</h2>
           <p className="text-[#6a6a6a] mb-6">The item you're looking for doesn't exist.</p>
@@ -162,68 +162,78 @@ export function InventoryItemDetailView({
   const step3Date = isHandoverDone ? handoverAt : isTerminal ? terminalAt : '—'
 
   return (
-    <div className="p-6 h-full overflow-y-auto mx-6">
-      <div className="mb-6 flex items-center gap-2 text-xs text-[#6a6a6a]">
-        <Link to={backTo.to} params={backTo.params} className="hover:text-[#222222] transition-colors">
+    <div className="h-full overflow-y-auto px-4 py-4 sm:px-5 sm:py-6 lg:mx-auto lg:max-w-[1600px] lg:px-8">
+      <div className="mb-4 flex min-w-0 items-center gap-1.5 text-xs text-[#6a6a6a] sm:mb-6 sm:gap-2">
+        <Link to={backTo.to} params={backTo.params} className="shrink-0 hover:text-[#222222] transition-colors">
           Inventory
         </Link>
-        <ChevronRight className="w-4 h-4" />
-        <span className="text-[#222222] font-medium">{headerPrimary}</span>
+        <ChevronRight className="h-3.5 w-3.5 shrink-0 sm:h-4 sm:w-4" />
+        <span className="min-w-0 truncate font-medium text-[#222222]" title={headerPrimary}>
+          {headerPrimary}
+        </span>
       </div>
 
       {/* Title outside the card */}
-      <div className="mb-4 flex items-start justify-between">
+      <div className="mb-4 flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between sm:gap-3">
         <div className="min-w-0">
-          <div className="flex items-center gap-3 mb-1">
-            <h1 className="text-2xl font-bold text-[#222222] truncate">{title}</h1>
-            <span className={`px-3 py-1 rounded-md text-xs font-bold uppercase ${inventoryStatusPillClass(item.status)}`}>
+          <div className="mb-1 flex flex-col items-start gap-2 sm:flex-row sm:flex-wrap sm:items-center sm:gap-3">
+            <h1 className="text-xl font-bold text-[#222222] sm:text-2xl">{title}</h1>
+            <span
+              className={`shrink-0 rounded-md px-2.5 py-1 text-[10px] font-bold uppercase sm:px-3 sm:text-xs ${inventoryStatusPillClass(item.status)}`}
+            >
               {inventoryStatusLabel(item.status)}
             </span>
           </div>
           <p className="text-xs text-[#6a6a6a]">Added {addedAt}</p>
         </div>
-        <div className="flex gap-2">{actions}</div>
+        {actions ? (
+          <div className="flex w-full flex-wrap gap-2 sm:w-auto sm:justify-end [&>button]:min-h-10 [&>button]:flex-1 sm:[&>button]:min-h-9 sm:[&>button]:flex-none">
+            {actions}
+          </div>
+        ) : null}
       </div>
 
-      <div className="bg-white rounded-[14px] border border-[#dddddd]">
-        <div className="px-6 py-4 border-b border-[#ebebeb]">
-          <div className="flex items-center justify-between gap-3">
-            <div className="min-w-0">
+      <div className="rounded-[14px] border border-[#dddddd] bg-white">
+        <div className="border-b border-[#ebebeb] px-4 py-3 sm:px-6 sm:py-4">
+          <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between lg:gap-3">
+            <div className="min-w-0 shrink-0">
               <div className="text-xs font-semibold text-[#6a6a6a]">Progress</div>
-              <div className="text-[11px] text-[#929292]">Status timeline (click to view details)</div>
+              <div className="text-[11px] text-[#929292]">Status timeline (tap to view details)</div>
             </div>
-            <div className="flex items-center gap-3 sm:gap-6">
-              <StepperDot
-                state={activeStep === 0 ? 'active' : progressStep >= 0 ? 'done' : 'todo'}
-                label="Detail"
-                date={addedAt}
-                showDate={false}
-                disabled={isTerminal}
-                onClick={() => setActiveStep(0)}
-              />
-              <div className={`h-px w-10 sm:w-14 ${progressStep >= 1 ? 'bg-[#ff385c]' : 'bg-[#dddddd]'}`} />
-              <StepperDot
-                state={activeStep === 1 ? 'active' : progressStep >= 1 ? 'done' : 'todo'}
-                label="In Storage"
-                date={intakeAt}
-                disabled={isTerminal}
-                onClick={() => setActiveStep(1)}
-              />
-              <div className={`h-px w-10 sm:w-14 ${progressStep >= 2 ? 'bg-[#ff385c]' : 'bg-[#dddddd]'}`} />
-              <StepperDot
-                state={activeStep === 2 ? 'active' : progressStep >= 2 ? 'done' : 'todo'}
-                label={step3Label}
-                date={step3Date}
-                disabled={isTerminal || !isHandoverDone}
-                onClick={() => setActiveStep(2)}
-              />
+            <div className="-mx-1 w-full min-w-0 overflow-x-auto overflow-y-hidden px-1 pb-1 lg:mx-0 lg:w-auto lg:overflow-visible lg:px-0 lg:pb-0 [&::-webkit-scrollbar]:h-1 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-[#e8e8e8]">
+              <div className="flex min-w-max items-center justify-center gap-2 px-1 sm:gap-3 md:gap-6 lg:justify-end">
+                <StepperDot
+                  state={activeStep === 0 ? 'active' : progressStep >= 0 ? 'done' : 'todo'}
+                  label="Detail"
+                  date={addedAt}
+                  showDate={false}
+                  disabled={isTerminal}
+                  onClick={() => setActiveStep(0)}
+                />
+                <div className={`h-px w-8 shrink-0 sm:w-10 md:w-14 ${progressStep >= 1 ? 'bg-[#ff385c]' : 'bg-[#dddddd]'}`} />
+                <StepperDot
+                  state={activeStep === 1 ? 'active' : progressStep >= 1 ? 'done' : 'todo'}
+                  label="In Storage"
+                  date={intakeAt}
+                  disabled={isTerminal}
+                  onClick={() => setActiveStep(1)}
+                />
+                <div className={`h-px w-8 shrink-0 sm:w-10 md:w-14 ${progressStep >= 2 ? 'bg-[#ff385c]' : 'bg-[#dddddd]'}`} />
+                <StepperDot
+                  state={activeStep === 2 ? 'active' : progressStep >= 2 ? 'done' : 'todo'}
+                  label={step3Label}
+                  date={step3Date}
+                  disabled={isTerminal || !isHandoverDone}
+                  onClick={() => setActiveStep(2)}
+                />
+              </div>
             </div>
           </div>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-7">
-          <div className="lg:col-span-3 p-6 border-r border-[#ebebeb]">
-            <div className="relative h-[350px] bg-[#f7f7f7] rounded-[8px] overflow-hidden mb-4 flex items-center justify-center">
+          <div className="border-b border-[#ebebeb] p-4 sm:p-6 lg:col-span-3 lg:border-r lg:border-b-0">
+            <div className="relative mb-4 flex h-[min(280px,52vw)] max-h-[360px] min-h-[200px] items-center justify-center overflow-hidden rounded-[8px] bg-[#f7f7f7] sm:h-[min(320px,45vh)] lg:h-[350px] lg:max-h-none">
               {mainImg ? (
                 <img src={mainImg} alt={imgAlt} className="w-full h-full object-contain bg-white" />
               ) : (
@@ -232,12 +242,12 @@ export function InventoryItemDetailView({
             </div>
 
             {images.length > 1 ? (
-              <div className="flex gap-3">
+              <div className="-mx-1 flex gap-2 overflow-x-auto px-1 pb-1 sm:gap-3 [&::-webkit-scrollbar]:h-1.5 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-[#e0e0e0]">
                 {images.map((img, idx) => (
                   <button
                     key={idx}
                     onClick={() => onMainImageIndexChange(idx)}
-                    className={`relative w-20 h-20 rounded-[8px] overflow-hidden border-2 transition-all ${
+                    className={`relative h-16 w-16 shrink-0 overflow-hidden rounded-[8px] border-2 transition-all sm:h-20 sm:w-20 ${
                       mainImageIndex === idx ? 'border-[#ff385c] ring-2 ring-[#fff0f2]' : 'border-[#dddddd] hover:border-[#b0b0b0]'
                     }`}
                   >
@@ -245,7 +255,10 @@ export function InventoryItemDetailView({
                   </button>
                 ))}
                 {showAddThumbnailButton ? (
-                  <button className="w-20 h-20 rounded-[8px] border-2 border-dashed border-[#dddddd] flex items-center justify-center text-[#929292]">
+                  <button
+                    type="button"
+                    className="flex h-16 w-16 shrink-0 items-center justify-center rounded-[8px] border-2 border-dashed border-[#dddddd] text-[#929292] sm:h-20 sm:w-20"
+                  >
                     <Camera className="w-5 h-5" />
                   </button>
                 ) : null}
@@ -253,7 +266,7 @@ export function InventoryItemDetailView({
             ) : null}
           </div>
 
-          <div className="lg:col-span-4 py-6 px-8 space-y-6 text-sm">
+          <div className="space-y-6 px-4 py-5 text-sm sm:px-6 lg:col-span-4 lg:px-8 lg:py-6">
             {activeStep === 0 ? (
               <InventoryDetailAttributeGrid
                 item={item}
@@ -310,7 +323,7 @@ export function InventoryItemDetailView({
                     {(returnReportForPost?.evidenceImageUrls?.length ?? 0) > 0 ? (
                       <>
                         <SectionTitle title="Evidence photos" />
-                        <div className="mt-2 grid grid-cols-2 sm:grid-cols-3 gap-3">
+                        <div className="mt-2 grid grid-cols-2 gap-3 sm:grid-cols-3">
                           {(returnReportForPost.evidenceImageUrls ?? []).map((url: string, idx: number) => (
                             <a
                               key={`${url}:${idx}`}

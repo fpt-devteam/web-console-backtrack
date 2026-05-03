@@ -37,8 +37,8 @@ export function Pagination({
   }
 
   return (
-    <div className="flex items-center justify-center px-4 py-3">
-      <div className="flex items-center gap-1">
+    <div className="flex items-center justify-center overflow-x-auto px-1 py-3 sm:px-4">
+      <div className="flex min-w-0 items-center justify-center gap-0.5 sm:gap-1">
         {/* Previous */}
         <button
           onClick={() => onPageChange(currentPage - 1)}
@@ -69,7 +69,7 @@ export function Pagination({
             <button
               key={pageNum}
               onClick={() => onPageChange(pageNum)}
-              className={`min-w-[36px] px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
+              className={`min-w-[32px] shrink-0 px-2 py-1.5 rounded-lg text-xs font-medium transition-colors sm:min-w-[36px] sm:px-3 sm:text-sm ${
                 isActive
                   ? 'bg-[#222222] text-white'
                   : 'text-[#222222] hover:bg-[#f7f7f7]'
