@@ -2,13 +2,15 @@ import { StaffLayout } from '../../components/staff/layout'
 import { useState } from 'react'
 import { useParams, useNavigate } from '@tanstack/react-router'
 import { Button } from '@/components/ui/button'
-import { useInventoryItem, useDeleteInventoryItem } from '@/hooks/use-inventory'
+import { useInventoryItem, useArchiveInventoryItem } from '@/hooks/use-inventory'
 import { useCurrentOrgId } from '@/contexts/current-org.context'
 import { HandoverItemModal } from '@/modules/console/components/staff/handover-item-modal'
+import { ArchiveConfirmModal } from '@/modules/console/components/staff/archive-confirm-modal'
 import { useOrgReturnReports } from '@/hooks/use-return-report'
 import { InventoryItemDetailView } from '../../components/inventory/inventory-item-detail-view'
 import { useSubcategories } from '@/hooks/use-subcategories'
 import { getInventoryTitle } from '@/utils/inventory-view'
+import { showToast } from '@/lib/toast'
 
 export function ItemDetailPage() {
   const { slug, itemId } = useParams({ from: '/console/$slug/staff/item/$itemId' })
@@ -16,7 +18,8 @@ export function ItemDetailPage() {
   const { currentOrgId } = useCurrentOrgId()
   const [mainImageIndex, setMainImageIndex] = useState(0)
   const [handoverOpen, setHandoverOpen] = useState(false)
-  const deleteItem = useDeleteInventoryItem(currentOrgId)
+  const [archiveOpen, setArchiveOpen] = useState(false)
+  const archiveItem = useArchiveInventoryItem(currentOrgId)
 
   const { data: item, isLoading } = useInventoryItem(currentOrgId, itemId)
   const orgIdForHandover = item?.organization?.id ?? currentOrgId
@@ -27,7 +30,7 @@ export function ItemDetailPage() {
     return acc
   }, {})
   const returnReportForPost =
-    returnReports?.items?.find((r) => r.post?.id === item?.id) ?? null
+    returnReports?.items.find((r) => r.post?.id === item?.id) ?? null
 
   return (
     <StaffLayout>
@@ -67,30 +70,42 @@ export function ItemDetailPage() {
                 variant="outline"
                 size="sm"
                 className="text-[#c13515] border-[#c13515] hover:bg-[#c13515] hover:text-white transition-all hover:scale-[1.03] hover:drop-shadow-sm"
-                disabled={deleteItem.isPending}
-                onClick={() => {
-                  if (window.confirm('Are you sure you want to delete this item? This cannot be undone.')) {
-                    deleteItem.mutate(item.id, {
-                      onSuccess: () => navigate({ to: `/console/${slug}/staff/inventory` }),
-                      onError: (err) => alert(err instanceof Error ? err.message : 'Failed to delete item'),
-                    })
-                  }
-                }}
+                disabled={archiveItem.isPending}
+                onClick={() => setArchiveOpen(true)}
               >
-                {deleteItem.isPending ? 'Deleting...' : 'Delete'}
+                Archive
               </Button>
             </>
           ) : null
         }
         extra={
           item ? (
-            <HandoverItemModal
-              open={handoverOpen}
-              title={`Handover — ${getInventoryTitle(item, subcategoryNameById)}`}
-              orgId={orgIdForHandover}
-              postId={item.id}
-              onClose={() => setHandoverOpen(false)}
-            />
+            <>
+              <HandoverItemModal
+                open={handoverOpen}
+                title={`Handover — ${getInventoryTitle(item, subcategoryNameById)}`}
+                orgId={orgIdForHandover}
+                postId={item.id}
+                onClose={() => setHandoverOpen(false)}
+              />
+              <ArchiveConfirmModal
+                open={archiveOpen}
+                isPending={archiveItem.isPending}
+                onConfirm={() => {
+                  archiveItem.mutate(item.id, {
+                    onSuccess: () => {
+                      setArchiveOpen(false)
+                      showToast.success('Item archived')
+                      void navigate({ to: '/console/$slug/staff/inventory', params: { slug } })
+                    },
+                    onError: (err) => {
+                      showToast.error(err instanceof Error ? err.message : 'Failed to archive item')
+                    },
+                  })
+                }}
+                onClose={() => setArchiveOpen(false)}
+              />
+            </>
           ) : null
         }
       />

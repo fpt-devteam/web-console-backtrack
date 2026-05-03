@@ -161,8 +161,6 @@ export interface CreateInventoryPayload {
 export interface UpdateInventoryPayload {
   /** UpdatePostCommand.PostType */
   postType?: PostType
-  /** UpdatePostCommand.Status */
-  status?: PostStatus
   /** UpdatePostCommand.EventTime (ISO DateTimeOffset) */
   eventTime?: string
   /** UpdatePostCommand.ImageUrls */
@@ -443,8 +441,10 @@ export const inventoryService = {
     return data.data
   },
 
-  async delete(orgId: string, id: string): Promise<void> {
-    await privateClient.delete(`/api/core/orgs/${orgId}/inventory/${id}`)
+  async archive(orgId: string, id: string): Promise<InventoryItem> {
+    const { data } = await privateClient.patch<ApiResponse<InventoryItem>>(`/api/core/orgs/${orgId}/inventory/${id}/archive`)
+    if (!data.success) throw new Error(data.error?.message ?? 'Failed to archive inventory item')
+    return data.data
   },
 
   async publish(orgId: string, id: string): Promise<InventoryItem> {
