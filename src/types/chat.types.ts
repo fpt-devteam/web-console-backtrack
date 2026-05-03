@@ -84,6 +84,8 @@ export interface IConversation {
   orgSlug?: string | null;
   orgLogoUrl?: string | null;
   assignedStaffId?: string | null;
+  /** Pinned inventory item ID for this conversation */
+  postId?: string | null;
   /** The other participant in the conversation */
   partner?: IConversationPartner | null;
   /** Flattened from lastMessage.timestamp for convenience */

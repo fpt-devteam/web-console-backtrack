@@ -20,6 +20,7 @@ interface RawConversation {
   orgSlug?: string | null;
   orgLogoUrl?: string | null;
   assignedStaffId?: string | null;
+  postId?: string | null;
   status?: string;
   partner?: {
     id: string;
@@ -59,6 +60,7 @@ export function normalizeConv(raw: unknown): IConversation {
     orgSlug: obj.orgSlug ?? null,
     orgLogoUrl: obj.orgLogoUrl ?? null,
     assignedStaffId: obj.assignedStaffId ?? null,
+    postId: obj.postId ?? null,
     partner: obj.partner ?? null,
     lastMessage: obj.lastMessage ?? null,
     lastMessageAt: obj.lastMessage?.timestamp ?? null,
