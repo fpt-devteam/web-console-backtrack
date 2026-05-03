@@ -1,9 +1,10 @@
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Lock, Eye, EyeOff } from 'lucide-react';
+import { ConsoleAuthLayout, ConsoleAuthMobileLogo } from '@/modules/auth/components/console-auth-layout';
+import { Lock, Eye, EyeOff, ArrowRight } from 'lucide-react';
 import { useState, useEffect } from 'react';
-import { useRouter } from '@tanstack/react-router';
+import { Link, useRouter } from '@tanstack/react-router';
 import { useSignUp } from '@/hooks/use-auth';
 import { showToast } from '@/lib/toast';
 import { getTempEmail, saveTempEmail } from '@/lib/auth-storage';
@@ -51,7 +52,7 @@ export function CreatePassword() {
             saveTempEmail(email);
             showToast.success('Account created! Check your email to verify.');
             router.navigate({ to: '/auth/check-email' });
-          } catch (error: any) {
+          } catch (_err: unknown) {
             saveTempEmail(email);
             showToast.error('Account created but failed to send verification email.');
             router.navigate({ to: '/auth/check-email' });
@@ -64,127 +65,120 @@ export function CreatePassword() {
     );
   };
 
+  const inputCls =
+    'h-12 rounded-xl border-[#E5E7EB] bg-[#FAFAFA] text-[15px] text-[#111] placeholder:text-[#C4C4C4] focus-visible:ring-2 focus-visible:ring-brand-400 focus-visible:border-transparent transition-all duration-150';
+
   return (
-    <div className="min-h-screen bg-[#f7f7f7] flex items-center justify-center px-4 py-12">
-      <div className="w-full max-w-xl">
-        <div className="bg-white rounded-[14px] border border-[#dddddd] p-8">
-          {/* Lock Icon */}
-          <div className="flex justify-center mb-6">
-            <div className="w-16 h-16 bg-[#fff0f2] rounded-full flex items-center justify-center">
-              <Lock className="w-8 h-8 text-[#ff385c]" />
-            </div>
-          </div>
-
-          <h1 className="text-2xl font-bold text-[#222222] text-center mb-2">
-            Create a Password
-          </h1>
-
-          <p className="text-sm text-[#6a6a6a] text-center mb-6">
-            Set a password to secure your account.
-          </p>
-
-          <form className="space-y-4" onSubmit={handleSubmit}>
-            {/* Email Field */}
-            <div>
-              <Label htmlFor="email" className="text-sm font-medium text-[#222222]">
-                Email address
-              </Label>
-              <div className="relative mt-2 text-[#929292]">
-                <Input
-                  id="email"
-                  type="email"
-                  value={email}
-                  readOnly
-                  className="pr-10"
-                />
-                <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
-                  <Lock className="h-5 w-5 text-[#929292]" />
-                </div>
-              </div>
-            </div>
-
-            {/* Password Field */}
-            <div>
-              <Label htmlFor="password" className="text-sm font-medium text-[#222222] mb-2 block">
-                Password
-              </Label>
-              <div className="relative">
-                <Input
-                  id="password"
-                  type={showPassword ? 'text' : 'password'}
-                  placeholder="Create a strong password (min 6 chars)"
-                  className="pr-10"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  disabled={signUp.isPending}
-                  required
-                />
-                <button
-                  type="button"
-                  className="absolute inset-y-0 right-0 pr-3 flex items-center text-[#929292] hover:text-[#6a6a6a]"
-                  onClick={() => setShowPassword(!showPassword)}
-                  aria-label={showPassword ? 'Hide password' : 'Show password'}
-                >
-                  {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
-                </button>
-              </div>
-            </div>
-
-            {/* Confirm Password Field */}
-            <div>
-              <Label htmlFor="confirmPassword" className="text-sm font-medium text-[#222222] mb-2 block">
-                Confirm Password
-              </Label>
-              <div className="relative">
-                <Input
-                  id="confirmPassword"
-                  type={showConfirmPassword ? 'text' : 'password'}
-                  placeholder="Re-enter your password"
-                  className="pr-10"
-                  value={confirmPassword}
-                  onChange={(e) => setConfirmPassword(e.target.value)}
-                  disabled={signUp.isPending}
-                  required
-                />
-                <button
-                  type="button"
-                  className="absolute inset-y-0 right-0 pr-3 flex items-center text-[#929292] hover:text-[#6a6a6a]"
-                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                  aria-label={showConfirmPassword ? 'Hide password' : 'Show password'}
-                >
-                  {showConfirmPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
-                </button>
-              </div>
-            </div>
-
-            <Button
-              type="submit"
-              className="w-full bg-[#ff385c] hover:bg-[#e0324f] text-white py-5 text-base font-medium mt-6"
-              disabled={signUp.isPending}
-            >
-              {signUp.isPending ? 'Creating Account...' : 'Continue'}
-            </Button>
-
-            <p className="text-xs font-semibold text-[#6a6a6a] text-center mt-5">
-              SECURED BY ENTERPRISE SSO
-            </p>
-          </form>
-
-          <div className="mt-8 pt-6 border-t border-[#ebebeb]">
-            <div className="flex flex-wrap justify-center gap-4 text-xs text-[#929292]">
-              <a href="#" className="hover:text-[#222222] transition-colors">Terms of Service</a>
-              <span className="text-[#dddddd]">|</span>
-              <a href="#" className="hover:text-[#222222] transition-colors">Privacy Policy</a>
-              <span className="text-[#dddddd]">|</span>
-              <a href="#" className="hover:text-[#222222] transition-colors">Contact Support</a>
-            </div>
-          </div>
-
-          <p className="text-xs text-[#929292] text-center mt-6">
-            © 2023 Enterprise Corp. All rights reserved.
+    <ConsoleAuthLayout>
+      <div className="w-full">
+        <div className="mb-8">
+          <ConsoleAuthMobileLogo />
+          <h2 className="text-2xl font-black tracking-tight text-[#111]">Sign up</h2>
+          <p className="mt-1 text-[15px] font-medium text-[#888]">
+            Create a password for your organisation console operator account. We&apos;ll email you to verify next.
           </p>
         </div>
+
+        <form className="space-y-4" onSubmit={handleSubmit}>
+          <div className="space-y-1.5">
+            <Label htmlFor="email" className="text-xs font-bold tracking-widest text-[#555] uppercase">
+              Email
+            </Label>
+            <div className="relative">
+              <Lock className="pointer-events-none absolute top-1/2 left-4 h-4 w-4 -translate-y-1/2 text-[#bbb]" />
+              <Input
+                id="email"
+                type="email"
+                value={email}
+                readOnly
+                autoComplete="email"
+                className={`pl-11 ${inputCls}`}
+              />
+            </div>
+          </div>
+
+          <div className="space-y-1.5">
+            <Label htmlFor="password" className="text-xs font-bold tracking-widest text-[#555] uppercase">
+              Password
+            </Label>
+            <div className="relative">
+              <Lock className="pointer-events-none absolute top-1/2 left-4 h-4 w-4 -translate-y-1/2 text-[#bbb]" />
+              <Input
+                id="password"
+                type={showPassword ? 'text' : 'password'}
+                placeholder="Minimum 6 characters"
+                autoComplete="new-password"
+                className={`pl-11 pr-12 ${inputCls}`}
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                disabled={signUp.isPending}
+                required
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute top-1/2 right-4 -translate-y-1/2 cursor-pointer text-[#bbb] transition-colors hover:text-[#555]"
+                aria-label={showPassword ? 'Hide password' : 'Show password'}
+              >
+                {showPassword ? <Eye className="h-4 w-4" /> : <EyeOff className="h-4 w-4" />}
+              </button>
+            </div>
+          </div>
+
+          <div className="space-y-1.5">
+            <Label htmlFor="confirmPassword" className="text-xs font-bold tracking-widest text-[#555] uppercase">
+              Confirm password
+            </Label>
+            <div className="relative">
+              <Lock className="pointer-events-none absolute top-1/2 left-4 h-4 w-4 -translate-y-1/2 text-[#bbb]" />
+              <Input
+                id="confirmPassword"
+                type={showConfirmPassword ? 'text' : 'password'}
+                placeholder="Re-enter password"
+                autoComplete="new-password"
+                className={`pl-11 pr-12 ${inputCls}`}
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                disabled={signUp.isPending}
+                required
+              />
+              <button
+                type="button"
+                onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                className="absolute top-1/2 right-4 -translate-y-1/2 cursor-pointer text-[#bbb] transition-colors hover:text-[#555]"
+                aria-label={showConfirmPassword ? 'Hide password' : 'Show password'}
+              >
+                {showConfirmPassword ? <Eye className="h-4 w-4" /> : <EyeOff className="h-4 w-4" />}
+              </button>
+            </div>
+          </div>
+
+          <Button
+            type="submit"
+            disabled={signUp.isPending}
+            className="mt-2 flex h-12 w-full cursor-pointer items-center justify-center gap-2 rounded-xl bg-[#111] text-sm font-bold text-white transition-all duration-150 hover:bg-[#222] focus-visible:ring-2 focus-visible:ring-[#111] focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+          >
+            {signUp.isPending ? (
+              <span className="h-4 w-4 animate-spin rounded-full border-2 border-white/30 border-t-white" />
+            ) : (
+              <>
+                Sign up
+                <ArrowRight className="h-4 w-4" />
+              </>
+            )}
+          </Button>
+        </form>
+
+        <p className="mt-6 text-center text-[14px] text-[#888]">
+          Already have an account?{' '}
+          <Link
+            to="/auth/signin-or-signup"
+            className="cursor-pointer font-bold text-[#111] transition-colors hover:text-brand-600"
+          >
+            Sign in
+          </Link>
+        </p>
       </div>
-    </div>
+    </ConsoleAuthLayout>
   );
 }

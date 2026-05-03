@@ -19,6 +19,11 @@ export interface IAuthService {
   signIn(credentials: LoginCredentials): Promise<AuthUser>;
 
   /**
+   * Sign in with Google (Firebase popup).
+   */
+  signInWithGoogle(): Promise<AuthUser>;
+
+  /**
    * Sign up with email and password
    * @throws {AuthError} When signup fails
    */

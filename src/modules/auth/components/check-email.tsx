@@ -1,7 +1,8 @@
 import { Button } from '@/components/ui/button';
-import { Mail } from 'lucide-react';
+import { Mail, ArrowRight } from 'lucide-react';
 import { useEffect, useState } from 'react';
-import { useRouter } from '@tanstack/react-router';
+import { Link, useRouter } from '@tanstack/react-router';
+import { ConsoleAuthLayout, ConsoleAuthMobileLogo } from '@/modules/auth/components/console-auth-layout';
 import { getTempEmail } from '@/lib/auth-storage';
 import { showToast } from '@/lib/toast';
 import { authService } from '@/services';
@@ -38,7 +39,7 @@ export function CheckEmail() {
       setCountdown(60);
 
       const timer = setInterval(() => {
-        setCountdown(prev => {
+        setCountdown((prev) => {
           if (prev <= 1) {
             clearInterval(timer);
             setCanResend(true);
@@ -47,8 +48,9 @@ export function CheckEmail() {
           return prev - 1;
         });
       }, 1000);
-    } catch (error: any) {
-      showToast.error(error.message || 'Failed to send email.');
+    } catch (error: unknown) {
+      const msg = error && typeof error === 'object' && 'message' in error ? String((error as Error).message) : '';
+      showToast.error(msg || 'Failed to send email.');
     } finally {
       setResending(false);
     }
@@ -59,8 +61,9 @@ export function CheckEmail() {
     router.navigate({ to: '/auth/signin' });
   };
 
-  const maskEmail = (email: string): string => {
-    const [name, domain] = email.split('@');
+  const maskEmail = (value: string): string => {
+    const [name, domain] = value.split('@');
+    if (!domain) return value;
     if (name.length <= 2) {
       return `${name[0]}***@${domain}`;
     }
@@ -68,64 +71,63 @@ export function CheckEmail() {
   };
 
   return (
-    <div className="min-h-screen bg-[#f7f7f7] flex items-center justify-center px-4 py-12">
-      <div className="w-full max-w-xl">
-        <div className="bg-white rounded-[14px] border border-[#dddddd] p-8 text-center">
-          {/* Icon */}
-          <div className="flex justify-center mb-6">
-            <div className="w-16 h-16 bg-[#fff0f2] rounded-full flex items-center justify-center">
-              <Mail className="w-8 h-8 text-[#ff385c]" />
-            </div>
-          </div>
-
-          <h1 className="text-2xl font-bold text-[#222222] mb-2">
-            Check your email
-          </h1>
-
-          <p className="text-sm text-[#6a6a6a] mb-8">
-            A verification link has been sent to{' '}
-            <span className="font-medium text-[#222222]">
-              {email ? maskEmail(email) : 'your email'}
-            </span>
-            . <br />
-            <strong>Click the link in your email to verify your account before continuing.</strong>
-          </p>
-
-          <div className="space-y-3">
-            <Button
-              onClick={handleContinue}
-              className="w-full bg-[#ff385c] hover:bg-[#e0324f] text-white py-5 text-base font-medium"
-            >
-              Continue to login →
-            </Button>
-
-            <Button
-              onClick={handleResend}
-              disabled={!canResend || resending}
-              variant="outline"
-              className="w-full py-5 text-base font-medium"
-            >
-              {resending ? 'Sending...' :
-               !canResend ? `Resend in ${countdown}s` :
-               'Resend verification email'}
-            </Button>
-          </div>
-
-          <div className="mt-6 p-4 bg-[#f7f7f7] rounded-[8px]">
-            <p className="text-xs text-[#6a6a6a] text-center">
-              <strong>Important:</strong> Verify your email first, then click "Continue to login" to sign in.
-            </p>
-          </div>
-
-          <p className="text-sm text-[#6a6a6a] mt-6 text-center">
-            Check your spam folder if you don&apos;t see the email.
+    <ConsoleAuthLayout>
+      <div className="w-full text-left">
+        <div className="mb-8">
+          <ConsoleAuthMobileLogo />
+          <h2 className="text-2xl font-black tracking-tight text-[#111]">Verify your inbox</h2>
+          <p className="mt-1 text-[15px] font-medium text-[#888]">
+            We emailed a verification link — open it before returning to sign in.
           </p>
         </div>
 
-        <p className="text-xs text-[#929292] text-center mt-6">
-          © 2023 Enterprise Corp. All rights reserved.
+        <div className="mb-6 flex justify-center rounded-full lg:justify-start">
+          <span className="flex h-14 w-14 items-center justify-center rounded-full border border-[#E5E7EB] bg-[#FAFAFA]">
+            <Mail className="h-7 w-7 text-brand-500" aria-hidden />
+          </span>
+        </div>
+
+        <p className="text-[15px] leading-relaxed text-[#555]">
+          Sent to{' '}
+          <span className="font-semibold text-[#111]">{email ? maskEmail(email) : 'your email'}</span>. Confirm the link to
+          activate operator access before you continue.
+        </p>
+
+        <div className="mt-8 space-y-3">
+          <Button
+            type="button"
+            onClick={handleContinue}
+            className="flex h-12 w-full cursor-pointer items-center justify-center gap-2 rounded-xl bg-[#111] text-sm font-bold text-white transition-all hover:bg-[#222] focus-visible:ring-2 focus-visible:ring-[#111] focus-visible:ring-offset-2"
+          >
+            Continue to sign in
+            <ArrowRight className="h-4 w-4" />
+          </Button>
+
+          <Button
+            type="button"
+            variant="outline"
+            disabled={!canResend || resending}
+            onClick={handleResend}
+            className="h-12 w-full cursor-pointer rounded-xl border-[#E5E7EB] bg-white text-sm font-semibold text-[#222] hover:bg-[#F9FAFB]"
+          >
+            {resending ? 'Sending…' : !canResend ? `Resend in ${countdown}s` : 'Resend verification email'}
+          </Button>
+        </div>
+
+        <p className="mt-6 text-center text-xs text-[#aaa]">
+          Spam folder tip: check promotions or junk if nothing arrives within a minute.
+        </p>
+
+        <p className="mt-6 text-center text-[14px] text-[#888]">
+          Wrong email?{' '}
+          <Link
+            to="/auth/signin-or-signup"
+            className="cursor-pointer font-bold text-[#111] transition-colors hover:text-brand-600"
+          >
+            Start over
+          </Link>
         </p>
       </div>
-    </div>
+    </ConsoleAuthLayout>
   );
 }
