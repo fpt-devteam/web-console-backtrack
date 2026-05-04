@@ -22,7 +22,7 @@ export function ChartAreaInteractive({
   title,
   data,
   series,
-  defaultRange = '1m',
+  defaultRange = '3m',
   rangeSlice,
   onRangeChange,
 }: ChartConfig) {

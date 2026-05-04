@@ -10,14 +10,6 @@ import { superAdminService } from '@/services/super-admin.service';
 
 
 
-const hotspots = [
-  { x: 50, y: 19, r: 26, label: 'Hanoi',     count: 445, color: '#F59E0B' },
-  { x: 58, y: 16, r: 14, label: 'Hai Phong', count: 187, color: '#10B981' },
-  { x: 67, y: 46, r: 19, label: 'Da Nang',   count: 298, color: '#F59E0B' },
-  { x: 67, y: 62, r: 11, label: 'Nha Trang', count: 98,  color: '#10B981' },
-  { x: 64, y: 76, r: 30, label: 'HCMC',      count: 612, color: '#EF4444' },
-  { x: 61, y: 84, r: 13, label: 'Can Tho',   count: 143, color: '#F59E0B' },
-];
 
 const REVENUE_SERIES: Array<SeriesConfig> = [
   { key: 'org',  label: 'Org Revenue', color: '#3B82F6' },
