@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { Building2, Eye, User } from 'lucide-react'
+import { Building2, User } from 'lucide-react'
 import type { RevenueStatus, RevenueTransaction, SubscriberType } from '@/services/revenue.service'
 import { revenueService } from '@/services/revenue.service'
 import { TableFiltersBar } from '@/components/filters/table-filters-bar'
