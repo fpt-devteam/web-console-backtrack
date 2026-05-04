@@ -62,7 +62,6 @@ export const mockRevenueMonthly: ApiSuccess<Array<RevenueMonthlyItem>> = {
  * GET /api/core/super-admin/dashboard/post-monthly
  *
  * Returns one entry per calendar month, ordered oldest → newest.
- * The chart component slices from the tail: 7d = last 7 months, 30d = last 30, 90d = all.
  */
 export const mockPostMonthly: ApiSuccess<Array<PostMonthlyItem>> = {
   success: true,

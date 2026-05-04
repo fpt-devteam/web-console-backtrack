@@ -10,21 +10,30 @@ import {
 } from 'recharts';
 import type { ChartConfig } from './types';
 
-const RANGES = ['7d', '30d', '90d'] as const;
+const RANGES = ['3m', '12m'] as const;
 type Range = (typeof RANGES)[number];
 
+const RANGE_LABEL: Record<Range, string> = { '3m': '3 months', '12m': '12 months' };
+
 /** Number of data points to show per range; null = show all */
-const RANGE_SLICE: Record<Range, number | null> = { '7d': 7, '30d': 30, '90d': null };
+const RANGE_SLICE: Record<Range, number | null> = { '3m': 90, '12m': null };
 
 export function ChartAreaInteractive({
   title,
   data,
   series,
-  defaultRange = '30d',
+  defaultRange = '1m',
+  rangeSlice,
+  onRangeChange,
 }: ChartConfig) {
   const [range, setRange] = useState<Range>(defaultRange);
-  const limit = RANGE_SLICE[range];
+  const limit = (rangeSlice ?? RANGE_SLICE)[range];
   const sliced = limit != null ? data.slice(-limit) : data;
+
+  function handleRangeChange(r: Range) {
+    setRange(r)
+    onRangeChange?.(r)
+  }
 
   return (
     <div className="bg-white rounded-[14px] border border-[#dddddd] p-6">
@@ -35,14 +44,14 @@ export function ChartAreaInteractive({
             <button
               key={r}
               type="button"
-              onClick={() => setRange(r)}
+              onClick={() => handleRangeChange(r)}
               className={`px-3 py-1 rounded-full text-xs font-medium border transition-colors ${
                 range === r
                   ? 'border-[#222222] bg-[#222222] text-white'
                   : 'border-[#dddddd] text-[#6a6a6a] hover:border-[#222222]'
               }`}
             >
-              {r}
+              {RANGE_LABEL[r]}
             </button>
           ))}
         </div>

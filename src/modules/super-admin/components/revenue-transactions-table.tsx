@@ -15,7 +15,7 @@ const STATUS_CLASS: Record<RevenueStatus, string> = {
 }
 
 const formatCurrency = (amount: number, currency = 'usd') =>
-  new Intl.NumberFormat('en-US', { style: 'currency', currency: currency.toUpperCase(), minimumFractionDigits: 0, maximumFractionDigits: 0 }).format(amount)
+  new Intl.NumberFormat('en-US', { style: 'currency', currency: currency.toUpperCase(), minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(amount)
 
 const formatDate = (date: Date) =>
   date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })

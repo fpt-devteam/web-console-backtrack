@@ -27,7 +27,7 @@ const STATUS_FILTERS = [
   { label: 'Expired',  value: 'Expired'  },
 ] as const;
 
-const PAGE_SIZE = 5;
+const PAGE_SIZE = 3;
 
 export function RecentActivity() {
   const [items, setItems] = useState<Array<RecentActivityItem>>([]);

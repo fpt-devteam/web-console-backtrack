@@ -4,7 +4,7 @@ import type { RevenueSummary } from '@/services/revenue.service'
 import { revenueService } from '@/services/revenue.service'
 
 const formatCurrency = (amount: number, currency = 'USD') =>
-  new Intl.NumberFormat('en-US', { style: 'currency', currency, minimumFractionDigits: 0, maximumFractionDigits: 0 }).format(amount)
+  new Intl.NumberFormat('en-US', { style: 'currency', currency, minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(amount)
 
 export function RevenueStatCards() {
   const [summary, setSummary] = useState<RevenueSummary | null>(null)
@@ -30,7 +30,7 @@ export function RevenueStatCards() {
       ),
     },
     {
-      label: 'Subscription Revenue',
+      label: 'Subs Organizations',
       value: formatCurrency(summary.subscriptionRevenue),
       icon: Package,
       iconBg: 'bg-[#fff0f2]',
@@ -38,7 +38,7 @@ export function RevenueStatCards() {
       meta: <span className="text-xs text-[#929292]">{summary.subscriptionTransactions.toLocaleString()} transactions · From Tenants</span>,
     },
     {
-      label: 'QR Sales Revenue',
+      label: 'Subs Customers',
       value: formatCurrency(summary.qrSalesRevenue),
       icon: QrCode,
       iconBg: 'bg-[#f7f7f7]',
