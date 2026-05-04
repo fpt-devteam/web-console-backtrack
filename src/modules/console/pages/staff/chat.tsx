@@ -132,10 +132,9 @@ export function StaffChatPage() {
                 isResolvePending={resolveMutation.isPending}
                 onResolve={handleResolve}
               />
-              {activeConv.postId && (
+              {activeConv.supportFormData && (
                 <PinnedPostCard
-                  postId={activeConv.postId}
-                  orgSlug={activeConv.orgSlug ?? ''}
+                  supportFormData={activeConv.supportFormData}
                 />
               )}
               <MessagePanel
