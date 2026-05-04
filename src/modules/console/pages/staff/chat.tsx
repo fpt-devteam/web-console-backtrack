@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { Smile } from 'lucide-react'
 import { StaffLayout } from '../../components/staff/layout'
 import { AssignConfirmDialog } from '../../components/staff/chat/assign-confirm-dialog'
+import { ResolveConfirmDialog } from '../../components/staff/chat/resolve-confirm-dialog'
 import { ChatHeader } from '../../components/staff/chat/chat-header'
 import { ChatSidebar } from '../../components/staff/chat/chat-sidebar'
 import { MessagePanel } from '../../components/staff/chat/message-panel'
@@ -24,6 +25,7 @@ export function StaffChatPage() {
   const [tab, setTab] = useState<'queue' | 'assigned' | 'resolved'>('assigned')
   const [searchTerm, setSearchTerm] = useState('')
   const [assignConfirmConv, setAssignConfirmConv] = useState<IConversation | null>(null)
+  const [resolveConfirmOpen, setResolveConfirmOpen] = useState(false)
 
   const { data: queueData, isLoading: isQueueLoading, removeFromQueue } = useSocketChatQueue(currentOrgId ?? undefined)
   const assignedQuery = useChatAssigned()
@@ -73,9 +75,14 @@ export function StaffChatPage() {
   }
 
   function handleResolve() {
+    setResolveConfirmOpen(true)
+  }
+
+  function handleConfirmResolve() {
     if (!activeConversationId) return
     resolveMutation.mutate(activeConversationId, {
       onSuccess: () => {
+        setResolveConfirmOpen(false)
         setActiveConversationId(null)
         setTab('assigned')
       },
@@ -90,6 +97,15 @@ export function StaffChatPage() {
           isPending={assignMutation.isPending}
           onConfirm={handleConfirmAssign}
           onCancel={() => setAssignConfirmConv(null)}
+        />
+      )}
+      {resolveConfirmOpen && (
+        <ResolveConfirmDialog
+          partnerName={partnerName}
+          avatarUrl={activeConv?.partner?.avatarUrl ?? undefined}
+          isPending={resolveMutation.isPending}
+          onConfirm={handleConfirmResolve}
+          onCancel={() => setResolveConfirmOpen(false)}
         />
       )}
 
@@ -116,10 +132,9 @@ export function StaffChatPage() {
                 isResolvePending={resolveMutation.isPending}
                 onResolve={handleResolve}
               />
-              {activeConv.postId && (
+              {activeConv.supportFormData && (
                 <PinnedPostCard
-                  postId={activeConv.postId}
-                  orgSlug={activeConv.orgSlug ?? ''}
+                  supportFormData={activeConv.supportFormData}
                 />
               )}
               <MessagePanel

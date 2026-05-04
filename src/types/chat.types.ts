@@ -70,6 +70,17 @@ export interface IConversationLastMessage {
   content: string;
   timestamp: string | null;
 }
+export interface SupportFormData {
+  postId: string
+  category: string
+  subCategoryId: string
+  itemName: string
+  color: string
+  additionalDetails: string | null
+  imageUrls: Array<string> | null
+  lostLocation: string | null
+  eventTime: Date | null
+}
 
 /**
  * Frontend conversation model — mirrors ConversationResponse from Backtrack.Chat.
@@ -85,7 +96,7 @@ export interface IConversation {
   orgLogoUrl?: string | null;
   assignedStaffId?: string | null;
   /** Pinned inventory item ID for this conversation */
-  postId?: string | null;
+  supportFormData?: SupportFormData | null;
   /** The other participant in the conversation */
   partner?: IConversationPartner | null;
   /** Flattened from lastMessage.timestamp for convenience */

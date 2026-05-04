@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { Calendar, DollarSign, Package, QrCode, TrendingUp } from 'lucide-react'
+import { Calendar, DollarSign, Package, QrCode, TrendingDown, TrendingUp } from 'lucide-react'
 import type { RevenueSummary } from '@/services/revenue.service'
 import { revenueService } from '@/services/revenue.service'
 
@@ -22,12 +22,16 @@ export function RevenueStatCards() {
       icon: DollarSign,
       iconBg: 'bg-[#e8f9f0]',
       iconColor: 'text-[#06c167]',
-      meta: (
-        <span className="flex items-center gap-1 text-xs font-semibold text-[#06c167]">
-          <TrendingUp className="w-3 h-3" />
-          +{summary.growthPercentage}% vs last period
-        </span>
-      ),
+      meta: (() => {
+        const pct = summary.growthPercentage
+        const isUp = pct >= 0
+        return (
+          <span className={`flex items-center gap-1 text-xs font-semibold ${isUp ? 'text-[#06c167]' : 'text-[#c13515]'}`}>
+            {isUp ? <TrendingUp className="w-3 h-3" /> : <TrendingDown className="w-3 h-3" />}
+            {isUp ? '+' : ''}{pct}% vs last period
+          </span>
+        )
+      })(),
     },
     {
       label: 'Subs Organizations',
@@ -35,7 +39,7 @@ export function RevenueStatCards() {
       icon: Package,
       iconBg: 'bg-[#fff0f2]',
       iconColor: 'text-[#ff385c]',
-      meta: <span className="text-xs text-[#929292]">{summary.subscriptionTransactions.toLocaleString()} transactions · From Tenants</span>,
+      meta: <span className="text-xs text-[#929292]">{summary.subscriptionTransactions.toLocaleString()} transactions · From Organizations</span>,
     },
     {
       label: 'Subs Customers',
@@ -43,7 +47,7 @@ export function RevenueStatCards() {
       icon: QrCode,
       iconBg: 'bg-[#f7f7f7]',
       iconColor: 'text-[#6a6a6a]',
-      meta: <span className="text-xs text-[#929292]">{summary.qrSalesTransactions.toLocaleString()} transactions · From End Users</span>,
+      meta: <span className="text-xs text-[#929292]">{summary.qrSalesTransactions.toLocaleString()} transactions · From Customers</span>,
     },
     {
       label: 'This Month',
