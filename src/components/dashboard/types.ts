@@ -38,7 +38,11 @@ export interface ChartConfig {
   /** Full dataset; ChartAreaInteractive slices based on selected time range */
   data: ChartPoint[];
   series: SeriesConfig[];
-  defaultRange?: '7d' | '30d' | '90d';
+  defaultRange?: '3m' | '12m';
+  /** Override per-range slice counts (useful when data is monthly instead of daily) */
+  rangeSlice?: Record<'3m' | '12m', number | null>;
+  /** Called when user switches range — use this to re-fetch data from API */
+  onRangeChange?: (range: '3m' | '12m') => void;
 }
 
 export type TableRow = Record<string, unknown>;

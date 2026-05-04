@@ -94,10 +94,11 @@ export const superAdminService = {
     return data.data;
   },
 
-  async getPostMonthly(): Promise<Array<PostMonthlyItem>> {
+  async getPostMonthly(months = 12): Promise<Array<PostMonthlyItem>> {
     try {
       const { data } = await privateClient.get<ApiResponse<Array<PostMonthlyItem>>>(
         '/api/core/super-admin/dashboard/post-monthly',
+        { params: { months } },
       );
       if (!data.success) throw new Error('Failed to fetch post monthly trend');
       return data.data;

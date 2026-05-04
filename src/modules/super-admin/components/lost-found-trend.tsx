@@ -1,8 +1,7 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 
 import { ChartAreaInteractive } from '@/components/dashboard';
 import type { SeriesConfig } from '@/components/dashboard';
-import type { PostMonthlyItem } from '@/services/super-admin.service';
 import { superAdminService } from '@/services/super-admin.service';
 
 const SERIES: SeriesConfig[] = [
@@ -10,21 +9,28 @@ const SERIES: SeriesConfig[] = [
   { key: 'found', label: 'Found', color: '#10B981' },
 ];
 
+type Range = '3m' | '12m';
+const RANGE_MONTHS: Record<Range, number> = { '3m': 3, '12m': 12 };
+
 export function LostFoundTrend() {
-  const [data, setData] = useState<Array<PostMonthlyItem>>([]);
+  const [months, setMonths] = useState(3);
+  const [chartData, setChartData] = useState<Array<{ label: string; lost: number; found: number }>>([]);
 
   useEffect(() => {
-    superAdminService.getPostMonthly().then(setData).catch(console.error);
-  }, []);
+    superAdminService.getPostMonthly(months)
+      .then(d => setChartData(d.map(p => ({ label: p.month, lost: p.lost, found: p.found }))))
+      .catch(console.error);
+  }, [months]);
 
-  const chartData = data.map(d => ({ label: d.month, lost: d.lost, found: d.found }));
+  const handleRangeChange = useCallback((r: Range) => setMonths(RANGE_MONTHS[r]), []);
 
   return (
     <ChartAreaInteractive
       title="Lost vs Found Trend"
       data={chartData}
       series={SERIES}
-      defaultRange="30d"
+      defaultRange="3m"
+      onRangeChange={handleRangeChange}
     />
   );
 }

@@ -15,7 +15,7 @@ type TimeFilter = '12months' | '6months' | '3months' | '1month'
 const TIME_SLICE: Record<TimeFilter, number> = { '12months': 12, '6months': 6, '3months': 3, '1month': 1 }
 
 const formatCurrency = (amount: number) =>
-  new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', minimumFractionDigits: 0, maximumFractionDigits: 0 }).format(amount)
+  new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(amount)
 
 const formatYAxis = (v: number) => {
   if (v >= 1_000_000) return `$${(v / 1_000_000).toFixed(1)}M`
@@ -51,8 +51,8 @@ export function RevenueChart() {
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="All">All Revenue</SelectItem>
-              <SelectItem value="Subscription">Subscription</SelectItem>
-              <SelectItem value="QR Sales">QR Sales</SelectItem>
+              <SelectItem value="Subscription">Subs Organizations</SelectItem>
+              <SelectItem value="QR Sales">Subs Customers</SelectItem>
             </SelectContent>
           </Select>
           <Select value={timeFilter} onValueChange={(v) => setTimeFilter(v as TimeFilter)}>
@@ -82,8 +82,8 @@ export function RevenueChart() {
             />
             {chartView === 'All' ? (
               <>
-                <Bar dataKey="subscription" stackId="rev" fill="#ff385c" name="Subscription" radius={[0, 0, 0, 0]} animationDuration={600} />
-                <Bar dataKey="qrSales"      stackId="rev" fill="#929292" name="QR Sales"     radius={[6, 6, 0, 0]} animationDuration={600} />
+                <Bar dataKey="subscription" stackId="rev" fill="#ff385c" name="Organizations" radius={[0, 0, 0, 0]} animationDuration={600} />
+                <Bar dataKey="qrSales"      stackId="rev" fill="#929292" name="Customers"     radius={[6, 6, 0, 0]} animationDuration={600} />
                 <Legend wrapperStyle={{ paddingTop: 16, fontSize: 13 }} iconType="circle" />
               </>
             ) : (
