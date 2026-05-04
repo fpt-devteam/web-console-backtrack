@@ -238,6 +238,8 @@ export function EditItemPage() {
 
   const validate = (): string | null => {
     if (!item) return 'Item not loaded.'
+    if (!organizationStorageLocation.trim()) return 'Storage location is required.'
+    if (!organizationFoundLocation.trim()) return 'Found location is required.'
     if (item.category === 'Others') {
       if (!otherIdentifier.trim()) return 'Item identifier is required.'
     } else {
@@ -268,6 +270,8 @@ export function EditItemPage() {
       const payloadBase = {
         imageUrls,
         ...(eventTimeIso ? { eventTime: eventTimeIso } : {}),
+        organizationStorageLocation: organizationStorageLocation.trim() || null,
+        organizationFoundLocation: organizationFoundLocation.trim() || null,
       }
 
       const payload =
@@ -410,11 +414,21 @@ export function EditItemPage() {
                 </div>
                 <div>
                   <Label className="text-sm font-semibold">Storage location</Label>
-                  <Input value={organizationStorageLocation} readOnly className="mt-1 bg-[#f7f7f7]" />
+                  <Input
+                    value={organizationStorageLocation}
+                    onChange={(e) => setOrganizationStorageLocation(e.target.value)}
+                    className="mt-1"
+                    placeholder="Lost & Found counter, Shelf A-12, Locker 3"
+                  />
                 </div>
                 <div>
                   <Label className="text-sm font-semibold">Found location</Label>
-                  <Input value={organizationFoundLocation} readOnly className="mt-1 bg-[#f7f7f7]" />
+                  <Input
+                    value={organizationFoundLocation}
+                    onChange={(e) => setOrganizationFoundLocation(e.target.value)}
+                    className="mt-1"
+                    placeholder="Terminal 2 Gate B, Room 408, Parking P1"
+                  />
                 </div>
               </div>
             </section>

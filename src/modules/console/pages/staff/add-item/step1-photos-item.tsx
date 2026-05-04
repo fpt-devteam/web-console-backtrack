@@ -47,6 +47,7 @@ export type Step1PhotosAndItemProps = {
   onAnalyze: () => void
   analyzeDisabled?: boolean
   analyzeHint?: string
+  maxEventTimeIso?: string
   postTitle: string
   setPostTitle: (v: string) => void
   detailItemName: string
@@ -111,6 +112,7 @@ export function Step1PhotosAndItem({
   onAnalyze,
   analyzeDisabled,
   analyzeHint,
+  maxEventTimeIso,
   postTitle,
   setPostTitle,
   detailItemName,
@@ -166,6 +168,7 @@ export function Step1PhotosAndItem({
 }: Step1PhotosAndItemProps) {
   const subcategoryLabel =
     (subcategories ?? []).find((s) => s.code === subcategoryCode)?.name ?? subcategoryCode
+  const maxLocal = maxEventTimeIso ? toDateTimeLocalFromIso(maxEventTimeIso) : undefined
 
   return (
     <div className="space-y-6 mt-3">
@@ -247,6 +250,7 @@ export function Step1PhotosAndItem({
               id="eventTime"
               type="datetime-local"
               value={eventTime ? toDateTimeLocalFromIso(eventTime) : ''}
+              max={maxLocal}
               onChange={(e) => {
                 const v = e.target.value
                 if (!v) {
@@ -254,8 +258,16 @@ export function Step1PhotosAndItem({
                   return
                 }
                 // `datetime-local` is local time without timezone; convert to ISO
-                const iso = new Date(v).toISOString()
-                setEventTime(iso)
+                const picked = new Date(v).toISOString()
+                if (maxEventTimeIso) {
+                  const maxT = new Date(maxEventTimeIso).getTime()
+                  const pickedT = new Date(picked).getTime()
+                  if (!Number.isNaN(maxT) && !Number.isNaN(pickedT) && pickedT > maxT) {
+                    setEventTime(maxEventTimeIso)
+                    return
+                  }
+                }
+                setEventTime(picked)
               }}
               className="mt-1"
             />

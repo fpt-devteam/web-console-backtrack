@@ -13,6 +13,9 @@ import {
   useAdminRecentInventory,
   useAdminStaffPerformance,
 } from '@/hooks/use-admin-dashboard'
+import { useCurrentOrgId } from '@/contexts/current-org.context'
+import { isOrgOnFreePlan, useOrgSubscription } from '@/hooks/use-org-subscription'
+import { AdminDashboardMockPage } from './dashboard-mock'
 
 function greeting(): string {
   const h = new Date().getHours()
@@ -24,12 +27,43 @@ function greeting(): string {
 const PAGE_SIZE = 3
 
 export function AdminDashboardPage() {
+  const { currentOrgId } = useCurrentOrgId()
+  const { data: orgSubscription, isLoading: isSubLoading, isError: isSubError } = useOrgSubscription(currentOrgId)
+
   const [itemsPage, setItemsPage] = useState(1)
-  const { data: user }     = useCurrentUser()
-  const { data: stats }    = useAdminDashboardStats()
-  const { data: monthly }  = useAdminMonthlyActivity()
-  const { data: staff }    = useAdminStaffPerformance()
-  const { data: inventory} = useAdminRecentInventory(itemsPage, PAGE_SIZE)
+  const { data: user } = useCurrentUser()
+  const { data: stats } = useAdminDashboardStats()
+  const { data: monthly } = useAdminMonthlyActivity()
+  const { data: staff } = useAdminStaffPerformance()
+  const { data: inventory } = useAdminRecentInventory(itemsPage, PAGE_SIZE)
+
+  const isFreeOrg = !!currentOrgId && !isSubLoading && isOrgOnFreePlan(orgSubscription ?? null)
+
+  // If we can't resolve subscription, fall back to mock dashboard instead of crashing the page.
+  if (isSubError || isFreeOrg) {
+    return <AdminDashboardMockPage />
+  }
+
+  if (!currentOrgId || isSubLoading) {
+    return (
+      <Layout>
+        <div className="h-full overflow-y-auto p-4 sm:p-6 lg:p-8 space-y-6">
+          <div className="h-10 w-64 rounded-xl bg-white border border-[#dddddd] animate-pulse" />
+          <div className="h-5 w-80 rounded-xl bg-white border border-[#dddddd] animate-pulse" />
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+            {Array.from({ length: 4 }).map((_, i) => (
+              <div key={i} className="h-28 bg-white rounded-2xl border border-[#dddddd] animate-pulse" />
+            ))}
+          </div>
+          <div className="h-[296px] bg-white rounded-2xl border border-[#dddddd] animate-pulse" />
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+            <div className="h-64 bg-white rounded-2xl border border-[#dddddd] animate-pulse" />
+            <div className="h-64 bg-white rounded-2xl border border-[#dddddd] animate-pulse" />
+          </div>
+        </div>
+      </Layout>
+    )
+  }
 
   const firstName = user?.name ? user.name.split(' ')[0] : 'Admin'
 

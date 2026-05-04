@@ -56,17 +56,6 @@ export function useSignIn() {
   });
 }
 
-export function useSignInWithGoogle() {
-  const queryClient = useQueryClient();
-
-  return useMutation<AuthUser, AuthError, void>({
-    mutationFn: () => authService.signInWithGoogle(),
-    onSuccess: (user) => {
-      queryClient.setQueryData(AUTH_KEYS.currentUser, user);
-    },
-  });
-}
-
 /**
  * Sign up with email and password
  * 

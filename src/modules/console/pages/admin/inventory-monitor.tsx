@@ -13,6 +13,7 @@ import { InventoryListFiltersBar } from '../../components/inventory/inventory-li
 import { InventoryGridCards } from '../../components/inventory/inventory-grid-cards'
 import { InventoryStatusTabs } from '../../components/inventory/inventory-status-tabs'
 import { useSubcategories } from '@/hooks/use-subcategories'
+import { useOrgReturnReports } from '@/hooks/use-return-report'
 
 const pageSize = 8
 
@@ -29,6 +30,7 @@ export function AdminInventoryMonitorPage() {
   })
 
   const { data, isLoading, isError } = useInventoryItems(currentOrgId, listState.listParams)
+  const { data: returnReports } = useOrgReturnReports(currentOrgId, 1, 200)
   const { data: subcategories } = useSubcategories()
   const subcategoryNameById = (subcategories ?? []).reduce<Record<string, string>>((acc, s) => {
     acc[s.id] = s.name
@@ -36,6 +38,14 @@ export function AdminInventoryMonitorPage() {
   }, {})
 
   const items: InventoryListItem[] = data?.items ?? []
+  const returnedAtByPostId = useMemo(() => {
+    const map: Record<string, string> = {}
+    for (const r of returnReports?.items ?? []) {
+      const postId = r.post?.id
+      if (postId) map[postId] = r.createdAt
+    }
+    return map
+  }, [returnReports?.items])
   const totalCount = data?.totalCount ?? 0
   const totalPages = Math.max(1, Math.ceil(totalCount / pageSize))
   const authorOptions = useMemo(
@@ -109,6 +119,7 @@ export function AdminInventoryMonitorPage() {
           isLoading={isLoading}
           isError={isError}
           subcategoryNameById={subcategoryNameById}
+          getDate={(item) => (item.status === 'Returned' ? returnedAtByPostId[item.id] ?? item.createdAt : item.createdAt)}
           detailLink={{
             to: '/console/$slug/admin/inventory/$itemId',
             params: (item) => ({ slug, itemId: item.id }),

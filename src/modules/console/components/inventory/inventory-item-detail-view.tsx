@@ -162,7 +162,7 @@ export function InventoryItemDetailView({
   const step3Date = isHandoverDone ? handoverAt : isTerminal ? terminalAt : '—'
 
   return (
-    <div className="h-full overflow-y-auto px-4 py-4 sm:px-5 sm:py-6 lg:mx-auto lg:max-w-[1600px] lg:px-8">
+    <div className="mx-auto h-full w-full max-w-6xl overflow-y-auto px-4 py-4 sm:px-5 sm:py-6 lg:px-8">
       <div className="mb-4 flex min-w-0 items-center gap-1.5 text-xs text-[#6a6a6a] sm:mb-6 sm:gap-2">
         <Link to={backTo.to} params={backTo.params} className="shrink-0 hover:text-[#222222] transition-colors">
           Inventory

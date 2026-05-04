@@ -33,6 +33,12 @@ function formatOrDash(v: string | null | undefined) {
   return v?.trim() ? v.trim() : '—'
 }
 
+function formatBoolOrDash(v: boolean | null | undefined): string {
+  if (v === true) return 'Yes'
+  if (v === false) return 'No'
+  return '—'
+}
+
 function formatFoundTime24h(iso: string | null | undefined): string {
   if (!iso) return '—'
   const d = new Date(iso)
@@ -109,6 +115,12 @@ export function InventoryDetailAttributeGrid({
   const subName = getInventorySubcategoryName(item, subcategoryNameById)
   const cat = item.category
   const aiDesc = getInventoryAiDescription(item)
+  const brand = getInventoryBrand(item)
+  const material = getInventoryMaterial(item)
+  const size = getInventorySize(item)
+  const color = getInventoryColor(item)
+  const condition = getInventoryCondition(item)
+  const model = getInventoryModel(item)
   const itemNameValue =
     cat === 'Others'
       ? item.otherDetail?.itemName
@@ -156,18 +168,32 @@ export function InventoryDetailAttributeGrid({
           <AttributeCard icon={Calendar} label="Created at" value={item.createdAt ? new Date(item.createdAt).toLocaleString() : null} />
 
           <AttributeCard icon={ScanSearch} label={cat === 'Others' ? 'Item identifier' : 'Item name'} value={itemNameValue} />
-          <AttributeCard icon={Palette} label="Color" value={getInventoryColor(item)} />
+          {cat !== 'Cards' ? <AttributeCard icon={Palette} label="Color" value={color} /> : null}
 
-          <AttributeCard icon={Tag} label="Brand" value={getInventoryBrand(item)} />
-          <AttributeCard icon={Layers3} label="Material" value={getInventoryMaterial(item)} />
-
-          {getInventoryCondition(item) ? (
-            <AttributeCard icon={Layers3} label="Condition" value={getInventoryCondition(item)} />
+          {/* Only show general physical attributes when relevant / present. */}
+          {cat !== 'Cards' && (cat === 'PersonalBelongings' || brand) ? (
+            <AttributeCard icon={Tag} label="Brand" value={brand} />
           ) : null}
-          <AttributeCard icon={Ruler} label="Size" value={getInventorySize(item)} />
+          {cat !== 'Cards' && (cat === 'PersonalBelongings' || material) ? (
+            <AttributeCard icon={Layers3} label="Material" value={material} />
+          ) : null}
 
+          {cat !== 'Cards' && (cat === 'PersonalBelongings' || condition) ? (
+            <AttributeCard icon={Layers3} label="Condition" value={condition} />
+          ) : null}
+          {cat !== 'Cards' && (cat === 'PersonalBelongings' || size) ? (
+            <AttributeCard icon={Ruler} label="Size" value={size} />
+          ) : null}
+
+          {cat === 'Electronics' && model ? <AttributeCard icon={Layers3} label="Model" value={model} /> : null}
           {cat === 'Electronics' ? (
-            <AttributeCard icon={Layers3} label="Model" value={getInventoryModel(item)} />
+            <AttributeCard icon={Layers3} label="Has case" value={formatBoolOrDash(item.electronicDetail?.hasCase)} />
+          ) : null}
+          {cat === 'Electronics' && item.electronicDetail?.caseDescription?.trim() ? (
+            <AttributeCard icon={Layers3} label="Case description" value={item.electronicDetail?.caseDescription} />
+          ) : null}
+          {cat === 'Electronics' && item.electronicDetail?.lockScreenDescription?.trim() ? (
+            <AttributeCard icon={Layers3} label="Lock screen" value={item.electronicDetail?.lockScreenDescription} />
           ) : null}
           {cat === 'Cards' ? (
             <AttributeCard icon={User} label="Holder name" value={item.cardDetail?.holderName} />

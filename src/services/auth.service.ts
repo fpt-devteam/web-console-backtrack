@@ -5,8 +5,6 @@ import { publicClient } from '@/lib/api-client';
 import {
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
-  signInWithPopup,
-  GoogleAuthProvider,
   signOut as firebaseSignOut,
   sendEmailVerification,
   type User as FirebaseUser,
@@ -99,16 +97,6 @@ class RealAuthService implements IAuthService {
     try {
       const userCredential = await signInWithEmailAndPassword(auth, credentials.email, credentials.password);
       return firebaseUserToAuthUser(userCredential.user);
-    } catch (error: any) {
-      throw createAuthError(error);
-    }
-  }
-
-  async signInWithGoogle(): Promise<AuthUser> {
-    try {
-      const provider = new GoogleAuthProvider();
-      const credential = await signInWithPopup(auth, provider);
-      return firebaseUserToAuthUser(credential.user);
     } catch (error: any) {
       throw createAuthError(error);
     }

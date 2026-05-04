@@ -142,6 +142,9 @@ export function AddItemPage() {
   const { data: me } = useUser()
   const { data: org } = useOrganization(currentOrgId)
 
+  // Lock "Found time" to not exceed the moment the form was created.
+  const [formCreatedAtIso] = useState(() => new Date().toISOString())
+
   const [step, setStep] = useState<StepId>(0)
 
   const MAX_PHOTOS = 5
@@ -477,6 +480,16 @@ export function AddItemPage() {
     if (!organizationStorageLocation.trim()) return 'Storage location is required.'
     if (!organizationFoundLocation.trim()) return 'Found location is required.'
     if (!eventTime.trim()) return 'Event time is required.'
+    // Prevent future times beyond when the form was opened.
+    try {
+      const picked = new Date(eventTime)
+      const max = new Date(formCreatedAtIso)
+      if (!Number.isNaN(picked.getTime()) && !Number.isNaN(max.getTime()) && picked.getTime() > max.getTime()) {
+        return 'Found time cannot be after the time this form was created.'
+      }
+    } catch {
+      /* ignore */
+    }
     return null
   }
 
@@ -765,6 +778,7 @@ export function AddItemPage() {
                     ? 'Add at least one photo to analyze'
                     : 'Analyze all selected photos'
               }
+              maxEventTimeIso={formCreatedAtIso}
               postTitle={postTitle}
               setPostTitle={setPostTitle}
               detailItemName={detailItemName}
