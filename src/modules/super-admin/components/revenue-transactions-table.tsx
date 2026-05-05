@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { Building2, Eye, User } from 'lucide-react'
+import { Building2, User } from 'lucide-react'
 import type { RevenueStatus, RevenueTransaction, SubscriberType } from '@/services/revenue.service'
 import { revenueService } from '@/services/revenue.service'
 import { TableFiltersBar } from '@/components/filters/table-filters-bar'
@@ -49,22 +49,25 @@ export function RevenueTransactionsTable() {
   const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE))
   const start = (page - 1) * PAGE_SIZE + 1
 
+  const resultLabel = total === 0 ? '0 results' : `${start}–${Math.min(start + PAGE_SIZE - 1, total)} of ${total}`
+
   return (
     <div className="space-y-4">
       <TableFiltersBar
         searchValue={searchTerm}
         onSearchChange={setSearchTerm}
-        searchPlaceholder="Search by tenant, user, invoice…"
+        searchPlaceholder="Search by organization, customer, invoice…"
+        resultLabel={resultLabel}
         filters={[
           {
             label: 'Revenue Type',
             value: typeFilter,
             onChange: (v) => setTypeFilter(v as typeof typeFilter),
             options: [
-              { value: 'Organization', label: 'Subscription' },
-              { value: 'User',     label: 'QR Sales' },
+              { value: 'Organization', label: 'Organization' },
+              { value: 'User',         label: 'Customer' },
             ],
-            allLabel: 'All',
+            allLabel: 'All types',
           },
           {
             label: 'Status',
@@ -75,7 +78,7 @@ export function RevenueTransactionsTable() {
               { value: 'Pending',   label: 'Pending' },
               { value: 'Failed',    label: 'Failed' },
             ],
-            allLabel: 'All',
+            allLabel: 'All statuses',
           },
         ]}
       />
@@ -101,7 +104,7 @@ export function RevenueTransactionsTable() {
                   <tr key={t.id} className="hover:bg-[#fafafa] transition-colors">
                     <td className="px-5 py-3 whitespace-nowrap">
                       <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${isSub ? 'bg-[#fff0f2] text-[#ff385c]' : 'bg-[#f7f7f7] text-[#6a6a6a]'}`}>
-                        {t.subscriberType === 'Organization' ? 'Subscription' : 'QR Sales'}
+                        {t.subscriberType === 'Organization' ? 'Organization' : 'Customer'}
                       </span>
                     </td>
                     <td className="px-5 py-3 whitespace-nowrap">
@@ -131,15 +134,6 @@ export function RevenueTransactionsTable() {
                     <td className="px-5 py-3 whitespace-nowrap">
                       <span className="text-sm text-[#6a6a6a]">{formatDate(t.transactionDate)}</span>
                     </td>
-                    <td className="px-5 py-3 whitespace-nowrap">
-                      <button
-                        onClick={() => console.log('View transaction:', t.id)}
-                        className="p-1.5 text-[#929292] hover:text-[#ff385c] hover:bg-[#fff0f2] rounded-lg transition-colors"
-                        title="View details"
-                      >
-                        <Eye className="w-4 h-4" />
-                      </button>
-                    </td>
                   </tr>
                 )
               })}
@@ -147,10 +141,7 @@ export function RevenueTransactionsTable() {
           </table>
         </div>
 
-        <div className="px-5 py-3 border-t border-[#f0f0f0] flex items-center justify-between">
-          <span className="text-sm text-[#929292]">
-            {total === 0 ? '0' : `${start}–${Math.min(start + PAGE_SIZE - 1, total)}`} of {total}
-          </span>
+        <div className="px-5 py-3 border-t border-[#f0f0f0] flex justify-end">
           <Pagination currentPage={page} totalPages={totalPages} onPageChange={setPage} />
         </div>
       </div>
