@@ -189,7 +189,7 @@ export const mockPostStatusBreakdown: ApiSuccess<PostStatusBreakdown> = {
         total: 200,
         statuses: [
           { status: 'InStorage',       count: 6,   pct: 3  },
-          { status: 'ReturnScheduled', count: 16,  pct: 8  },
+          { status: 'Returned', count: 16,  pct: 8  },
           { status: 'Returned',        count: 100, pct: 50 },
           { status: 'Archived',        count: 16,  pct: 8  },
           { status: 'Expired',         count: 12,  pct: 6  },
@@ -199,7 +199,7 @@ export const mockPostStatusBreakdown: ApiSuccess<PostStatusBreakdown> = {
         total: 300,
         statuses: [
           { status: 'InStorage',       count: 99,  pct: 33 },
-          { status: 'ReturnScheduled', count: 33,  pct: 11 },
+          { status: 'Returned', count: 33,  pct: 11 },
           { status: 'Returned',        count: 117, pct: 39 },
           { status: 'Archived',        count: 18,  pct: 6  },
           { status: 'Expired',         count: 9,   pct: 3  },
@@ -211,7 +211,7 @@ export const mockPostStatusBreakdown: ApiSuccess<PostStatusBreakdown> = {
         total: 14,
         statuses: [
           { status: 'InStorage',       count: 0, pct: 0  },
-          { status: 'ReturnScheduled', count: 1, pct: 7  },
+          { status: 'Returned', count: 1, pct: 7  },
           { status: 'Returned',        count: 7, pct: 50 },
           { status: 'Archived',        count: 1, pct: 7  },
           { status: 'Expired',         count: 1, pct: 7  },
@@ -221,7 +221,7 @@ export const mockPostStatusBreakdown: ApiSuccess<PostStatusBreakdown> = {
         total: 23,
         statuses: [
           { status: 'InStorage',       count: 8, pct: 35 },
-          { status: 'ReturnScheduled', count: 4, pct: 17 },
+          { status: 'Returned', count: 4, pct: 17 },
           { status: 'Returned',        count: 8, pct: 35 },
           { status: 'Archived',        count: 1, pct: 4  },
           { status: 'Expired',         count: 0, pct: 0  },
