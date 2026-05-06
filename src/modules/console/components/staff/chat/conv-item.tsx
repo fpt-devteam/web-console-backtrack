@@ -1,7 +1,7 @@
+import { ImageOff } from 'lucide-react'
 import { Avatar } from './avatar'
-import { formatTime, statusBadge, statusLabel } from './utils'
+import { formatTime } from './utils'
 import type { IConversation } from '@/types/chat.types'
-import { ConversationStatus } from '@/types/chat.types'
 
 interface ConvItemProps {
   conv: IConversation
@@ -10,47 +10,80 @@ interface ConvItemProps {
 }
 
 export function ConvItem({ conv, isActive, onSelect }: ConvItemProps) {
-  const name = conv.partner?.displayName ?? conv.partner?.email ?? conv.id.slice(0, 8)
-  const hasUnread = (conv.unreadCount ?? 0) > 0
+  const partnerName = conv.partner?.displayName ?? conv.partner?.email ?? conv.id.slice(0, 8)
+  const itemName    = conv.supportFormData?.itemName ?? null
+  const itemThumb   = conv.supportFormData?.imageUrls?.[0] ?? null
+  const category    = conv.supportFormData?.category ?? null
+  const hasUnread   = (conv.unreadCount ?? 0) > 0
+
   return (
     <button
       onClick={onSelect}
-      className={`w-full px-4 py-3 flex items-center gap-3 transition-colors text-left
-        ${isActive ? 'bg-[#fff0f2]' : 'hover:bg-[#f7f7f7]'}`}
+      className={[
+        'w-full text-left transition-colors',
+        'border-b border-hairline last:border-b-0',
+        isActive ? 'bg-[#fff0f2]' : 'bg-white hover:bg-[#f7f7f7]',
+      ].join(' ')}
     >
-      <div className="relative flex-shrink-0">
-        <Avatar url={conv.partner?.avatarUrl} name={name} className="w-12 h-12 rounded-full" />
-        {conv.status === ConversationStatus.IN_PROGRESS && (
-          <span className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 border-2 border-white rounded-full" />
-        )}
-      </div>
-
-      <div className="flex-1 min-w-0">
-        <div className="flex items-baseline justify-between gap-1 mb-0.5">
-          <span className={`text-sm truncate ${hasUnread ? 'font-semibold text-[#222222]' : 'font-medium text-[#222222]'}`}>
-            {name}
-          </span>
-          <span className="text-[11px] text-[#929292] flex-shrink-0">
-            {formatTime(conv.lastMessageAt)}
-          </span>
-        </div>
-
-        <div className="flex items-center justify-between gap-1">
-          <p className={`text-xs truncate ${hasUnread ? 'font-medium text-[#6a6a6a]' : 'text-[#929292]'}`}>
-            {conv.lastMessageContent ?? 'No messages yet'}
-          </p>
-          {hasUnread && (
-            <span className="flex-shrink-0 min-w-[18px] h-[18px] bg-[#ff385c] text-white text-[10px] font-bold rounded-full flex items-center justify-center px-1">
-              {conv.unreadCount}
-            </span>
+      <div className="flex gap-3 px-4 py-3">
+        {/* Item image */}
+        <div className="shrink-0">
+          {itemThumb ? (
+            <img
+              src={itemThumb}
+              alt={itemName ?? 'item'}
+              className="w-14 h-14 rounded-xl object-cover border border-hairline"
+            />
+          ) : (
+            <div className="w-14 h-14 rounded-xl bg-neutral-100 border border-hairline flex items-center justify-center">
+              <ImageOff className="w-5 h-5 text-neutral-300" />
+            </div>
           )}
         </div>
 
-        {conv.status && (
-          <span className={`text-[10px] font-medium mt-1 inline-block px-2 py-0.5 rounded-full ${statusBadge(conv.status)}`}>
-            {statusLabel(conv.status)}
-          </span>
-        )}
+        {/* Right content */}
+        <div className="flex-1 min-w-0 flex flex-col gap-1">
+          {/* Item / partner name + unread */}
+          <div className="flex items-start justify-between gap-1">
+            <p className={`text-sm leading-snug line-clamp-2 ${hasUnread ? 'font-bold text-ink' : 'font-semibold text-ink'}`}>
+              {itemName ?? partnerName}
+            </p>
+            {hasUnread && (
+              <span className="shrink-0 min-w-4.5 h-4.5 bg-[#ff385c] text-white text-[10px] font-bold rounded-full flex items-center justify-center px-1 mt-0.5">
+                {conv.unreadCount}
+              </span>
+            )}
+          </div>
+
+          {/* Partner row */}
+          <div className="flex items-center gap-1">
+            <Avatar
+              url={conv.partner?.avatarUrl}
+              name={partnerName}
+              className="w-4 h-4 rounded-full text-[8px]"
+            />
+            <span className="text-[11px] text-mute font-medium truncate">
+              {partnerName}
+            </span>
+          </div>
+
+          {/* Last message */}
+          <p className={`text-xs truncate ${hasUnread ? 'font-medium text-[#6a6a6a]' : 'text-mute'}`}>
+            {conv.lastMessageContent ?? 'No messages yet'}
+          </p>
+
+          {/* Category / time footer */}
+          {(category ?? conv.lastMessageAt) && (
+            <div className="flex items-center justify-between gap-1 mt-0.5">
+              {category && (
+                <span className="text-[10px] text-mute/70 truncate">{category}</span>
+              )}
+              <span className="text-[10px] text-mute/70 ml-auto shrink-0">
+                {formatTime(conv.lastMessageAt)}
+              </span>
+            </div>
+          )}
+        </div>
       </div>
     </button>
   )

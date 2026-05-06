@@ -42,6 +42,7 @@ import { Route as ConsoleSlugStaffInventoryAddItemRouteImport } from './routes/c
 import { Route as ConsoleSlugStaffInventoryRouteImport } from './routes/console/$slug/staff/inventory'
 import { Route as ConsoleSlugStaffHistoryRouteImport } from './routes/console/$slug/staff/history'
 import { Route as ConsoleSlugStaffDashboardRouteImport } from './routes/console/$slug/staff/dashboard'
+import { Route as ConsoleSlugStaffChatBoardRouteImport } from './routes/console/$slug/staff/chat-board'
 import { Route as ConsoleSlugStaffChatRouteImport } from './routes/console/$slug/staff/chat'
 import { Route as ConsoleSlugAdminSettingRouteImport } from './routes/console/$slug/admin/setting'
 import { Route as ConsoleSlugAdminPricingRouteImport } from './routes/console/$slug/admin/pricing'
@@ -51,6 +52,7 @@ import { Route as ConsoleSlugAdminEmployeeRouteImport } from './routes/console/$
 import { Route as ConsoleSlugAdminEditAccountRouteImport } from './routes/console/$slug/admin/edit-account'
 import { Route as ConsoleSlugAdminDashboardRouteImport } from './routes/console/$slug/admin/dashboard'
 import { Route as ConsoleSlugAdminCheckoutRouteImport } from './routes/console/$slug/admin/checkout'
+import { Route as ConsoleSlugAdminChatBoardRouteImport } from './routes/console/$slug/admin/chat-board'
 import { Route as ConsoleSlugAccountSecurityRouteImport } from './routes/console/$slug/account/security'
 import { Route as ConsoleSlugAdminSettingIndexRouteImport } from './routes/console/$slug/admin/setting/index'
 import { Route as ConsoleSlugAdminInventoryIndexRouteImport } from './routes/console/$slug/admin/inventory/index'
@@ -232,6 +234,12 @@ const ConsoleSlugStaffDashboardRoute =
     path: '/dashboard',
     getParentRoute: () => ConsoleSlugStaffRoute,
   } as any)
+const ConsoleSlugStaffChatBoardRoute =
+  ConsoleSlugStaffChatBoardRouteImport.update({
+    id: '/chat-board',
+    path: '/chat-board',
+    getParentRoute: () => ConsoleSlugStaffRoute,
+  } as any)
 const ConsoleSlugStaffChatRoute = ConsoleSlugStaffChatRouteImport.update({
   id: '/chat',
   path: '/chat',
@@ -280,6 +288,12 @@ const ConsoleSlugAdminCheckoutRoute =
   ConsoleSlugAdminCheckoutRouteImport.update({
     id: '/checkout',
     path: '/checkout',
+    getParentRoute: () => ConsoleSlugAdminRoute,
+  } as any)
+const ConsoleSlugAdminChatBoardRoute =
+  ConsoleSlugAdminChatBoardRouteImport.update({
+    id: '/chat-board',
+    path: '/chat-board',
     getParentRoute: () => ConsoleSlugAdminRoute,
   } as any)
 const ConsoleSlugAccountSecurityRoute =
@@ -366,6 +380,7 @@ export interface FileRoutesByFullPath {
   '/console/$slug/admin': typeof ConsoleSlugAdminRouteWithChildren
   '/console/$slug/staff': typeof ConsoleSlugStaffRouteWithChildren
   '/console/$slug/account/security': typeof ConsoleSlugAccountSecurityRoute
+  '/console/$slug/admin/chat-board': typeof ConsoleSlugAdminChatBoardRoute
   '/console/$slug/admin/checkout': typeof ConsoleSlugAdminCheckoutRoute
   '/console/$slug/admin/dashboard': typeof ConsoleSlugAdminDashboardRoute
   '/console/$slug/admin/edit-account': typeof ConsoleSlugAdminEditAccountRoute
@@ -375,6 +390,7 @@ export interface FileRoutesByFullPath {
   '/console/$slug/admin/pricing': typeof ConsoleSlugAdminPricingRoute
   '/console/$slug/admin/setting': typeof ConsoleSlugAdminSettingRouteWithChildren
   '/console/$slug/staff/chat': typeof ConsoleSlugStaffChatRoute
+  '/console/$slug/staff/chat-board': typeof ConsoleSlugStaffChatBoardRoute
   '/console/$slug/staff/dashboard': typeof ConsoleSlugStaffDashboardRoute
   '/console/$slug/staff/history': typeof ConsoleSlugStaffHistoryRoute
   '/console/$slug/staff/inventory': typeof ConsoleSlugStaffInventoryRoute
@@ -418,6 +434,7 @@ export interface FileRoutesByTo {
   '/console/$slug/admin': typeof ConsoleSlugAdminRouteWithChildren
   '/console/$slug/staff': typeof ConsoleSlugStaffRouteWithChildren
   '/console/$slug/account/security': typeof ConsoleSlugAccountSecurityRoute
+  '/console/$slug/admin/chat-board': typeof ConsoleSlugAdminChatBoardRoute
   '/console/$slug/admin/checkout': typeof ConsoleSlugAdminCheckoutRoute
   '/console/$slug/admin/dashboard': typeof ConsoleSlugAdminDashboardRoute
   '/console/$slug/admin/edit-account': typeof ConsoleSlugAdminEditAccountRoute
@@ -425,6 +442,7 @@ export interface FileRoutesByTo {
   '/console/$slug/admin/plan': typeof ConsoleSlugAdminPlanRoute
   '/console/$slug/admin/pricing': typeof ConsoleSlugAdminPricingRoute
   '/console/$slug/staff/chat': typeof ConsoleSlugStaffChatRoute
+  '/console/$slug/staff/chat-board': typeof ConsoleSlugStaffChatBoardRoute
   '/console/$slug/staff/dashboard': typeof ConsoleSlugStaffDashboardRoute
   '/console/$slug/staff/history': typeof ConsoleSlugStaffHistoryRoute
   '/console/$slug/staff/inventory': typeof ConsoleSlugStaffInventoryRoute
@@ -469,6 +487,7 @@ export interface FileRoutesById {
   '/console/$slug/admin': typeof ConsoleSlugAdminRouteWithChildren
   '/console/$slug/staff': typeof ConsoleSlugStaffRouteWithChildren
   '/console/$slug/account/security': typeof ConsoleSlugAccountSecurityRoute
+  '/console/$slug/admin/chat-board': typeof ConsoleSlugAdminChatBoardRoute
   '/console/$slug/admin/checkout': typeof ConsoleSlugAdminCheckoutRoute
   '/console/$slug/admin/dashboard': typeof ConsoleSlugAdminDashboardRoute
   '/console/$slug/admin/edit-account': typeof ConsoleSlugAdminEditAccountRoute
@@ -478,6 +497,7 @@ export interface FileRoutesById {
   '/console/$slug/admin/pricing': typeof ConsoleSlugAdminPricingRoute
   '/console/$slug/admin/setting': typeof ConsoleSlugAdminSettingRouteWithChildren
   '/console/$slug/staff/chat': typeof ConsoleSlugStaffChatRoute
+  '/console/$slug/staff/chat-board': typeof ConsoleSlugStaffChatBoardRoute
   '/console/$slug/staff/dashboard': typeof ConsoleSlugStaffDashboardRoute
   '/console/$slug/staff/history': typeof ConsoleSlugStaffHistoryRoute
   '/console/$slug/staff/inventory': typeof ConsoleSlugStaffInventoryRoute
@@ -523,6 +543,7 @@ export interface FileRouteTypes {
     | '/console/$slug/admin'
     | '/console/$slug/staff'
     | '/console/$slug/account/security'
+    | '/console/$slug/admin/chat-board'
     | '/console/$slug/admin/checkout'
     | '/console/$slug/admin/dashboard'
     | '/console/$slug/admin/edit-account'
@@ -532,6 +553,7 @@ export interface FileRouteTypes {
     | '/console/$slug/admin/pricing'
     | '/console/$slug/admin/setting'
     | '/console/$slug/staff/chat'
+    | '/console/$slug/staff/chat-board'
     | '/console/$slug/staff/dashboard'
     | '/console/$slug/staff/history'
     | '/console/$slug/staff/inventory'
@@ -575,6 +597,7 @@ export interface FileRouteTypes {
     | '/console/$slug/admin'
     | '/console/$slug/staff'
     | '/console/$slug/account/security'
+    | '/console/$slug/admin/chat-board'
     | '/console/$slug/admin/checkout'
     | '/console/$slug/admin/dashboard'
     | '/console/$slug/admin/edit-account'
@@ -582,6 +605,7 @@ export interface FileRouteTypes {
     | '/console/$slug/admin/plan'
     | '/console/$slug/admin/pricing'
     | '/console/$slug/staff/chat'
+    | '/console/$slug/staff/chat-board'
     | '/console/$slug/staff/dashboard'
     | '/console/$slug/staff/history'
     | '/console/$slug/staff/inventory'
@@ -625,6 +649,7 @@ export interface FileRouteTypes {
     | '/console/$slug/admin'
     | '/console/$slug/staff'
     | '/console/$slug/account/security'
+    | '/console/$slug/admin/chat-board'
     | '/console/$slug/admin/checkout'
     | '/console/$slug/admin/dashboard'
     | '/console/$slug/admin/edit-account'
@@ -634,6 +659,7 @@ export interface FileRouteTypes {
     | '/console/$slug/admin/pricing'
     | '/console/$slug/admin/setting'
     | '/console/$slug/staff/chat'
+    | '/console/$slug/staff/chat-board'
     | '/console/$slug/staff/dashboard'
     | '/console/$slug/staff/history'
     | '/console/$slug/staff/inventory'
@@ -899,6 +925,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ConsoleSlugStaffDashboardRouteImport
       parentRoute: typeof ConsoleSlugStaffRoute
     }
+    '/console/$slug/staff/chat-board': {
+      id: '/console/$slug/staff/chat-board'
+      path: '/chat-board'
+      fullPath: '/console/$slug/staff/chat-board'
+      preLoaderRoute: typeof ConsoleSlugStaffChatBoardRouteImport
+      parentRoute: typeof ConsoleSlugStaffRoute
+    }
     '/console/$slug/staff/chat': {
       id: '/console/$slug/staff/chat'
       path: '/chat'
@@ -960,6 +993,13 @@ declare module '@tanstack/react-router' {
       path: '/checkout'
       fullPath: '/console/$slug/admin/checkout'
       preLoaderRoute: typeof ConsoleSlugAdminCheckoutRouteImport
+      parentRoute: typeof ConsoleSlugAdminRoute
+    }
+    '/console/$slug/admin/chat-board': {
+      id: '/console/$slug/admin/chat-board'
+      path: '/chat-board'
+      fullPath: '/console/$slug/admin/chat-board'
+      preLoaderRoute: typeof ConsoleSlugAdminChatBoardRouteImport
       parentRoute: typeof ConsoleSlugAdminRoute
     }
     '/console/$slug/account/security': {
@@ -1124,6 +1164,7 @@ const ConsoleSlugAdminSettingRouteWithChildren =
   )
 
 interface ConsoleSlugAdminRouteChildren {
+  ConsoleSlugAdminChatBoardRoute: typeof ConsoleSlugAdminChatBoardRoute
   ConsoleSlugAdminCheckoutRoute: typeof ConsoleSlugAdminCheckoutRoute
   ConsoleSlugAdminDashboardRoute: typeof ConsoleSlugAdminDashboardRoute
   ConsoleSlugAdminEditAccountRoute: typeof ConsoleSlugAdminEditAccountRoute
@@ -1135,6 +1176,7 @@ interface ConsoleSlugAdminRouteChildren {
 }
 
 const ConsoleSlugAdminRouteChildren: ConsoleSlugAdminRouteChildren = {
+  ConsoleSlugAdminChatBoardRoute: ConsoleSlugAdminChatBoardRoute,
   ConsoleSlugAdminCheckoutRoute: ConsoleSlugAdminCheckoutRoute,
   ConsoleSlugAdminDashboardRoute: ConsoleSlugAdminDashboardRoute,
   ConsoleSlugAdminEditAccountRoute: ConsoleSlugAdminEditAccountRoute,
@@ -1150,6 +1192,7 @@ const ConsoleSlugAdminRouteWithChildren =
 
 interface ConsoleSlugStaffRouteChildren {
   ConsoleSlugStaffChatRoute: typeof ConsoleSlugStaffChatRoute
+  ConsoleSlugStaffChatBoardRoute: typeof ConsoleSlugStaffChatBoardRoute
   ConsoleSlugStaffDashboardRoute: typeof ConsoleSlugStaffDashboardRoute
   ConsoleSlugStaffHistoryRoute: typeof ConsoleSlugStaffHistoryRoute
   ConsoleSlugStaffInventoryRoute: typeof ConsoleSlugStaffInventoryRoute
@@ -1161,6 +1204,7 @@ interface ConsoleSlugStaffRouteChildren {
 
 const ConsoleSlugStaffRouteChildren: ConsoleSlugStaffRouteChildren = {
   ConsoleSlugStaffChatRoute: ConsoleSlugStaffChatRoute,
+  ConsoleSlugStaffChatBoardRoute: ConsoleSlugStaffChatBoardRoute,
   ConsoleSlugStaffDashboardRoute: ConsoleSlugStaffDashboardRoute,
   ConsoleSlugStaffHistoryRoute: ConsoleSlugStaffHistoryRoute,
   ConsoleSlugStaffInventoryRoute: ConsoleSlugStaffInventoryRoute,

@@ -18,11 +18,11 @@ interface ChatSidebarProps {
 
 export function ChatSidebar({
   tab,
-  onTabChange,
+  onTabChange: _onTabChange,
   searchTerm,
   onSearchChange,
   conversations,
-  queueCount,
+  queueCount: _queueCount,
   isLoading,
   activeConversationId,
   onSelect,
@@ -50,7 +50,7 @@ export function ChatSidebar({
           />
         </div>
 
-        <div className="flex bg-cloud rounded-xl p-1 gap-2 w-full">
+        {/* <div className="flex bg-cloud rounded-xl p-1 gap-2 w-full">
           <button
             onClick={() => onTabChange('assigned')}
             className={`flex-1 py-2.5 rounded-lg text-base font-semibold transition-all ${
@@ -82,7 +82,7 @@ export function ChatSidebar({
           >
             Resolved
           </button>
-        </div>
+        </div> */}
       </div>
 
       <div className="flex-1 overflow-y-auto">

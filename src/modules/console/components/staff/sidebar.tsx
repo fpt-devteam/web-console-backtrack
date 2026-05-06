@@ -6,6 +6,7 @@ import {
   LogOut,
   ChevronsUpDown,
   LayoutDashboard,
+  KanbanSquare,
 } from 'lucide-react'
 import { Link, useLocation, useParams } from '@tanstack/react-router'
 import { OrgLogo } from '@/components/org-logo'
@@ -56,8 +57,14 @@ const NAV_ITEMS = [
     to: '/console/$slug/staff/inventory' as const,
   },
   {
+    key: 'chat-board',
+    name: 'Chat Board',
+    icon: KanbanSquare,
+    to: '/console/$slug/staff/chat-board' as const,
+  },
+  {
     key: 'chat',
-    name: 'Chat',
+    name: 'My Chat',
     icon: MessageCircle,
     to: '/console/$slug/staff/chat' as const,
   },
@@ -92,7 +99,8 @@ function StaffSidebarInner() {
         !cur.startsWith(`${base}/staff/history`)
       )
     }
-    if (key === 'chat') return cur.startsWith(`${base}/staff/chat`)
+    if (key === 'chat') return cur === `${base}/staff/chat`
+    if (key === 'chat-board') return cur.startsWith(`${base}/staff/chat-board`)
     if (key === 'history') return cur.startsWith(`${base}/staff/history`)
     return false
   }
