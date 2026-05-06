@@ -26,7 +26,6 @@ import {
   getInventoryMaterial,
   getInventoryModel,
   getInventorySize,
-  getInventorySubcategoryName,
 } from '@/utils/inventory-view'
 
 function formatOrDash(v: string | null | undefined) {
@@ -88,7 +87,7 @@ function AttributeCard({
   )
 }
 
-function categoryLabel(c: string) {
+export function categoryLabel(c: string) {
   switch (c) {
     case 'PersonalBelongings':
       return 'Personal Belongings'
@@ -105,14 +104,11 @@ function categoryLabel(c: string) {
 
 export function InventoryDetailAttributeGrid({
   item,
-  subcategoryNameById,
-  orgSlug,
 }: {
   item: InventoryItem
   subcategoryNameById?: Record<string, string>
   orgSlug?: string | null
 }) {
-  const subName = getInventorySubcategoryName(item, subcategoryNameById)
   const cat = item.category
   const aiDesc = getInventoryAiDescription(item)
   const brand = getInventoryBrand(item)
@@ -133,15 +129,11 @@ export function InventoryDetailAttributeGrid({
     <>
       <div className="space-y-4">
         <div>
+          
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-10 gap-y-2">
-            <div className="flex items-start min-w-0">
-              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-[#fff0f2] text-[#ff385c]">
-                <Tag className="w-3.5 h-3.5 shrink-0" />
-                <span className="break-words text-left">
-                  {`${categoryLabel(item.category)}${subName.trim() ? ` - ${subName.trim()}` : ''}`}
-                </span>
-              </span>
-            </div>
+            <InlineMetaRow
+              icon={ScanSearch}
+              label={cat === 'Others' ? 'Item identifier' : 'Item name'} value={itemNameValue} />
             <InlineMetaRow
               icon={MapPin}
               label="Storage"
@@ -165,9 +157,9 @@ export function InventoryDetailAttributeGrid({
         <div className="h-px bg-[#ebebeb]" />
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-10">
-          <AttributeCard icon={Calendar} label="Created at" value={item.createdAt ? new Date(item.createdAt).toLocaleString() : null} />
+          {/* <AttributeCard icon={Calendar} label="Created at" value={item.createdAt ? new Date(item.createdAt).toLocaleString() : null} />
 
-          <AttributeCard icon={ScanSearch} label={cat === 'Others' ? 'Item identifier' : 'Item name'} value={itemNameValue} />
+          <AttributeCard icon={ScanSearch} label={cat === 'Others' ? 'Item identifier' : 'Item name'} value={itemNameValue} /> */}
           {cat !== 'Cards' ? <AttributeCard icon={Palette} label="Color" value={color} /> : null}
 
           {/* Only show general physical attributes when relevant / present. */}
@@ -190,10 +182,10 @@ export function InventoryDetailAttributeGrid({
             <AttributeCard icon={Layers3} label="Has case" value={formatBoolOrDash(item.electronicDetail?.hasCase)} />
           ) : null}
           {cat === 'Electronics' && item.electronicDetail?.caseDescription?.trim() ? (
-            <AttributeCard icon={Layers3} label="Case description" value={item.electronicDetail?.caseDescription} />
+            <AttributeCard icon={Layers3} label="Case description" value={item.electronicDetail.caseDescription} />
           ) : null}
           {cat === 'Electronics' && item.electronicDetail?.lockScreenDescription?.trim() ? (
-            <AttributeCard icon={Layers3} label="Lock screen" value={item.electronicDetail?.lockScreenDescription} />
+            <AttributeCard icon={Layers3} label="Lock screen" value={item.electronicDetail.lockScreenDescription} />
           ) : null}
           {cat === 'Cards' ? (
             <AttributeCard icon={User} label="Holder name" value={item.cardDetail?.holderName} />
@@ -239,21 +231,12 @@ export function InventoryDetailAttributeGrid({
           </div>
         ) : null}
 
-        {/* QR (link to item detail) */}
-        <div className="pt-2">
-          <div className="text-xs font-semibold text-[#a8a8a8] uppercase tracking-wide">QR code</div>
-          {orgSlug ? (
-            <ItemQrCard orgSlug={orgSlug} itemId={item.id} />
-          ) : (
-            <div className="mt-3 text-xs text-[#929292]">Missing organization slug — cannot generate QR.</div>
-          )}
-        </div>
       </div>
     </>
   )
 }
 
-function ItemQrCard({ orgSlug, itemId }: { orgSlug: string; itemId: string }) {
+export function ItemQrCard({ orgSlug, itemId }: { orgSlug: string; itemId: string }) {
   const itemUrl = useMemo(() => {
     return `https://backtrack-console.vercel.app/console/${orgSlug}/staff/item/${itemId}`
   }, [orgSlug, itemId])

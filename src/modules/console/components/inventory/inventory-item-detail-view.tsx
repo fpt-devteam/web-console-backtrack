@@ -1,11 +1,11 @@
 import { useEffect, useMemo, useState, type ReactNode } from 'react'
-import { Check, ChevronRight, Camera, ImageOff } from 'lucide-react'
+import { Check, ChevronRight, Camera, ImageOff, Mail, Phone, User, Tag } from 'lucide-react'
 import { Link } from '@tanstack/react-router'
 import { Spinner } from '@/components/ui/spinner'
 import type { InventoryItem } from '@/services/inventory.service'
 import { inventoryStatusLabel, inventoryStatusPillClass } from './status'
 import { getInventorySubcategoryName, getInventoryTitle } from '@/utils/inventory-view'
-import { InventoryDetailAttributeGrid } from './inventory-detail-attribute-grid'
+import { categoryLabel, InventoryDetailAttributeGrid, ItemQrCard } from './inventory-detail-attribute-grid'
 
 function DetailRow({ label, value }: { label: string; value: string }) {
   return (
@@ -36,12 +36,37 @@ function formatDateTimeOrDash(iso: string | null | undefined) {
   return d.toLocaleString()
 }
 
+type StepVariant = 'rose' | 'amber' | 'slate'
+
+const VARIANT_COLORS: Record<StepVariant, {
+  activeBorder: string; activeBg: string; activeRing: string; activeDot: string
+  doneBorder: string; doneBg: string
+  activeText: string
+}> = {
+  rose: {
+    activeBorder: 'border-rose-500', activeBg: 'bg-rose-50', activeRing: 'ring-rose-100', activeDot: 'bg-rose-500',
+    doneBorder: 'border-rose-500', doneBg: 'bg-rose-500',
+    activeText: 'text-rose-600',
+  },
+  amber: {
+    activeBorder: 'border-amber-500', activeBg: 'bg-amber-50', activeRing: 'ring-amber-100', activeDot: 'bg-amber-500',
+    doneBorder: 'border-amber-500', doneBg: 'bg-amber-500',
+    activeText: 'text-amber-600',
+  },
+  slate: {
+    activeBorder: 'border-slate-400', activeBg: 'bg-slate-50', activeRing: 'ring-slate-100', activeDot: 'bg-slate-400',
+    doneBorder: 'border-slate-400', doneBg: 'bg-slate-400',
+    activeText: 'text-slate-500',
+  },
+}
+
 function StepperDot({
   state,
   label,
   date,
   showDate = true,
   disabled = false,
+  variant = 'rose',
   onClick,
 }: {
   state: 'done' | 'active' | 'todo'
@@ -49,10 +74,12 @@ function StepperDot({
   date: string
   showDate?: boolean
   disabled?: boolean
+  variant?: StepVariant
   onClick?: () => void
 }) {
   const isDone = state === 'done'
   const isActive = state === 'active'
+  const c = VARIANT_COLORS[variant]
 
   return (
     <button
@@ -62,19 +89,19 @@ function StepperDot({
       className={['group flex flex-col items-center gap-1.5 min-w-0', disabled ? 'cursor-default' : 'cursor-pointer'].join(' ')}
       aria-current={isActive ? 'step' : undefined}
     >
-      <span className={`
-        flex h-8 w-8 items-center justify-center rounded-full border-2 transition-all duration-200 shrink-0
-        ${isActive ? 'border-rose-500 bg-rose-50 ring-4 ring-rose-100 scale-110' :
-          isDone  ? 'border-rose-500 bg-rose-500' :
-                    'border-gray-200 bg-white'}
-      `}>
+      <span className={[
+        'flex h-8 w-8 items-center justify-center rounded-full border-2 transition-all duration-200 shrink-0',
+        isActive ? `${c.activeBorder} ${c.activeBg} ring-4 ${c.activeRing} scale-110`
+          : isDone ? `${c.doneBorder} ${c.doneBg}`
+            : 'border-gray-200 bg-white',
+      ].join(' ')}>
         {isActive
-          ? <span className="w-3 h-3 rounded-full bg-rose-500" />
+          ? <span className={`w-3 h-3 rounded-full ${c.activeDot}`} />
           : isDone
             ? <Check className="w-4 h-4 text-white" strokeWidth={2.5} />
             : <span className="w-2 h-2 rounded-full bg-gray-300" />}
       </span>
-      <span className={`text-xs font-semibold whitespace-nowrap ${isActive ? 'text-rose-600' : isDone ? 'text-gray-700' : 'text-gray-400'}`}>
+      <span className={`text-xs font-semibold whitespace-nowrap ${isActive ? c.activeText : isDone ? 'text-gray-700' : 'text-gray-400'}`}>
         {label}
       </span>
       {showDate && <span className="text-[11px] text-gray-400 whitespace-nowrap">{date}</span>}
@@ -93,7 +120,6 @@ export function InventoryItemDetailView({
   showAddThumbnailButton = false,
   returnReportForPost,
   subcategoryNameById,
-  defaultActiveStep = 0,
 }: {
   slug: string
   itemId: string
@@ -107,7 +133,6 @@ export function InventoryItemDetailView({
   showAddThumbnailButton?: boolean
   returnReportForPost: any
   subcategoryNameById?: Record<string, string>
-  defaultActiveStep?: number
 }) {
   if (isLoading) {
     return (
@@ -145,31 +170,34 @@ export function InventoryItemDetailView({
 
   const [activeStep, setActiveStep] = useState<number>(0)
 
+  // 0=InStorage, 1=Returned, 2=Archived, 3=Expired
   useEffect(() => {
-    setActiveStep(defaultActiveStep)
-  }, [item.id, defaultActiveStep])
+    if (item.status === 'Returned') setActiveStep(1)
+    else if (item.status === 'Archived') setActiveStep(2)
+    else if (item.status === 'Expired') setActiveStep(3)
+    else setActiveStep(0)
+  }, [item.id, item.status])
 
-  const progressStep = useMemo(() => {
-    if (item.status === 'Returned' || item.status === 'Archived' || item.status === 'Expired') return 2
-    if (item.status === 'InStorage') return 1
-    return 0
-  }, [item.status])
+  // A step is "occurred" only if the item's current status matches that step.
+  // Returned / Archived / Expired are mutually exclusive — only one can be done.
+  const stepOccurred = (idx: number): boolean => {
+    if (idx === 0) return true // InStorage is always the first step (item is registered)
+    if (idx === 1) return item.status === 'Returned'
+    if (idx === 2) return item.status === 'Archived'
+    if (idx === 3) return item.status === 'Expired'
+    return false
+  }
 
-  const addedAt = useMemo(() => {
-    return new Date(item.createdAt).toLocaleDateString('vi-VN', { year: 'numeric', month: '2-digit', day: '2-digit' })
-  }, [item.createdAt])
+  const dotState = (idx: number): 'done' | 'active' | 'todo' => {
+    if (activeStep === idx) return 'active'
+    return stepOccurred(idx) ? 'done' : 'todo'
+  }
 
   const intakeAt = useMemo(() => formatDateTimeOrDash(item.createdAt), [item.createdAt])
-  const handoverAt = useMemo(() => formatDateTimeOrDash(returnReportForPost?.createdAt), [returnReportForPost?.createdAt])
   const terminalAt = useMemo(
     () => formatDateTimeOrDash((item as any).updatedAt ?? item.createdAt),
     [item],
   )
-
-  const isTerminal = item.status === 'Archived' || item.status === 'Expired'
-  const isHandoverDone = item.status === 'Returned'
-  const step3Label = isHandoverDone ? 'Handover' : isTerminal ? inventoryStatusLabel(item.status) : 'Handover'
-  const step3Date = isHandoverDone ? handoverAt : isTerminal ? terminalAt : '—'
 
   return (
     <div className="mx-auto h-full w-full overflow-y-auto px-4 py-4 sm:px-6 sm:py-6 lg:px-24">
@@ -194,6 +222,12 @@ export function InventoryItemDetailView({
               {inventoryStatusLabel(item.status)}
             </span>
           </div>
+          <div className="flex flex-wrap items-center gap-2">
+            <span className="inline-flex items-center gap-1.5 rounded-full bg-rose-50 px-3 py-1 text-xs font-semibold text-rose-500">
+              <Tag className="w-4 h-4 text-gray-400 shrink-0 text-rose-500" /> 
+              {categoryLabel(item.category)}{subName.trim() ? ` · ${subName.trim()}` : ''}
+            </span>
+          </div>
         </div>
         {actions && (
           <div className="flex w-full flex-wrap gap-2 sm:w-auto sm:justify-end [&>button]:min-h-10 [&>button]:flex-1 sm:[&>button]:min-h-9 sm:[&>button]:flex-none">
@@ -215,26 +249,38 @@ export function InventoryItemDetailView({
             <div className="-mx-1 overflow-x-auto overflow-y-hidden px-1 pb-1 lg:mx-0 lg:overflow-visible lg:pb-0 [&::-webkit-scrollbar]:h-1 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-gray-200">
               <div className="flex min-w-max items-center gap-2 px-1 sm:gap-3 md:gap-5 lg:justify-end">
                 <StepperDot
-                  state={activeStep === 0 ? 'active' : progressStep >= 0 ? 'done' : 'todo'}
-                  label="Detail"
-                  date={addedAt}
-                  showDate={false}
-                  onClick={() => setActiveStep(0)}
-                />
-                <div className={`h-0.5 w-10 shrink-0 rounded-full sm:w-14 md:w-20 transition-colors ${progressStep >= 1 ? 'bg-rose-400' : 'bg-gray-200'}`} />
-                <StepperDot
-                  state={activeStep === 1 ? 'active' : progressStep >= 1 ? 'done' : 'todo'}
+                  state={dotState(0)}
                   label="In Storage"
                   date={intakeAt}
+                  variant="rose"
+                  onClick={() => setActiveStep(0)}
+                />
+                <div className="h-0.5 w-10 shrink-0 rounded-full sm:w-14 md:w-20 bg-gray-200" />
+                <StepperDot
+                  state={dotState(1)}
+                  label="Returned"
+                  date={item.status === 'Returned' ? formatDateTimeOrDash(returnReportForPost?.createdAt) : '—'}
+                  variant="rose"
+                  disabled={!stepOccurred(1)}
                   onClick={() => setActiveStep(1)}
                 />
-                <div className={`h-0.5 w-10 shrink-0 rounded-full sm:w-14 md:w-20 transition-colors ${progressStep >= 2 ? 'bg-rose-400' : 'bg-gray-200'}`} />
+                <div className="h-0.5 w-10 shrink-0 rounded-full sm:w-14 md:w-20 bg-gray-200" />
                 <StepperDot
-                  state={activeStep === 2 ? 'active' : progressStep >= 2 ? 'done' : 'todo'}
-                  label={step3Label}
-                  date={step3Date}
-                  disabled={isTerminal || !isHandoverDone}
+                  state={dotState(2)}
+                  label="Archived"
+                  date={item.status === 'Archived' ? terminalAt : '—'}
+                  variant="amber"
+                  disabled={!stepOccurred(2)}
                   onClick={() => setActiveStep(2)}
+                />
+                <div className="h-0.5 w-10 shrink-0 rounded-full sm:w-14 md:w-20 bg-gray-200" />
+                <StepperDot
+                  state={dotState(3)}
+                  label="Expired"
+                  date={item.status === 'Expired' ? terminalAt : '—'}
+                  variant="slate"
+                  disabled={!stepOccurred(3)}
+                  onClick={() => setActiveStep(3)}
                 />
               </div>
             </div>
@@ -283,99 +329,173 @@ export function InventoryItemDetailView({
                 )}
               </div>
             )}
+
+            {/* QR + Received by */}
+            <div className="mt-4 border-t border-gray-100 pt-4 space-y-4">
+              {item.organization?.slug ? (
+                <div className="space-y-3">
+                  <p className="text-[11px] font-bold uppercase tracking-widest text-gray-400">QR Code</p>
+                  <ItemQrCard orgSlug={item.organization.slug} itemId={item.id} />
+                </div>
+              ) : null}
+              <div className="flex items-center gap-3">
+                <div className="h-px flex-1 bg-gray-100" />
+                <span className="text-[10px] font-bold uppercase tracking-widest text-gray-400">Received by</span>
+                <div className="h-px flex-1 bg-gray-100" />
+              </div>
+              <div>
+                <SectionTitle title="Assignee" />
+                <div className="mt-2 rounded-xl bg-gray-50 px-4">
+                  <DetailRow label="Received at" value={formatDateTimeOrDash(item.createdAt)} />
+                  <DetailRow label="Receiving staff" value={formatOrDash(item.author?.displayName)} />
+                </div>
+              </div>
+            </div>
           </div>
 
           {/* Details panel */}
           <div className="px-5 py-5 sm:px-6 sm:py-6 lg:col-span-4 lg:px-8 lg:py-6">
+            {/* Step 0 — In Storage */}
             {activeStep === 0 && (
-              <InventoryDetailAttributeGrid
-                item={item}
-                subcategoryNameById={subcategoryNameById}
-                orgSlug={item.organization?.slug}
-              />
-            )}
-
-            {activeStep === 1 && (
-              <div className="space-y-5">
-                <SectionTitle title="Finder — contact & ID" />
-                <div className="rounded-xl bg-gray-50 px-4">
-                  <DetailRow label="Full name" value={formatOrDash(item.finderInfo?.finderName)} />
-                  <DetailRow label="Email" value={formatOrDash(item.finderInfo?.email)} />
+              <div className="space-y-6">
+                <div>
+                  <SectionTitle title="Item details" />
+                  <div className="mt-3">
+                    <InventoryDetailAttributeGrid
+                      item={item}
+                      subcategoryNameById={subcategoryNameById}
+                      orgSlug={item.organization?.slug}
+                    />
+                  </div>
                 </div>
 
-                <SectionTitle title="Finder — identification" />
-                <div className="rounded-xl bg-gray-50 px-4">
-                  <DetailRow label="National ID / citizen ID" value={formatOrDash(item.finderInfo?.nationalId)} />
-                  <DetailRow label="Student / staff ID" value={formatOrDash(item.finderInfo?.orgMemberId)} />
-                  <DetailRow label="Phone number" value={formatOrDash(item.finderInfo?.phone)} />
+                <div className="flex items-center gap-3">
+                  <div className="h-px flex-1 bg-gray-100" />
+                  <span className="text-[10px] font-bold uppercase tracking-widest text-gray-400">Finder Information</span>
+                  <div className="h-px flex-1 bg-gray-100" />
                 </div>
 
-                <SectionTitle title="Intake" />
-                <div className="rounded-xl bg-gray-50 px-4">
-                  <DetailRow label="Created at" value={formatDateTimeOrDash(item.createdAt)} />
-                  <DetailRow label="Receiving staff" value={formatOrDash(item.author?.displayName)} />
+                <div className="rounded-2xl bg-gradient-to-br from-sky-50 to-blue-50 border border-sky-100 p-4">
+                  <div className="flex items-center gap-3">
+                    <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-white shadow-sm shrink-0">
+                      <User className="w-6 h-6 text-sky-500" />
+                    </div>
+                    <div className="min-w-0">
+                      <p className="text-[10px] font-bold uppercase tracking-widest text-sky-400 mb-0.5">Finder</p>
+                      <p className="text-base font-bold text-gray-900 truncate">
+                        {formatOrDash(item.finderInfo?.finderName)}
+                      </p>
+                    </div>
+                  </div>
+                  {(item.finderInfo?.email ?? item.finderInfo?.phone) && (
+                    <div className="mt-3 flex flex-wrap gap-x-4 gap-y-1.5 border-t border-sky-100 pt-3">
+                      {item.finderInfo.email && (
+                        <div className="flex items-center gap-1.5 text-sm text-gray-600">
+                          <Mail className="w-3.5 h-3.5 text-sky-400 shrink-0" />
+                          {item.finderInfo.email}
+                        </div>
+                      )}
+                      {item.finderInfo.phone && (
+                        <div className="flex items-center gap-1.5 text-sm text-gray-600">
+                          <Phone className="w-3.5 h-3.5 text-sky-400 shrink-0" />
+                          {item.finderInfo.phone}
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </div>
+
+                <div>
+                  <SectionTitle title="Identification" />
+                  <div className="mt-2 rounded-xl bg-gray-50 px-4">
+                    <DetailRow label="National ID / citizen ID" value={formatOrDash(item.finderInfo?.nationalId)} />
+                    <DetailRow label="Student / staff ID" value={formatOrDash(item.finderInfo?.orgMemberId)} />
+                  </div>
                 </div>
               </div>
             )}
 
-            {activeStep === 2 && isHandoverDone && (
+            {/* Step 1 — Returned */}
+            {activeStep === 1 && (
               <div className="space-y-5">
-                {item.status === 'Returned' ? (
+                <SectionTitle title="Recipient — contact & ID" />
+                <div className="rounded-xl bg-gray-50 px-4">
+                  <DetailRow label="Full name" value={formatOrDash(returnReportForPost?.ownerInfo?.ownerName)} />
+                  <DetailRow label="Email" value={formatOrDash(returnReportForPost?.ownerInfo?.email)} />
+                </div>
+
+                <SectionTitle title="Recipient — identification" />
+                <div className="rounded-xl bg-gray-50 px-4">
+                  <DetailRow label="National ID / citizen ID" value={formatOrDash(returnReportForPost?.ownerInfo?.nationalId)} />
+                  <DetailRow label="Student / staff ID" value={formatOrDash(returnReportForPost?.ownerInfo?.orgMemberId)} />
+                  <DetailRow label="Phone number" value={formatOrDash(returnReportForPost?.ownerInfo?.phone)} />
+                </div>
+
+                <SectionTitle title="Return release" />
+                <div className="rounded-xl bg-gray-50 px-4">
+                  <DetailRow label="Created at" value={formatDateTimeOrDash(returnReportForPost?.createdAt)} />
+                  <DetailRow label="Releasing staff" value={formatOrDash(returnReportForPost?.staff?.displayName)} />
+                </div>
+
+                {(returnReportForPost?.evidenceImageUrls?.length ?? 0) > 0 && (
                   <>
-                    <SectionTitle title="Recipient — contact & ID" />
-                    <div className="rounded-xl bg-gray-50 px-4">
-                      <DetailRow label="Full name" value={formatOrDash(returnReportForPost?.ownerInfo?.ownerName)} />
-                      <DetailRow label="Email" value={formatOrDash(returnReportForPost?.ownerInfo?.email)} />
-                    </div>
-
-                    <SectionTitle title="Recipient — identification" />
-                    <div className="rounded-xl bg-gray-50 px-4">
-                      <DetailRow label="National ID / citizen ID" value={formatOrDash(returnReportForPost?.ownerInfo?.nationalId)} />
-                      <DetailRow label="Student / staff ID" value={formatOrDash(returnReportForPost?.ownerInfo?.orgMemberId)} />
-                      <DetailRow label="Phone number" value={formatOrDash(returnReportForPost?.ownerInfo?.phone)} />
-                    </div>
-
-                    <SectionTitle title="Return release" />
-                    <div className="rounded-xl bg-gray-50 px-4">
-                      <DetailRow label="Created at" value={formatDateTimeOrDash(returnReportForPost?.createdAt)} />
-                      <DetailRow label="Releasing staff" value={formatOrDash(returnReportForPost?.staff?.displayName)} />
-                    </div>
-
-                    {(returnReportForPost?.evidenceImageUrls?.length ?? 0) > 0 && (
-                      <>
-                        <SectionTitle title="Evidence photos" />
-                        <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
-                          {(returnReportForPost.evidenceImageUrls ?? []).map((url: string, idx: number) => (
-                            <a
-                              key={`${url}:${idx}`}
-                              href={url}
-                              target="_blank"
-                              rel="noreferrer"
-                              className="block overflow-hidden rounded-xl border border-gray-200 hover:border-gray-400 transition-colors"
-                              title="Open image"
-                            >
-                              <img
-                                src={url}
-                                alt={`Evidence ${idx + 1}`}
-                                className="w-full h-28 object-contain bg-white"
-                                loading="lazy"
-                                decoding="async"
-                              />
-                            </a>
-                          ))}
-                        </div>
-                      </>
-                    )}
-                  </>
-                ) : (
-                  <>
-                    <SectionTitle title="Status update" />
-                    <div className="rounded-xl bg-gray-50 px-4">
-                      <DetailRow label="Status" value={inventoryStatusLabel(item.status)} />
-                      <DetailRow label="Updated at" value={terminalAt} />
+                    <SectionTitle title="Evidence photos" />
+                    <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
+                      {(returnReportForPost.evidenceImageUrls ?? []).map((url: string, idx: number) => (
+                        <a
+                          key={`${url}:${idx}`}
+                          href={url}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="block overflow-hidden rounded-xl border border-gray-200 hover:border-gray-400 transition-colors"
+                          title="Open image"
+                        >
+                          <img
+                            src={url}
+                            alt={`Evidence ${idx + 1}`}
+                            className="w-full h-28 object-contain bg-white"
+                            loading="lazy"
+                            decoding="async"
+                          />
+                        </a>
+                      ))}
                     </div>
                   </>
                 )}
+              </div>
+            )}
+
+            {/* Step 2 — Archived */}
+            {activeStep === 2 && (
+              <div className="space-y-5">
+                <div className="flex items-center gap-2.5 pb-1">
+                  <div className="h-4 w-1 rounded-full bg-amber-400 shrink-0" />
+                  <span className="text-[11px] font-bold uppercase tracking-widest text-gray-400">Status update</span>
+                </div>
+                <div className="rounded-xl bg-amber-50 border border-amber-100 px-4">
+                  <DetailRow label="Status" value={inventoryStatusLabel(item.status)} />
+                  <DetailRow label="Updated at" value={terminalAt} />
+                </div>
+                <p className="text-xs text-amber-600 leading-relaxed">
+                  This item was archived and was not returned to an owner.
+                </p>
+              </div>
+            )}
+
+            {/* Step 3 — Expired */}
+            {activeStep === 3 && (
+              <div className="space-y-5">
+                <div className="flex items-center gap-2.5 pb-1">
+                  <div className="h-4 w-1 rounded-full bg-slate-400 shrink-0" />
+                  <span className="text-[11px] font-bold uppercase tracking-widest text-gray-400">Status update</span>
+                </div>
+                <div className="rounded-xl bg-slate-50 border border-slate-200 px-4">
+                  <DetailRow label="Status" value={inventoryStatusLabel(item.status)} />
+                  <DetailRow label="Updated at" value={terminalAt} />
+                </div>
+                <p className="text-xs text-slate-500 leading-relaxed">
+                  This item expired without being claimed and was not returned to an owner.
+                </p>
               </div>
             )}
           </div>
