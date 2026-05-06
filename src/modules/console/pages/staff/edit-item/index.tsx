@@ -240,6 +240,7 @@ export function EditItemPage() {
     if (!item) return 'Item not loaded.'
     if (!organizationStorageLocation.trim()) return 'Storage location is required.'
     if (!organizationFoundLocation.trim()) return 'Found location is required.'
+    if (photoPreviews.length === 0) return 'Please keep at least 1 photo for this item.'
     if (item.category === 'Others') {
       if (!otherIdentifier.trim()) return 'Item identifier is required.'
     } else {
@@ -348,7 +349,7 @@ export function EditItemPage() {
   return (
     <StaffLayout>
       <div className="p-4 sm:p-6 lg:p-8">
-        <div className="max-w-5xl xl:max-w-6xl 2xl:max-w-7xl mx-auto">
+        <div className="max-w-5xl xl:max-w-6xl 2xl:max-w-[96rem] mx-auto">
           <div className="mb-6 flex items-center gap-2 text-sm text-[#6a6a6a]">
             <Link to="/console/$slug/staff/inventory" params={{ slug }} className="hover:text-[#222222] transition-colors">
               Inventory
@@ -390,6 +391,12 @@ export function EditItemPage() {
                 isAnalyzing={isAnalyzing}
                 onAnalyze={() => void analyzeFromPhotos()}
                 analyzeDisabled={photoPreviews.length === 0 || !item}
+                required
+                errorText={
+                  submitError?.toLowerCase().includes('photo')
+                    ? submitError
+                    : undefined
+                }
               />
             </section>
 

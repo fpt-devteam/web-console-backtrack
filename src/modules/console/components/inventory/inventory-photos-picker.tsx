@@ -17,6 +17,9 @@ export function InventoryPhotosPicker({
   analyzeDisabled,
   analyzeHint,
   showAnalyze = true,
+  required,
+  errorText,
+  title = 'Photos',
 }: {
   photoPreviews: InventoryPhotosPickerPreview[]
   maxPhotos: number
@@ -28,11 +31,16 @@ export function InventoryPhotosPicker({
   analyzeDisabled?: boolean
   analyzeHint?: string
   showAnalyze?: boolean
+  required?: boolean
+  errorText?: string
+  title?: string
 }) {
   return (
     <div>
       <div className="flex items-center justify-between mb-4">
-        <div className="text-base font-semibold text-[#222222]">Photos</div>
+        <div className="text-base font-semibold text-[#222222]">
+          {title} {required ? <span className="text-[#c13515]">*</span> : null}
+        </div>
         <span className="text-sm text-[#6a6a6a]">Max {maxPhotos} photos</span>
       </div>
 
@@ -77,7 +85,12 @@ export function InventoryPhotosPicker({
         ))}
 
         {photoPreviews.length < maxPhotos ? (
-          <label className="w-32 h-32 border-2 border-dashed border-[#dddddd] rounded-[8px] flex flex-col items-center justify-center cursor-pointer hover:border-[#ff385c] hover:bg-[#fff0f2] transition-colors">
+          <label
+            className={cx(
+              'w-32 h-32 border-2 border-dashed rounded-[8px] flex flex-col items-center justify-center cursor-pointer hover:border-[#ff385c] hover:bg-[#fff0f2] transition-colors',
+              errorText ? 'border-[#c13515] bg-[#fff0f2]' : 'border-[#dddddd]',
+            )}
+          >
             <input
               type="file"
               accept="image/*"
@@ -85,12 +98,15 @@ export function InventoryPhotosPicker({
               onChange={onPickPhotos}
               className="hidden"
               disabled={photoPreviews.length >= maxPhotos}
+              aria-invalid={Boolean(errorText) || undefined}
             />
             <Camera className="w-6 h-6 text-[#6a6a6a] mb-2" />
             <span className="text-xs text-[#222222] text-center px-2">Add photos</span>
           </label>
         ) : null}
       </div>
+
+      {errorText ? <p className="mt-2 text-xs text-[#c13515]">{errorText}</p> : null}
 
       {showAnalyze ? (
         <div className="mt-4">

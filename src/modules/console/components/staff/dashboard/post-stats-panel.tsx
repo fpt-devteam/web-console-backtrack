@@ -6,6 +6,10 @@ interface PostStatsPanelProps {
 }
 
 export function PostStatsPanel({ data }: PostStatsPanelProps) {
+  const thisMonth = data.thisMonth ?? { lost: 0, found: 0 }
+  const foundPosts = data.foundPosts ?? 0
+  const total = data.total ?? 0
+
   return (
     <div className="bg-white rounded-2xl border border-[#dddddd] p-5 flex flex-col gap-4">
       <div>
@@ -18,10 +22,10 @@ export function PostStatsPanel({ data }: PostStatsPanelProps) {
           <FileSearch className="w-3.5 h-3.5 text-[#06c167]" />
           <span className="text-[11px] font-medium text-[#06c167]">Found Posts</span>
         </div>
-        <span className="text-2xl font-bold text-[#222222] leading-none">{data.foundPosts}</span>
+        <span className="text-2xl font-bold text-[#222222] leading-none">{foundPosts}</span>
         <div className="flex items-center justify-between gap-3 text-[10px] text-[#929292]">
-          <span>+{data.thisMonth.found} this month</span>
-          <span className="font-semibold text-[#222222]">{data.total} total</span>
+          <span>+{thisMonth.found} this month</span>
+          <span className="font-semibold text-[#222222]">{total} total</span>
         </div>
       </div>
     </div>

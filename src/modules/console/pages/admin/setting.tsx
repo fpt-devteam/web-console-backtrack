@@ -34,6 +34,7 @@ import { useCurrentOrgId } from '@/contexts/current-org.context'
 import { useOrganization, useUpdateOrganization } from '@/hooks/use-org'
 import { uploadOrgCoverImage, uploadOrgLogo } from '@/services/storage.service'
 import type { DailySchedule, OrgWeekDay } from '@/types/organization.types'
+import { isValidEmail, isValidPhone10StartingWith0 } from '@/utils/validators'
 
 const INDUSTRY_OPTIONS: { value: string; label: string }[] = [
   { value: 'airport', label: 'Airport' },
@@ -320,7 +321,11 @@ export function SettingPage() {
       setSaveError('Slug is too short.')
       return
     }
-    if (email.trim() && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) {
+    if (phone.trim() && !isValidPhone10StartingWith0(phone)) {
+      setSaveError('Phone number must start with 0 and contain exactly 10 digits.')
+      return
+    }
+    if (email.trim() && !isValidEmail(email)) {
       setSaveError('Please enter a valid contact email.')
       return
     }

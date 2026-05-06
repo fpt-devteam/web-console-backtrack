@@ -277,6 +277,14 @@ export function Step3Preview({
                     <AttributeCard icon={ScanSearch} label="Details" value={item.description} />
                   )}
 
+                  {c === 'Electronics' ? (
+                    <>
+                      <AttributeCard icon={Layers3} label="Has case / accessories" value={item.hasCase ? 'Yes' : 'No'} />
+                      <AttributeCard icon={Layers3} label="Case description" value={item.caseDescription} />
+                      <AttributeCard icon={Layers3} label="Lock screen description" value={item.lockScreenDescription} />
+                    </>
+                  ) : null}
+
                   {c === 'PersonalBelongings' ? (
                     <AttributeCard icon={Ruler} label="Size" value={item.size} />
                   ) : null}

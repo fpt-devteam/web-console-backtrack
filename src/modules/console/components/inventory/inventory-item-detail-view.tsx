@@ -88,6 +88,7 @@ export function InventoryItemDetailView({
   showAddThumbnailButton = false,
   returnReportForPost,
   subcategoryNameById,
+  defaultActiveStep = 0,
 }: {
   slug: string
   itemId: string
@@ -101,6 +102,7 @@ export function InventoryItemDetailView({
   showAddThumbnailButton?: boolean
   returnReportForPost: any
   subcategoryNameById?: Record<string, string>
+  defaultActiveStep?: number
 }) {
   if (isLoading) {
     return (
@@ -136,8 +138,8 @@ export function InventoryItemDetailView({
   const [activeStep, setActiveStep] = useState<number>(0)
 
   useEffect(() => {
-    setActiveStep(0)
-  }, [item.id])
+    setActiveStep(defaultActiveStep)
+  }, [item.id, defaultActiveStep])
 
   const progressStep = useMemo(() => {
     if (item.status === 'Returned' || item.status === 'Archived' || item.status === 'Expired') return 2
@@ -162,7 +164,7 @@ export function InventoryItemDetailView({
   const step3Date = isHandoverDone ? handoverAt : isTerminal ? terminalAt : '—'
 
   return (
-    <div className="mx-auto h-full w-full max-w-6xl overflow-y-auto px-4 py-4 sm:px-5 sm:py-6 lg:px-8">
+    <div className="mx-auto h-full w-full max-w-6xl 2xl:max-w-[96rem] overflow-y-auto px-4 py-4 sm:px-5 sm:py-6 lg:px-8">
       <div className="mb-4 flex min-w-0 items-center gap-1.5 text-xs text-[#6a6a6a] sm:mb-6 sm:gap-2">
         <Link to={backTo.to} params={backTo.params} className="shrink-0 hover:text-[#222222] transition-colors">
           Inventory
@@ -207,7 +209,6 @@ export function InventoryItemDetailView({
                   label="Detail"
                   date={addedAt}
                   showDate={false}
-                  disabled={isTerminal}
                   onClick={() => setActiveStep(0)}
                 />
                 <div className={`h-px w-8 shrink-0 sm:w-10 md:w-14 ${progressStep >= 1 ? 'bg-[#ff385c]' : 'bg-[#dddddd]'}`} />
@@ -215,7 +216,6 @@ export function InventoryItemDetailView({
                   state={activeStep === 1 ? 'active' : progressStep >= 1 ? 'done' : 'todo'}
                   label="In Storage"
                   date={intakeAt}
-                  disabled={isTerminal}
                   onClick={() => setActiveStep(1)}
                 />
                 <div className={`h-px w-8 shrink-0 sm:w-10 md:w-14 ${progressStep >= 2 ? 'bg-[#ff385c]' : 'bg-[#dddddd]'}`} />

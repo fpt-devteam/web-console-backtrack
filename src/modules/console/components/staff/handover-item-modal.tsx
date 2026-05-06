@@ -11,6 +11,7 @@ import type { FinderContactField } from '@/types/organization.types'
 import { InventoryPhotosPicker } from '@/modules/console/components/inventory/inventory-photos-picker'
 import { collectInventoryImageUrls, reorderList, revokeObjectUrls, type InventoryPhotoPreview } from '@/utils/inventory-photos'
 import { uploadInventoryImage } from '@/services/storage.service'
+import { isValidEmail, isValidPhone10StartingWith0 } from '@/utils/validators'
 
 export function HandoverItemModal({
   open,
@@ -18,12 +19,14 @@ export function HandoverItemModal({
   orgId,
   postId,
   onClose,
+  onSuccess,
 }: {
   open: boolean
   title?: string
   orgId: string | null
   postId: string
   onClose: () => void
+  onSuccess?: () => void
 }) {
   const createReturnReport = useCreateOrgReturnReport()
   const { data: me } = useUser()
@@ -34,6 +37,7 @@ export function HandoverItemModal({
   const [recipientNationalId, setRecipientNationalId] = useState('')
   const [recipientInternalId, setRecipientInternalId] = useState('')
   const [recipientPhone, setRecipientPhone] = useState('')
+  const [submitting, setSubmitting] = useState(false)
 
   const MAX_EVIDENCE_PHOTOS = 4
   const [evidencePreviews, setEvidencePreviews] = useState<InventoryPhotoPreview[]>([])
@@ -46,6 +50,11 @@ export function HandoverItemModal({
   const isRequired = (f: FinderContactField) => requiredOwnerFields.includes(f)
 
   const validateRequired = () => {
+    if (evidencePreviews.length === 0) return 'Please upload at least 1 evidence photo.'
+    if (recipientEmail.trim() && !isValidEmail(recipientEmail)) return 'Please enter a valid recipient email.'
+    if (recipientPhone.trim() && !isValidPhone10StartingWith0(recipientPhone)) {
+      return 'Recipient phone number must start with 0 and contain exactly 10 digits.'
+    }
     if (isRequired('Email') && !recipientEmail.trim()) return 'Email is required.'
     if (isRequired('Phone') && !recipientPhone.trim()) return 'Phone number is required.'
     if (isRequired('NationalId') && !recipientNationalId.trim()) return 'National ID / citizen ID is required.'
@@ -98,6 +107,7 @@ export function HandoverItemModal({
         className="space-y-3"
         onSubmit={(e) => {
           e.preventDefault()
+          if (submitting || createReturnReport.isPending) return
           if (!orgId) {
             showToast.error('No active organization')
             return
@@ -111,6 +121,7 @@ export function HandoverItemModal({
 
           ;(async () => {
             try {
+              setSubmitting(true)
               const evidenceImageUrls = await collectInventoryImageUrls({
                 previews: evidencePreviews,
                 cacheByFileKey: uploadedUrlByFileKeyRef.current,
@@ -133,21 +144,27 @@ export function HandoverItemModal({
                 {
                   onSuccess: () => {
                     showToast.success('Handover saved')
+                    setSubmitting(false)
                     onClose()
+                    onSuccess?.()
                   },
                   onError: (err) => {
                     showToast.error(err instanceof Error ? err.message : 'Failed to save handover')
+                    setSubmitting(false)
                   },
                 },
               )
             } catch (err) {
               showToast.error(err instanceof Error ? err.message : 'Failed to upload evidence photos')
+              setSubmitting(false)
             }
           })()
         }}
       >
         <div className="space-y-1">
-          <div className="text-sm font-semibold text-[#222222]">EVIDENCE PHOTOS</div>
+          <div className="text-sm font-semibold text-[#222222]">
+            EVIDENCE PHOTOS <span className="text-[#c13515]">*</span>
+          </div>
         </div>
 
         <InventoryPhotosPicker
@@ -159,6 +176,7 @@ export function HandoverItemModal({
           isAnalyzing={false}
           onAnalyze={() => {}}
           showAnalyze={false}
+          required
         />
 
         <div className="space-y-1">
@@ -242,11 +260,16 @@ export function HandoverItemModal({
         </div>
 
         <div className="flex items-center justify-end gap-3 pt-4 border-t border-[#ebebeb]">
-          <Button type="button" variant="outline" size="sm" disabled={createReturnReport.isPending} onClick={onClose}>
+          <Button type="button" variant="outline" size="sm" disabled={submitting || createReturnReport.isPending} onClick={onClose}>
             Cancel
           </Button>
-          <Button type="submit" size="sm" className="bg-[#ff385c] hover:bg-[#e0324f]" disabled={createReturnReport.isPending}>
-            {createReturnReport.isPending ? 'Saving…' : 'Handover'}
+          <Button
+            type="submit"
+            size="sm"
+            className="bg-[#ff385c] hover:bg-[#e0324f]"
+            disabled={submitting || createReturnReport.isPending}
+          >
+            {submitting || createReturnReport.isPending ? 'Saving…' : 'Handover'}
           </Button>
         </div>
       </form>

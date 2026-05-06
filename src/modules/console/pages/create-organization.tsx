@@ -10,6 +10,7 @@ import { useDebouncedValue } from '@/hooks/use-debounce';
 import { orgService } from '@/services/org.service';
 import { uploadOrgLogo } from '@/services/storage.service';
 import { useEffect } from 'react';
+import { isValidEmail, isValidPhone10StartingWith0 } from '@/utils/validators'
 
 const INDUSTRY_OPTIONS = [
   { value: 'airport', label: 'Airport' },
@@ -22,6 +23,11 @@ const INDUSTRY_OPTIONS = [
 ] as const;
 
 const SLUG_PATTERN = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
+
+function randomTaxId(): string {
+  const n = Math.floor(10000000 + Math.random() * 90000000)
+  return String(n)
+}
 
 function normalizeSlug(raw: string): string {
   return raw
@@ -137,9 +143,13 @@ export function CreateOrganizationPage() {
       setError('Please enter a phone number.');
       return;
     }
-    if (!form.taxIdentificationNumber.trim()) {
-      setError('Please enter your tax identification number.');
-      return;
+    if (!isValidPhone10StartingWith0(form.phone)) {
+      setError('Phone number must start with 0 and contain exactly 10 digits.')
+      return
+    }
+    if (form.contactEmail.trim() && !isValidEmail(form.contactEmail)) {
+      setError('Please enter a valid contact email.')
+      return
     }
     if (!slugOk) {
       setError('Workspace URL is invalid. Use lowercase letters, numbers, and hyphens only (e.g. acme-corp).');
@@ -155,6 +165,7 @@ export function CreateOrganizationPage() {
     }
     const displayAddress = form.address.trim() || name;
     const coords = location ?? { latitude: 0, longitude: 0 };
+    const taxIdentificationNumber = form.taxIdentificationNumber.trim() || randomTaxId()
     createOrg.mutate(
       {
         name,
@@ -165,7 +176,7 @@ export function CreateOrganizationPage() {
         phone: form.phone.trim(),
         contactEmail: form.contactEmail.trim() || undefined,
         industryType: form.industryType,
-        taxIdentificationNumber: form.taxIdentificationNumber.trim(),
+        taxIdentificationNumber,
         // BE expects `LogoUrl` string (we send base64 data URL from FE).
         logoUrl,
         // Default: phone is always required. Admin can change this in Security settings.
@@ -395,16 +406,6 @@ export function CreateOrganizationPage() {
                   value={form.contactEmail}
                   onChange={update('contactEmail')}
                   placeholder="support@company.com"
-                />
-              </div>
-              <div className="md:col-span-2">
-                <Label htmlFor="taxId" className="text-sm font-semibold mb-2 block">Tax Identification Number <span className="text-[#c13515]">*</span></Label>
-                <Input
-                  id="taxId"
-                  value={form.taxIdentificationNumber}
-                  onChange={update('taxIdentificationNumber')}
-                  placeholder="XX-XXXXXXX"
-                  required
                 />
               </div>
             </div>

@@ -4,8 +4,11 @@ import { auth } from '@/lib/firebase';
 import { publicClient } from '@/lib/api-client';
 import {
   createUserWithEmailAndPassword,
+  GoogleAuthProvider,
   signInWithEmailAndPassword,
+  signInWithPopup,
   signOut as firebaseSignOut,
+  sendPasswordResetEmail as firebaseSendPasswordResetEmail,
   sendEmailVerification,
   type User as FirebaseUser,
 } from 'firebase/auth';
@@ -99,6 +102,26 @@ class RealAuthService implements IAuthService {
       return firebaseUserToAuthUser(userCredential.user);
     } catch (error: any) {
       throw createAuthError(error);
+    }
+  }
+
+  async signInWithGoogle(): Promise<AuthUser> {
+    try {
+      const provider = new GoogleAuthProvider()
+      provider.setCustomParameters({ prompt: 'select_account' })
+      const userCredential = await signInWithPopup(auth, provider)
+      return firebaseUserToAuthUser(userCredential.user)
+    } catch (error: any) {
+      throw createAuthError(error)
+    }
+  }
+
+  async sendPasswordResetEmail(email: string): Promise<void> {
+    try {
+      const trimmedEmail = email.trim().toLowerCase()
+      await firebaseSendPasswordResetEmail(auth, trimmedEmail)
+    } catch (error: any) {
+      throw createAuthError(error)
     }
   }
 

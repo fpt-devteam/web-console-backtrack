@@ -18,6 +18,14 @@ export interface IAuthService {
    */
   signIn(credentials: LoginCredentials): Promise<AuthUser>;
 
+  
+  signInWithGoogle(): Promise<AuthUser>;
+
+  /**
+   * Send password reset email
+   */
+  sendPasswordResetEmail(email: string): Promise<void>;
+
   /**
    * Sign up with email and password
    * @throws {AuthError} When signup fails

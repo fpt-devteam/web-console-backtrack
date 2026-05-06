@@ -17,6 +17,7 @@ import { Step2Finder, type FinderInfo } from './add-item/step2-finder'
 import { Step3Preview, type StaffInfo } from './add-item/step3-preview'
 import { useSubcategories } from '@/hooks/use-subcategories'
 import { Step0PickSubcategory } from './add-item/step0-pick-subcategory'
+import { isValidEmail, isValidPhone10StartingWith0 } from '@/utils/validators'
 
 type StepId = 0 | 1 | 2 | 3
 
@@ -28,7 +29,6 @@ type AddInventoryDraft = {
   v: 4
   step: StepId
   item: {
-    postTitle: string
     detailItemName: string
     itemName: string
     description: string
@@ -151,7 +151,6 @@ export function AddItemPage() {
   // objectURL previews + File for upload
   const [photoPreviews, setPhotoPreviews] = useState<PhotoPreview[]>([])
 
-  const [postTitle, setPostTitle] = useState<string>('')
   const [detailItemName, setDetailItemName] = useState<string>('')
   const [itemName, setItemName] = useState<string>('')
   const [description, setDescription] = useState<string>('')
@@ -184,6 +183,7 @@ export function AddItemPage() {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [submittingAction, setSubmittingAction] = useState<'save' | 'addAnother' | null>(null)
   const [submitError, setSubmitError] = useState<string | null>(null)
+  const [step1AttemptedNext, setStep1AttemptedNext] = useState(false)
 
   const photoPreviewsRef = useRef<PhotoPreview[]>([])
   const uploadedUrlByFileKeyRef = useRef<Map<string, string>>(new Map())
@@ -238,7 +238,6 @@ export function AddItemPage() {
         v: 4,
         step,
         item: {
-          postTitle,
           detailItemName,
           itemName,
           description,
@@ -282,7 +281,6 @@ export function AddItemPage() {
   }, [
     draftKey,
     step,
-    postTitle,
     detailItemName,
     itemName,
     description,
@@ -433,11 +431,15 @@ export function AddItemPage() {
     if (!category) {
       throw new Error('Category is required.')
     }
+    const postTitleDerived =
+      category === 'Others'
+        ? itemName.trim()
+        : detailItemName.trim()
     return {
-    postTitle: postTitle.trim(),
+    postTitle: postTitleDerived,
     postType,
     detailItemName: detailItemName.trim() || undefined,
-    itemName: itemName.trim(),
+    itemName: (category === 'Others' ? itemName.trim() : detailItemName.trim()),
     description: description.trim(),
     distinctiveMarks: distinctiveMarks.trim() || undefined,
     category,
@@ -473,9 +475,9 @@ export function AddItemPage() {
 
   const validateStep1 = (): string | null => {
     if (!category) return 'Category is required.'
-    if (!postTitle.trim()) return 'Post title is required.'
     if (category === 'Others' && !itemName.trim()) return 'Item identifier is required.'
-    if (photoPreviews.length === 0) return 'At least one photo is required.'
+    if (category !== 'Others' && !detailItemName.trim()) return 'Item name is required.'
+    if (photoPreviews.length === 0) return 'Please upload at least 1 photo of the item.'
     if (!subcategoryCode.trim()) return 'Subcategory is required.'
     if (!organizationStorageLocation.trim()) return 'Storage location is required.'
     if (!organizationFoundLocation.trim()) return 'Found location is required.'
@@ -495,6 +497,10 @@ export function AddItemPage() {
 
   const validateStep2 = (): string | null => {
     if (!finder.fullName.trim()) return 'Finder full name is required.'
+    if (finder.email.trim() && !isValidEmail(finder.email)) return 'Please enter a valid finder email.'
+    if (finder.phone.trim() && !isValidPhone10StartingWith0(finder.phone)) {
+      return 'Finder phone number must start with 0 and contain exactly 10 digits.'
+    }
 
     const required = (org?.requiredFinderContractFields ?? []).filter(Boolean) as FinderContactField[]
 
@@ -521,7 +527,6 @@ export function AddItemPage() {
   }
 
   const resetItemForm = () => {
-    setPostTitle('')
     setDetailItemName('')
     setItemName('')
     setDescription('')
@@ -584,7 +589,7 @@ export function AddItemPage() {
         resetItemForm()
         setFinder({ fullName: '', email: '', nationalId: '', orgMemberId: '', phone: '' })
         setStaff({ fullName: '', email: '', staffId: '' })
-        setStep(1)
+        setStep(0)
       } else {
         if (draftKey) {
           try {
@@ -605,6 +610,7 @@ export function AddItemPage() {
   }
 
   const nextFromStep1 = () => {
+    setStep1AttemptedNext(true)
     const err = validateStep1()
     if (err) {
       setSubmitError(err)
@@ -695,7 +701,7 @@ export function AddItemPage() {
   return (
     <StaffLayout>
       <div className="h-full overflow-y-auto p-8">
-        <div className="max-w-5xl mx-auto">
+        <div className="max-w-xl xl:max-w-6xl 2xl:max-w-[96rem] mx-auto">
           {/* Breadcrumb */}
           <div className="mb-6 flex items-center gap-2 text-sm text-[#6a6a6a]">
             <Link
@@ -720,12 +726,12 @@ export function AddItemPage() {
         </div>
 
         {/* Stepper (outside data card) */}
-        <div className="max-w-6xl mx-auto w-full mb-6">
+        <div className="max-w-6xl 2xl:max-w-[96rem] mx-auto w-full mb-6">
           <Stepper current={step} onGo={(s) => goToStep(s)} />
         </div>
 
         {/* Form Container */}
-        <div className="max-w-6xl mx-auto w-full bg-white rounded-[14px] border border-[#dddddd] px-4 sm:px-6 lg:px-7 py-4 flex-1 min-h-0">
+        <div className="max-w-6xl 2xl:max-w-[96rem] mx-auto w-full bg-white rounded-[14px] border border-[#dddddd] px-4 sm:px-6 lg:px-7 py-4 flex-1 min-h-0">
 
           {submitError && (
             <div className="mb-4 p-3 rounded-md bg-[#fff0f2] text-[#c13515] text-sm">
@@ -751,7 +757,6 @@ export function AddItemPage() {
               onPick={({ category: pickedCategory, subcategory }) => {
                 setCategory(pickedCategory)
                 setSubcategoryCode(subcategory.code)
-                setPostTitle('')
                 setDetailItemName('')
                 // Keep name empty until staff types it, or AI fills a specific identifier (e.g. Others.itemIdentifier).
                 setItemName('')
@@ -778,9 +783,12 @@ export function AddItemPage() {
                     ? 'Add at least one photo to analyze'
                     : 'Analyze all selected photos'
               }
+              photosErrorText={
+                step1AttemptedNext && photoPreviews.length === 0
+                  ? 'Please upload at least 1 photo to continue.'
+                  : undefined
+              }
               maxEventTimeIso={formCreatedAtIso}
-              postTitle={postTitle}
-              setPostTitle={setPostTitle}
               detailItemName={detailItemName}
               setDetailItemName={setDetailItemName}
               itemName={itemName}
@@ -848,7 +856,7 @@ export function AddItemPage() {
             <Step3Preview
               photoPreviews={photoPreviews}
               item={{
-                postTitle,
+                postTitle: category === 'Others' ? itemName : detailItemName,
                 detailItemName,
                 itemName,
                 description,

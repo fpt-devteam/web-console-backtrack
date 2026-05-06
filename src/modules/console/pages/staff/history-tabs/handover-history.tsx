@@ -2,13 +2,14 @@ import { useState, useMemo, useEffect } from 'react'
 import { useParams } from '@tanstack/react-router'
 import { useCurrentOrgId } from '@/contexts/current-org.context'
 import { useOrgReturnReports } from '@/hooks/use-return-report'
+import { useUser } from '@/hooks/use-user'
 import { useDebouncedValue } from '@/hooks/use-debounce'
 import { Search, X } from 'lucide-react'
 import { Pagination } from '@/components/ui/pagination'
-import type { OrgReturnReportResult } from '@/services/return-report.service'
 import { useSubcategories } from '@/hooks/use-subcategories'
 import { getInventoryDescription, getInventoryTitle, getInventoryDistinctiveMarks } from '@/utils/inventory-view'
 import type { InventoryListItem } from '@/services/inventory.service'
+import { useInventoryItems } from '@/hooks/use-inventory'
 import { InventoryGridCards } from '@/modules/console/components/inventory/inventory-grid-cards'
 import { FilterDateRangeChip } from '@/modules/console/components/inventory/filter-dropdown-chip'
 
@@ -27,15 +28,13 @@ function matchesDateRange(createdAt: string, fromDate: string, toDate: string): 
   return true
 }
 
-function matchesSearch(report: OrgReturnReportResult, q: string): boolean {
+function matchesItemSearch(item: InventoryListItem, q: string, subcategoryNameById: Record<string, string>): boolean {
   if (!q) return true
-  const post = report.post
-  if (!post) return false
   const hay = [
-    getInventoryTitle(post),
-    getInventoryDescription(post),
-    post.category,
-    getInventoryDistinctiveMarks(post),
+    getInventoryTitle(item, subcategoryNameById),
+    getInventoryDescription(item),
+    item.category,
+    getInventoryDistinctiveMarks(item),
   ]
     .filter(Boolean)
     .join(' ')
@@ -46,6 +45,7 @@ function matchesSearch(report: OrgReturnReportResult, q: string): boolean {
 export function HandoverHistory() {
   const { slug } = useParams({ strict: false }) as { slug: string }
   const { currentOrgId } = useCurrentOrgId()
+  const { data: user } = useUser()
   const [searchTerm, setSearchTerm] = useState('')
   const [fromDate, setFromDate] = useState('')
   const [toDate, setToDate] = useState('')
@@ -58,36 +58,50 @@ export function HandoverHistory() {
 
   const debouncedSearch = useDebouncedValue(searchTerm.trim(), 500)
 
-  const { data, isLoading, isError } = useOrgReturnReports(currentOrgId, 1, FETCH_PAGE_SIZE)
+  const { data: returnReports, isLoading: isReportsLoading, isError: isReportsError } = useOrgReturnReports(
+    currentOrgId,
+    1,
+    FETCH_PAGE_SIZE,
+  )
 
-  const filteredReports = useMemo(() => {
-    const items = data?.items ?? []
-    return items.filter((r) => {
-      if (!r.post) return false
-      if (!matchesDateRange(r.createdAt, fromDate, toDate)) return false
-      if (!matchesSearch(r, debouncedSearch)) return false
-      return true
-    })
-  }, [data?.items, fromDate, toDate, debouncedSearch])
+  // Inventory "Returned" items are fetched like the normal grid (same card data source),
+  // then constrained using return reports to ensure the return was done by the current staff.
+  const { data: inventoryReturned, isLoading: isInventoryLoading, isError: isInventoryError } = useInventoryItems(
+    currentOrgId,
+    { page: 1, pageSize: FETCH_PAGE_SIZE, status: 'Returned' },
+  )
 
-  const totalCount = filteredReports.length
-  const totalPages = Math.max(1, Math.ceil(totalCount / pageSize))
-  const pageItems = useMemo(() => {
-    const start = (currentPage - 1) * pageSize
-    return filteredReports.slice(start, start + pageSize)
-  }, [filteredReports, currentPage])
-
-  const handoverDateByPostId = useMemo(() => {
-    const map: Record<string, string> = {}
-    for (const r of filteredReports) {
-      if (r.post?.id) map[r.post.id] = r.createdAt
+  const reportByPostId = useMemo(() => {
+    const map: Record<string, { createdAt: string; staffId?: string | null }> = {}
+    for (const r of returnReports?.items ?? []) {
+      const postId = r.post?.id
+      if (!postId) continue
+      map[postId] = { createdAt: r.createdAt, staffId: r.staff?.id ?? null }
     }
     return map
-  }, [filteredReports])
+  }, [returnReports?.items])
 
-  const items: InventoryListItem[] = useMemo(() => {
-    return pageItems.map((r) => r.post!).filter(Boolean) as unknown as InventoryListItem[]
-  }, [pageItems])
+  const filteredItems = useMemo(() => {
+    const staffId = user?.id
+    if (!staffId) return []
+
+    const base = (inventoryReturned?.items ?? []) as InventoryListItem[]
+    return base.filter((item) => {
+      const rep = reportByPostId[item.id]
+      if (!rep) return false
+      if (rep.staffId !== staffId) return false
+      if (!matchesDateRange(rep.createdAt, fromDate, toDate)) return false
+      if (!matchesItemSearch(item, debouncedSearch, subcategoryNameById)) return false
+      return true
+    })
+  }, [inventoryReturned?.items, reportByPostId, user?.id, fromDate, toDate, debouncedSearch, subcategoryNameById])
+
+  const totalCount = filteredItems.length
+  const totalPages = Math.max(1, Math.ceil(totalCount / pageSize))
+  const pageItems: InventoryListItem[] = useMemo(() => {
+    const start = (currentPage - 1) * pageSize
+    return filteredItems.slice(start, start + pageSize)
+  }, [filteredItems, currentPage])
 
   useEffect(() => {
     setCurrentPage(1)
@@ -133,19 +147,19 @@ export function HandoverHistory() {
         )}
       </div>
 
-      {isError && (
+      {(isReportsError || isInventoryError) && (
         <div className="text-center py-12">
           <p className="text-[#929292] text-lg">Failed to load return history.</p>
         </div>
       )}
 
       <InventoryGridCards
-        items={items}
-        isLoading={isLoading}
-        isError={isError}
+        items={pageItems}
+        isLoading={isReportsLoading || isInventoryLoading}
+        isError={isReportsError || isInventoryError}
         emptyText="No matching returns found"
         subcategoryNameById={subcategoryNameById}
-        getDate={(item) => handoverDateByPostId[item.id]}
+        getDate={(item) => reportByPostId[item.id]?.createdAt}
         detailLink={{
           to: '/console/$slug/staff/item/$itemId',
           params: (item) => ({ slug, itemId: item.id }),
@@ -153,12 +167,12 @@ export function HandoverHistory() {
       />
 
       <div className="mt-auto pt-2">
-        {!isLoading && totalCount > pageSize && (
+        {!isReportsLoading && !isInventoryLoading && totalCount > pageSize && (
           <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={setCurrentPage} />
         )}
       </div>
 
-      {!isLoading && (data?.items?.length ?? 0) >= FETCH_PAGE_SIZE && (
+      {!isReportsLoading && (returnReports?.items?.length ?? 0) >= FETCH_PAGE_SIZE && (
         <p className="text-xs text-amber-700 text-center">
           Showing up to {FETCH_PAGE_SIZE} most recent handovers. Narrow filters or ask for server-side paging if you need more.
         </p>

@@ -47,9 +47,8 @@ export type Step1PhotosAndItemProps = {
   onAnalyze: () => void
   analyzeDisabled?: boolean
   analyzeHint?: string
+  photosErrorText?: string
   maxEventTimeIso?: string
-  postTitle: string
-  setPostTitle: (v: string) => void
   detailItemName: string
   setDetailItemName: (v: string) => void
   itemName: string
@@ -112,9 +111,8 @@ export function Step1PhotosAndItem({
   onAnalyze,
   analyzeDisabled,
   analyzeHint,
+  photosErrorText,
   maxEventTimeIso,
-  postTitle,
-  setPostTitle,
   detailItemName,
   setDetailItemName,
   itemName,
@@ -177,20 +175,6 @@ export function Step1PhotosAndItem({
         <div className="text-base font-semibold text-[#222222]">Item information</div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div className="md:col-span-2">
-            <Label htmlFor="postTitle" className="text-sm font-semibold text-[#222222]">
-              Post title <span className="text-[#c13515]">*</span>
-            </Label>
-            <Input
-              id="postTitle"
-              type="text"
-              placeholder="Short title to identify this post"
-              value={postTitle}
-              onChange={(e) => setPostTitle(e.target.value)}
-              className="mt-1"
-            />
-          </div>
-
           <div>
             <Label htmlFor="category" className="text-sm font-semibold text-[#222222]">
               Category <span className="text-[#c13515]">*</span>
@@ -285,13 +269,15 @@ export function Step1PhotosAndItem({
               onAnalyze={onAnalyze}
               analyzeDisabled={analyzeDisabled}
               analyzeHint={analyzeHint}
+              required
+              errorText={photosErrorText}
             />
           </div>
 
           {category !== 'Others' ? (
             <div className="md:col-span-2">
               <Label htmlFor="detailItemName" className="text-sm font-semibold text-[#222222]">
-                Item name
+                Item name <span className="text-[#c13515]">*</span>
               </Label>
               <Input
                 id="detailItemName"

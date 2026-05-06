@@ -30,10 +30,10 @@ export function WelcomePage() {
 
   return (
     // Airbnb welcome: white canvas, max-width centered, zero decoration
-    <div className="min-h-screen bg-[#f7f7f7] flex items-center justify-center px-4 py-12">
-      <div className="w-full max-w-md">
+    <div className="min-h-screen bg-[#fff0f2] flex items-center justify-center px-4 py-12">
+      <div className="w-full max-w-md sm:max-w-lg lg:max-w-xl xl:max-w-2xl 2xl:max-w-3xl">
         {/* Card: white, 14px radius, 1px Hairline Gray border */}
-        <div className="bg-white rounded-[14px] border border-[#dddddd] p-10">
+        <div className="bg-white rounded-[14px] border border-[#dddddd] p-6 sm:p-8 lg:p-10">
           {/* Header */}
           <div className="text-center mb-8">
             <h1 className="text-2xl font-semibold text-[#222222] tracking-tight mb-2">

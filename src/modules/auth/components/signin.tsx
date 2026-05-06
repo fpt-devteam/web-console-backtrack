@@ -6,8 +6,9 @@ import { completeConsoleLogin, toFriendlyAuthErrorMessage } from '@/modules/auth
 import { Lock, Eye, EyeOff, Mail, ArrowRight } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { Link, useRouter } from '@tanstack/react-router';
-import { useSignIn } from '@/hooks/use-auth';
+import { useSendPasswordResetEmail, useSignIn } from '@/hooks/use-auth';
 import { clearTempEmail, getTempEmail } from '@/lib/auth-storage';
+import { showToast } from '@/lib/toast';
 
 export function SignIn() {
   const [showPassword, setShowPassword] = useState(false);
@@ -17,6 +18,7 @@ export function SignIn() {
 
   const router = useRouter();
   const signIn = useSignIn();
+  const sendReset = useSendPasswordResetEmail()
 
   useEffect(() => {
     const tempEmail = getTempEmail();
@@ -54,6 +56,7 @@ export function SignIn() {
   };
 
   const isPending = signIn.isPending;
+  const isResetPending = sendReset.isPending
   const inputCls =
     'h-12 rounded-xl border-[#E5E7EB] bg-[#FAFAFA] text-[15px] text-[#111] placeholder:text-[#C4C4C4] focus-visible:ring-2 focus-visible:ring-brand-400 focus-visible:border-transparent transition-all duration-150';
 
@@ -101,9 +104,25 @@ export function SignIn() {
               </Label>
               <button
                 type="button"
+                disabled={isPending || isResetPending || !email}
                 className="cursor-pointer text-xs font-semibold text-brand-500 transition-colors hover:text-brand-600"
+                onClick={() => {
+                  const target = email?.trim()
+                  if (!target) {
+                    setFormError('Please enter your email first')
+                    return
+                  }
+                  sendReset.mutate(target, {
+                    onSuccess: () => {
+                      showToast.success('Password reset email sent. Please check your inbox.')
+                    },
+                    onError: (err) => {
+                      setFormError(toFriendlyAuthErrorMessage(err?.message))
+                    },
+                  })
+                }}
               >
-                Forgot password?
+                {isResetPending ? 'Sending…' : 'Forgot password?'}
               </button>
             </div>
             <div className="relative">

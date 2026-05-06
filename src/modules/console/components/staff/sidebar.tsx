@@ -1,7 +1,6 @@
 import {
   Package,
   MessageCircle,
-  Bell,
   ClipboardList,
   ArrowLeftRight,
   LogOut,
@@ -68,12 +67,6 @@ const NAV_ITEMS = [
     icon: ClipboardList,
     to: '/console/$slug/staff/history' as const,
   },
-  {
-    key: 'notification',
-    name: 'Notification',
-    icon: Bell,
-    to: '/console/$slug/staff/notification' as const,
-  },
 ]
 
 function StaffSidebarInner() {
@@ -101,7 +94,6 @@ function StaffSidebarInner() {
     }
     if (key === 'chat') return cur.startsWith(`${base}/staff/chat`)
     if (key === 'history') return cur.startsWith(`${base}/staff/history`)
-    if (key === 'notification') return cur.startsWith(`${base}/staff/notification`)
     return false
   }
 

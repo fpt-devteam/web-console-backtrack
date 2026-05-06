@@ -1,5 +1,5 @@
 import { Layout } from '../../components/admin/layout';
-import { Search, Filter, Plus, ChevronDown, Edit, Trash2, Mail } from 'lucide-react';
+import { Search, Filter, Plus, ChevronDown, Edit, Trash2, Mail, Info } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { useNavigate, useSearch } from '@tanstack/react-router';
 import { useCurrentUser } from '@/hooks/use-auth';
@@ -16,9 +16,27 @@ import { AdminModal } from '@/modules/console/components/admin/AdminModal';
 import { InviteEmployeeModal } from '@/modules/console/components/admin/InviteEmployeeModal';
 import { EditEmployeeModal } from '@/modules/console/components/admin/EditEmployeeModal';
 import type { OrgMember } from '@/types/organization.types';
+import { isOrgOnFreePlan, useOrgSubscription } from '@/hooks/use-org-subscription'
 
 const PAGE_SIZE = 10;
 const ROLE_LABEL: Record<string, string> = { OrgAdmin: 'Admin', OrgStaff: 'Staff' };
+
+function FreePlanInviteNotice() {
+  return (
+    <div className="rounded-2xl border border-[#fca5a5] bg-[#fef2f2] px-4 py-3 sm:px-5 sm:py-4">
+      <div className="flex items-start gap-3">
+        <Info className="mt-1 w-4 h-4 flex-shrink-0 text-[#dc2626]" />
+        <div className="min-w-0">
+          <div className="text-sm font-semibold text-[#222222] leading-none uppercase">Notice</div>
+          <div className="mt-1 text-sm text-[#6a6a6a] leading-relaxed">
+            Your organization is currently on the Free plan. You only can invite up to{' '}
+            <span className="font-semibold text-[#222222]">3 employees</span>.
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+}
 
 function formatJoinedAt(iso: string) {
   try {
@@ -57,6 +75,9 @@ export function EmployeePage() {
   const { currentOrgId } = useCurrentOrgId();
   const { data: myOrgs = [] } = useMyOrganizations({ enabled: !!user });
   const orgId = currentOrgId ?? myOrgs[0]?.orgId ?? null;
+
+  const { data: orgSubscription, isLoading: isSubLoading } = useOrgSubscription(orgId)
+  const isFreeOrg = !!orgId && !isSubLoading && isOrgOnFreePlan(orgSubscription ?? null)
 
   const [activeTab, setActiveTab] = useState<'employee' | 'invitation'>('employee');
   const [currentPage, setCurrentPage] = useState(1);
@@ -200,6 +221,12 @@ export function EmployeePage() {
             Invite Employee
           </Button>
         </div>
+
+        {isFreeOrg ? (
+          <div className="mb-6">
+            <FreePlanInviteNotice />
+          </div>
+        ) : null}
 
         {/* Airbnb-style tabs — 2px bottom-border indicator */}
         <div className="flex gap-1 border-b border-[#dddddd] mb-6">
