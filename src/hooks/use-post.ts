@@ -39,6 +39,7 @@ export type PinnedPostData = {
   postType: string
   postTitle: string | null
   category: string | null
+  subcategoryName: string | null
   imageUrls: string[]
 }
 
@@ -53,6 +54,7 @@ export function useGetPost(postId: string | null) {
         postType: raw['postType'] as string,
         postTitle: (raw['postTitle'] ?? raw['itemName'] ?? null) as string | null,
         category: (raw['category'] ?? null) as string | null,
+        subcategoryName: (raw['subcategoryName'] ?? null) as string | null,
         imageUrls: (raw['imageUrls'] ?? []) as string[],
       }
     },
