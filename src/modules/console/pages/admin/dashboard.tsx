@@ -1,9 +1,8 @@
 import { useState } from 'react'
-import { CheckCircle, MapPin, Package, Users } from 'lucide-react'
+import { CheckCircle, Package, Users } from 'lucide-react'
 import { Layout } from '../../components/admin/layout'
 import { StatCard } from '../../components/admin/dashboard/stat-card'
 import { MonthlyActivityChart } from '../../components/admin/dashboard/monthly-activity-chart'
-import { StaffPerformancePanel } from '../../components/admin/dashboard/staff-performance-panel'
 // import { OrgItemStatsPanel } from '../../components/admin/dashboard/org-item-stats-panel'
 import { RecentInventoryPanel } from '../../components/admin/dashboard/recent-inventory-panel'
 import { useCurrentUser } from '@/hooks/use-auth'
@@ -11,7 +10,6 @@ import {
   useAdminDashboardStats,
   useAdminMonthlyActivity,
   useAdminRecentInventory,
-  useAdminStaffPerformance,
 } from '@/hooks/use-admin-dashboard'
 import { useCurrentOrgId } from '@/contexts/current-org.context'
 import { isOrgOnFreePlan, useOrgSubscription } from '@/hooks/use-org-subscription'
@@ -34,7 +32,6 @@ export function AdminDashboardPage() {
   const { data: user } = useCurrentUser()
   const { data: stats } = useAdminDashboardStats()
   const { data: monthly } = useAdminMonthlyActivity()
-  const { data: staff } = useAdminStaffPerformance()
   const { data: inventory } = useAdminRecentInventory(itemsPage, PAGE_SIZE)
 
   const isFreeOrg = !!currentOrgId && !isSubLoading && isOrgOnFreePlan(orgSubscription ?? null)
@@ -82,7 +79,7 @@ export function AdminDashboardPage() {
         </div>
 
         {/* Stat cards */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="grid grid-cols-2 lg:grid-cols-3 gap-4">
           <StatCard
             label="Active Staff"
             value={stats?.activeStaff ?? '—'}
@@ -107,14 +104,6 @@ export function AdminDashboardPage() {
             iconBg="bg-[#e8f9f0]"
             iconColor="text-[#06c167]"
           />
-          <StatCard
-            label="Found Posts"
-            value={stats?.foundPosts ?? '—'}
-            sub={`${stats?.lostPosts ?? 0} lost posts`}
-            icon={MapPin}
-            iconBg="bg-[#fff8e6]"
-            iconColor="text-[#c97a00]"
-          />
         </div>
 
         {/* Monthly trend (2/3) + Org item stats (1/3) */}
@@ -134,11 +123,11 @@ export function AdminDashboardPage() {
         </div>
 
         {/* Staff performance (1/2) + Recent inventory (1/2) */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-          {staff
+        <div className="gap-4">
+          {/* {staff
             ? <StaffPerformancePanel data={staff} />
             : <div className="h-64 bg-white rounded-2xl border border-[#dddddd] animate-pulse" />
-          }
+          } */}
           <RecentInventoryPanel
             items={inventory?.items ?? []}
             totalCount={inventory?.totalCount ?? 0}
