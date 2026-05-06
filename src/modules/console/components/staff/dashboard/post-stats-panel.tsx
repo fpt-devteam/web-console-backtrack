@@ -24,8 +24,8 @@ export function PostStatsPanel({ data }: PostStatsPanelProps) {
         </div>
         <span className="text-2xl font-bold text-[#222222] leading-none">{foundPosts}</span>
         <div className="flex items-center justify-between gap-3 text-[10px] text-[#929292]">
-          <span>+{thisMonth.found} this month</span>
-          <span className="font-semibold text-[#222222]">{total} total</span>
+          <span>+{data.foundPosts} this month</span>
+          <span className="font-semibold text-[#222222]">{data.foundThisMonth} total</span>
         </div>
       </div>
     </div>

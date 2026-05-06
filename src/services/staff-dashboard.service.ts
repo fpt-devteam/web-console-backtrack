@@ -16,17 +16,15 @@ interface ChatAnalyticsResponse {
 interface ItemStatsResponse {
   myItemsInStorage: number
   myItemsTotal: number
-  pendingReturns: number
+  totalReturns: number
   returnedThisWeek: number
 }
 
 // ── API 3: /api/orgs/{orgId}/staff/dashboard/post-stats ───────────────────
 
 export interface PostStatsResponse {
-  lostPosts: number
   foundPosts: number
-  total: number
-  thisMonth: { lost: number; found: number }
+  foundThisMonth: number
 }
 
 // ── API 4: /api/core/orgs/{orgId}/inventory ───────────────────────────────

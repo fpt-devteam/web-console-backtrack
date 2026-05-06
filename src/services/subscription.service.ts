@@ -112,7 +112,7 @@ export const subscriptionService = {
   async createCustomerPortalSession(organizationId: string, returnUrl: string): Promise<string> {
     const { data } = await privateClient.post<ApiResponse<{ url: string }>>(
       '/api/core/subscriptions/customer-portal',
-      { organizationId, returnUrl },
+      { subscriber: { subscriberType: 'Organization', organizationId }, returnUrl },
     );
     if (!data.success) throw new Error(data.error?.message ?? 'Failed to open billing portal');
     return data.data.url;
@@ -129,6 +129,6 @@ export const subscriptionService = {
     const result = data.data;
     if (!result) return [];
     if (Array.isArray(result)) return result;
-    return result.items ?? [];
+    return result.items;
   },
 };

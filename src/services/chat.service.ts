@@ -3,13 +3,13 @@ import type {
   ConversationListResponse,
   IConversation,
   MessageListResponse,
+  SupportFormData,
 } from '@/types/chat.types';
 import { privateClient } from '@/lib/api-client';
 
 const BASE = '/api/chat';
 
 // ── Raw backend shape ──────────────────────────────────────────────────────
-
 interface RawConversation {
   conversationId?: string;
   _id?: string;
@@ -20,7 +20,7 @@ interface RawConversation {
   orgSlug?: string | null;
   orgLogoUrl?: string | null;
   assignedStaffId?: string | null;
-  postId?: string | null;
+  supportFormData?: SupportFormData | null;
   status?: string;
   partner?: {
     id: string;
@@ -60,7 +60,7 @@ export function normalizeConv(raw: unknown): IConversation {
     orgSlug: obj.orgSlug ?? null,
     orgLogoUrl: obj.orgLogoUrl ?? null,
     assignedStaffId: obj.assignedStaffId ?? null,
-    postId: obj.postId ?? null,
+    supportFormData: obj.supportFormData ?? null,
     partner: obj.partner ?? null,
     lastMessage: obj.lastMessage ?? null,
     lastMessageAt: obj.lastMessage?.timestamp ?? null,
