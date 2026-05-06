@@ -63,10 +63,8 @@ function buildMockBreakdown(): PostStatusBreakdown {
 }
 
 const MOCK_POST_STATS: PostStatsResponse = {
-  lostPosts: 6,
   foundPosts: 34,
-  total: 40,
-  thisMonth: { lost: 2, found: 9 },
+  foundThisMonth: 9,
 }
 
 const MOCK_ENGAGEMENT: EngagementMetrics = {
