@@ -433,7 +433,7 @@ export function InventoryItemDetailView({
 
                 <SectionTitle title="Return release" />
                 <div className="rounded-xl bg-gray-50 px-4">
-                  <DetailRow label="Created at" value={formatDateTimeOrDash(returnReportForPost?.createdAt)} />
+                  <DetailRow label="Returned at" value={formatDateTimeOrDash(returnReportForPost?.createdAt)} />
                   <DetailRow label="Releasing staff" value={formatOrDash(returnReportForPost?.staff?.displayName)} />
                 </div>
 
@@ -473,8 +473,8 @@ export function InventoryItemDetailView({
                   <span className="text-[11px] font-bold uppercase tracking-widest text-gray-400">Status update</span>
                 </div>
                 <div className="rounded-xl bg-amber-50 border border-amber-100 px-4">
-                  <DetailRow label="Status" value={inventoryStatusLabel(item.status)} />
-                  <DetailRow label="Updated at" value={terminalAt} />
+                  <DetailRow label="Archived at" value={terminalAt} />
+                  <DetailRow label="Archived by" value={formatOrDash(returnReportForPost?.staff?.displayName)} />
                 </div>
                 <p className="text-xs text-amber-600 leading-relaxed">
                   This item was archived and was not returned to an owner.
@@ -490,8 +490,8 @@ export function InventoryItemDetailView({
                   <span className="text-[11px] font-bold uppercase tracking-widest text-gray-400">Status update</span>
                 </div>
                 <div className="rounded-xl bg-slate-50 border border-slate-200 px-4">
-                  <DetailRow label="Status" value={inventoryStatusLabel(item.status)} />
-                  <DetailRow label="Updated at" value={terminalAt} />
+                  <DetailRow label="Expired at" value={terminalAt} />
+                  <DetailRow label="Expired by" value={formatOrDash(returnReportForPost?.staff?.displayName)} />
                 </div>
                 <p className="text-xs text-slate-500 leading-relaxed">
                   This item expired without being claimed and was not returned to an owner.
