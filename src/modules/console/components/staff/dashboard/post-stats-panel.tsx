@@ -6,9 +6,7 @@ interface PostStatsPanelProps {
 }
 
 export function PostStatsPanel({ data }: PostStatsPanelProps) {
-  const thisMonth = data.thisMonth ?? { lost: 0, found: 0 }
   const foundPosts = data.foundPosts ?? 0
-  const total = data.total ?? 0
 
   return (
     <div className="bg-white rounded-2xl border border-[#dddddd] p-5 flex flex-col gap-4">
