@@ -1,4 +1,4 @@
-import { Calendar, MapPin, Package } from 'lucide-react'
+import { Calendar, MapPin, Package, Warehouse } from 'lucide-react'
 import { Link } from '@tanstack/react-router'
 import { inventoryStatusBadgeClass, inventoryStatusLabel } from './status'
 import { NoResultsEmptyState } from './no-results-empty-state'
@@ -113,36 +113,48 @@ export function InventoryGridCards({
               )}
             </div>
 
-            {/* Body */}
-            <div className="p-3 space-y-2">
-              <h3 className="font-semibold text-[#222222] line-clamp-2 leading-snug text-sm group-hover:text-[#ff385c] transition-colors">
-                {displayTitle}
-              </h3>
-              <span
-                className={`inline-block px-2 py-0.5 rounded-full text-[11px] font-semibold ${inventoryStatusBadgeClass(item.status)}`}
-              >
-                {inventoryStatusLabel(item.status)}
-              </span>
+{/* Badges Row */}
+              <div >
+               {/* Inventory Status Badge */}
+                <span
+                  className={`inline-block px-2 py-0.5 rounded-full text-[11px] font-semibold ${inventoryStatusBadgeClass(item.status)}`}
+                >
+                  {inventoryStatusLabel(item.status)}
+                </span>
 
-              <div className="space-y-1.5">
-                <div className="flex items-center gap-1.5 text-xs text-[#6a6a6a]">
-                  <MapPin className="w-3.5 h-3.5 flex-shrink-0 text-[#b0b0b0]" />
-                  <span className="shrink-0 text-[#929292]">Storage:</span>
-                  <span className="truncate">{locationLine}</span>
-                </div>
-                <div className="flex items-center gap-1.5 text-xs text-[#6a6a6a]">
-                  <MapPin className="w-3.5 h-3.5 flex-shrink-0 text-[#b0b0b0]" />
-                  <span className="shrink-0 text-[#929292]">Found:</span>
-                  <span className="truncate">{foundLine}</span>
-                </div>
-                <div className="flex items-center justify-between text-xs text-[#929292]">
-                  {subName.trim() ? (
+                {subName.trim() ? (
                     <span className="px-2 py-0.5 rounded-full bg-[#f0f0f0] text-[#6a6a6a] font-medium text-[11px] truncate max-w-[55%]">
                       {subName}
                     </span>
                   ) : (
                     <span />
                   )}
+              </div>
+
+            {/* Body */}
+            <div className="p-3 space-y-2">
+              {/* Title */}
+              <h3 className="font-semibold text-[#222222] line-clamp-2 leading-snug text-sm group-hover:text-[#ff385c] transition-colors">
+                {displayTitle}
+              </h3>
+
+              <div className="space-y-1.5">
+                {/* Storage Location */}
+                <div className="flex items-center gap-1.5 text-xs text-[#6a6a6a]">
+                  <Warehouse className="w-3.5 h-3.5 flex-shrink-0 text-[#b0b0b0]" />
+                  <span className="shrink-0 text-[#929292]">Storage:</span>
+                  <span className="truncate">{locationLine}</span>
+                </div>
+
+                {/* Found Location */}
+                <div className="flex items-center gap-1.5 text-xs text-[#6a6a6a]">
+                  <MapPin className="w-3.5 h-3.5 flex-shrink-0 text-[#b0b0b0]" />
+                  <span className="shrink-0 text-[#929292]">Found:</span>
+                  <span className="truncate">{foundLine}</span>
+                </div>
+
+                {/* Event Time */}
+                <div className="flex items-center justify-between text-xs text-[#929292]">
                   <span className="flex items-center gap-1 flex-shrink-0">
                     <Calendar className="w-3 h-3" />
                     {dateText}
