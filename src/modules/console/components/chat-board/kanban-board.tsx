@@ -12,7 +12,6 @@ import toast from 'react-hot-toast'
 import { KanbanColumn } from './kanban-column'
 import { ConversationCard } from './conversation-card'
 import { ConversationStatus } from '@/types/chat.types'
-import type { IConversationWithStaff } from './mock-data'
 import { AssignConfirmDialog } from '../staff/chat/assign-confirm-dialog'
 import { ReturnToQueueConfirmDialog } from '../staff/chat/return-to-queue-confirm-dialog'
 import { ResolveConfirmDialog } from '../staff/chat/resolve-confirm-dialog'
@@ -26,6 +25,7 @@ import {
 import { useSocketChatQueue } from '@/hooks/use-chat-socket'
 import { useCurrentOrgId } from '@/contexts/current-org.context'
 import { useCurrentUser } from '@/hooks/use-auth'
+import type { IConversationWithStaff } from './kanban-board.type'
 
 const COLUMNS: { id: ConversationStatus; title: string; accent: string }[] = [
   { id: ConversationStatus.QUEUE,       title: 'Queue',       accent: 'bg-amber-400' },

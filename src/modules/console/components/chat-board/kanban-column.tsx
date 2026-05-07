@@ -1,16 +1,7 @@
 import { useDroppable } from '@dnd-kit/core'
 import { Skeleton } from '@/components/ui/skeleton'
 import { ConversationCard } from './conversation-card'
-import type { IConversationWithStaff } from './mock-data'
-
-interface KanbanColumnProps {
-  id: string
-  title: string
-  accent: string
-  conversations: IConversationWithStaff[]
-  isLoading?: boolean
-  isCardDraggable?: (conv: IConversationWithStaff) => boolean
-}
+import type { KanbanColumnProps } from './kanban-board.type'
 
 export function KanbanColumn({
   id,
