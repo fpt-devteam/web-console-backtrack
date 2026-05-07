@@ -1,4 +1,4 @@
-import { Calendar, MapPin, Package, Warehouse } from 'lucide-react'
+import { MapPin, Package, Warehouse } from 'lucide-react'
 import { Link } from '@tanstack/react-router'
 import type { InventoryListItem } from '@/services/inventory.service'
 import {
