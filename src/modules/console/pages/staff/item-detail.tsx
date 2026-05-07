@@ -15,7 +15,6 @@ import { showToast } from '@/lib/toast'
 export function ItemDetailPage() {
   const { slug, itemId } = useParams({ from: '/console/$slug/staff/item/$itemId' })
   const navigate = useNavigate()
-  const tab = typeof window !== 'undefined' ? new URLSearchParams(window.location.search).get('tab') : null
   const { currentOrgId } = useCurrentOrgId()
   const [mainImageIndex, setMainImageIndex] = useState(0)
   const [handoverOpen, setHandoverOpen] = useState(false)
@@ -46,7 +45,6 @@ export function ItemDetailPage() {
         returnReportForPost={returnReportForPost}
         subcategoryNameById={subcategoryNameById}
         showAddThumbnailButton
-        defaultActiveStep={tab === 'handover' ? 2 : 0}
         actions={
           item && item.status !== 'Returned' && item.status !== 'Archived' && item.status !== 'Expired' ? (
             <>
@@ -90,7 +88,7 @@ export function ItemDetailPage() {
                 postId={item.id}
                 onClose={() => setHandoverOpen(false)}
                 onSuccess={() => {
-                  void navigate({ to: `/console/${slug}/staff/item/${item.id}?tab=handover`, replace: true } as any)
+                  void navigate({ to: `/console/${slug}/staff/item/${item.id}`, replace: true } as any)
                 }}
               />
               <ArchiveConfirmModal
