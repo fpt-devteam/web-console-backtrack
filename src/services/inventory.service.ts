@@ -5,6 +5,7 @@ import { privateClient } from '@/lib/api-client'
 export type PostStatus =
   | 'Active'
   | 'InStorage'
+  | 'ReturnScheduled'
   | 'Returned'
   | 'Archived'
   | 'Expired'
