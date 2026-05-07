@@ -10,6 +10,7 @@ export function KanbanColumn({
   conversations,
   isLoading = false,
   isCardDraggable,
+  onOpenConversation,
 }: KanbanColumnProps) {
   const { setNodeRef, isOver } = useDroppable({ id })
 
@@ -49,6 +50,7 @@ export function KanbanColumn({
               key={conv.id}
               conv={conv}
               disabled={!(isCardDraggable?.(conv) ?? false)}
+              onOpenConversation={onOpenConversation}
             />
           ))
         )}

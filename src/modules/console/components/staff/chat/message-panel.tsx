@@ -12,9 +12,11 @@ interface MessagePanelProps {
   conversationId: string
   partner?: { avatarUrl?: string | null; displayName?: string | null; email?: string | null } | null
   readOnly?: boolean
+  /** When true, hide composer (view-only) without "resolved" footer. */
+  viewOnly?: boolean
 }
 
-export function MessagePanel({ conversationId, partner, readOnly = false }: MessagePanelProps) {
+export function MessagePanel({ conversationId, partner, readOnly = false, viewOnly = false }: MessagePanelProps) {
   const { data, isLoading, fetchNextPage, hasNextPage, isFetchingNextPage } =
     useChatMessages(conversationId)
   const { send } = useSendMessage()
@@ -59,6 +61,7 @@ export function MessagePanel({ conversationId, partner, readOnly = false }: Mess
   }
 
   const groups = buildGroups([...allMessages].reverse())
+  const composerDisabled = readOnly || viewOnly
 
   return (
     <div
@@ -138,10 +141,10 @@ export function MessagePanel({ conversationId, partner, readOnly = false }: Mess
       </div>
 
       <div>
-        {!readOnly && <TypingIndicator conversationId={conversationId} />}
-        {readOnly ? (
+        {!composerDisabled && <TypingIndicator conversationId={conversationId} />}
+        {composerDisabled ? (
           <div className="px-4 py-3 border-t border-[#dddddd] text-center text-xs text-[#929292]">
-            This conversation has been resolved.
+            {readOnly ? 'This conversation has been resolved.' : 'View only.'}
           </div>
         ) : (
           <div className="px-4 py-4 border-t border-[#dddddd]">
