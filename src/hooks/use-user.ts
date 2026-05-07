@@ -21,3 +21,11 @@ export function useUpdateProfile() {
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['user', 'me'] }),
   });
 }
+
+export function useUserById(userId: string | null | undefined) {
+  return useQuery({
+    queryKey: ['user', userId],
+    queryFn: () => userService.getUserById(userId!),
+    enabled: !!userId,
+  });
+}

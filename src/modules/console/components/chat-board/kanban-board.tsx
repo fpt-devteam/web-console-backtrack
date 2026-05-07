@@ -13,7 +13,9 @@ import { KanbanColumn } from './kanban-column'
 import { ConversationCard } from './conversation-card'
 import { ConversationStatus } from '@/types/chat.types'
 import type { IConversationWithStaff } from './mock-data'
-import { MOCK_BOARD } from './mock-data'
+import { AssignConfirmDialog } from '../staff/chat/assign-confirm-dialog'
+import { ReturnToQueueConfirmDialog } from '../staff/chat/return-to-queue-confirm-dialog'
+import { ResolveConfirmDialog } from '../staff/chat/resolve-confirm-dialog'
 import {
   useAssignConversation,
   useChatAssigned,
@@ -47,7 +49,6 @@ const VALID_TRANSITIONS: Partial<Record<ColKey, ColKey[]>> = {
 export function ChatKanbanBoard() {
   const { currentOrgId } = useCurrentOrgId()
   const { data: currentUser } = useCurrentUser()
-
   const { data: queueData, isLoading: isQueueLoading, removeFromQueue } = useSocketChatQueue(currentOrgId ?? undefined)
   const assignedQuery  = useChatAssigned()
   const resolvedQuery  = useChatResolved()
@@ -56,28 +57,28 @@ export function ChatKanbanBoard() {
   const returnMutation  = useReturnToQueue()
   const resolveMutation = useResolveConversation()
 
-  const [board, setBoard] = useState<BoardState>(MOCK_BOARD)
+  const [board, setBoard] = useState<BoardState>({
+    [ConversationStatus.QUEUE]: [],
+    [ConversationStatus.IN_PROGRESS]: [],
+    [ConversationStatus.CLOSED]: [],
+  })
   const [draggingConv, setDraggingConv] = useState<IConversationWithStaff | null>(null)
+  const [pendingAssign, setPendingAssign] = useState<IConversationWithStaff | null>(null)
+  const [pendingReturn, setPendingReturn] = useState<IConversationWithStaff | null>(null)
+  const [pendingResolve, setPendingResolve] = useState<IConversationWithStaff | null>(null)
 
   const isLoading = isQueueLoading || assignedQuery.isLoading || resolvedQuery.isLoading
 
-  // Replace mock with real data once loaded
   useEffect(() => {
-    const real = Array.isArray(queueData) ? queueData : []
-    if (real.length === 0) return
-    setBoard((prev) => ({ ...prev, [ConversationStatus.QUEUE]: real }))
+    setBoard((prev) => ({ ...prev, [ConversationStatus.QUEUE]: Array.isArray(queueData) ? queueData : [] }))
   }, [queueData])
 
   useEffect(() => {
-    const real = Array.isArray(assignedQuery.data) ? assignedQuery.data : []
-    if (real.length === 0) return
-    setBoard((prev) => ({ ...prev, [ConversationStatus.IN_PROGRESS]: real }))
+    setBoard((prev) => ({ ...prev, [ConversationStatus.IN_PROGRESS]: Array.isArray(assignedQuery.data) ? assignedQuery.data : [] }))
   }, [assignedQuery.data])
 
   useEffect(() => {
-    const real = Array.isArray(resolvedQuery.data) ? resolvedQuery.data : []
-    if (real.length === 0) return
-    setBoard((prev) => ({ ...prev, [ConversationStatus.CLOSED]: real }))
+    setBoard((prev) => ({ ...prev, [ConversationStatus.CLOSED]: Array.isArray(resolvedQuery.data) ? resolvedQuery.data : [] }))
   }, [resolvedQuery.data])
 
   const sensors = useSensors(
@@ -114,30 +115,68 @@ export function ChatKanbanBoard() {
       return
     }
 
+    if (sourceCol === ConversationStatus.QUEUE && targetCol === ConversationStatus.IN_PROGRESS) {
+      setPendingAssign(conv)
+      return
+    }
+
+    if (sourceCol === ConversationStatus.IN_PROGRESS && targetCol === ConversationStatus.QUEUE) {
+      setPendingReturn(conv)
+      return
+    }
+
+    if (sourceCol === ConversationStatus.IN_PROGRESS && targetCol === ConversationStatus.CLOSED) {
+      setPendingResolve(conv)
+      return
+    }
+  }
+
+  function applyMove(conv: IConversationWithStaff, sourceCol: ColKey, targetCol: ColKey) {
     const snapshot = { ...board }
     setBoard((prev) => ({
       ...prev,
-      [sourceCol]: prev[sourceCol].filter((c) => c.id !== convId),
+      [sourceCol]: prev[sourceCol].filter((c) => c.id !== conv.id),
       [targetCol]: [{ ...conv, status: targetCol }, ...prev[targetCol]],
     }))
-
-    const revert = () => setBoard(snapshot)
-
-    if (sourceCol === ConversationStatus.QUEUE && targetCol === ConversationStatus.IN_PROGRESS) {
-      removeFromQueue(convId)
-      assignMutation.mutate(convId, {
-        onError: () => { revert(); toast.error('Failed to assign conversation') },
-      })
-    } else if (sourceCol === ConversationStatus.IN_PROGRESS && targetCol === ConversationStatus.QUEUE) {
-      returnMutation.mutate(convId, {
-        onError: () => { revert(); toast.error('Failed to return conversation to queue') },
-      })
-    } else if (sourceCol === ConversationStatus.IN_PROGRESS && targetCol === ConversationStatus.CLOSED) {
-      resolveMutation.mutate(convId, {
-        onError: () => { revert(); toast.error('Failed to resolve conversation') },
-      })
-    }
+    return () => setBoard(snapshot)
   }
+
+  function handleAssignConfirm() {
+    if (!pendingAssign) return
+    const conv = pendingAssign
+    setPendingAssign(null)
+    const revert = applyMove(conv, ConversationStatus.QUEUE, ConversationStatus.IN_PROGRESS)
+    removeFromQueue(conv.id)
+    assignMutation.mutate(conv.id, {
+      onError: () => { revert(); toast.error('Failed to assign conversation') },
+    })
+  }
+
+  function handleAssignCancel() { setPendingAssign(null) }
+
+  function handleReturnConfirm() {
+    if (!pendingReturn) return
+    const conv = pendingReturn
+    setPendingReturn(null)
+    const revert = applyMove(conv, ConversationStatus.IN_PROGRESS, ConversationStatus.QUEUE)
+    returnMutation.mutate(conv.id, {
+      onError: () => { revert(); toast.error('Failed to return conversation to queue') },
+    })
+  }
+
+  function handleReturnCancel() { setPendingReturn(null) }
+
+  function handleResolveConfirm() {
+    if (!pendingResolve) return
+    const conv = pendingResolve
+    setPendingResolve(null)
+    const revert = applyMove(conv, ConversationStatus.IN_PROGRESS, ConversationStatus.CLOSED)
+    resolveMutation.mutate(conv.id, {
+      onError: () => { revert(); toast.error('Failed to resolve conversation') },
+    })
+  }
+
+  function handleResolveCancel() { setPendingResolve(null) }
 
   return (
     <DndContext
@@ -174,10 +213,38 @@ export function ChatKanbanBoard() {
       <DragOverlay modifiers={[restrictToWindowEdges]}>
         {draggingConv && (
           <div className="w-96 shadow-2xl rotate-1">
-            <ConversationCard conv={draggingConv} staffInfo={draggingConv.staffInfo} />
+            <ConversationCard conv={draggingConv} />
           </div>
         )}
       </DragOverlay>
+
+      {pendingAssign && (
+        <AssignConfirmDialog
+          conv={pendingAssign}
+          isPending={assignMutation.isPending}
+          onConfirm={handleAssignConfirm}
+          onCancel={handleAssignCancel}
+        />
+      )}
+
+      {pendingReturn && (
+        <ReturnToQueueConfirmDialog
+          conv={pendingReturn}
+          isPending={returnMutation.isPending}
+          onConfirm={handleReturnConfirm}
+          onCancel={handleReturnCancel}
+        />
+      )}
+
+      {pendingResolve && (
+        <ResolveConfirmDialog
+          partnerName={pendingResolve.partner?.displayName ?? pendingResolve.partner?.email ?? pendingResolve.id.slice(0, 8)}
+          avatarUrl={pendingResolve.partner?.avatarUrl ?? undefined}
+          isPending={resolveMutation.isPending}
+          onConfirm={handleResolveConfirm}
+          onCancel={handleResolveCancel}
+        />
+      )}
     </DndContext>
   )
 }

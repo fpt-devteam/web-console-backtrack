@@ -40,4 +40,10 @@ export const userService = {
     if (!data.success) throw new Error(data.error?.message ?? 'Failed to update profile');
     return data.data;
   },
+
+  async getUserById(userId: string): Promise<UserProfile> {
+    const { data } = await privateClient.get<ApiResponse<UserProfile>>(`/api/core/users/${userId}`);
+    if (!data.success) throw new Error(data.error?.message ?? 'Failed to fetch user');
+    return data.data;
+  },
 };

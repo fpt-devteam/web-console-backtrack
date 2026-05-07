@@ -1,17 +1,17 @@
 import { useDraggable } from '@dnd-kit/core'
 import { CSS } from '@dnd-kit/utilities'
 import { GripVertical, ImageOff, UserCircle2 } from 'lucide-react'
+import { useNavigate, useParams } from '@tanstack/react-router'
 import { Avatar } from '@/modules/console/components/staff/chat/avatar'
 import { formatTime, statusLabel } from '@/modules/console/components/staff/chat/utils'
 import type { IConversation } from '@/types/chat.types'
 import { ConversationStatus } from '@/types/chat.types'
-import type { StaffInfo } from './mock-data'
 import { useCurrentOrgId } from '@/contexts/current-org.context'
 import { useInventoryItem } from '@/hooks/use-inventory'
+import { useUserById } from '@/hooks/use-user'
 
 interface ConversationCardProps {
   conv: IConversation
-  staffInfo?: StaffInfo | null
   disabled?: boolean
 }
 
@@ -27,7 +27,7 @@ const STATUS_DOT: Record<ConversationStatus, string> = {
   [ConversationStatus.CLOSED]:      'bg-neutral-400',
 }
 
-export function ConversationCard({ conv, staffInfo, disabled = false }: ConversationCardProps) {
+export function ConversationCard({ conv, disabled = false }: ConversationCardProps) {
   const { attributes, listeners, setNodeRef, transform, isDragging } = useDraggable({
     id: conv.id,
     data: { status: conv.status },
@@ -37,19 +37,15 @@ export function ConversationCard({ conv, staffInfo, disabled = false }: Conversa
   const style = {
     transform: CSS.Translate.toString(transform),
     opacity: isDragging ? 0.4 : 1,
-    cursor: disabled ? 'default' : undefined,
   }
 
   const { currentOrgId } = useCurrentOrgId()
   const { data: orgInventory, isLoading } = useInventoryItem(currentOrgId, conv.supportFormData ? conv.supportFormData.postId : null)
+  const { data: staffProfile } = useUserById(conv.assignedStaffId)
+  const navigate = useNavigate()
+  const { slug } = useParams({ strict: false })
 
-  const partnerName = conv.partner?.displayName ?? conv.partner?.email ?? conv.id.slice(0, 8)
-  const itemName    = orgInventory?.postTitle   ?? conv.supportFormData?.itemName   ?? partnerName
-  const itemThumb   = orgInventory?.imageUrls?.[0] ?? conv.supportFormData?.imageUrls?.[0] ?? null
-  const category    = orgInventory?.category    ?? conv.supportFormData?.category   ?? null
-  const statusKey   = conv.status ?? ConversationStatus.QUEUE
-
-  if (isLoading) {
+  if (isLoading || !orgInventory) {
     return (
       <div
         ref={setNodeRef}
@@ -59,14 +55,28 @@ export function ConversationCard({ conv, staffInfo, disabled = false }: Conversa
     )
   }
 
+  const partnerName = conv.partner?.displayName ?? conv.partner?.email ?? conv.id.slice(0, 8)
+  const itemName    = orgInventory.postTitle
+  const itemThumb   = orgInventory.imageUrls[0]
+  const category    = orgInventory.category
+  const statusKey   = conv.status ?? ConversationStatus.QUEUE
+  const postId      = conv.supportFormData?.postId
+
+  function handleCardClick() {
+    if (!slug || !postId || isDragging) return
+    void navigate({ to: '/console/$slug/staff/item/$itemId', params: { slug, itemId: postId } })
+  }
+
   return (
     <div
       ref={setNodeRef}
       style={style}
+      onClick={handleCardClick}
       className={[
         'relative bg-white rounded-xl border border-hairline shadow-sm select-none group',
         'transition-shadow hover:shadow-md',
         isDragging ? 'shadow-xl ring-2 ring-primary/30' : '',
+        'cursor-pointer',
       ].join(' ')}
     >
       {/* Status badge — absolute top-right */}
@@ -129,9 +139,7 @@ export function ConversationCard({ conv, staffInfo, disabled = false }: Conversa
 
           {/* Category / time */}
           <div className="flex items-center justify-between gap-1">
-            {category && (
-              <span className="text-[10px] text-mute/70 truncate">{category}</span>
-            )}
+            <span className="text-[10px] text-mute/70 truncate">{category}</span>
             <span className="text-[10px] text-mute/70 ml-auto shrink-0">
               {formatTime(conv.lastMessageAt)}
             </span>
@@ -139,15 +147,15 @@ export function ConversationCard({ conv, staffInfo, disabled = false }: Conversa
 
           {/* Staff section */}
           <div className="border-t border-hairline pt-2 mt-0.5">
-            {staffInfo ? (
+            {staffProfile ? (
               <div className="flex items-center gap-1.5">
                 <Avatar
-                  url={staffInfo.avatarUrl}
-                  name={staffInfo.name}
+                  url={staffProfile.avatarUrl}
+                  name={staffProfile.displayName ?? staffProfile.name ?? ''}
                   className="w-5 h-5 rounded-full text-[9px] shrink-0"
                 />
                 <span className="text-[11px] font-medium text-ink/80 truncate">
-                  {staffInfo.name}
+                  {staffProfile.displayName ?? staffProfile.name}
                 </span>
                 <span className="text-[10px] text-mute/60 ml-auto shrink-0">handling</span>
               </div>

@@ -57,7 +57,6 @@ export function KanbanColumn({
             <ConversationCard
               key={conv.id}
               conv={conv}
-              staffInfo={conv.staffInfo}
               disabled={!(isCardDraggable?.(conv) ?? false)}
             />
           ))
