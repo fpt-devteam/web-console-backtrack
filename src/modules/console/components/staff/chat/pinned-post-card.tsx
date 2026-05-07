@@ -5,6 +5,7 @@ import {
   ChevronLeft,
   ChevronRight,
   CreditCard,
+  ExternalLink,
   MapPin,
   Package,
   PackageSearch,
@@ -18,6 +19,7 @@ import {
 } from 'lucide-react'
 import { useState } from 'react'
 import type { ElementType } from 'react'
+import { Link } from '@tanstack/react-router'
 import { useGetPost } from '@/hooks/use-post'
 import { useCurrentOrgId } from '@/contexts/current-org.context'
 import { Skeleton } from '@/components/ui/skeleton'
@@ -114,93 +116,62 @@ function MiniImageStrip({ images }: { images: string[] }) {
   )
 }
 
-function HeroCarousel({ images, title, isLost, category, onClose }: {
-  images: Array<string>
+function PopupHeader({ title, isLost, category, slug, itemId, onClose, status }: {
   title: string
   isLost: boolean
   category: string
+  slug: string
+  itemId: string
   onClose: () => void
+  status?: string
 }) {
-  const [idx, setIdx] = useState(0)
-  const hasImages = images.length > 0
-  const prev = () => setIdx(i => (i - 1 + images.length) % images.length)
-  const next = () => setIdx(i => (i + 1) % images.length)
-
   return (
-    <div className="relative shrink-0">
-      <div className="w-full h-52 sm:h-56 relative overflow-hidden bg-gradient-to-br from-brand-100 to-brand-50">
-        {hasImages ? (
-          <AnimatePresence mode="wait">
-            <motion.img
-              key={idx}
-              src={images[idx]}
-              alt={`${title} photo ${idx + 1}`}
-              initial={{ opacity: 0, x: 30 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: -30 }}
-              transition={{ duration: 0.2 }}
-              className="absolute inset-0 w-full h-full object-cover"
-            />
-          </AnimatePresence>
-        ) : (
-          <div className="w-full h-full flex items-center justify-center">
-            <PackageSearch className="w-16 h-16 text-brand-200" strokeWidth={1} />
+    <div className="flex items-start gap-4 px-6 py-4 border-b border-gray-100 bg-white shrink-0">
+      {/* Left: metadata + title */}
+      <div className="flex-1 min-w-0">
+        <div className="flex flex-wrap items-center gap-1.5 mb-2">
+          <div className="flex items-center gap-1 text-brand-500">
+            <Pin className="w-3 h-3 -rotate-45" strokeWidth={2.5} />
+            <span className="text-[10px] font-bold uppercase tracking-wider">Pinned item</span>
           </div>
-        )}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
-      </div>
-
-      {images.length > 1 && (
-        <>
-          <button type="button" onClick={prev}
-            className="absolute left-3 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-black/30 backdrop-blur-sm flex items-center justify-center hover:bg-black/50 transition-colors"
-          >
-            <ChevronLeft className="w-4 h-4 text-white" />
-          </button>
-          <button type="button" onClick={next}
-            className="absolute right-14 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-black/30 backdrop-blur-sm flex items-center justify-center hover:bg-black/50 transition-colors"
-          >
-            <ChevronRight className="w-4 h-4 text-white" />
-          </button>
-        </>
-      )}
-
-      <button type="button" onClick={onClose}
-        className="absolute top-4 right-4 w-8 h-8 rounded-full bg-black/30 backdrop-blur-sm flex items-center justify-center hover:bg-black/50 transition-colors"
-        aria-label="Close"
-      >
-        <X className="w-4 h-4 text-white" />
-      </button>
-
-      <div className="absolute top-4 left-4 flex items-center gap-1.5 bg-white/20 backdrop-blur-sm rounded-full px-2.5 py-1 border border-white/30">
-        <Pin className="w-3 h-3 text-white -rotate-45" strokeWidth={2.5} />
-        <span className="text-[10px] font-bold text-white uppercase tracking-wider">Pinned item</span>
-      </div>
-
-      <div className="absolute bottom-0 left-0 right-0 px-5 pb-4">
-        <p className="text-white font-black text-[18px] leading-tight drop-shadow-sm truncate mb-1.5">{title}</p>
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold ${isLost ? 'bg-rose-500/80 text-white' : 'bg-emerald-500/80 text-white'}`}>
-              <span className="w-1 h-1 rounded-full bg-white inline-block" />
-              {isLost ? 'Lost' : 'Found'}
+          <span className="text-gray-200">·</span>
+          <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold ${isLost ? 'bg-rose-100 text-rose-600' : 'bg-emerald-100 text-emerald-600'}`}>
+            <span className={`w-1.5 h-1.5 rounded-full ${isLost ? 'bg-rose-500' : 'bg-emerald-500'}`} />
+            {isLost ? 'Lost' : 'Found'}
+          </span>
+          {category && (
+            <span className="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-gray-100 text-gray-500 border border-gray-200">
+              {category}
             </span>
-            {category && (
-              <span className="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-white/20 backdrop-blur-sm text-white border border-white/30">
-                {category}
-              </span>
-            )}
-          </div>
-          {images.length > 1 && (
-            <div className="flex items-center gap-1">
-              {images.map((_, i) => (
-                <button key={i} type="button" onClick={() => setIdx(i)}
-                  className={`rounded-full transition-all ${i === idx ? 'w-4 h-1.5 bg-white' : 'w-1.5 h-1.5 bg-white/50'}`}
-                />
-              ))}
-            </div>
+          )}
+          {status && (
+            <span className="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-gray-100 text-gray-500 border border-gray-200">
+              {status}
+            </span>
           )}
         </div>
+        <p className="text-[15px] font-bold text-gray-900 leading-snug truncate">{title}</p>
+      </div>
+
+      {/* Right: actions */}
+      <div className="flex items-center gap-2 shrink-0">
+        <Link
+          to="/console/$slug/staff/item/$itemId"
+          params={{ slug, itemId }}
+          onClick={onClose}
+          className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold bg-brand-500 text-white hover:bg-brand-600 transition-colors shadow-sm"
+        >
+          <ExternalLink className="w-3.5 h-3.5" />
+          View detail
+        </Link>
+        <button
+          type="button"
+          onClick={onClose}
+          className="w-8 h-8 rounded-xl bg-gray-100 flex items-center justify-center hover:bg-gray-200 transition-colors"
+          aria-label="Close"
+        >
+          <X className="w-4 h-4 text-gray-500" />
+        </button>
       </div>
     </div>
   )
@@ -290,12 +261,13 @@ export function PinnedPostCard({ supportFormData }: PinnedPostCardProps) {
               className="bg-white w-full sm:max-w-6xl rounded-t-3xl sm:rounded-3xl
                          max-h-[92vh] flex flex-col overflow-hidden shadow-2xl"
             >
-              {/* Hero — post inventory images */}
-              <HeroCarousel
-                images={post.imageUrls}
+              <PopupHeader
                 title={post.postTitle}
                 isLost={isLost}
                 category={post.category}
+                status = {post.status}
+                slug={post.organization?.slug ?? ''}
+                itemId={post.id}
                 onClose={() => setShowPopup(false)}
               />
 

@@ -170,28 +170,12 @@ export function InventoryItemDetailView({
 
   const [activeStep, setActiveStep] = useState<number>(0)
 
-  // 0=InStorage, 1=Returned, 2=Archived, 3=Expired
   useEffect(() => {
     if (item.status === 'Returned') setActiveStep(1)
     else if (item.status === 'Archived') setActiveStep(2)
     else if (item.status === 'Expired') setActiveStep(3)
     else setActiveStep(0)
   }, [item.id, item.status])
-
-  // A step is "occurred" only if the item's current status matches that step.
-  // Returned / Archived / Expired are mutually exclusive — only one can be done.
-  const stepOccurred = (idx: number): boolean => {
-    if (idx === 0) return true // InStorage is always the first step (item is registered)
-    if (idx === 1) return item.status === 'Returned'
-    if (idx === 2) return item.status === 'Archived'
-    if (idx === 3) return item.status === 'Expired'
-    return false
-  }
-
-  const dotState = (idx: number): 'done' | 'active' | 'todo' => {
-    if (activeStep === idx) return 'active'
-    return stepOccurred(idx) ? 'done' : 'todo'
-  }
 
   const intakeAt = useMemo(() => formatDateTimeOrDash(item.createdAt), [item.createdAt])
   const terminalAt = useMemo(
@@ -249,39 +233,39 @@ export function InventoryItemDetailView({
             <div className="-mx-1 overflow-x-auto overflow-y-hidden px-1 pb-1 lg:mx-0 lg:overflow-visible lg:pb-0 [&::-webkit-scrollbar]:h-1 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-gray-200">
               <div className="flex min-w-max items-center gap-2 px-1 sm:gap-3 md:gap-5 lg:justify-end">
                 <StepperDot
-                  state={dotState(0)}
+                  state={activeStep === 0 ? 'active' : 'done'}
                   label="In Storage"
                   date={intakeAt}
                   variant="rose"
                   onClick={() => setActiveStep(0)}
                 />
                 <div className="h-0.5 w-10 shrink-0 rounded-full sm:w-14 md:w-20 bg-gray-200" />
-                <StepperDot
-                  state={dotState(1)}
-                  label="Returned"
-                  date={item.status === 'Returned' ? formatDateTimeOrDash(returnReportForPost?.createdAt) : '—'}
-                  variant="rose"
-                  disabled={!stepOccurred(1)}
-                  onClick={() => setActiveStep(1)}
-                />
-                <div className="h-0.5 w-10 shrink-0 rounded-full sm:w-14 md:w-20 bg-gray-200" />
-                <StepperDot
-                  state={dotState(2)}
-                  label="Archived"
-                  date={item.status === 'Archived' ? terminalAt : '—'}
-                  variant="amber"
-                  disabled={!stepOccurred(2)}
-                  onClick={() => setActiveStep(2)}
-                />
-                <div className="h-0.5 w-10 shrink-0 rounded-full sm:w-14 md:w-20 bg-gray-200" />
-                <StepperDot
-                  state={dotState(3)}
-                  label="Expired"
-                  date={item.status === 'Expired' ? terminalAt : '—'}
-                  variant="slate"
-                  disabled={!stepOccurred(3)}
-                  onClick={() => setActiveStep(3)}
-                />
+                {item.status === 'Archived' ? (
+                  <StepperDot
+                    state={activeStep === 2 ? 'active' : 'done'}
+                    label="Archived"
+                    date={terminalAt}
+                    variant="amber"
+                    onClick={() => setActiveStep(2)}
+                  />
+                ) : item.status === 'Expired' ? (
+                  <StepperDot
+                    state={activeStep === 3 ? 'active' : 'done'}
+                    label="Expired"
+                    date={terminalAt}
+                    variant="slate"
+                    onClick={() => setActiveStep(3)}
+                  />
+                ) : (
+                  <StepperDot
+                    state={item.status === 'Returned' ? (activeStep === 1 ? 'active' : 'done') : 'todo'}
+                    label="Returned"
+                    date={item.status === 'Returned' ? formatDateTimeOrDash(returnReportForPost?.createdAt) : '—'}
+                    variant="rose"
+                    disabled={item.status !== 'Returned'}
+                    onClick={() => setActiveStep(1)}
+                  />
+                )}
               </div>
             </div>
           </div>
