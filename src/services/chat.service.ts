@@ -128,9 +128,14 @@ export const chatService = {
   },
 
   /** List conversations currently assigned to the authenticated staff member. */
-  async listAssigned(): Promise<Array<IConversation>> {
+  async listAssigned({ isMe }: { isMe: boolean }): Promise<Array<IConversation>> {
     const { data } = await privateClient.get<ApiResponse<unknown>>(
-      `${BASE}/conversations/organization/assigned`
+      `${BASE}/conversations/organization/assigned`,
+      {
+        params: {
+          isMe,
+        }
+      }
     );
     if (!data.success) throw new Error(data.error?.message ?? 'Failed to fetch assigned conversations');
     return toList(data.data).conversations;

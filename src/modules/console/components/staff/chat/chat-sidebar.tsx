@@ -49,40 +49,6 @@ export function ChatSidebar({
             className="w-full pl-10 pr-4 py-2.5 bg-cloud rounded-full text-base text-ink placeholder-mute focus:outline-none"
           />
         </div>
-
-        {/* <div className="flex bg-cloud rounded-xl p-1 gap-2 w-full">
-          <button
-            onClick={() => onTabChange('assigned')}
-            className={`flex-1 py-2.5 rounded-lg text-base font-semibold transition-all ${
-              tab === 'assigned' ? 'bg-white text-ink shadow-sm' : 'text-mute hover:text-ash'
-            }`}
-          >
-            My Chats
-          </button>
-          <button
-            onClick={() => onTabChange('queue')}
-            className={`flex-1 py-2.5 rounded-lg text-base font-semibold transition-all ${
-              tab === 'queue' ? 'bg-white text-ink shadow-sm' : 'text-mute hover:text-ash'
-            }`}
-          >
-            <span className="flex items-center justify-center gap-1">
-              Queue
-              {queueCount > 0 && (
-                <span className="bg-[#c97a00] text-white text-sm font-bold px-1.5 py-0.5 rounded-full leading-none">
-                  {queueCount}
-                </span>
-              )}
-            </span>
-          </button>
-          <button
-            onClick={() => onTabChange('resolved')}
-            className={`flex-1 py-2.5 rounded-lg text-base font-semibold transition-all ${
-              tab === 'resolved' ? 'bg-white text-ink shadow-sm' : 'text-mute hover:text-ash'
-            }`}
-          >
-            Resolved
-          </button>
-        </div> */}
       </div>
 
       <div className="flex-1 overflow-y-auto">

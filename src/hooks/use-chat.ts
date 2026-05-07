@@ -37,10 +37,10 @@ export function useChatQueue(orgId?: string, options?: { poll?: boolean }) {
 /**
  * Fetch conversations currently assigned to the authenticated staff member.
  */
-export function useChatAssigned() {
+export function useChatAssigned({ isMe }: { isMe: boolean } = { isMe: false }) {
   return useQuery({
     queryKey: chatKeys.assigned(),
-    queryFn: () => chatService.listAssigned(),
+    queryFn: () => chatService.listAssigned({ isMe }),
     staleTime: 1000 * 30,
     retry: false,
   });

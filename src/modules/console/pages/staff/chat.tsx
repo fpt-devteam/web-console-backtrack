@@ -28,7 +28,7 @@ export function StaffChatPage() {
   const [resolveConfirmOpen, setResolveConfirmOpen] = useState(false)
 
   const { data: queueData, isLoading: isQueueLoading, removeFromQueue } = useSocketChatQueue(currentOrgId ?? undefined)
-  const assignedQuery = useChatAssigned()
+  const assignedQuery = useChatAssigned({ isMe: true })
   const resolvedQuery = useChatResolved()
   const assignMutation  = useAssignConversation()
   const resolveMutation = useResolveConversation()
