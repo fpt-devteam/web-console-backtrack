@@ -12,6 +12,7 @@ import { InventoryPhotosPicker } from '@/modules/console/components/inventory/in
 import { collectInventoryImageUrls, reorderList, revokeObjectUrls, type InventoryPhotoPreview } from '@/utils/inventory-photos'
 import { uploadInventoryImage } from '@/services/storage.service'
 import { isValidEmail, isValidPhone10StartingWith0 } from '@/utils/validators'
+import { chatService } from '@/services/chat.service'
 
 export function HandoverItemModal({
   open,
@@ -143,6 +144,7 @@ export function HandoverItemModal({
                 },
                 {
                   onSuccess: () => {
+                    void chatService.closePostConversations(postId).catch(() => {})
                     showToast.success('Handover saved')
                     setSubmitting(false)
                     onClose()
