@@ -51,7 +51,7 @@ export function ConversationCard({ conv, disabled = false, onOpenConversation }:
       <div
         ref={setNodeRef}
         style={style}
-        className="bg-white rounded-xl border border-hairline shadow-sm h-28 animate-pulse"
+        className="bg-white rounded-xl border border-hairline shadow-sm h-40 animate-pulse"
       />
     )
   }
@@ -93,79 +93,79 @@ export function ConversationCard({ conv, disabled = false, onOpenConversation }:
         <div
           {...listeners}
           {...attributes}
-          className="flex items-center justify-center h-5 cursor-grab active:cursor-grabbing opacity-0 group-hover:opacity-100 transition-opacity"
+          className="flex items-center justify-center h-6 cursor-grab active:cursor-grabbing opacity-0 group-hover:opacity-100 transition-opacity"
         >
-          <GripVertical className="w-4 h-4 text-neutral-300" />
+          <GripVertical className="w-5 h-5 text-neutral-300" />
         </div>
       )}
 
-      <div className={`flex gap-3 px-3 pb-3 ${!disabled ? 'pt-0' : 'pt-3'}`}>
+      <div className={`flex gap-4 px-4 pb-4 ${!disabled ? 'pt-0' : 'pt-4'}`}>
         {/* Item image */}
         <div className="shrink-0">
           {itemThumb ? (
             <img
               src={itemThumb}
               alt={itemName}
-              className="w-14 h-14 rounded-xl object-cover border border-hairline"
+              className="w-20 h-20 rounded-xl object-cover border border-hairline"
             />
           ) : (
-            <div className="w-14 h-14 rounded-xl bg-neutral-100 border border-hairline flex items-center justify-center">
-              <ImageOff className="w-5 h-5 text-neutral-300" />
+            <div className="w-20 h-20 rounded-xl bg-neutral-100 border border-hairline flex items-center justify-center">
+              <ImageOff className="w-7 h-7 text-neutral-300" />
             </div>
           )}
         </div>
 
         {/* Right content — extra right padding so text doesn't run under the badge */}
-        <div className="flex-1 min-w-0 flex flex-col gap-1.5 pr-16">
+        <div className="flex-1 min-w-0 flex flex-col gap-2 pr-20">
           {/* Item name */}
-          <p className="text-sm font-semibold text-ink leading-snug line-clamp-2">
+          <p className="text-base font-semibold text-ink leading-snug line-clamp-2 min-h-[2.75rem]">
             {itemName}
           </p>
 
           {/* Partner row */}
-          <div className="flex items-center gap-1">
-            <span className="text-[11px] text-mute">by</span>
+          <div className="flex items-center gap-1.5">
+            <span className="text-xs text-mute">by</span>
             <Avatar
               url={conv.partner?.avatarUrl}
               name={partnerName}
-              className="w-4 h-4 rounded-full text-[8px]"
+              className="w-5 h-5 rounded-full text-[9px]"
             />
-            <span className="text-[11px] text-mute font-medium truncate">
+            <span className="text-xs text-mute font-medium truncate">
               {partnerName}
             </span>
           </div>
 
           {/* Last message */}
-          <p className="text-xs text-mute truncate">
+          <p className="text-sm text-mute truncate">
             {conv.lastMessageContent ?? 'No messages yet'}
           </p>
 
           {/* Category / time */}
           <div className="flex items-center justify-between gap-1">
-            <span className="text-[10px] text-mute/70 truncate">{category}</span>
-            <span className="text-[10px] text-mute/70 ml-auto shrink-0">
+            <span className="text-xs text-mute/70 truncate">{category}</span>
+            <span className="text-xs text-mute/70 ml-auto shrink-0">
               {formatTime(conv.lastMessageAt)}
             </span>
           </div>
 
           {/* Staff section */}
-          <div className="border-t border-hairline pt-2 mt-0.5">
+          <div className="border-t border-hairline pt-2.5 mt-0.5">
             {staffProfile ? (
-              <div className="flex items-center gap-1.5">
+              <div className="flex items-center gap-2">
                 <Avatar
                   url={staffProfile.avatarUrl}
                   name={staffProfile.displayName ?? staffProfile.name ?? ''}
-                  className="w-5 h-5 rounded-full text-[9px] shrink-0"
+                  className="w-6 h-6 rounded-full text-[10px] shrink-0"
                 />
-                <span className="text-[11px] font-medium text-ink/80 truncate">
+                <span className="text-xs font-medium text-ink/80 truncate">
                   {staffProfile.displayName ?? staffProfile.name}
                 </span>
-                <span className="text-[10px] text-mute/60 ml-auto shrink-0">handling</span>
+                <span className="text-[11px] text-mute/60 ml-auto shrink-0">handling</span>
               </div>
             ) : (
-              <div className="flex items-center gap-1.5 text-mute/50">
-                <UserCircle2 className="w-4 h-4 shrink-0" />
-                <span className="text-[11px]">Unassigned</span>
+              <div className="flex items-center gap-2 text-mute/50">
+                <UserCircle2 className="w-5 h-5 shrink-0" />
+                <span className="text-xs">Unassigned</span>
               </div>
             )}
           </div>

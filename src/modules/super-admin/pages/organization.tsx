@@ -32,8 +32,9 @@ function getStatusStyle(status: OrgStatus) {
   }
 }
 
-function formatCapacity(current: number, limit: number | null | undefined): string {
-  if (limit == null) return `${current} members (unlimited)`;
+function formatCapacity(current: number, limit: number | null | undefined, plan: string): string {
+  const hasActiveSubscription = plan.toLowerCase() !== 'free';
+  if (hasActiveSubscription || limit == null) return `${current} members (unlimited)`;
   return `${current} / ${limit} members`;
 }
 
@@ -239,7 +240,7 @@ export function OrganizationPage() {
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         <span className="text-sm text-[#6a6a6a]">
-                          {formatCapacity(org.capacity.current, org.capacity.limit)}
+                          {formatCapacity(org.capacity.current, org.capacity.limit, org.subscriptionPlan)}
                         </span>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">

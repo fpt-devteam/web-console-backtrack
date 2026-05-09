@@ -159,7 +159,7 @@ export function HandoverHistory() {
         isError={isReportsError || isInventoryError}
         emptyText="No matching returns found"
         subcategoryNameById={subcategoryNameById}
-        getDate={(item) => reportByPostId[item.id]?.createdAt}
+
         detailLink={{
           to: '/console/$slug/staff/item/$itemId',
           params: (item) => ({ slug, itemId: item.id }),

@@ -10,8 +10,7 @@ import { InventoryGridCards } from '../../components/inventory/inventory-grid-ca
 import { InventoryStatusTabs } from '../../components/inventory/inventory-status-tabs'
 import { useParams } from '@tanstack/react-router'
 import { InventoryCtaButton } from '../../components/inventory/inventory-cta-button'
-import { useOrgReturnReports } from '@/hooks/use-return-report'
-import { useMemo } from 'react'
+
 
 const pageSize = 8
 
@@ -28,7 +27,6 @@ export function StaffInventoryPage() {
   })
 
   const { data, isLoading, isError } = useInventoryItems(currentOrgId, listState.listParams)
-  const { data: returnReports } = useOrgReturnReports(currentOrgId, 1, 200)
   const { data: subcategories } = useSubcategories()
   const subcategoryNameById = (subcategories ?? []).reduce<Record<string, string>>((acc, s) => {
     acc[s.id] = s.name
@@ -36,14 +34,6 @@ export function StaffInventoryPage() {
   }, {})
 
   const items: InventoryListItem[] = data?.items ?? []
-  const returnedAtByPostId = useMemo(() => {
-    const map: Record<string, string> = {}
-    for (const r of returnReports?.items ?? []) {
-      const postId = r.post?.id
-      if (postId) map[postId] = r.createdAt
-    }
-    return map
-  }, [returnReports?.items])
   const totalCount = data?.totalCount ?? 0
   const totalPages = Math.max(1, Math.ceil(totalCount / pageSize))
 
@@ -109,7 +99,7 @@ export function StaffInventoryPage() {
             isLoading={isLoading}
             isError={isError}
             subcategoryNameById={subcategoryNameById}
-            getDate={(item) => (item.status === 'Returned' ? returnedAtByPostId[item.id] ?? item.createdAt : item.createdAt)}
+
             detailLink={{
               to: '/console/$slug/staff/item/$itemId',
               params: (item) => ({ slug, itemId: item.id }),

@@ -214,4 +214,12 @@ export const chatService = {
     if (!data.success) throw new Error(data.error?.message ?? 'Failed to fetch conversations');
     return toList(data.data).conversations;
   },
+
+  /** Close all queued conversations linked to a post (called after handover). */
+  async closePostConversations(postId: string): Promise<void> {
+    const { data } = await privateClient.post<ApiResponse<void>>(
+      `${BASE}/conversations/organization/posts/${postId}/close`
+    );
+    if (!data.success) throw new Error(data.error?.message ?? 'Failed to close conversations');
+  },
 };

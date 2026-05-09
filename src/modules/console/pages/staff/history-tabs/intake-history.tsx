@@ -121,7 +121,7 @@ export function IntakeHistory() {
         isError={isError}
         subcategoryNameById={subcategoryNameById}
         emptyText="No intake history found matching your filters."
-        getDate={(item) => item.createdAt}
+
         detailLink={{
           to: '/console/$slug/staff/item/$itemId',
           params: (item: InventoryListItem) => ({ slug, itemId: item.id }),

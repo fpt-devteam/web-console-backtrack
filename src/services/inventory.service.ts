@@ -107,6 +107,10 @@ export interface InventoryItem {
   organizationFoundLocation?: string | null
   eventTime: string
   createdAt: string
+  updatedAt?: string | null
+  returnedAt?: string | null
+  archivedAt?: string | null
+  expiredAt?: string | null
   author?: PostAuthorResult | null
   organization?: { id: string; name: string; slug: string } | null
   finderInfo?: FinderInfo | null
