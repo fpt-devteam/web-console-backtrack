@@ -202,4 +202,16 @@ export const chatService = {
     if (!data.success) throw new Error(data.error?.message ?? 'Failed to fetch resolved conversations');
     return toList(data.data).conversations;
   },
+
+  /** List all conversations related to a specific inventory post (item). */
+  async listByPostId(postId: string, orgId?: string): Promise<Array<IConversation>> {
+    const { data } = await privateClient.get<ApiResponse<unknown>>(
+      `${BASE}/conversations/organization/posts/${postId}`,
+      {
+        headers: orgId ? { 'X-Org-Id': orgId } : undefined,
+      }
+    );
+    if (!data.success) throw new Error(data.error?.message ?? 'Failed to fetch conversations');
+    return toList(data.data).conversations;
+  },
 };

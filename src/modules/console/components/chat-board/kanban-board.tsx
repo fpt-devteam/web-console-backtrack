@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import type { DragEndEvent, DragStartEvent } from '@dnd-kit/core'
 import {
   DndContext,
@@ -46,7 +46,7 @@ const VALID_TRANSITIONS: Partial<Record<ColKey, ColKey[]>> = {
   [ConversationStatus.IN_PROGRESS]: [ConversationStatus.QUEUE, ConversationStatus.CLOSED],
 }
 
-export function ChatKanbanBoard() {
+export function ChatKanbanBoard({ searchTerm = '' }: { searchTerm?: string }) {
   const { currentOrgId } = useCurrentOrgId()
   const { data: currentUser } = useCurrentUser()
   const { data: queueData, isLoading: isQueueLoading, removeFromQueue } = useSocketChatQueue(currentOrgId ?? undefined)
@@ -68,6 +68,26 @@ export function ChatKanbanBoard() {
   const [pendingResolve, setPendingResolve] = useState<IConversationWithStaff | null>(null)
 
   const isLoading = isQueueLoading || assignedQuery.isLoading || resolvedQuery.isLoading
+
+  const filteredBoard = useMemo(() => {
+    const term = searchTerm.trim().toLowerCase()
+    if (!term) return board
+    const matches = (c: IConversationWithStaff) => {
+      const name = (c.partner?.displayName ?? c.partner?.email ?? '').toLowerCase()
+      const itemTitle = (c.supportFormData?.itemName ?? '').toLowerCase()
+      return (
+        name.includes(term) ||
+        itemTitle.includes(term) ||
+        c.id.toLowerCase().includes(term) ||
+        (c.lastMessageContent ?? '').toLowerCase().includes(term)
+      )
+    }
+    return {
+      [ConversationStatus.QUEUE]: board[ConversationStatus.QUEUE].filter(matches),
+      [ConversationStatus.IN_PROGRESS]: board[ConversationStatus.IN_PROGRESS].filter(matches),
+      [ConversationStatus.CLOSED]: board[ConversationStatus.CLOSED].filter(matches),
+    } satisfies BoardState
+  }, [board, searchTerm])
 
   useEffect(() => {
     setBoard((prev) => ({ ...prev, [ConversationStatus.QUEUE]: Array.isArray(queueData) ? queueData : [] }))
@@ -201,7 +221,7 @@ export function ChatKanbanBoard() {
                 id={id}
                 title={title}
                 accent={accent}
-                conversations={isLoading ? [] : board[id]}
+                conversations={isLoading ? [] : filteredBoard[id]}
                 isLoading={isLoading}
                 isCardDraggable={draggable}
               />

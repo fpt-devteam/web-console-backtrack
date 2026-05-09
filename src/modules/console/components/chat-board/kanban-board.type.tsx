@@ -17,4 +17,5 @@ export interface KanbanColumnProps {
   conversations: IConversationWithStaff[]
   isLoading?: boolean
   isCardDraggable?: (conv: IConversationWithStaff) => boolean
+  onOpenConversation?: (conv: IConversationWithStaff) => void
 }

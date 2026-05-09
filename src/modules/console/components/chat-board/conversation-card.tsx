@@ -13,6 +13,7 @@ import { useUserById } from '@/hooks/use-user'
 interface ConversationCardProps {
   conv: IConversation
   disabled?: boolean
+  onOpenConversation?: (conv: IConversation) => void
 }
 
 const STATUS_BADGE: Record<ConversationStatus, string> = {
@@ -27,7 +28,7 @@ const STATUS_DOT: Record<ConversationStatus, string> = {
   [ConversationStatus.CLOSED]:      'bg-neutral-400',
 }
 
-export function ConversationCard({ conv, disabled = false }: ConversationCardProps) {
+export function ConversationCard({ conv, disabled = false, onOpenConversation }: ConversationCardProps) {
   const { attributes, listeners, setNodeRef, transform, isDragging } = useDraggable({
     id: conv.id,
     data: { status: conv.status },
@@ -63,7 +64,9 @@ export function ConversationCard({ conv, disabled = false }: ConversationCardPro
   const postId      = conv.supportFormData?.postId
 
   function handleCardClick() {
-    if (!slug || !postId || isDragging) return
+    if (isDragging) return
+    if (onOpenConversation) return onOpenConversation(conv)
+    if (!slug || !postId) return
     void navigate({ to: '/console/$slug/staff/item/$itemId', params: { slug, itemId: postId } })
   }
 

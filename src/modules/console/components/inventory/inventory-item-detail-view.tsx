@@ -6,6 +6,13 @@ import type { InventoryItem } from '@/services/inventory.service'
 import { inventoryStatusLabel, inventoryStatusPillClass } from './status'
 import { getInventorySubcategoryName, getInventoryTitle } from '@/utils/inventory-view'
 import { categoryLabel, InventoryDetailAttributeGrid, ItemQrCard } from './inventory-detail-attribute-grid'
+import { useChatConversationsByPostId } from '@/hooks/use-chat'
+import { statusBadge, statusLabel } from '@/modules/console/components/staff/chat/utils'
+import { useUser } from '@/hooks/use-user'
+import { AdminModal } from '@/modules/console/components/admin/AdminModal'
+import { MessagePanel } from '@/modules/console/components/staff/chat/message-panel'
+import { ConversationStatus, type IConversation } from '@/types/chat.types'
+import { Avatar } from '@/modules/console/components/staff/chat/avatar'
 
 function DetailRow({ label, value }: { label: string; value: string }) {
   return (
@@ -168,12 +175,13 @@ export function InventoryItemDetailView({
   const headerPrimary = title.trim() || subName.trim() || 'Inventory item'
   const imgAlt = title.trim() || subName.trim() || 'Inventory item'
 
+  // 0: In Storage | 1: Conversations | 2: Returned | 3: Archived | 4: Expired
   const [activeStep, setActiveStep] = useState<number>(0)
 
   useEffect(() => {
-    if (item.status === 'Returned') setActiveStep(1)
-    else if (item.status === 'Archived') setActiveStep(2)
-    else if (item.status === 'Expired') setActiveStep(3)
+    if (item.status === 'Returned') setActiveStep(2)
+    else if (item.status === 'Archived') setActiveStep(3)
+    else if (item.status === 'Expired') setActiveStep(4)
     else setActiveStep(0)
   }, [item.id, item.status])
 
@@ -183,8 +191,14 @@ export function InventoryItemDetailView({
     [item],
   )
 
+  const meQuery = useUser()
+  const myUserId = meQuery.data?.id
+  const relatedConvsQuery = useChatConversationsByPostId(item.id, item.organization?.id ?? undefined)
+  const relatedConvs = relatedConvsQuery.data ?? []
+  const [openConv, setOpenConv] = useState<IConversation | null>(null)
+
   return (
-    <div className="mx-auto h-full w-full overflow-y-auto px-4 py-4 sm:px-6 sm:py-6 lg:px-24">
+    <div className="mx-auto h-full w-full overflow-y-auto px-10 py-4  ">
 
       {/* Breadcrumb */}
       <div className="mb-5 flex min-w-0 items-center gap-1.5 text-xs text-gray-400">
@@ -240,30 +254,42 @@ export function InventoryItemDetailView({
                   onClick={() => setActiveStep(0)}
                 />
                 <div className="h-0.5 w-10 shrink-0 rounded-full sm:w-14 md:w-20 bg-gray-200" />
+                <StepperDot
+                  state={activeStep === 1 ? 'active' : activeStep > 1 ? 'done' : 'todo'}
+                  label="Conversations"
+                  date={
+                    relatedConvsQuery.isLoading
+                      ? 'Loading…'
+                      : `${relatedConvs.length} conversation${relatedConvs.length === 1 ? '' : 's'}`
+                  }
+                  variant="rose"
+                  onClick={() => setActiveStep(1)}
+                />
+                <div className="h-0.5 w-10 shrink-0 rounded-full sm:w-14 md:w-20 bg-gray-200" />
                 {item.status === 'Archived' ? (
                   <StepperDot
-                    state={activeStep === 2 ? 'active' : 'done'}
+                    state={activeStep === 3 ? 'active' : 'done'}
                     label="Archived"
                     date={terminalAt}
                     variant="amber"
-                    onClick={() => setActiveStep(2)}
+                    onClick={() => setActiveStep(3)}
                   />
                 ) : item.status === 'Expired' ? (
                   <StepperDot
-                    state={activeStep === 3 ? 'active' : 'done'}
+                    state={activeStep === 4 ? 'active' : 'done'}
                     label="Expired"
                     date={terminalAt}
                     variant="slate"
-                    onClick={() => setActiveStep(3)}
+                    onClick={() => setActiveStep(4)}
                   />
                 ) : (
                   <StepperDot
-                    state={item.status === 'Returned' ? (activeStep === 1 ? 'active' : 'done') : 'todo'}
+                    state={item.status === 'Returned' ? (activeStep === 2 ? 'active' : 'done') : 'todo'}
                     label="Returned"
                     date={item.status === 'Returned' ? formatDateTimeOrDash(returnReportForPost?.createdAt) : '—'}
                     variant="rose"
                     disabled={item.status !== 'Returned'}
-                    onClick={() => setActiveStep(1)}
+                    onClick={() => setActiveStep(2)}
                   />
                 )}
               </div>
@@ -399,8 +425,130 @@ export function InventoryItemDetailView({
               </div>
             )}
 
-            {/* Step 1 — Returned */}
+            {/* Step 1 — Conversations */}
             {activeStep === 1 && (
+              <div className="space-y-5">
+                <div className="flex items-center justify-between gap-3">
+                  <SectionTitle title="Conversations" />
+                </div>
+
+                {relatedConvsQuery.isLoading ? (
+                  <div className="flex items-center justify-center rounded-2xl border border-gray-100 bg-gray-50/50 py-10">
+                    <Spinner />
+                  </div>
+                ) : relatedConvsQuery.isError ? (
+                  <div className="rounded-2xl border border-rose-100 bg-rose-50 px-4 py-3 text-sm text-rose-700">
+                    Failed to load related conversations.
+                  </div>
+                ) : relatedConvs.length === 0 ? (
+                  <div className="rounded-2xl border border-gray-100 bg-gray-50/50 px-4 py-8 text-center">
+                    <p className="text-sm font-semibold text-gray-700">No conversations yet</p>
+                    <p className="text-xs text-gray-500 mt-1">This item doesn’t have any related support chats.</p>
+                  </div>
+                ) : (
+                  <div className="space-y-3">
+                    {relatedConvs.map((conv) => {
+                      const partner = conv.partner?.displayName ?? conv.partner?.email ?? conv.id.slice(0, 8)
+                      const isAssignedToOtherStaff =
+                        !!conv.assignedStaffId && !!myUserId && conv.assignedStaffId !== myUserId
+                      const isLocked = !!conv.assignedStaffId && (!myUserId || isAssignedToOtherStaff)
+                      return (
+                        <button
+                          key={conv.id}
+                          type="button"
+                          disabled={isLocked}
+                          onClick={() => {
+                            if (isLocked) return
+                            setOpenConv(conv)
+                          }}
+                          title={isAssignedToOtherStaff ? 'This conversation is being handled by another staff member.' : undefined}
+                          className={[
+                            'w-full text-left rounded-2xl border px-4 py-3 shadow-sm transition-shadow',
+                            isLocked
+                              ? 'border-gray-200 bg-gray-50 text-gray-400 cursor-not-allowed opacity-80'
+                              : 'border-gray-200 bg-white hover:shadow-md',
+                          ].join(' ')}
+                        >
+                          <div className="flex items-start justify-between gap-3">
+                            <div className="min-w-0">
+                              <p className="text-sm font-bold text-gray-900 truncate">{partner}</p>
+                              <p className="text-xs text-gray-500 mt-0.5 truncate">
+                                {conv.lastMessageContent ?? 'No messages yet'}
+                              </p>
+                            </div>
+                            <div className="shrink-0 flex flex-col items-end gap-1">
+                              <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-[11px] font-semibold ${statusBadge(conv.status)}`}>
+                                {statusLabel(conv.status)}
+                              </span>
+                              <span className="text-[11px] text-gray-400 whitespace-nowrap">
+                                {formatDateTimeOrDash(conv.lastMessageAt ?? conv.updatedAt)}
+                              </span>
+                            </div>
+                          </div>
+                          {isAssignedToOtherStaff && (
+                            <div className="">
+                              <span className="inline-flex items-center rounded-full bg-neutral-100  py-1 text-[11px] font-bold text-neutral-500">
+                                Assigned to other staff
+                              </span>
+                            </div>
+                          )}
+                          {typeof conv.unreadCount === 'number' && conv.unreadCount > 0 && (
+                            <div className="mt-2">
+                              <span className="inline-flex items-center rounded-full bg-rose-50 px-2.5 py-1 text-[11px] font-bold text-rose-600">
+                                {conv.unreadCount} unread
+                              </span>
+                            </div>
+                          )}
+                        </button>
+                      )
+                    })}
+                  </div>
+                )}
+
+                <AdminModal
+                  open={!!openConv}
+                  title={
+                    openConv?.partner?.displayName ??
+                    openConv?.partner?.email ??
+                    (openConv ? `Conversation ${openConv.id.slice(0, 8)}` : 'Conversation')
+                  }
+                  header={
+                    openConv ? (
+                      <div className="flex items-center gap-3 min-w-0">
+                        <Avatar
+                          url={openConv.partner?.avatarUrl}
+                          name={openConv.partner?.displayName ?? openConv.partner?.email ?? openConv.id.slice(0, 2)}
+                          className="w-9 h-9 rounded-full shrink-0"
+                        />
+                        <div className="min-w-0">
+                          <p className="text-base sm:text-lg font-semibold text-[#222222] truncate">
+                            {openConv.partner?.displayName ?? openConv.partner?.email ?? openConv.id.slice(0, 8)}
+                          </p>
+                          {openConv.partner?.email && openConv.partner?.displayName ? (
+                            <p className="text-xs text-[#929292] truncate">{openConv.partner.email}</p>
+                          ) : null}
+                        </div>
+                      </div>
+                    ) : null
+                  }
+                  onClose={() => setOpenConv(null)}
+                >
+                  {openConv && (
+                    <div className="h-[70vh] min-h-[520px] flex flex-col rounded-xl border border-[#ebebeb] overflow-hidden">
+                      <MessagePanel
+                        conversationId={openConv.id}
+                        partner={openConv.partner}
+                        readOnly={openConv.status === ConversationStatus.CLOSED}
+                        viewOnly
+                      />
+                    </div>
+                  )}
+                </AdminModal>
+              </div>
+            )}
+
+            {/* Step 2 — Returned */}
+            {activeStep === 2 && (
               <div className="space-y-5">
                 <SectionTitle title="Recipient — contact & ID" />
                 <div className="rounded-xl bg-gray-50 px-4">
@@ -449,8 +597,8 @@ export function InventoryItemDetailView({
               </div>
             )}
 
-            {/* Step 2 — Archived */}
-            {activeStep === 2 && (
+            {/* Step 3 — Archived */}
+            {activeStep === 3 && (
               <div className="space-y-5">
                 <div className="flex items-center gap-2.5 pb-1">
                   <div className="h-4 w-1 rounded-full bg-amber-400 shrink-0" />
@@ -466,8 +614,8 @@ export function InventoryItemDetailView({
               </div>
             )}
 
-            {/* Step 3 — Expired */}
-            {activeStep === 3 && (
+            {/* Step 4 — Expired */}
+            {activeStep === 4 && (
               <div className="space-y-5">
                 <div className="flex items-center gap-2.5 pb-1">
                   <div className="h-4 w-1 rounded-full bg-slate-400 shrink-0" />

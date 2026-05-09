@@ -4,11 +4,13 @@ import { useEffect } from 'react';
 export function AdminModal({
   open,
   title,
+  header,
   onClose,
   children,
 }: {
   open: boolean;
   title: string;
+  header?: React.ReactNode;
   onClose: () => void;
   children: React.ReactNode;
 }) {
@@ -40,7 +42,13 @@ export function AdminModal({
           className="w-full max-w-lg sm:max-w-xl lg:max-w-2xl xl:max-w-4xl 2xl:max-w-2xl bg-white rounded-[14px] border border-[#dddddd] overflow-hidden"
         >
           <div className="px-5 py-4 sm:px-6 border-b border-[#ebebeb] flex items-center justify-between">
-            <h2 className="text-base sm:text-lg font-semibold text-[#222222]">{title}</h2>
+            <div className="min-w-0">
+              {header ? (
+                header
+              ) : (
+                <h2 className="text-base sm:text-lg font-semibold text-[#222222]">{title}</h2>
+              )}
+            </div>
             <button
               type="button"
               onClick={onClose}

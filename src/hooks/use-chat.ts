@@ -14,6 +14,7 @@ export const chatKeys = {
   queue: () => [...chatKeys.all, 'queue'] as const,
   assigned: () => [...chatKeys.all, 'assigned'] as const,
   resolved: () => [...chatKeys.all, 'resolved'] as const,
+  byPost: (postId: string) => [...chatKeys.all, 'by-post', postId] as const,
   conversation: (id: string) => [...chatKeys.all, 'conversation', id] as const,
   messages: (conversationId: string) => [...chatKeys.all, 'messages', conversationId] as const,
 };
@@ -51,6 +52,17 @@ export function useChatResolved() {
   return useQuery({
     queryKey: chatKeys.resolved(),
     queryFn: () => chatService.listResolved(),
+    staleTime: 1000 * 30,
+    retry: false,
+  });
+}
+
+/** Fetch conversations related to a specific inventory item (post). */
+export function useChatConversationsByPostId(postId: string | null, orgId?: string) {
+  return useQuery({
+    queryKey: [...chatKeys.byPost(postId ?? ''), { orgId }],
+    queryFn: () => chatService.listByPostId(postId!, orgId),
+    enabled: !!postId,
     staleTime: 1000 * 30,
     retry: false,
   });
