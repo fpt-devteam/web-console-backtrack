@@ -1,4 +1,4 @@
-import { MapPin, Package, Warehouse } from 'lucide-react'
+import { Clock, MapPin, Package, Warehouse } from 'lucide-react'
 import { Link } from '@tanstack/react-router'
 import type { InventoryListItem } from '@/services/inventory.service'
 import {
@@ -14,7 +14,6 @@ type InventoryCardProps = {
     params: (item: InventoryListItem) => Record<string, string>
   }
   subcategoryNameById?: Record<string, string>
-  getDate?: (item: InventoryListItem) => string | Date | null | undefined
 }
 
 function formatCardDate(value: string | Date | null | undefined) {
@@ -39,12 +38,10 @@ export function InventoryCard({
   item,
   detailLink,
   subcategoryNameById,
-  getDate,
 }: InventoryCardProps) {
   const displayTitle = getInventoryTitle(item, subcategoryNameById)
   const subName = getInventorySubcategoryName(item, subcategoryNameById).trim()
   const imgAlt = displayTitle.trim() || subName || 'Inventory item'
-  const dateText = formatCardDate(getDate ? getDate(item) : item.eventTime)
   const storageLine = item.organizationStorageLocation?.trim() || '—'
   const foundLine = item.organizationFoundLocation?.trim() || '—'
 
@@ -94,25 +91,50 @@ export function InventoryCard({
 
         {/* Info — outside the clipped image, Airbnb-style */}
         <div className="flex flex-col gap-1.5 px-3 pb-3 pt-2.5">
-          <div className="flex items-center justify-between gap-2">
-            <h3 className="line-clamp-1 text-sm font-semibold leading-snug text-[#222222]">
-              {displayTitle}
-            </h3>
-            <div className="flex shrink-0 items-center gap-1 text-xs text-[#b0b0b0]">
-              <span className="whitespace-nowrap">{dateText}</span>
-            </div>
-          </div>
+          <h3 className="line-clamp-1 text-sm font-semibold leading-snug text-[#222222]">
+            {displayTitle}
+          </h3>
 
           <div className="flex items-center gap-1.5 text-xs text-[#717171]">
-            <Warehouse className="h-3.5 w-3.5 flex-shrink-0 text-[#b0b0b0]" />
-            <span className="shrink-0 text-[#b0b0b0]">Storage at</span>
-            <span className="truncate">{storageLine}</span>
-          </div>
-
-          <div className="flex items-center gap-1.5 text-xs text-[#717171]">
-            <MapPin className="h-3.5 w-3.5 flex-shrink-0 text-[#b0b0b0]" />
-            <span className="shrink-0 text-[#b0b0b0]">Found at</span>
+            <MapPin className="h-3.5 w-3.5 shrink-0 text-[#b0b0b0]" />
+            <span className="shrink-0 text-[#b0b0b0]">Found at:</span>
             <span className="truncate">{foundLine}</span>
+          </div>
+
+          <div className="flex items-center gap-1.5 text-xs text-[#717171]">
+            <Clock className="h-3.5 w-3.5 shrink-0 text-[#b0b0b0]" />
+            <span className="shrink-0 text-[#b0b0b0]">Found time:</span>
+            <span className="truncate">{formatCardDate(item.eventTime)}</span>
+          </div>
+
+          {item.archivedAt ? (
+            <div className="flex items-center gap-1.5 text-xs text-[#717171]">
+              <Clock className="h-3.5 w-3.5 shrink-0 text-[#b0b0b0]" />
+              <span className="shrink-0 text-[#b0b0b0]">Archived time:</span>
+              <span className="truncate">{formatCardDate(item.archivedAt)}</span>
+            </div>
+          ) : null}
+
+          {item.status === 'Expired' && item.expiredAt ? (
+            <div className="flex items-center gap-1.5 text-xs text-[#717171]">
+              <Clock className="h-3.5 w-3.5 shrink-0 text-[#b0b0b0]" />
+              <span className="shrink-0 text-[#b0b0b0]">Expired time:</span>
+              <span className="truncate">{formatCardDate(item.expiredAt)}</span>
+            </div>
+          ) : null}
+
+          {item.returnedAt ? (
+            <div className="flex items-center gap-1.5 text-xs text-[#717171]">
+              <Clock className="h-3.5 w-3.5 shrink-0 text-[#b0b0b0]" />
+              <span className="shrink-0 text-[#b0b0b0]">Returned time:</span>
+              <span className="truncate">{formatCardDate(item.returnedAt)}</span>
+            </div>
+          ) : null}
+
+          <div className="flex items-center gap-1.5 text-xs text-[#717171]">
+            <Warehouse className="h-3.5 w-3.5 shrink-0 text-[#b0b0b0]" />
+            <span className="shrink-0 text-[#b0b0b0]">Storage at:</span>
+            <span className="truncate">{storageLine}</span>
           </div>
         </div>
       </article>

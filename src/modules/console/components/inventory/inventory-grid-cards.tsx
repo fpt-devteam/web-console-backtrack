@@ -28,7 +28,6 @@ export function InventoryGridCards({
   emptyText = 'No items found matching your filters.',
   detailLink,
   subcategoryNameById,
-  getDate,
 }: {
   items: Array<InventoryListItem>
   isLoading: boolean
@@ -39,7 +38,6 @@ export function InventoryGridCards({
     params: (item: InventoryListItem) => Record<string, string>
   }
   subcategoryNameById?: Record<string, string>
-  getDate?: (item: InventoryListItem) => string | Date | null | undefined
 }) {
   if (isError) {
     return (
@@ -71,7 +69,6 @@ export function InventoryGridCards({
           item={item}
           detailLink={detailLink}
           subcategoryNameById={subcategoryNameById}
-          getDate={getDate}
         />
       ))}
     </div>
