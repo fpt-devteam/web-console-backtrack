@@ -11,7 +11,6 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as SuperAdminRouteImport } from './routes/super-admin'
 import { Route as DashboardRouteImport } from './routes/dashboard'
-import { Route as MarketingRouteImport } from './routes/_marketing'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as SuperAdminUsersRouteImport } from './routes/super-admin/users'
 import { Route as SuperAdminServicePackagesRouteImport } from './routes/super-admin/service-packages'
@@ -29,12 +28,6 @@ import { Route as AuthSigninRouteImport } from './routes/auth/signin'
 import { Route as AuthRedirectRouteImport } from './routes/auth/redirect'
 import { Route as AuthCreatePasswordRouteImport } from './routes/auth/create-password'
 import { Route as AuthCheckEmailRouteImport } from './routes/auth/check-email'
-import { Route as MarketingUseCasesRouteImport } from './routes/_marketing/use-cases'
-import { Route as MarketingPricingRouteImport } from './routes/_marketing/pricing'
-import { Route as MarketingFeaturesRouteImport } from './routes/_marketing/features'
-import { Route as MarketingContactRouteImport } from './routes/_marketing/contact'
-import { Route as MarketingApplyRouteImport } from './routes/_marketing/apply'
-import { Route as MarketingAboutRouteImport } from './routes/_marketing/about'
 import { Route as ConsoleSlugStaffRouteImport } from './routes/console/$slug/staff'
 import { Route as ConsoleSlugAdminRouteImport } from './routes/console/$slug/admin'
 import { Route as ConsoleSlugStaffInventorySearchRouteImport } from './routes/console/$slug/staff/inventory-search'
@@ -71,10 +64,6 @@ const SuperAdminRoute = SuperAdminRouteImport.update({
 const DashboardRoute = DashboardRouteImport.update({
   id: '/dashboard',
   path: '/dashboard',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const MarketingRoute = MarketingRouteImport.update({
-  id: '/_marketing',
   getParentRoute: () => rootRouteImport,
 } as any)
 const IndexRoute = IndexRouteImport.update({
@@ -164,36 +153,6 @@ const AuthCheckEmailRoute = AuthCheckEmailRouteImport.update({
   id: '/auth/check-email',
   path: '/auth/check-email',
   getParentRoute: () => rootRouteImport,
-} as any)
-const MarketingUseCasesRoute = MarketingUseCasesRouteImport.update({
-  id: '/use-cases',
-  path: '/use-cases',
-  getParentRoute: () => MarketingRoute,
-} as any)
-const MarketingPricingRoute = MarketingPricingRouteImport.update({
-  id: '/pricing',
-  path: '/pricing',
-  getParentRoute: () => MarketingRoute,
-} as any)
-const MarketingFeaturesRoute = MarketingFeaturesRouteImport.update({
-  id: '/features',
-  path: '/features',
-  getParentRoute: () => MarketingRoute,
-} as any)
-const MarketingContactRoute = MarketingContactRouteImport.update({
-  id: '/contact',
-  path: '/contact',
-  getParentRoute: () => MarketingRoute,
-} as any)
-const MarketingApplyRoute = MarketingApplyRouteImport.update({
-  id: '/apply',
-  path: '/apply',
-  getParentRoute: () => MarketingRoute,
-} as any)
-const MarketingAboutRoute = MarketingAboutRouteImport.update({
-  id: '/about',
-  path: '/about',
-  getParentRoute: () => MarketingRoute,
 } as any)
 const ConsoleSlugStaffRoute = ConsoleSlugStaffRouteImport.update({
   id: '/staff',
@@ -355,12 +314,6 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/dashboard': typeof DashboardRoute
   '/super-admin': typeof SuperAdminRouteWithChildren
-  '/about': typeof MarketingAboutRoute
-  '/apply': typeof MarketingApplyRoute
-  '/contact': typeof MarketingContactRoute
-  '/features': typeof MarketingFeaturesRoute
-  '/pricing': typeof MarketingPricingRoute
-  '/use-cases': typeof MarketingUseCasesRoute
   '/auth/check-email': typeof AuthCheckEmailRoute
   '/auth/create-password': typeof AuthCreatePasswordRoute
   '/auth/redirect': typeof AuthRedirectRoute
@@ -409,12 +362,6 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/dashboard': typeof DashboardRoute
   '/super-admin': typeof SuperAdminRouteWithChildren
-  '/about': typeof MarketingAboutRoute
-  '/apply': typeof MarketingApplyRoute
-  '/contact': typeof MarketingContactRoute
-  '/features': typeof MarketingFeaturesRoute
-  '/pricing': typeof MarketingPricingRoute
-  '/use-cases': typeof MarketingUseCasesRoute
   '/auth/check-email': typeof AuthCheckEmailRoute
   '/auth/create-password': typeof AuthCreatePasswordRoute
   '/auth/redirect': typeof AuthRedirectRoute
@@ -459,15 +406,8 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
-  '/_marketing': typeof MarketingRouteWithChildren
   '/dashboard': typeof DashboardRoute
   '/super-admin': typeof SuperAdminRouteWithChildren
-  '/_marketing/about': typeof MarketingAboutRoute
-  '/_marketing/apply': typeof MarketingApplyRoute
-  '/_marketing/contact': typeof MarketingContactRoute
-  '/_marketing/features': typeof MarketingFeaturesRoute
-  '/_marketing/pricing': typeof MarketingPricingRoute
-  '/_marketing/use-cases': typeof MarketingUseCasesRoute
   '/auth/check-email': typeof AuthCheckEmailRoute
   '/auth/create-password': typeof AuthCreatePasswordRoute
   '/auth/redirect': typeof AuthRedirectRoute
@@ -518,12 +458,6 @@ export interface FileRouteTypes {
     | '/'
     | '/dashboard'
     | '/super-admin'
-    | '/about'
-    | '/apply'
-    | '/contact'
-    | '/features'
-    | '/pricing'
-    | '/use-cases'
     | '/auth/check-email'
     | '/auth/create-password'
     | '/auth/redirect'
@@ -572,12 +506,6 @@ export interface FileRouteTypes {
     | '/'
     | '/dashboard'
     | '/super-admin'
-    | '/about'
-    | '/apply'
-    | '/contact'
-    | '/features'
-    | '/pricing'
-    | '/use-cases'
     | '/auth/check-email'
     | '/auth/create-password'
     | '/auth/redirect'
@@ -621,15 +549,8 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/'
-    | '/_marketing'
     | '/dashboard'
     | '/super-admin'
-    | '/_marketing/about'
-    | '/_marketing/apply'
-    | '/_marketing/contact'
-    | '/_marketing/features'
-    | '/_marketing/pricing'
-    | '/_marketing/use-cases'
     | '/auth/check-email'
     | '/auth/create-password'
     | '/auth/redirect'
@@ -677,7 +598,6 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  MarketingRoute: typeof MarketingRouteWithChildren
   DashboardRoute: typeof DashboardRoute
   SuperAdminRoute: typeof SuperAdminRouteWithChildren
   AuthCheckEmailRoute: typeof AuthCheckEmailRoute
@@ -706,13 +626,6 @@ declare module '@tanstack/react-router' {
       path: '/dashboard'
       fullPath: '/dashboard'
       preLoaderRoute: typeof DashboardRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/_marketing': {
-      id: '/_marketing'
-      path: ''
-      fullPath: ''
-      preLoaderRoute: typeof MarketingRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/': {
@@ -833,48 +746,6 @@ declare module '@tanstack/react-router' {
       fullPath: '/auth/check-email'
       preLoaderRoute: typeof AuthCheckEmailRouteImport
       parentRoute: typeof rootRouteImport
-    }
-    '/_marketing/use-cases': {
-      id: '/_marketing/use-cases'
-      path: '/use-cases'
-      fullPath: '/use-cases'
-      preLoaderRoute: typeof MarketingUseCasesRouteImport
-      parentRoute: typeof MarketingRoute
-    }
-    '/_marketing/pricing': {
-      id: '/_marketing/pricing'
-      path: '/pricing'
-      fullPath: '/pricing'
-      preLoaderRoute: typeof MarketingPricingRouteImport
-      parentRoute: typeof MarketingRoute
-    }
-    '/_marketing/features': {
-      id: '/_marketing/features'
-      path: '/features'
-      fullPath: '/features'
-      preLoaderRoute: typeof MarketingFeaturesRouteImport
-      parentRoute: typeof MarketingRoute
-    }
-    '/_marketing/contact': {
-      id: '/_marketing/contact'
-      path: '/contact'
-      fullPath: '/contact'
-      preLoaderRoute: typeof MarketingContactRouteImport
-      parentRoute: typeof MarketingRoute
-    }
-    '/_marketing/apply': {
-      id: '/_marketing/apply'
-      path: '/apply'
-      fullPath: '/apply'
-      preLoaderRoute: typeof MarketingApplyRouteImport
-      parentRoute: typeof MarketingRoute
-    }
-    '/_marketing/about': {
-      id: '/_marketing/about'
-      path: '/about'
-      fullPath: '/about'
-      preLoaderRoute: typeof MarketingAboutRouteImport
-      parentRoute: typeof MarketingRoute
     }
     '/console/$slug/staff': {
       id: '/console/$slug/staff'
@@ -1068,28 +939,6 @@ declare module '@tanstack/react-router' {
   }
 }
 
-interface MarketingRouteChildren {
-  MarketingAboutRoute: typeof MarketingAboutRoute
-  MarketingApplyRoute: typeof MarketingApplyRoute
-  MarketingContactRoute: typeof MarketingContactRoute
-  MarketingFeaturesRoute: typeof MarketingFeaturesRoute
-  MarketingPricingRoute: typeof MarketingPricingRoute
-  MarketingUseCasesRoute: typeof MarketingUseCasesRoute
-}
-
-const MarketingRouteChildren: MarketingRouteChildren = {
-  MarketingAboutRoute: MarketingAboutRoute,
-  MarketingApplyRoute: MarketingApplyRoute,
-  MarketingContactRoute: MarketingContactRoute,
-  MarketingFeaturesRoute: MarketingFeaturesRoute,
-  MarketingPricingRoute: MarketingPricingRoute,
-  MarketingUseCasesRoute: MarketingUseCasesRoute,
-}
-
-const MarketingRouteWithChildren = MarketingRoute._addFileChildren(
-  MarketingRouteChildren,
-)
-
 interface SuperAdminRouteChildren {
   SuperAdminDashboardRoute: typeof SuperAdminDashboardRoute
   SuperAdminMatchingEvaluationRoute: typeof SuperAdminMatchingEvaluationRoute
@@ -1235,7 +1084,6 @@ const ConsoleSlugRouteWithChildren = ConsoleSlugRoute._addFileChildren(
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  MarketingRoute: MarketingRouteWithChildren,
   DashboardRoute: DashboardRoute,
   SuperAdminRoute: SuperAdminRouteWithChildren,
   AuthCheckEmailRoute: AuthCheckEmailRoute,

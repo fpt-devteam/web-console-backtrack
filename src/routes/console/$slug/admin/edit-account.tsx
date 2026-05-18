@@ -1,4 +1,4 @@
-import { EditAccountPage } from '@/modules/console/pages/admin/edit-account';
+import { EditAccountPage } from '@/pages/console/admin/edit-account';
 import { createFileRoute } from '@tanstack/react-router';
 
 export const Route = createFileRoute('/console/$slug/admin/edit-account')({

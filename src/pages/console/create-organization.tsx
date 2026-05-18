@@ -1,0 +1,454 @@
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Camera, Check, X } from 'lucide-react';
+import { useState } from 'react';
+import { useNavigate } from '@tanstack/react-router';
+import { useCreateOrganization } from '@/hooks/use-org';
+import { PlaceSearchInput } from '@/components/common/place-search-input';
+import { useDebouncedValue } from '@/hooks/use-debounce';
+import { orgService } from '@/services/org.service';
+import { uploadOrgLogo } from '@/services/storage.service';
+import { useEffect } from 'react';
+import { isValidEmail, isValidPhone10StartingWith0 } from '@/utils/validators'
+
+const INDUSTRY_OPTIONS = [
+  { value: 'airport', label: 'Airport' },
+  { value: 'hotel', label: 'Hotel' },
+  { value: 'university', label: 'University' },
+  { value: 'mall', label: 'Shopping Mall' },
+  { value: 'stadium', label: 'Stadium/Arena' },
+  { value: 'transportation', label: 'Transportation Hub' },
+  { value: 'other', label: 'Other' },
+] as const;
+
+const SLUG_PATTERN = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
+
+function randomTaxId(): string {
+  const n = Math.floor(10000000 + Math.random() * 90000000)
+  return String(n)
+}
+
+function normalizeSlug(raw: string): string {
+  return raw
+    .trim()
+    .toLowerCase()
+    .replace(/\s+/g, '-')
+    .replace(/[^a-z0-9-]/g, '') // drop invalid chars
+    .replace(/-+/g, '-')        // collapse dashes
+    .replace(/^-|-$/g, '');     // trim dashes
+}
+
+export function CreateOrganizationPage() {
+  const navigate = useNavigate();
+  const createOrg = useCreateOrganization();
+  const [form, setForm] = useState({
+    name: '',
+    industryType: '',
+    address: '',
+    slug: '',
+    phone: '',
+    contactEmail: '',
+    taxIdentificationNumber: '',
+  });
+  const [logoUrl, setLogoUrl] = useState<string>('');
+  const [isUploadingLogo, setIsUploadingLogo] = useState(false);
+  /** Lat/lon from Nominatim when user selects a place; null if only typing. */
+  const [location, setLocation] = useState<{ latitude: number; longitude: number } | null>(null);
+  /** place_id from Nominatim (externalPlaceId for BE) when selected from dropdown. */
+  const [externalPlaceId, setExternalPlaceId] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
+
+  const slugInput = form.slug.trim();
+  // Validate the *raw input* strictly so uppercase / diacritics won't pass.
+  // We still normalize for submission.
+  const slugOk = slugInput.length > 0 && SLUG_PATTERN.test(slugInput) && slugInput.length <= 255;
+  const slugNormalized = normalizeSlug(slugInput);
+  const debouncedSlug = useDebouncedValue(slugOk ? slugInput : '', 500);
+  const [isSlugChecking, setIsSlugChecking] = useState(false);
+  const [slugExistsError, setSlugExistsError] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!debouncedSlug || !slugOk) {
+      setSlugExistsError(null);
+      setIsSlugChecking(false);
+      return;
+    }
+    let ignore = false;
+    setIsSlugChecking(true);
+    setSlugExistsError(null);
+    orgService.getBySlug(debouncedSlug)
+      .then(() => {
+        if (!ignore) {
+          setSlugExistsError('That Workspace URL is already taken. Please choose another one.');
+          setIsSlugChecking(false);
+        }
+      })
+      .catch(() => {
+        if (!ignore) {
+          // If error (like 404), it's likely available
+          setSlugExistsError(null);
+          setIsSlugChecking(false);
+        }
+      });
+    return () => { ignore = true; };
+  }, [debouncedSlug, slugOk]);
+
+  const update = (field: keyof typeof form) => (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+    setForm((prev) => ({ ...prev, [field]: e.target.value }));
+    setError(null);
+  };
+
+  const handleLogoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (!file.type.startsWith('image/')) {
+      setError('Logo must be an image file');
+      return;
+    }
+
+    setError(null);
+    setIsUploadingLogo(true);
+    try {
+      const url = await uploadOrgLogo(file);
+      setLogoUrl(url);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to upload logo image');
+    } finally {
+      setIsUploadingLogo(false);
+      // Reset input so the same file can be re-selected if user wants.
+      e.target.value = '';
+    }
+  };
+
+  const removeLogo = () => {
+    setLogoUrl('');
+    setError(null);
+  };
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    setError(null);
+
+    const name = form.name.trim();
+    if (!name) {
+      setError('Please enter your organization name.');
+      return;
+    }
+    if (!form.industryType) {
+      setError('Please select an industry type.');
+      return;
+    }
+    if (!form.phone.trim()) {
+      setError('Please enter a phone number.');
+      return;
+    }
+    if (!isValidPhone10StartingWith0(form.phone)) {
+      setError('Phone number must start with 0 and contain exactly 10 digits.')
+      return
+    }
+    if (form.contactEmail.trim() && !isValidEmail(form.contactEmail)) {
+      setError('Please enter a valid contact email.')
+      return
+    }
+    if (!slugOk) {
+      setError('Workspace URL is invalid. Use lowercase letters, numbers, and hyphens only (e.g. acme-corp).');
+      return;
+    }
+    if (slugExistsError) {
+      setError(slugExistsError);
+      return;
+    }
+    if (!logoUrl) {
+      setError('Organization logo is required');
+      return;
+    }
+    const displayAddress = form.address.trim() || name;
+    const coords = location ?? { latitude: 0, longitude: 0 };
+    const taxIdentificationNumber = form.taxIdentificationNumber.trim() || randomTaxId()
+    createOrg.mutate(
+      {
+        name,
+        slug: slugNormalized,
+        displayAddress,
+        location: coords,
+        externalPlaceId: externalPlaceId ?? undefined,
+        phone: form.phone.trim(),
+        contactEmail: form.contactEmail.trim() || undefined,
+        industryType: form.industryType,
+        taxIdentificationNumber,
+        // BE expects `LogoUrl` string (we send base64 data URL from FE).
+        logoUrl,
+        // Default: phone is always required. Admin can change this in Security settings.
+        requiredFinderContractFields: ['Phone'] as const,
+        requiredOwnerContractFields: ['Phone'] as const,
+      },
+      {
+        onSuccess: (createdOrg) => {
+          navigate({ to: `/console/processing`, search: { slug: createdOrg.slug } });
+        },
+        onError: (err) => {
+          const e = err as Error & { code?: string };
+          if (e.code === 'SlugAlreadyExists') {
+            setError('That Workspace URL is already taken. Please choose another one.');
+            return;
+          }
+          // Fallback: show BE message (already user-facing from validators)
+          setError(e?.message || 'Failed to create organization');
+        },
+      }
+    );
+  };
+
+  return (
+    <div className="min-h-screen bg-[#f7f7f7] flex items-center justify-center px-4 py-12">
+      <div className="w-full max-w-5xl">
+        {/* Main Card */}
+        <div className="bg-white rounded-[14px] border border-[#dddddd] p-10">
+          {/* Header */}
+          <div className="text-center mb-8">
+            <h1 className="text-3xl font-bold mb-2">
+              Create Your Organization Account
+            </h1>
+            <p className="text-sm text-[#6a6a6a]">
+              Get started with Backtrack for your organization.
+            </p>
+          </div>
+
+          {/* Form */}
+          <form className="space-y-6" onSubmit={handleSubmit}>
+            {error && (
+              <p className="text-sm text-[#c13515] bg-[#fff0f2] px-3 py-2 rounded-md">{error}</p>
+            )}
+            {/* Logo — layout aligned with staff Add Found Item → Photos */}
+            <div>
+              <div className="flex items-center justify-between mb-4">
+                <Label className="text-base font-semibold text-[#222222]">
+                  Organization logo <span className="text-[#c13515]">*</span>
+                </Label>
+                <span className="text-sm text-[#929292]">1 image</span>
+              </div>
+              <div className="flex gap-4 flex-wrap">
+                {logoUrl ? (
+                  <div className="relative w-32 h-32 rounded-lg overflow-hidden group">
+                    <img
+                      src={logoUrl}
+                      alt="Organization logo"
+                      className="w-full h-full object-cover"
+                    />
+                    <button
+                      type="button"
+                      onClick={removeLogo}
+                      className="absolute top-1 right-1 p-1 bg-red-500 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
+                      aria-label="Remove logo"
+                    >
+                      <X className="w-3 h-3" />
+                    </button>
+                  </div>
+                ) : null}
+                {!logoUrl ? (
+                  <label
+                    className={`w-32 h-32 border-2 border-dashed border-[#dddddd] rounded-lg flex flex-col items-center justify-center transition-colors ${
+                      createOrg.isPending || isUploadingLogo
+                        ? 'cursor-not-allowed opacity-60'
+                        : 'cursor-pointer hover:border-[#ff385c] hover:bg-[#fff0f2]'
+                    }`}
+                  >
+                    <input
+                      id="orgLogo"
+                      type="file"
+                      accept="image/*"
+                      onChange={handleLogoUpload}
+                      className="hidden"
+                      disabled={createOrg.isPending || isUploadingLogo}
+                    />
+                    <Camera className="w-6 h-6 text-[#929292] mb-2" />
+                    <span className="text-xs text-[#929292] text-center px-2">
+                      {isUploadingLogo ? 'Uploading...' : 'Add logo'}
+                    </span>
+                  </label>
+                ) : (
+                  <label
+                    className={`w-32 h-32 border-2 border-dashed border-[#dddddd] rounded-lg flex flex-col items-center justify-center transition-colors ${
+                      createOrg.isPending || isUploadingLogo
+                        ? 'cursor-not-allowed opacity-60'
+                        : 'cursor-pointer hover:border-[#ff385c] hover:bg-[#fff0f2]'
+                    }`}
+                  >
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={handleLogoUpload}
+                      className="hidden"
+                      disabled={createOrg.isPending || isUploadingLogo}
+                    />
+                    <Camera className="w-6 h-6 text-[#929292] mb-2" />
+                    <span className="text-xs text-[#929292] text-center px-2">
+                       {isUploadingLogo ? 'Uploading...' : 'Change'}
+                    </span>
+                  </label>
+                )}
+              </div>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div>
+                <Label htmlFor="companyName" className="text-sm font-semibold mb-2 block">Company Name <span className="text-[#c13515]">*</span></Label>
+                <Input
+                  id="companyName"
+                  value={form.name}
+                  onChange={update('name')}
+                  placeholder="Acme Inc."
+                  required
+                />
+              </div>
+              <div>
+                <Label htmlFor="industryType" className="text-sm font-semibold mb-2 block">Industry Type <span className="text-[#c13515]">*</span></Label>
+                <select
+                  id="industryType"
+                  value={form.industryType}
+                  onChange={update('industryType')}
+                  className="w-full h-10 px-3 border border-[#dddddd] rounded-md text-sm bg-white focus:outline-none focus:border-[#222222]"
+                  required
+                >
+                  <option value="">Select industry</option>
+                  {INDUSTRY_OPTIONS.map((o) => (
+                    <option key={o.value} value={o.value}>{o.label}</option>
+                  ))}
+                </select>
+              </div>
+            </div>
+
+            <div>
+              <Label htmlFor="companyAddress" className="text-sm font-semibold mb-2 block">
+                Company Address <span className="text-[#c13515]">*</span>
+              </Label>
+              <PlaceSearchInput
+                id="companyAddress"
+                value={form.address}
+                onChange={(value) => {
+                  setForm((prev) => ({ ...prev, address: value }));
+                  setError(null);
+                }}
+                onSelect={(place) => {
+                  setForm((prev) => ({ ...prev, address: place.displayAddress }));
+                  setLocation({ latitude: place.latitude, longitude: place.longitude });
+                  setExternalPlaceId(place.placeId ?? null);
+                }}
+                placeholder="Type address or place name, then select a result for coordinates (OpenStreetMap)"
+              />
+              {location && (
+                <p className="text-xs text-[#06c167] mt-1">
+                  Selected coordinates: {location.latitude.toFixed(5)}, {location.longitude.toFixed(5)}
+                </p>
+              )}
+            </div>
+
+            <div>
+              <Label htmlFor="workspaceUrl" className="text-sm font-semibold mb-2 block">Workspace URL <span className="text-[#c13515]">*</span></Label>
+              <div className="relative flex items-center">
+                <div className="h-10 px-3 flex items-center rounded-l-md border border-[#dddddd] bg-[#f7f7f7] text-sm text-[#6a6a6a] whitespace-nowrap">
+                  https://thebacktrack.vercel.app/organizations/
+                </div>
+                <Input
+                  id="workspaceUrl"
+                  value={form.slug}
+                  onChange={update('slug')}
+                  placeholder="fptu-hcm"
+                  className="w-full rounded-l-none pr-10"
+                  required
+                />
+                {slugOk && form.slug && !isSlugChecking && !slugExistsError && (
+                  <div className="absolute inset-y-0 right-3 flex items-center">
+                    <Check className="h-5 w-5 text-green-500" />
+                  </div>
+                )}
+              </div>
+
+              {!slugOk && form.slug.trim() ? (
+                <p className="mt-1 text-xs text-[#c13515]">
+                  Invalid workspace URL. Use only <span className="font-mono">a-z</span>, <span className="font-mono">0-9</span>, and hyphens (<span className="font-mono">-</span>).
+                </p>
+              ) : null}
+
+              {slugExistsError && (
+                <p className="mt-1 text-xs text-[#c13515]">
+                  {slugExistsError}
+                </p>
+              )}
+
+              <div className="flex items-center justify-between mt-2">
+                <p className="text-xs text-[#929292]">Lowercase letters, numbers, and hyphens only.</p>
+                {slugOk && form.slug && !isSlugChecking && !slugExistsError && <p className="text-xs text-[#06c167] font-medium">Looks good</p>}
+                {isSlugChecking && <p className="text-xs text-[#929292] font-medium">Checking...</p>}
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div>
+                <Label htmlFor="phoneNumber" className="text-sm font-semibold mb-2 block">Phone Number <span className="text-[#c13515]">*</span></Label>
+                <Input
+                  id="phoneNumber"
+                  type="tel"
+                  value={form.phone}
+                  onChange={update('phone')}
+                  placeholder="+84 000 000 000"
+                  required
+                />
+              </div>
+              <div>
+                <Label htmlFor="contactEmail" className="text-sm font-semibold mb-2 block">
+                  Contact email <span className="text-[#929292] font-normal">(optional)</span>
+                </Label>
+                <Input
+                  id="contactEmail"
+                  type="email"
+                  autoComplete="email"
+                  value={form.contactEmail}
+                  onChange={update('contactEmail')}
+                  placeholder="support@company.com"
+                />
+              </div>
+            </div>
+
+            <div className="flex items-start gap-3 pt-2">
+              <input
+                type="checkbox"
+                id="terms"
+                className="mt-1 h-4 w-4 rounded border-[#dddddd] text-[#ff385c] focus:ring-[#ff385c]"
+                required
+              />
+              <label htmlFor="terms" className="text-sm">
+                I agree to the{' '}
+                <a href="#" className="text-[#ff385c] hover:underline">Terms of Service</a>
+                {' '}and{' '}
+                <a href="#" className="text-[#ff385c] hover:underline">Privacy Policy</a>.
+              </label>
+            </div>
+
+            <Button
+              type="submit"
+              disabled={createOrg.isPending}
+              className="w-full bg-[#ff385c] hover:bg-[#e00b41] text-white py-6 text-base font-medium mt-6"
+            >
+              {createOrg.isPending ? 'Creating…' : 'Create Account'}
+            </Button>
+          </form>
+
+          {/* Footer Links */}
+          <div className="mt-8 pt-6 border-t border-[#dddddd]">
+            <div className="flex justify-center gap-6 text-sm text-[#6a6a6a]">
+              <a href="#" className="transition-colors">
+                Help Center
+              </a>
+              <span className="text-[#dddddd]">|</span>
+              <a href="#" className="transition-colors">
+                Contact Support
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+

@@ -1,4 +1,4 @@
-import { ProcessingPage } from '@/modules/console/pages/processing';
+import { ProcessingPage } from '@/pages/console/processing';
 import { createFileRoute } from '@tanstack/react-router';
 import { z } from 'zod';
 

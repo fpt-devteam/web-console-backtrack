@@ -1,13 +1,13 @@
 export type ItemStatus = 'New' | 'Storage' | 'Claimed' | 'Disposed'
 export type ItemCategory = 'Electronics' | 'Clothing' | 'Personal Items' | 'Food & Drink'
-import laptopImage from '@/modules/console/assets/staff/items/laptop.png'
-import shoeImage from '@/modules/console/assets/staff/items/red_sneaker.png'
-import booksImage from '@/modules/console/assets/staff/items/history_book.png'
-import tumblerImage from '@/modules/console/assets/staff/items/tumbler.png'
-import phoneImage from '@/modules/console/assets/staff/items/ip14.png'
-import walletImage from '@/modules/console/assets/staff/items/leather_wallet.png'
-import backpackImage from '@/modules/console/assets/staff/items/blue_backpack.png'
-import airpodsImage from '@/modules/console/assets/staff/items/airpod.png' 
+import laptopImage from '@/assets/items/laptop.png'
+import shoeImage from '@/assets/items/red_sneaker.png'
+import booksImage from '@/assets/items/history_book.png'
+import tumblerImage from '@/assets/items/tumbler.png'
+import phoneImage from '@/assets/items/ip14.png'
+import walletImage from '@/assets/items/leather_wallet.png'
+import backpackImage from '@/assets/items/blue_backpack.png'
+import airpodsImage from '@/assets/items/airpod.png' 
 
 export interface InventoryItem {
   id: string

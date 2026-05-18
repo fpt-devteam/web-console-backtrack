@@ -1,4 +1,4 @@
-import { DashboardPage } from '@/modules/super-admin/pages/dashboard';
+import { DashboardPage } from '@/pages/super-admin/dashboard';
 import { createFileRoute } from '@tanstack/react-router';
 
 export const Route = createFileRoute('/super-admin/dashboard')({

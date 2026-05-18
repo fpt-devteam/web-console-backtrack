@@ -1,4 +1,4 @@
-import { AdminInventoryItemDetailPage } from '@/modules/console/pages/admin/inventory-item-detail';
+import { AdminInventoryItemDetailPage } from '@/pages/console/admin/inventory-item-detail';
 import { createFileRoute } from '@tanstack/react-router';
 
 export const Route = createFileRoute('/console/$slug/admin/inventory/$itemId')({

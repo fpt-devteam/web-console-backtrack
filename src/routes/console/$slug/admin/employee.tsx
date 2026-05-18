@@ -1,4 +1,4 @@
-import { EmployeePage } from '@/modules/console/pages/admin/employee';
+import { EmployeePage } from '@/pages/console/admin/employee';
 import { createFileRoute } from '@tanstack/react-router';
 import { z } from 'zod';
 

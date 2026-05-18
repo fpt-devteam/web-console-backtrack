@@ -1,4 +1,4 @@
-import { AddItemPage } from '@/modules/console/pages/staff/add-item'
+import { AddItemPage } from '@/pages/console/staff/add-item'
 import { createFileRoute } from '@tanstack/react-router'
 import type { PostType } from '@/services/inventory.service'
 

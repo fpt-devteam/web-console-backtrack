@@ -1,4 +1,4 @@
-import { StaffProcessingHistoryPage } from '@/modules/console/pages/staff'
+import { StaffProcessingHistoryPage } from '@/pages/console/staff'
 import { createFileRoute } from '@tanstack/react-router'
 
 export const Route = createFileRoute('/console/$slug/staff/history')({

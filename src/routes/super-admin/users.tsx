@@ -1,4 +1,4 @@
-import { UsersPage } from '@/modules/super-admin/pages/users';
+import { UsersPage } from '@/pages/super-admin/users';
 import { createFileRoute } from '@tanstack/react-router';
 import { z } from 'zod';
 

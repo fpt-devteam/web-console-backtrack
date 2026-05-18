@@ -1,4 +1,4 @@
-import { SearchResultsPage, type SearchResultsSearch } from '@/modules/console/pages/staff/search-results'
+import { SearchResultsPage, type SearchResultsSearch } from '@/pages/console/staff/search-results'
 import { createFileRoute } from '@tanstack/react-router'
 
 export const Route = createFileRoute('/console/$slug/staff/inventory-search')({

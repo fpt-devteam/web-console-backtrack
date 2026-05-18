@@ -15,7 +15,9 @@
       "Read(//home/catlinh/capstone/web-console-backtrack/src/routes/console/$slug//**)",
       "Read(//home/catlinh/capstone/web-console-backtrack/src/routes/console/$slug/**)",
       "Bash(npx tsc *)",
-      "Bash(npm run *)"
+      "Bash(npm run *)",
+      "Bash(python3 *)",
+      "Bash(git -C /home/nhatthang/Fptu/web-console-backtrack show HEAD:src/modules/console/assets/staff/items/laptop.png)"
     ]
   }
 }

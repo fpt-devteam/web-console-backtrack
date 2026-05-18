@@ -1,4 +1,4 @@
-import { Redirect } from '@/modules/auth/components/redirect'
+import { Redirect } from '@/pages/auth/redirect'
 import { createFileRoute } from '@tanstack/react-router'
 
 export const Route = createFileRoute('/auth/redirect')({

@@ -1,4 +1,4 @@
-import { OrganizationPage } from '@/modules/super-admin/pages/organization';
+import { OrganizationPage } from '@/pages/super-admin/organization';
 import { createFileRoute } from '@tanstack/react-router';
 import { z } from 'zod';
 

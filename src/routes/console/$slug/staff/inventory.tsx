@@ -1,4 +1,4 @@
-import { StaffInventoryPage } from '@/modules/console/pages/staff'
+import { StaffInventoryPage } from '@/pages/console/staff'
 import { createFileRoute } from '@tanstack/react-router'
 
 export const Route = createFileRoute('/console/$slug/staff/inventory')({
