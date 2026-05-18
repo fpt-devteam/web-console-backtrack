@@ -58,13 +58,13 @@ const NAV_ITEMS = [
   },
   {
     key: 'chat-board',
-    name: 'Chat Board',
+    name: 'Task Board',
     icon: KanbanSquare,
     to: '/console/$slug/staff/chat-board' as const,
   },
   {
     key: 'chat',
-    name: 'My Chat',
+    name: 'My Task',
     icon: MessageCircle,
     to: '/console/$slug/staff/chat' as const,
   },
