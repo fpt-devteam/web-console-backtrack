@@ -30,13 +30,13 @@ import { Route as AuthCreatePasswordRouteImport } from './routes/auth/create-pas
 import { Route as AuthCheckEmailRouteImport } from './routes/auth/check-email'
 import { Route as ConsoleSlugStaffRouteImport } from './routes/console/$slug/staff'
 import { Route as ConsoleSlugAdminRouteImport } from './routes/console/$slug/admin'
+import { Route as ConsoleSlugStaffMyTaskRouteImport } from './routes/console/$slug/staff/my-task'
 import { Route as ConsoleSlugStaffInventorySearchRouteImport } from './routes/console/$slug/staff/inventory-search'
 import { Route as ConsoleSlugStaffInventoryAddItemRouteImport } from './routes/console/$slug/staff/inventory-add-item'
 import { Route as ConsoleSlugStaffInventoryRouteImport } from './routes/console/$slug/staff/inventory'
 import { Route as ConsoleSlugStaffHistoryRouteImport } from './routes/console/$slug/staff/history'
 import { Route as ConsoleSlugStaffDashboardRouteImport } from './routes/console/$slug/staff/dashboard'
 import { Route as ConsoleSlugStaffChatBoardRouteImport } from './routes/console/$slug/staff/chat-board'
-import { Route as ConsoleSlugStaffChatRouteImport } from './routes/console/$slug/staff/chat'
 import { Route as ConsoleSlugAdminSettingRouteImport } from './routes/console/$slug/admin/setting'
 import { Route as ConsoleSlugAdminPricingRouteImport } from './routes/console/$slug/admin/pricing'
 import { Route as ConsoleSlugAdminPlanRouteImport } from './routes/console/$slug/admin/plan'
@@ -164,6 +164,11 @@ const ConsoleSlugAdminRoute = ConsoleSlugAdminRouteImport.update({
   path: '/admin',
   getParentRoute: () => ConsoleSlugRoute,
 } as any)
+const ConsoleSlugStaffMyTaskRoute = ConsoleSlugStaffMyTaskRouteImport.update({
+  id: '/my-task',
+  path: '/my-task',
+  getParentRoute: () => ConsoleSlugStaffRoute,
+} as any)
 const ConsoleSlugStaffInventorySearchRoute =
   ConsoleSlugStaffInventorySearchRouteImport.update({
     id: '/inventory-search',
@@ -199,11 +204,6 @@ const ConsoleSlugStaffChatBoardRoute =
     path: '/chat-board',
     getParentRoute: () => ConsoleSlugStaffRoute,
   } as any)
-const ConsoleSlugStaffChatRoute = ConsoleSlugStaffChatRouteImport.update({
-  id: '/chat',
-  path: '/chat',
-  getParentRoute: () => ConsoleSlugStaffRoute,
-} as any)
 const ConsoleSlugAdminSettingRoute = ConsoleSlugAdminSettingRouteImport.update({
   id: '/setting',
   path: '/setting',
@@ -342,13 +342,13 @@ export interface FileRoutesByFullPath {
   '/console/$slug/admin/plan': typeof ConsoleSlugAdminPlanRoute
   '/console/$slug/admin/pricing': typeof ConsoleSlugAdminPricingRoute
   '/console/$slug/admin/setting': typeof ConsoleSlugAdminSettingRouteWithChildren
-  '/console/$slug/staff/chat': typeof ConsoleSlugStaffChatRoute
   '/console/$slug/staff/chat-board': typeof ConsoleSlugStaffChatBoardRoute
   '/console/$slug/staff/dashboard': typeof ConsoleSlugStaffDashboardRoute
   '/console/$slug/staff/history': typeof ConsoleSlugStaffHistoryRoute
   '/console/$slug/staff/inventory': typeof ConsoleSlugStaffInventoryRoute
   '/console/$slug/staff/inventory-add-item': typeof ConsoleSlugStaffInventoryAddItemRoute
   '/console/$slug/staff/inventory-search': typeof ConsoleSlugStaffInventorySearchRoute
+  '/console/$slug/staff/my-task': typeof ConsoleSlugStaffMyTaskRoute
   '/console/$slug/admin/inventory/$itemId': typeof ConsoleSlugAdminInventoryItemIdRoute
   '/console/$slug/admin/setting/organization': typeof ConsoleSlugAdminSettingOrganizationRouteWithChildren
   '/console/$slug/staff/item-edit/$itemId': typeof ConsoleSlugStaffItemEditItemIdRoute
@@ -388,13 +388,13 @@ export interface FileRoutesByTo {
   '/console/$slug/admin/employee': typeof ConsoleSlugAdminEmployeeRoute
   '/console/$slug/admin/plan': typeof ConsoleSlugAdminPlanRoute
   '/console/$slug/admin/pricing': typeof ConsoleSlugAdminPricingRoute
-  '/console/$slug/staff/chat': typeof ConsoleSlugStaffChatRoute
   '/console/$slug/staff/chat-board': typeof ConsoleSlugStaffChatBoardRoute
   '/console/$slug/staff/dashboard': typeof ConsoleSlugStaffDashboardRoute
   '/console/$slug/staff/history': typeof ConsoleSlugStaffHistoryRoute
   '/console/$slug/staff/inventory': typeof ConsoleSlugStaffInventoryRoute
   '/console/$slug/staff/inventory-add-item': typeof ConsoleSlugStaffInventoryAddItemRoute
   '/console/$slug/staff/inventory-search': typeof ConsoleSlugStaffInventorySearchRoute
+  '/console/$slug/staff/my-task': typeof ConsoleSlugStaffMyTaskRoute
   '/console/$slug/admin/inventory/$itemId': typeof ConsoleSlugAdminInventoryItemIdRoute
   '/console/$slug/staff/item-edit/$itemId': typeof ConsoleSlugStaffItemEditItemIdRoute
   '/console/$slug/staff/item/$itemId': typeof ConsoleSlugStaffItemItemIdRoute
@@ -436,13 +436,13 @@ export interface FileRoutesById {
   '/console/$slug/admin/plan': typeof ConsoleSlugAdminPlanRoute
   '/console/$slug/admin/pricing': typeof ConsoleSlugAdminPricingRoute
   '/console/$slug/admin/setting': typeof ConsoleSlugAdminSettingRouteWithChildren
-  '/console/$slug/staff/chat': typeof ConsoleSlugStaffChatRoute
   '/console/$slug/staff/chat-board': typeof ConsoleSlugStaffChatBoardRoute
   '/console/$slug/staff/dashboard': typeof ConsoleSlugStaffDashboardRoute
   '/console/$slug/staff/history': typeof ConsoleSlugStaffHistoryRoute
   '/console/$slug/staff/inventory': typeof ConsoleSlugStaffInventoryRoute
   '/console/$slug/staff/inventory-add-item': typeof ConsoleSlugStaffInventoryAddItemRoute
   '/console/$slug/staff/inventory-search': typeof ConsoleSlugStaffInventorySearchRoute
+  '/console/$slug/staff/my-task': typeof ConsoleSlugStaffMyTaskRoute
   '/console/$slug/admin/inventory/$itemId': typeof ConsoleSlugAdminInventoryItemIdRoute
   '/console/$slug/admin/setting/organization': typeof ConsoleSlugAdminSettingOrganizationRouteWithChildren
   '/console/$slug/staff/item-edit/$itemId': typeof ConsoleSlugStaffItemEditItemIdRoute
@@ -486,13 +486,13 @@ export interface FileRouteTypes {
     | '/console/$slug/admin/plan'
     | '/console/$slug/admin/pricing'
     | '/console/$slug/admin/setting'
-    | '/console/$slug/staff/chat'
     | '/console/$slug/staff/chat-board'
     | '/console/$slug/staff/dashboard'
     | '/console/$slug/staff/history'
     | '/console/$slug/staff/inventory'
     | '/console/$slug/staff/inventory-add-item'
     | '/console/$slug/staff/inventory-search'
+    | '/console/$slug/staff/my-task'
     | '/console/$slug/admin/inventory/$itemId'
     | '/console/$slug/admin/setting/organization'
     | '/console/$slug/staff/item-edit/$itemId'
@@ -532,13 +532,13 @@ export interface FileRouteTypes {
     | '/console/$slug/admin/employee'
     | '/console/$slug/admin/plan'
     | '/console/$slug/admin/pricing'
-    | '/console/$slug/staff/chat'
     | '/console/$slug/staff/chat-board'
     | '/console/$slug/staff/dashboard'
     | '/console/$slug/staff/history'
     | '/console/$slug/staff/inventory'
     | '/console/$slug/staff/inventory-add-item'
     | '/console/$slug/staff/inventory-search'
+    | '/console/$slug/staff/my-task'
     | '/console/$slug/admin/inventory/$itemId'
     | '/console/$slug/staff/item-edit/$itemId'
     | '/console/$slug/staff/item/$itemId'
@@ -579,13 +579,13 @@ export interface FileRouteTypes {
     | '/console/$slug/admin/plan'
     | '/console/$slug/admin/pricing'
     | '/console/$slug/admin/setting'
-    | '/console/$slug/staff/chat'
     | '/console/$slug/staff/chat-board'
     | '/console/$slug/staff/dashboard'
     | '/console/$slug/staff/history'
     | '/console/$slug/staff/inventory'
     | '/console/$slug/staff/inventory-add-item'
     | '/console/$slug/staff/inventory-search'
+    | '/console/$slug/staff/my-task'
     | '/console/$slug/admin/inventory/$itemId'
     | '/console/$slug/admin/setting/organization'
     | '/console/$slug/staff/item-edit/$itemId'
@@ -761,6 +761,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ConsoleSlugAdminRouteImport
       parentRoute: typeof ConsoleSlugRoute
     }
+    '/console/$slug/staff/my-task': {
+      id: '/console/$slug/staff/my-task'
+      path: '/my-task'
+      fullPath: '/console/$slug/staff/my-task'
+      preLoaderRoute: typeof ConsoleSlugStaffMyTaskRouteImport
+      parentRoute: typeof ConsoleSlugStaffRoute
+    }
     '/console/$slug/staff/inventory-search': {
       id: '/console/$slug/staff/inventory-search'
       path: '/inventory-search'
@@ -801,13 +808,6 @@ declare module '@tanstack/react-router' {
       path: '/chat-board'
       fullPath: '/console/$slug/staff/chat-board'
       preLoaderRoute: typeof ConsoleSlugStaffChatBoardRouteImport
-      parentRoute: typeof ConsoleSlugStaffRoute
-    }
-    '/console/$slug/staff/chat': {
-      id: '/console/$slug/staff/chat'
-      path: '/chat'
-      fullPath: '/console/$slug/staff/chat'
-      preLoaderRoute: typeof ConsoleSlugStaffChatRouteImport
       parentRoute: typeof ConsoleSlugStaffRoute
     }
     '/console/$slug/admin/setting': {
@@ -1040,25 +1040,25 @@ const ConsoleSlugAdminRouteWithChildren =
   ConsoleSlugAdminRoute._addFileChildren(ConsoleSlugAdminRouteChildren)
 
 interface ConsoleSlugStaffRouteChildren {
-  ConsoleSlugStaffChatRoute: typeof ConsoleSlugStaffChatRoute
   ConsoleSlugStaffChatBoardRoute: typeof ConsoleSlugStaffChatBoardRoute
   ConsoleSlugStaffDashboardRoute: typeof ConsoleSlugStaffDashboardRoute
   ConsoleSlugStaffHistoryRoute: typeof ConsoleSlugStaffHistoryRoute
   ConsoleSlugStaffInventoryRoute: typeof ConsoleSlugStaffInventoryRoute
   ConsoleSlugStaffInventoryAddItemRoute: typeof ConsoleSlugStaffInventoryAddItemRoute
   ConsoleSlugStaffInventorySearchRoute: typeof ConsoleSlugStaffInventorySearchRoute
+  ConsoleSlugStaffMyTaskRoute: typeof ConsoleSlugStaffMyTaskRoute
   ConsoleSlugStaffItemEditItemIdRoute: typeof ConsoleSlugStaffItemEditItemIdRoute
   ConsoleSlugStaffItemItemIdRoute: typeof ConsoleSlugStaffItemItemIdRoute
 }
 
 const ConsoleSlugStaffRouteChildren: ConsoleSlugStaffRouteChildren = {
-  ConsoleSlugStaffChatRoute: ConsoleSlugStaffChatRoute,
   ConsoleSlugStaffChatBoardRoute: ConsoleSlugStaffChatBoardRoute,
   ConsoleSlugStaffDashboardRoute: ConsoleSlugStaffDashboardRoute,
   ConsoleSlugStaffHistoryRoute: ConsoleSlugStaffHistoryRoute,
   ConsoleSlugStaffInventoryRoute: ConsoleSlugStaffInventoryRoute,
   ConsoleSlugStaffInventoryAddItemRoute: ConsoleSlugStaffInventoryAddItemRoute,
   ConsoleSlugStaffInventorySearchRoute: ConsoleSlugStaffInventorySearchRoute,
+  ConsoleSlugStaffMyTaskRoute: ConsoleSlugStaffMyTaskRoute,
   ConsoleSlugStaffItemEditItemIdRoute: ConsoleSlugStaffItemEditItemIdRoute,
   ConsoleSlugStaffItemItemIdRoute: ConsoleSlugStaffItemItemIdRoute,
 }

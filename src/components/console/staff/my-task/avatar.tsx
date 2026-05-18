@@ -1,4 +1,4 @@
-import { pickColor } from './utils'
+import { pickColor } from './task-utils'
 
 interface AvatarProps {
   url?: string | null

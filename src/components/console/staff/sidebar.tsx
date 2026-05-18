@@ -63,10 +63,10 @@ const NAV_ITEMS = [
     to: '/console/$slug/staff/chat-board' as const,
   },
   {
-    key: 'chat',
+    key: 'my-task',
     name: 'My Task',
     icon: MessageCircle,
-    to: '/console/$slug/staff/chat' as const,
+    to: '/console/$slug/staff/my-task' as const,
   },
   {
     key: 'history',
@@ -99,7 +99,7 @@ function StaffSidebarInner() {
         !cur.startsWith(`${base}/staff/history`)
       )
     }
-    if (key === 'chat') return cur === `${base}/staff/chat`
+    if (key === 'my-task') return cur === `${base}/staff/my-task`
     if (key === 'chat-board') return cur.startsWith(`${base}/staff/chat-board`)
     if (key === 'history') return cur.startsWith(`${base}/staff/history`)
     return false

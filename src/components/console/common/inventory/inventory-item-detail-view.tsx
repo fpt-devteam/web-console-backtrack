@@ -7,12 +7,12 @@ import { inventoryStatusLabel, inventoryStatusPillClass } from './status'
 import { getInventorySubcategoryName, getInventoryTitle } from '@/utils/inventory-view'
 import { categoryLabel, InventoryDetailAttributeGrid, ItemQrCard } from './inventory-detail-attribute-grid'
 import { useChatConversationsByPostId } from '@/hooks/use-chat'
-import { statusBadge, statusLabel } from '@/components/console/staff/chat/utils'
+import { statusBadge, statusLabel } from '@/components/console/staff/my-task/task-utils'
 import { useUser } from '@/hooks/use-user'
 import { AdminModal } from '@/components/console/admin/AdminModal'
-import { MessagePanel } from '@/components/console/staff/chat/message-panel'
+import { TaskConversation } from '@/components/console/staff/my-task/task-conversation'
 import { ConversationStatus, type IConversation } from '@/types/chat.types'
-import { Avatar } from '@/components/console/staff/chat/avatar'
+import { Avatar } from '@/components/console/staff/my-task/avatar'
 
 function DetailRow({ label, value }: { label: string; value: string }) {
   return (
@@ -535,7 +535,7 @@ export function InventoryItemDetailView({
                 >
                   {openConv && (
                     <div className="h-[70vh] min-h-[520px] flex flex-col rounded-xl border border-[#ebebeb] overflow-hidden">
-                      <MessagePanel
+                      <TaskConversation
                         conversationId={openConv.id}
                         partner={openConv.partner}
                         readOnly={openConv.status === ConversationStatus.CLOSED}

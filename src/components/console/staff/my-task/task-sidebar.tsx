@@ -1,12 +1,8 @@
 import { Loader2, RefreshCw, Search } from 'lucide-react'
-import { ConvItem } from './conv-item'
+import { TaskItem } from './task-item'
 import type { IConversation } from '@/types/chat.types'
 
-type Tab = 'queue' | 'assigned' | 'resolved'
-
-interface ChatSidebarProps {
-  tab: Tab
-  onTabChange: (tab: Tab) => void
+interface TaskSidebarProps {
   searchTerm: string
   onSearchChange: (term: string) => void
   conversations: Array<IConversation>
@@ -16,9 +12,7 @@ interface ChatSidebarProps {
   onSelect: (conv: IConversation) => void
 }
 
-export function ChatSidebar({
-  tab,
-  onTabChange: _onTabChange,
+export function TaskSidebar({
   searchTerm,
   onSearchChange,
   conversations,
@@ -26,17 +20,14 @@ export function ChatSidebar({
   isLoading,
   activeConversationId,
   onSelect,
-}: ChatSidebarProps) {
-  const emptyLabel =
-    tab === 'queue' ? 'No conversations in queue'
-    : tab === 'assigned' ? 'No assigned conversations'
-    : 'No resolved conversations'
+}: TaskSidebarProps) {
+  const emptyLabel = 'No conversations found'
 
   return (
     <div className="w-110 border-r border-hairline bg-white flex flex-col min-h-0">
       <div className="px-4 pt-5 pb-3 border-b border-[#dddddd]">
         <div className="flex items-center justify-between mb-4">
-          <h2 className="text-2xl font-bold text-black">Messages</h2>
+          <h2 className="text-2xl font-bold text-black">My claim requests handling</h2>
         </div>
 
         <div className="relative mb-3">
@@ -63,7 +54,7 @@ export function ChatSidebar({
           </div>
         ) : (
           conversations.map((conv) => (
-            <ConvItem
+            <TaskItem
               key={conv.id}
               conv={conv}
               isActive={activeConversationId === conv.id}

@@ -1,17 +1,17 @@
 import { ImageOff } from 'lucide-react'
 import { Avatar } from './avatar'
-import { formatTime } from './utils'
+import { formatTime } from './task-utils'
 import type { IConversation } from '@/types/chat.types'
 import { useInventoryItem } from '@/hooks/use-inventory'
 import { useCurrentOrgId } from '@/contexts/current-org.context'
 
-interface ConvItemProps {
+interface TaskItemProps {
   conv: IConversation
   isActive: boolean
   onSelect: () => void
 }
 
-export function ConvItem({ conv, isActive, onSelect }: ConvItemProps) {
+export function TaskItem({ conv, isActive, onSelect }: TaskItemProps) {
   const { currentOrgId } = useCurrentOrgId()
   const { data: orgInventory, isLoading } = useInventoryItem(
     currentOrgId,

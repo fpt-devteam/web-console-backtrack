@@ -2,14 +2,14 @@ import { Loader2, RotateCcw, X } from 'lucide-react'
 import { Avatar } from './avatar'
 import type { IConversation } from '@/types/chat.types'
 
-interface ReturnToQueueConfirmDialogProps {
+interface TaskRequeueDialogProps {
   conv: IConversation
   isPending: boolean
   onConfirm: () => void
   onCancel: () => void
 }
 
-export function ReturnToQueueConfirmDialog({ conv, isPending, onConfirm, onCancel }: ReturnToQueueConfirmDialogProps) {
+export function TaskRequeueDialog({ conv, isPending, onConfirm, onCancel }: TaskRequeueDialogProps) {
   const label = conv.partner?.displayName ?? conv.partner?.email ?? conv.id.slice(0, 8)
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">

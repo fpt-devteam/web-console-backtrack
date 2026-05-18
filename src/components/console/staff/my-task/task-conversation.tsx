@@ -2,13 +2,13 @@ import { useEffect, useRef, useState } from 'react'
 import { Image as ImageIcon, Loader2, Paperclip, Send, Smile } from 'lucide-react'
 import { Avatar } from './avatar'
 import { TypingIndicator } from './typing-indicator'
-import { bubbleClass, buildGroups, formatTime } from './utils'
+import { bubbleClass, buildGroups, formatTime } from './task-utils'
 import { auth } from '@/lib/firebase'
 import { useChatMessages } from '@/hooks/use-chat'
 import { useIncomingMessages, useMarkSeen, useSendMessage, useTypingIndicator } from '@/hooks/use-chat-socket'
 import { MessageType } from '@/types/chat.types'
 
-interface MessagePanelProps {
+interface TaskConversationProps {
   conversationId: string
   partner?: { avatarUrl?: string | null; displayName?: string | null; email?: string | null } | null
   readOnly?: boolean
@@ -16,7 +16,7 @@ interface MessagePanelProps {
   viewOnly?: boolean
 }
 
-export function MessagePanel({ conversationId, partner, readOnly = false, viewOnly = false }: MessagePanelProps) {
+export function TaskConversation({ conversationId, partner, readOnly = false, viewOnly = false }: TaskConversationProps) {
   const { data, isLoading, fetchNextPage, hasNextPage, isFetchingNextPage } =
     useChatMessages(conversationId)
   const { send } = useSendMessage()

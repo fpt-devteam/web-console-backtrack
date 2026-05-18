@@ -12,9 +12,9 @@ import toast from 'react-hot-toast'
 import { KanbanColumn } from './kanban-column'
 import { ConversationCard } from './conversation-card'
 import { ConversationStatus } from '@/types/chat.types'
-import { AssignConfirmDialog } from '../../staff/chat/assign-confirm-dialog'
-import { ReturnToQueueConfirmDialog } from '../../staff/chat/return-to-queue-confirm-dialog'
-import { ResolveConfirmDialog } from '../../staff/chat/resolve-confirm-dialog'
+import { TaskAssignDialog } from '../../staff/my-task/task-assign-dialog'
+import { TaskRequeueDialog } from '../../staff/my-task/task-requeue-dialog'
+import { TaskResolveDialog } from '../../staff/my-task/task-resolve-dialog'
 import {
   useAssignConversation,
   useChatAssigned,
@@ -239,7 +239,7 @@ export function ChatKanbanBoard({ searchTerm = '' }: { searchTerm?: string }) {
       </DragOverlay>
 
       {pendingAssign && (
-        <AssignConfirmDialog
+        <TaskAssignDialog
           conv={pendingAssign}
           isPending={assignMutation.isPending}
           onConfirm={handleAssignConfirm}
@@ -248,7 +248,7 @@ export function ChatKanbanBoard({ searchTerm = '' }: { searchTerm?: string }) {
       )}
 
       {pendingReturn && (
-        <ReturnToQueueConfirmDialog
+        <TaskRequeueDialog
           conv={pendingReturn}
           isPending={returnMutation.isPending}
           onConfirm={handleReturnConfirm}
@@ -257,7 +257,7 @@ export function ChatKanbanBoard({ searchTerm = '' }: { searchTerm?: string }) {
       )}
 
       {pendingResolve && (
-        <ResolveConfirmDialog
+        <TaskResolveDialog
           partnerName={pendingResolve.partner?.displayName ?? pendingResolve.partner?.email ?? pendingResolve.id.slice(0, 8)}
           avatarUrl={pendingResolve.partner?.avatarUrl ?? undefined}
           isPending={resolveMutation.isPending}

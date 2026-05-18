@@ -1,5 +1,5 @@
 export { StaffInventoryPage } from './inventory'
-export { StaffChatPage } from './chat'
+export { StaffMyTaskPage } from './my-task'
 export { StaffChatBoardPage } from './chat-board'
 export { AddItemPage } from './add-item'
 export { SearchResultsPage, type SearchResultsSearch } from './search-results'

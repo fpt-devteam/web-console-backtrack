@@ -2,14 +2,14 @@ import { Loader2, UserCheck, X } from 'lucide-react'
 import { Avatar } from './avatar'
 import type { IConversation } from '@/types/chat.types'
 
-interface AssignConfirmDialogProps {
+interface TaskAssignDialogProps {
   conv: IConversation
   isPending: boolean
   onConfirm: () => void
   onCancel: () => void
 }
 
-export function AssignConfirmDialog({ conv, isPending, onConfirm, onCancel }: AssignConfirmDialogProps) {
+export function TaskAssignDialog({ conv, isPending, onConfirm, onCancel }: TaskAssignDialogProps) {
   const label = conv.partner?.displayName ?? conv.partner?.email ?? conv.id.slice(0, 8)
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">

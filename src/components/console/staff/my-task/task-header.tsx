@@ -1,7 +1,7 @@
 import { CheckCircle2, Loader2 } from 'lucide-react'
 import { Avatar } from './avatar'
 
-interface ChatHeaderProps {
+interface TaskHeaderProps {
   partnerName: string
   avatarUrl?: string | null
   isResolved: boolean
@@ -9,7 +9,7 @@ interface ChatHeaderProps {
   onResolve: () => void
 }
 
-export function ChatHeader({ partnerName, avatarUrl, isResolved, isResolvePending, onResolve }: ChatHeaderProps) {
+export function TaskHeader({ partnerName, avatarUrl, isResolved, isResolvePending, onResolve }: TaskHeaderProps) {
   return (
     <div className="flex-shrink-0 px-5 py-5 border-b border-[#dddddd] flex items-center justify-between bg-white">
       <div className="flex items-center gap-4">

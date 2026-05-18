@@ -25,7 +25,7 @@ import { useCurrentOrgId } from '@/contexts/current-org.context'
 import { Skeleton } from '@/components/ui/skeleton'
 import type { SupportFormData } from '@/types/chat.types'
 
-interface PinnedPostCardProps {
+interface TaskPinnedItemProps {
   supportFormData: SupportFormData
 }
 
@@ -177,7 +177,7 @@ function PopupHeader({ title, isLost, category, slug, itemId, onClose, status }:
   )
 }
 
-export function PinnedPostCard({ supportFormData }: PinnedPostCardProps) {
+export function TaskPinnedItem({ supportFormData }: TaskPinnedItemProps) {
   const { currentOrgId } = useCurrentOrgId()
   const { data: post, isLoading } = useGetPost(currentOrgId ?? null, supportFormData.postId)
   const [showPopup, setShowPopup] = useState(false)
