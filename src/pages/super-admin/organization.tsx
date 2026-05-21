@@ -4,14 +4,14 @@ import { useRouter, useSearch } from '@tanstack/react-router';
 import {
   Sheet,
   SheetContent,
-} from '@/components/ui/sheet';
+} from '@/components/common/core/sheet';
 import { OrganizationDetailPanel } from './organization-detail';
 import type { OrgStatus } from '@/services/super-admin.service';
 import { SEARCH_DEBOUNCE_MS, useDebouncedValue } from '@/hooks/use-debounce';
 import { useSuperAdminOrganizations } from '@/hooks/use-super-admin';
 import { TableFiltersBar } from '@/components/common/filters/table-filters-bar';
-import { OrgLogo } from '@/components/common/org-logo';
-import { Pagination } from '@/components/ui/pagination';
+import { OrgLogo } from '@/components/common/org/org-logo';
+import { Pagination } from '@/components/common/core/pagination';
 
 type SortFilter = 'Newest' | 'Oldest' | 'Name A-Z' | 'Name Z-A';
 

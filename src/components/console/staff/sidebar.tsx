@@ -9,7 +9,7 @@ import {
   KanbanSquare,
 } from 'lucide-react'
 import { Link, useLocation, useParams } from '@tanstack/react-router'
-import { OrgLogo } from '@/components/common/org-logo'
+import { OrgLogo } from '@/components/common/org/org-logo'
 import { useCurrentOrgId } from '@/contexts/current-org.context'
 import { useOrganization } from '@/hooks/use-org'
 import { useCurrentUser } from '@/hooks/use-auth'
@@ -23,7 +23,7 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
   SidebarRail,
-} from '@/components/ui/sidebar'
+} from '@/components/common/core/sidebar'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -31,7 +31,7 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu'
+} from '@/components/common/core/dropdown-menu'
 
 function getInitials(name: string | null | undefined): string {
   if (!name?.trim()) return 'U'
@@ -64,7 +64,7 @@ const NAV_ITEMS = [
   },
   {
     key: 'my-task',
-    name: 'My Task',
+    name: 'My Claim',
     icon: MessageCircle,
     to: '/console/$slug/staff/my-task' as const,
   },

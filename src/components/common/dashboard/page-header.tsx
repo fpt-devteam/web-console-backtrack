@@ -1,6 +1,12 @@
-import type { SiteHeaderConfig } from './types';
+import type { ReactNode } from 'react';
 
-export function SiteHeader({ title, subtitle, action }: SiteHeaderConfig) {
+export interface PageHeaderConfig {
+  title: string;
+  subtitle?: string;
+  action?: ReactNode;
+}
+
+export function PageHeader({ title, subtitle, action }: PageHeaderConfig) {
   return (
     <div className="flex items-center justify-between">
       <div>

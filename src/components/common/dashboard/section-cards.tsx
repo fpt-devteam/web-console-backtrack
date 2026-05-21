@@ -1,4 +1,14 @@
-import type { CardConfig } from './types';
+import type { ReactNode } from 'react';
+
+export interface CardConfig {
+  label: string;
+  value: string;
+  trend?: string;
+  trendDirection?: 'up' | 'down' | 'neutral';
+  icon: ReactNode;
+  iconBg: string;
+  iconColor: string;
+}
 
 interface SectionCardsProps {
   cards: CardConfig[];

@@ -1,5 +1,5 @@
 import { StaffLayout } from '@/components/console/staff/layout'
-import { ChatKanbanBoard } from '@/components/console/common/chat-board/kanban-board'
+import { ClaimBoard } from '@/components/common/claim/claim-board'
 import { useConversationUpdates } from '@/hooks/use-chat-socket'
 import { useState } from 'react'
 import { Search } from 'lucide-react'
@@ -33,7 +33,7 @@ export function StaffChatBoardPage() {
           </div>
         </div>
         <div className="flex-1 overflow-hidden px-4 sm:px-6 lg:px-8 pb-6">
-          <ChatKanbanBoard searchTerm={searchTerm} />
+          <ClaimBoard searchTerm={searchTerm} />
         </div>
       </div>
     </StaffLayout>

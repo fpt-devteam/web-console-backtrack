@@ -12,24 +12,24 @@ import {
 } from 'lucide-react'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { useRouter, useParams } from '@tanstack/react-router'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import { Textarea } from '@/components/ui/textarea'
+import { Button } from '@/components/common/core/button'
+import { Input } from '@/components/common/core/input'
+import { Label } from '@/components/common/core/label'
+import { Textarea } from '@/components/common/core/textarea'
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select'
-import { OrgLogo } from '@/components/common/org-logo'
-import { PlaceSearchInput } from '@/components/common/place-search-input'
+} from '@/components/common/core/select'
+import { OrgLogo } from '@/components/common/org/org-logo'
+import { PlaceSearchInput } from '@/components/common/location/place-search-input'
 import {
   isValidOrgMapLocation,
   OrgLocationMap,
-} from '@/components/common/org-location-map'
-import { Spinner } from '@/components/ui/spinner'
+} from '@/components/common/location/location-map'
+import { Spinner } from '@/components/common/core/spinner'
 import { useCurrentOrgId } from '@/contexts/current-org.context'
 import { useOrganization, useUpdateOrganization } from '@/hooks/use-org'
 import { uploadOrgCoverImage, uploadOrgLogo } from '@/services/storage.service'

@@ -21,7 +21,7 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
   SidebarRail,
-} from '@/components/ui/sidebar'
+} from '@/components/common/core/sidebar'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -29,7 +29,7 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu'
+} from '@/components/common/core/dropdown-menu'
 
 const MENU_ITEM_CLS =
   'text-base text-charcoal hover:bg-cloud data-[active=true]:bg-[#fff0f2] data-[active=true]:text-rausch'

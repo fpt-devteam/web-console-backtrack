@@ -1,15 +1,15 @@
 import { StaffLayout } from '@/components/console/staff'
-import { Pagination } from '@/components/ui/pagination'
+import { Pagination } from '@/components/common/core/pagination'
 import { useInventoryItems } from '@/hooks/use-inventory'
 import { useCurrentOrgId } from '@/contexts/current-org.context'
 import { useSubcategories } from '@/hooks/use-subcategories'
 import type { InventoryListItem } from '@/services/inventory.service'
-import { useInventoryListState } from '@/components/console/common/inventory/use-inventory-list-state'
-import { InventoryListFiltersBar } from '@/components/console/common/inventory/inventory-list-filters-bar'
-import { InventoryGridCards } from '@/components/console/common/inventory/inventory-grid-cards'
-import { InventoryStatusTabs } from '@/components/console/common/inventory/inventory-status-tabs'
+import { useInventoryListState } from '@/components/common/inventory/use-inventory-list-state'
+import { InventoryListFiltersBar } from '@/components/common/inventory/inventory-list-filters-bar'
+import { InventoryGridCards } from '@/components/common/inventory/inventory-grid-cards'
+import { InventoryStatusTabs } from '@/components/common/inventory/inventory-status-tabs'
 import { useParams } from '@tanstack/react-router'
-import { InventoryCtaButton } from '@/components/console/common/inventory/inventory-cta-button'
+import { InventoryCtaButton } from '@/components/common/inventory/inventory-cta-button'
 
 
 const pageSize = 8

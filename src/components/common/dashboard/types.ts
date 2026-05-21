@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react';
 import type { ColumnDef } from '@tanstack/react-table';
 
-export interface SiteHeaderConfig {
+export interface PageHeaderConfig {
   title: string;
   subtitle?: string;
   /** Optional React node rendered on the right (e.g. a button) */
@@ -55,7 +55,7 @@ export interface TableConfig {
 }
 
 export interface DashboardShellProps {
-  header: SiteHeaderConfig;
+  header: PageHeaderConfig;
   cards: CardConfig[];
   chart: ChartConfig;
   table: TableConfig;

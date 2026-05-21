@@ -1,4 +1,4 @@
-import { StaffMyTaskPage } from '@/pages/console/staff'
+import { StaffMyClaimPage } from '@/pages/console/staff'
 import { createFileRoute } from '@tanstack/react-router'
 
 export const Route = createFileRoute('/console/$slug/staff/my-task')({
@@ -6,5 +6,5 @@ export const Route = createFileRoute('/console/$slug/staff/my-task')({
 })
 
 function RouteComponent() {
-  return <StaffMyTaskPage />
+  return <StaffMyClaimPage />
 }

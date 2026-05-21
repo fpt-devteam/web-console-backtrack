@@ -4,13 +4,13 @@ import { useEffect, useState } from 'react';
 import { useDebouncedValue, SEARCH_DEBOUNCE_MS } from '@/hooks/use-debounce';
 import type { AdminUserStatus, AdminUserSummary } from '@/types/admin-user.types';
 import { TableFiltersBar } from '@/components/common/filters/table-filters-bar';
-import { Pagination } from '@/components/ui/pagination';
+import { Pagination } from '@/components/common/core/pagination';
 import { useAdminUsers } from '@/hooks/use-admin-users';
 import { useRouter, useSearch } from '@tanstack/react-router';
 import {
   Sheet,
   SheetContent,
-} from '@/components/ui/sheet';
+} from '@/components/common/core/sheet';
 import { UserDetailPanel } from './user-detail';
 
 function rowDisplayName(u: AdminUserSummary): string {

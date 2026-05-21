@@ -9,9 +9,9 @@ import { routeTree } from './routeTree.gen'
 
 import './styles.css'
 import reportWebVitals from './reportWebVitals.ts'
-import { InternalServerError } from './components/ui/errors/internal-server-error-page.tsx'
-import { Spinner } from './components/ui/spinner.tsx'
-import { NotFoundPage } from './components/ui/errors/not-found-page.tsx'
+import { InternalServerError } from './components/common/errors/internal-server-error-page.tsx'
+import { Spinner } from './components/common/core/spinner.tsx'
+import { NotFoundPage } from './components/common/errors/not-found-page.tsx'
 import { CurrentOrgProvider } from './contexts/current-org.context.tsx'
 
 // Create a new router instance

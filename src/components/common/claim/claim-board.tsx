@@ -9,12 +9,12 @@ import {
 } from '@dnd-kit/core'
 import { restrictToWindowEdges } from '@dnd-kit/modifiers'
 import toast from 'react-hot-toast'
-import { KanbanColumn } from './kanban-column'
-import { ConversationCard } from './conversation-card'
+import { ClaimColumn } from './claim-column'
+import { ClaimCard } from './claim-card'
 import { ConversationStatus } from '@/types/chat.types'
-import { TaskAssignDialog } from '../../staff/my-task/task-assign-dialog'
-import { TaskRequeueDialog } from '../../staff/my-task/task-requeue-dialog'
-import { TaskResolveDialog } from '../../staff/my-task/task-resolve-dialog'
+import { ClaimAssignDialog } from '@/components/console/staff/my-processing-claim/claim-assign-dialog'
+import { ClaimRequeueDialog } from '@/components/console/staff/my-processing-claim/claim-requeue-dialog'
+import { ClaimResolveDialog } from '@/components/console/staff/my-processing-claim/claim-resolve-dialog'
 import {
   useAssignConversation,
   useChatAssigned,
@@ -25,7 +25,7 @@ import {
 import { useSocketChatQueue } from '@/hooks/use-chat-socket'
 import { useCurrentOrgId } from '@/contexts/current-org.context'
 import { useCurrentUser } from '@/hooks/use-auth'
-import type { IConversationWithStaff } from './kanban-board.type'
+import type { IConversationWithStaff } from './claim-board.types'
 
 const COLUMNS: { id: ConversationStatus; title: string; accent: string }[] = [
   { id: ConversationStatus.QUEUE,       title: 'Queue',       accent: 'bg-amber-400' },
@@ -46,7 +46,7 @@ const VALID_TRANSITIONS: Partial<Record<ColKey, ColKey[]>> = {
   [ConversationStatus.IN_PROGRESS]: [ConversationStatus.QUEUE, ConversationStatus.CLOSED],
 }
 
-export function ChatKanbanBoard({ searchTerm = '' }: { searchTerm?: string }) {
+export function ClaimBoard({ searchTerm = '' }: { searchTerm?: string }) {
   const { currentOrgId } = useCurrentOrgId()
   const { data: currentUser } = useCurrentUser()
   const { data: queueData, isLoading: isQueueLoading, removeFromQueue } = useSocketChatQueue(currentOrgId ?? undefined)
@@ -216,7 +216,7 @@ export function ChatKanbanBoard({ searchTerm = '' }: { searchTerm?: string }) {
                   : () => false
 
             return (
-              <KanbanColumn
+              <ClaimColumn
                 key={id}
                 id={id}
                 title={title}
@@ -233,13 +233,13 @@ export function ChatKanbanBoard({ searchTerm = '' }: { searchTerm?: string }) {
       <DragOverlay modifiers={[restrictToWindowEdges]}>
         {draggingConv && (
           <div className="w-96 shadow-2xl rotate-1">
-            <ConversationCard conv={draggingConv} />
+            <ClaimCard conv={draggingConv} />
           </div>
         )}
       </DragOverlay>
 
       {pendingAssign && (
-        <TaskAssignDialog
+        <ClaimAssignDialog
           conv={pendingAssign}
           isPending={assignMutation.isPending}
           onConfirm={handleAssignConfirm}
@@ -248,7 +248,7 @@ export function ChatKanbanBoard({ searchTerm = '' }: { searchTerm?: string }) {
       )}
 
       {pendingReturn && (
-        <TaskRequeueDialog
+        <ClaimRequeueDialog
           conv={pendingReturn}
           isPending={returnMutation.isPending}
           onConfirm={handleReturnConfirm}
@@ -257,7 +257,7 @@ export function ChatKanbanBoard({ searchTerm = '' }: { searchTerm?: string }) {
       )}
 
       {pendingResolve && (
-        <TaskResolveDialog
+        <ClaimResolveDialog
           partnerName={pendingResolve.partner?.displayName ?? pendingResolve.partner?.email ?? pendingResolve.id.slice(0, 8)}
           avatarUrl={pendingResolve.partner?.avatarUrl ?? undefined}
           isPending={resolveMutation.isPending}

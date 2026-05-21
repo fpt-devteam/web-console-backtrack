@@ -1,6 +1,6 @@
 import { Layout } from '@/components/super-admin/layout';
 import { useRouter } from '@tanstack/react-router';
-import { Button } from '@/components/ui/button';
+import { Button } from '@/components/common/core/button';
 import { ArrowLeft, Calendar, Phone, Mail } from 'lucide-react';
 import { useAdminUserDetail } from '@/hooks/use-admin-users';
 import type {

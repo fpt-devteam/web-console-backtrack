@@ -4,13 +4,13 @@ import { useCurrentOrgId } from '@/contexts/current-org.context'
 import { useUser } from '@/hooks/use-user'
 import { useInventoryItems } from '@/hooks/use-inventory'
 import { useDebouncedValue } from '@/hooks/use-debounce'
-import { Pagination } from '@/components/ui/pagination'
+import { Pagination } from '@/components/common/core/pagination'
 import type { InventoryListItem, PostStatus } from '@/services/inventory.service'
-import { InventoryGridCards } from '@/components/console/common/inventory/inventory-grid-cards'
+import { InventoryGridCards } from '@/components/common/inventory/inventory-grid-cards'
 import { Search, X } from 'lucide-react'
 import { useSubcategories } from '@/hooks/use-subcategories'
-import { FilterDateRangeChip, FilterDropdownChip } from '@/components/console/common/inventory/filter-dropdown-chip'
-import type { ChipOption } from '@/components/console/common/inventory/filter-dropdown-chip'
+import { FilterDateRangeChip, FilterDropdownChip } from '@/components/common/inventory/filter-dropdown-chip'
+import type { ChipOption } from '@/components/common/inventory/filter-dropdown-chip'
 
 const ALL_STATUS = 'All' as const
 type StatusFilter = typeof ALL_STATUS | PostStatus

@@ -22,10 +22,10 @@ import type { ElementType } from 'react'
 import { Link } from '@tanstack/react-router'
 import { useGetPost } from '@/hooks/use-post'
 import { useCurrentOrgId } from '@/contexts/current-org.context'
-import { Skeleton } from '@/components/ui/skeleton'
+import { Skeleton } from '@/components/common/core/skeleton'
 import type { SupportFormData } from '@/types/chat.types'
 
-interface TaskPinnedItemProps {
+interface ClaimPinnedItemProps {
   supportFormData: SupportFormData
 }
 
@@ -177,7 +177,7 @@ function PopupHeader({ title, isLost, category, slug, itemId, onClose, status }:
   )
 }
 
-export function TaskPinnedItem({ supportFormData }: TaskPinnedItemProps) {
+export function ClaimPinnedItem({ supportFormData }: ClaimPinnedItemProps) {
   const { currentOrgId } = useCurrentOrgId()
   const { data: post, isLoading } = useGetPost(currentOrgId ?? null, supportFormData.postId)
   const [showPopup, setShowPopup] = useState(false)

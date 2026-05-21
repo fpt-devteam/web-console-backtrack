@@ -6,7 +6,7 @@ import { useDashboardStats } from '@/hooks/use-dashboard-stats';
 import { useActivityLogs } from '@/hooks/use-activity-logs';
 import { DashboardShell } from '@/components/common/dashboard';
 import type { CardConfig, ChartPoint, TableRow } from '@/components/common/dashboard';
-import { Spinner } from '@/components/ui/spinner';
+import { Spinner } from '@/components/common/core/spinner';
 import { formatDistanceToNow } from 'date-fns';
 
 export const Route = createFileRoute('/dashboard')({

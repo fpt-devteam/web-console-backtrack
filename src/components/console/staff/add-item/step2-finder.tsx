@@ -1,6 +1,6 @@
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
+import { Button } from '@/components/common/core/button'
+import { Input } from '@/components/common/core/input'
+import { Label } from '@/components/common/core/label'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 import type { FinderContactField } from '@/types/organization.types'
 

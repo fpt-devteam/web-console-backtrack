@@ -7,12 +7,12 @@ import { useInventoryItem, useUpdateInventoryItem } from '@/hooks/use-inventory'
 import { useSubcategories } from '@/hooks/use-subcategories'
 import { uploadInventoryImage } from '@/services/storage.service'
 import { inventoryService, type ItemCategory } from '@/services/inventory.service'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import { Textarea } from '@/components/ui/textarea'
+import { Button } from '@/components/common/core/button'
+import { Input } from '@/components/common/core/input'
+import { Label } from '@/components/common/core/label'
+import { Textarea } from '@/components/common/core/textarea'
 import { collectInventoryImageUrls, reorderList, revokeObjectUrls, type InventoryPhotoPreview } from '@/utils/inventory-photos'
-import { InventoryPhotosPicker } from '@/components/console/common/inventory/inventory-photos-picker'
+import { InventoryPhotosPicker } from '@/components/common/inventory/inventory-photos-picker'
 
 function toIsoFromDateTimeLocal(v: string): string | null {
   const t = v?.trim()

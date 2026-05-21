@@ -10,7 +10,7 @@ export interface IConversationWithStaff extends IConversation {
   staffInfo?: StaffInfo | null
 }
 
-export interface KanbanColumnProps {
+export interface ClaimColumnProps {
   id: string
   title: string
   accent: string

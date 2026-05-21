@@ -1,9 +1,9 @@
 import { ChevronRight } from 'lucide-react';
-import { OrgLogo } from '@/components/common/org-logo';
+import { OrgLogo } from '@/components/common/org/org-logo';
 import { Link, useRouter } from '@tanstack/react-router';
 import { useCurrentUser } from '@/hooks/use-auth';
 import { useMyOrganizations } from '@/hooks/use-org';
-import { Spinner } from '@/components/ui/spinner';
+import { Spinner } from '@/components/common/core/spinner';
 import type { MyOrganization } from '@/types/organization.types';
 
 export function WelcomePage() {

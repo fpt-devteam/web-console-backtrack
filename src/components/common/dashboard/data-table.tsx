@@ -6,9 +6,17 @@ import {
   getPaginationRowModel,
   flexRender,
   type SortingState,
+  type ColumnDef,
 } from '@tanstack/react-table';
 import { ChevronUp, ChevronDown, ChevronsUpDown, ChevronLeft, ChevronRight } from 'lucide-react';
-import type { TableConfig } from './types';
+export type TableRow = Record<string, unknown>;
+
+export interface TableConfig {
+  title: string;
+  columns: ColumnDef<TableRow>[];
+  data: TableRow[];
+  pageSize?: number;
+}
 
 export function DataTable({ title, columns, data, pageSize = 5 }: TableConfig) {
   const [sorting, setSorting] = useState<SortingState>([]);

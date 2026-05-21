@@ -1,5 +1,5 @@
 import { StaffSidebar } from './sidebar'
-import { SidebarInset, SidebarProvider } from '@/components/ui/sidebar'
+import { SidebarInset, SidebarProvider } from '@/components/common/core/sidebar'
 
 interface LayoutProps {
   children: React.ReactNode

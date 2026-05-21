@@ -2,15 +2,15 @@ import { useDraggable } from '@dnd-kit/core'
 import { CSS } from '@dnd-kit/utilities'
 import { GripVertical, ImageOff, UserCircle2 } from 'lucide-react'
 import { useNavigate, useParams } from '@tanstack/react-router'
-import { Avatar } from '@/components/console/staff/my-task/avatar'
-import { formatTime, statusLabel } from '@/components/console/staff/my-task/task-utils'
+import { Avatar } from '@/components/common/avatar'
+import { formatTime, statusLabel } from '@/components/console/staff/my-processing-claim/claim-utils'
 import type { IConversation } from '@/types/chat.types'
 import { ConversationStatus } from '@/types/chat.types'
 import { useCurrentOrgId } from '@/contexts/current-org.context'
 import { useInventoryItem } from '@/hooks/use-inventory'
 import { useUserById } from '@/hooks/use-user'
 
-interface ConversationCardProps {
+interface ClaimCardProps {
   conv: IConversation
   disabled?: boolean
   onOpenConversation?: (conv: IConversation) => void
@@ -28,7 +28,7 @@ const STATUS_DOT: Record<ConversationStatus, string> = {
   [ConversationStatus.CLOSED]:      'bg-neutral-400',
 }
 
-export function ConversationCard({ conv, disabled = false, onOpenConversation }: ConversationCardProps) {
+export function ClaimCard({ conv, disabled = false, onOpenConversation }: ClaimCardProps) {
   const { attributes, listeners, setNodeRef, transform, isDragging } = useDraggable({
     id: conv.id,
     data: { status: conv.status },

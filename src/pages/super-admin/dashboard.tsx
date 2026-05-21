@@ -5,7 +5,7 @@ import { Clock } from 'lucide-react';
 import { KpiCards, Layout, LostFoundTrend, RecentActivity } from '@/components/super-admin';
 import type { SeriesConfig } from '@/components/common/dashboard';
 import type { DashboardKpi, RevenueMonthlyItem } from '@/services/super-admin.service';
-import { ChartAreaInteractive, SiteHeader } from '@/components/common/dashboard';
+import { AreaChart, PageHeader as SiteHeader } from '@/components/common/dashboard';
 import { superAdminService } from '@/services/super-admin.service';
 
 
@@ -82,7 +82,7 @@ export function DashboardPage() {
 
         {/* ── trend — full width ── */}
         <div className="mt-5">
-          <ChartAreaInteractive
+          <AreaChart
               title="Revenue Flow"
               data={revenueChartData}
               series={REVENUE_SERIES}
@@ -99,7 +99,7 @@ export function DashboardPage() {
           </div>
           {/* Revenue Flow
           <div className="lg:col-span-6">
-            <ChartAreaInteractive
+            <AreaChart
               title="Revenue Flow"
               data={revenueChartData}
               series={REVENUE_SERIES}

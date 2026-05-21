@@ -1,11 +1,11 @@
 import { useState } from 'react'
 import { Smile } from 'lucide-react'
 import { StaffLayout } from '@/components/console/staff/layout'
-import { TaskResolveDialog } from '@/components/console/staff/my-task/task-resolve-dialog'
-import { TaskHeader } from '@/components/console/staff/my-task/task-header'
-import { TaskSidebar } from '@/components/console/staff/my-task/task-sidebar'
-import { TaskConversation } from '@/components/console/staff/my-task/task-conversation'
-import { TaskPinnedItem } from '@/components/console/staff/my-task/task-pinned-item'
+import { ClaimResolveDialog } from '@/components/console/staff/my-processing-claim/claim-resolve-dialog'
+import { ClaimHeader } from '@/components/console/staff/my-processing-claim/claim-header'
+import { ClaimSidebar } from '@/components/console/staff/my-processing-claim/claim-sidebar'
+import { ClaimConversation } from '@/components/console/staff/my-processing-claim/claim-conversation'
+import { ClaimPinnedItem } from '@/components/console/staff/my-processing-claim/claim-pinned-item'
 import type { IConversation } from '@/types/chat.types'
 import { useChatContext } from '@/contexts/chat.context'
 import {
@@ -14,7 +14,7 @@ import {
 } from '@/hooks/use-chat'
 import { useConversationUpdates } from '@/hooks/use-chat-socket'
 
-export function StaffMyTaskPage() {
+export function StaffMyClaimPage() {
   const { activeConversationId, setActiveConversationId } = useChatContext()
   const [searchTerm, setSearchTerm] = useState('')
   const [resolveConfirmOpen, setResolveConfirmOpen] = useState(false)
@@ -57,7 +57,7 @@ export function StaffMyTaskPage() {
   return (
     <StaffLayout>
       {resolveConfirmOpen && (
-        <TaskResolveDialog
+        <ClaimResolveDialog
           partnerName={partnerName}
           avatarUrl={activeConv?.partner?.avatarUrl ?? undefined}
           isPending={resolveMutation.isPending}
@@ -67,7 +67,7 @@ export function StaffMyTaskPage() {
       )}
 
       <div className="h-full overflow-hidden flex bg-[#f7f7f7]">
-        <TaskSidebar
+        <ClaimSidebar
           searchTerm={searchTerm}
           onSearchChange={setSearchTerm}
           conversations={filtered}
@@ -80,7 +80,7 @@ export function StaffMyTaskPage() {
         <div className="flex-1 flex flex-col bg-white min-h-0">
           {activeConversationId && activeConv ? (
             <>
-              <TaskHeader
+              <ClaimHeader
                 partnerName={partnerName}
                 avatarUrl={activeConv.partner?.avatarUrl}
                 isResolved={isResolved}
@@ -88,11 +88,11 @@ export function StaffMyTaskPage() {
                 onResolve={handleResolve}
               />
               {activeConv.supportFormData && (
-                <TaskPinnedItem
+                <ClaimPinnedItem
                   supportFormData={activeConv.supportFormData}
                 />
               )}
-              <TaskConversation
+              <ClaimConversation
                 conversationId={activeConversationId}
                 partner={activeConv.partner}
                 readOnly={isResolved}
@@ -103,8 +103,8 @@ export function StaffMyTaskPage() {
               <div className="w-20 h-20 bg-[#f7f7f7] rounded-full flex items-center justify-center">
                 <Smile className="w-10 h-10 text-[#929292]" />
               </div>
-              <p className="text-base font-medium text-[#222222]">No conversation selected</p>
-              <p className="text-sm text-[#929292]">Choose a chat from the left to start messaging</p>
+              <p className="text-base font-medium text-[#222222]">No claim selected</p>
+              <p className="text-sm text-[#929292]">Select a claim from the left to start messaging</p>
             </div>
           )}
         </div>

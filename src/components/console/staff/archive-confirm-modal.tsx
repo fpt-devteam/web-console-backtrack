@@ -1,5 +1,5 @@
 import { AdminModal } from '@/components/console/admin/AdminModal'
-import { Button } from '@/components/ui/button'
+import { Button } from '@/components/common/core/button'
 
 export function ArchiveConfirmModal({
   open,

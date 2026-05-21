@@ -1,4 +1,4 @@
-import { Button } from '@/components/ui/button'
+import { Button } from '@/components/common/core/button'
 import type { ItemCategory } from '@/services/inventory.service'
 import {
   Calendar,

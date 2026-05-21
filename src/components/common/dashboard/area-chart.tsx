@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import {
-  AreaChart,
+  AreaChart as RechartsAreaChart,
   Area,
   XAxis,
   YAxis,
@@ -8,7 +8,25 @@ import {
   Tooltip,
   ResponsiveContainer,
 } from 'recharts';
-import type { ChartConfig } from './types';
+export interface SeriesConfig {
+  key: string;
+  label: string;
+  color: string;
+}
+
+export interface ChartPoint {
+  label: string;
+  [key: string]: string | number;
+}
+
+export interface ChartConfig {
+  title: string;
+  data: ChartPoint[];
+  series: SeriesConfig[];
+  defaultRange?: '3m' | '12m';
+  rangeSlice?: Record<'3m' | '12m', number | null>;
+  onRangeChange?: (range: '3m' | '12m') => void;
+}
 
 const RANGES = ['3m', '12m'] as const;
 type Range = (typeof RANGES)[number];
@@ -18,7 +36,7 @@ const RANGE_LABEL: Record<Range, string> = { '3m': '3 months', '12m': '12 months
 /** Number of data points to show per range; null = show all */
 const RANGE_SLICE: Record<Range, number | null> = { '3m': 90, '12m': null };
 
-export function ChartAreaInteractive({
+export function AreaChart({
   title,
   data,
   series,
@@ -58,7 +76,7 @@ export function ChartAreaInteractive({
       </div>
 
       <ResponsiveContainer width="100%" height={220}>
-        <AreaChart data={sliced} margin={{ top: 4, right: 0, left: -20, bottom: 0 }}>
+        <RechartsAreaChart data={sliced} margin={{ top: 4, right: 0, left: -20, bottom: 0 }}>
           <defs>
             {series.map((s) => (
               <linearGradient
@@ -107,7 +125,7 @@ export function ChartAreaInteractive({
               dot={false}
             />
           ))}
-        </AreaChart>
+        </RechartsAreaChart>
       </ResponsiveContainer>
 
       {series.length > 1 && (

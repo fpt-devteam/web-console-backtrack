@@ -1,11 +1,11 @@
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
+import { Button } from '@/components/common/core/button';
+import { Input } from '@/components/common/core/input';
+import { Label } from '@/components/common/core/label';
 import { Camera, Check, X } from 'lucide-react';
 import { useState } from 'react';
 import { useNavigate } from '@tanstack/react-router';
 import { useCreateOrganization } from '@/hooks/use-org';
-import { PlaceSearchInput } from '@/components/common/place-search-input';
+import { PlaceSearchInput } from '@/components/common/location/place-search-input';
 import { useDebouncedValue } from '@/hooks/use-debounce';
 import { orgService } from '@/services/org.service';
 import { uploadOrgLogo } from '@/services/storage.service';

@@ -1,4 +1,4 @@
-import { SidebarProvider, SidebarInset } from '@/components/ui/sidebar'
+import { SidebarProvider, SidebarInset } from '@/components/common/core/sidebar'
 import { AdminSidebar } from './sidebar'
 
 interface LayoutProps {

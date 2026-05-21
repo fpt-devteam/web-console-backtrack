@@ -1,6 +1,6 @@
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
+import { Button } from '@/components/common/core/button';
+import { Input } from '@/components/common/core/input';
+import { Label } from '@/components/common/core/label';
 import { ConsoleAuthLayout, ConsoleAuthMobileLogo } from '@/components/auth/console-auth-layout';
 import { Lock, Eye, EyeOff, ArrowRight } from 'lucide-react';
 import { useState, useEffect } from 'react';

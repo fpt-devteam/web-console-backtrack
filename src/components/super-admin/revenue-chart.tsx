@@ -7,7 +7,7 @@ import type { MonthlyRevenueItem } from '@/services/revenue.service'
 import { revenueService } from '@/services/revenue.service'
 import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
-} from '@/components/ui/select'
+} from '@/components/common/core/select'
 
 type ChartView = 'All' | 'Subscription' | 'QR Sales'
 type TimeFilter = '12months' | '6months' | '3months' | '1month'

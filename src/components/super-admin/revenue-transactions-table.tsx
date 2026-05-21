@@ -3,7 +3,7 @@ import { Building2, User } from 'lucide-react'
 import type { RevenueStatus, RevenueTransaction, SubscriberType } from '@/services/revenue.service'
 import { revenueService } from '@/services/revenue.service'
 import { TableFiltersBar } from '@/components/common/filters/table-filters-bar'
-import { Pagination } from '@/components/ui/pagination'
+import { Pagination } from '@/components/common/core/pagination'
 import { SEARCH_DEBOUNCE_MS, useDebouncedValue } from '@/hooks/use-debounce'
 
 const PAGE_SIZE = 5

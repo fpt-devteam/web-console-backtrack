@@ -1,6 +1,6 @@
 import { useEffect } from 'react'
 import { Outlet, createFileRoute } from '@tanstack/react-router'
-import { Forbidden } from '@/components/ui/errors/forbidden-page'
+import { Forbidden } from '@/components/common/errors/forbidden-page'
 import { orgService } from '@/services/org.service'
 import { ORG_KEYS } from '@/hooks/use-org'
 import { persistActiveOrgIdForSession, requireSignedIn } from '@/lib/route-guards'

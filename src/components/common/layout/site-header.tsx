@@ -1,6 +1,6 @@
 import React from 'react'
-import { SidebarTrigger } from '@/components/ui/sidebar'
-import { Separator } from '@/components/ui/separator'
+import { SidebarTrigger } from '@/components/common/core/sidebar'
+import { Separator } from '@/components/common/core/separator'
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -8,7 +8,7 @@ import {
   BreadcrumbList,
   BreadcrumbPage,
   BreadcrumbSeparator,
-} from '@/components/ui/breadcrumb'
+} from '@/components/common/core/breadcrumb'
 
 export interface SiteCrumb {
   label: string

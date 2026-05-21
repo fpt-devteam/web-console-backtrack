@@ -4,7 +4,7 @@ import { useParams } from '@tanstack/react-router'
 import { useInventoryItem } from '@/hooks/use-inventory'
 import { useCurrentOrgId } from '@/contexts/current-org.context'
 import { useOrgReturnReports } from '@/hooks/use-return-report'
-import { InventoryItemDetailView } from '@/components/console/common/inventory/inventory-item-detail-view'
+import { InventoryItemDetailView } from '@/components/common/inventory/inventory-item-detail-view'
 
 export function AdminInventoryItemDetailPage() {
   const { slug, itemId } = useParams({ strict: false }) as { slug: string, itemId: string }

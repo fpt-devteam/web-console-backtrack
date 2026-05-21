@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
 import { MapPin, Loader2 } from 'lucide-react'
-import { Input } from '@/components/ui/input'
+import { Input } from '@/components/common/core/input'
 import { nominatimService, type NominatimPlace } from '@/services/nominatim.service'
 
 /** Place selected from Nominatim – sent to BE (lat/lon + display_name, optional place_id). */

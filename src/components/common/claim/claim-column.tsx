@@ -1,9 +1,9 @@
 import { useDroppable } from '@dnd-kit/core'
-import { Skeleton } from '@/components/ui/skeleton'
-import { ConversationCard } from './conversation-card'
-import type { KanbanColumnProps } from './kanban-board.type'
+import { Skeleton } from '@/components/common/core/skeleton'
+import { ClaimCard } from './claim-card'
+import type { ClaimColumnProps } from './claim-board.types'
 
-export function KanbanColumn({
+export function ClaimColumn({
   id,
   title,
   accent,
@@ -11,7 +11,7 @@ export function KanbanColumn({
   isLoading = false,
   isCardDraggable,
   onOpenConversation,
-}: KanbanColumnProps) {
+}: ClaimColumnProps) {
   const { setNodeRef, isOver } = useDroppable({ id })
 
   return (
@@ -42,11 +42,11 @@ export function KanbanColumn({
           ))
         ) : conversations.length === 0 ? (
           <div className="flex-1 flex items-center justify-center">
-            <p className="text-xs text-mute text-center py-4">No conversations</p>
+            <p className="text-xs text-mute text-center py-4">No claims</p>
           </div>
         ) : (
           conversations.map((conv) => (
-            <ConversationCard
+            <ClaimCard
               key={conv.id}
               conv={conv}
               disabled={!(isCardDraggable?.(conv) ?? false)}

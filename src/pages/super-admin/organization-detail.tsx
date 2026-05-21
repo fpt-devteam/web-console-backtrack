@@ -1,8 +1,8 @@
 import { Layout } from '@/components/super-admin/layout';
 import { useRouter } from '@tanstack/react-router';
 import { Calendar, ArrowLeft, Phone, Mail } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { OrgLogo } from '@/components/common/org-logo';
+import { Button } from '@/components/common/core/button';
+import { OrgLogo } from '@/components/common/org/org-logo';
 import { useSuperAdminOrgDetail } from '@/hooks/use-super-admin';
 
 const WORKSPACE_BASE_URL =

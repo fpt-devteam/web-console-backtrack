@@ -1,7 +1,7 @@
 import { Loader2, Check, XCircle } from 'lucide-react'
 import { useState, useEffect } from 'react'
 import { useRouter } from '@tanstack/react-router'
-import { Button } from '@/components/ui/button'
+import { Button } from '@/components/common/core/button'
 import { getInvitationCode, clearInvitationCode } from '@/lib/auth-storage'
 import { persistActiveOrgIdForSession } from '@/lib/route-guards'
 import { invitationService } from '@/services/invitation.service'

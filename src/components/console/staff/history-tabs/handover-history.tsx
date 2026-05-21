@@ -5,13 +5,13 @@ import { useOrgReturnReports } from '@/hooks/use-return-report'
 import { useUser } from '@/hooks/use-user'
 import { useDebouncedValue } from '@/hooks/use-debounce'
 import { Search, X } from 'lucide-react'
-import { Pagination } from '@/components/ui/pagination'
+import { Pagination } from '@/components/common/core/pagination'
 import { useSubcategories } from '@/hooks/use-subcategories'
 import { getInventoryDescription, getInventoryTitle, getInventoryDistinctiveMarks } from '@/utils/inventory-view'
 import type { InventoryListItem } from '@/services/inventory.service'
 import { useInventoryItems } from '@/hooks/use-inventory'
-import { InventoryGridCards } from '@/components/console/common/inventory/inventory-grid-cards'
-import { FilterDateRangeChip } from '@/components/console/common/inventory/filter-dropdown-chip'
+import { InventoryGridCards } from '@/components/common/inventory/inventory-grid-cards'
+import { FilterDateRangeChip } from '@/components/common/inventory/filter-dropdown-chip'
 
 const pageSize = 8
 /** Staff return history: BE caps page size; load one batch then filter client-side. */

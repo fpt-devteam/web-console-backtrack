@@ -1,8 +1,8 @@
 import { Loader2, RefreshCw, Search } from 'lucide-react'
-import { TaskItem } from './task-item'
+import { ClaimItem } from './claim-item'
 import type { IConversation } from '@/types/chat.types'
 
-interface TaskSidebarProps {
+interface ClaimSidebarProps {
   searchTerm: string
   onSearchChange: (term: string) => void
   conversations: Array<IConversation>
@@ -12,7 +12,7 @@ interface TaskSidebarProps {
   onSelect: (conv: IConversation) => void
 }
 
-export function TaskSidebar({
+export function ClaimSidebar({
   searchTerm,
   onSearchChange,
   conversations,
@@ -20,7 +20,7 @@ export function TaskSidebar({
   isLoading,
   activeConversationId,
   onSelect,
-}: TaskSidebarProps) {
+}: ClaimSidebarProps) {
   const emptyLabel = 'No conversations found'
 
   return (
@@ -54,7 +54,7 @@ export function TaskSidebar({
           </div>
         ) : (
           conversations.map((conv) => (
-            <TaskItem
+            <ClaimItem
               key={conv.id}
               conv={conv}
               isActive={activeConversationId === conv.id}

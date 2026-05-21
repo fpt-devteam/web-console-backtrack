@@ -12,7 +12,7 @@ import {
   ChevronsUpDown,
   KanbanSquare,
 } from 'lucide-react'
-import { OrgLogo } from '@/components/common/org-logo'
+import { OrgLogo } from '@/components/common/org/org-logo'
 import { Link, useLocation, useParams } from '@tanstack/react-router'
 import { useMemo } from 'react'
 import { useCurrentOrgId } from '@/contexts/current-org.context'
@@ -32,12 +32,12 @@ import {
   SidebarMenuSubItem,
   SidebarRail,
   useSidebar,
-} from '@/components/ui/sidebar'
+} from '@/components/common/core/sidebar'
 import {
   Collapsible,
   CollapsibleContent,
   CollapsibleTrigger,
-} from '@/components/ui/collapsible'
+} from '@/components/common/core/collapsible'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -45,7 +45,7 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu'
+} from '@/components/common/core/dropdown-menu'
 
 const MENU_ITEM_CLS =
   'text-base text-charcoal hover:bg-cloud data-[active=true]:bg-[#fff0f2] data-[active=true]:text-rausch'
@@ -111,7 +111,7 @@ function AdminSidebarInner() {
   const navItems = [
     { key: 'dashboard',  name: 'Dashboard',  icon: LayoutGrid,   to: '/console/$slug/admin/dashboard'  as const },
     { key: 'employee',   name: 'Employee',   icon: Users,        to: '/console/$slug/admin/employee'   as const },
-    { key: 'chat-board', name: 'Chat Board', icon: KanbanSquare, to: '/console/$slug/admin/chat-board' as const },
+    { key: 'chat-board', name: 'Claim Board', icon: KanbanSquare, to: '/console/$slug/admin/chat-board' as const },
     { key: 'plan',       name: 'Plan',       icon: CreditCard,   to: '/console/$slug/admin/plan'       as const },
     { key: 'pricing',    name: 'Pricing',    icon: Tag,          to: '/console/$slug/admin/pricing'    as const },
     { key: 'inventory',  name: 'Inventory',  icon: Package,      to: '/console/$slug/admin/inventory'  as const },

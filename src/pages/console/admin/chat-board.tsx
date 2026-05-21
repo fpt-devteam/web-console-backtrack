@@ -1,5 +1,5 @@
 import { Layout } from '@/components/console/admin/layout'
-import { ChatKanbanBoard } from '@/components/console/common/chat-board/kanban-board'
+import { ClaimBoard } from '@/components/common/claim/claim-board'
 import { useConversationUpdates } from '@/hooks/use-chat-socket'
 
 export function AdminChatBoardPage() {
@@ -15,7 +15,7 @@ export function AdminChatBoardPage() {
           </p>
         </div>
         <div className="flex-1 overflow-hidden px-4 sm:px-6 lg:px-8 pb-6">
-          <ChatKanbanBoard />
+          <ClaimBoard />
         </div>
       </div>
     </Layout>

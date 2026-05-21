@@ -1,15 +1,14 @@
 export { DashboardShell } from './dashboard-shell';
-export { SiteHeader } from './site-header';
+export type { DashboardShellProps } from './dashboard-shell';
+
+export { PageHeader } from './page-header';
+export type { PageHeaderConfig } from './page-header';
+
 export { SectionCards } from './section-cards';
-export { ChartAreaInteractive } from './chart-area-interactive';
+export type { CardConfig } from './section-cards';
+
+export { AreaChart } from './area-chart';
+export type { SeriesConfig, ChartPoint, ChartConfig } from './area-chart';
+
 export { DataTable } from './data-table';
-export type {
-  DashboardShellProps,
-  SiteHeaderConfig,
-  CardConfig,
-  ChartConfig,
-  ChartPoint,
-  SeriesConfig,
-  TableConfig,
-  TableRow,
-} from './types';
+export type { TableRow, TableConfig } from './data-table';

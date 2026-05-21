@@ -1,18 +1,18 @@
 import { useEffect, useMemo, useState, type ReactNode } from 'react'
 import { Check, ChevronRight, Camera, ImageOff, Mail, Phone, User, Tag } from 'lucide-react'
 import { Link } from '@tanstack/react-router'
-import { Spinner } from '@/components/ui/spinner'
+import { Spinner } from '@/components/common/core/spinner'
 import type { InventoryItem } from '@/services/inventory.service'
 import { inventoryStatusLabel, inventoryStatusPillClass } from './status'
 import { getInventorySubcategoryName, getInventoryTitle } from '@/utils/inventory-view'
 import { categoryLabel, InventoryDetailAttributeGrid, ItemQrCard } from './inventory-detail-attribute-grid'
 import { useChatConversationsByPostId } from '@/hooks/use-chat'
-import { statusBadge, statusLabel } from '@/components/console/staff/my-task/task-utils'
+import { statusBadge, statusLabel } from '@/components/console/staff/my-processing-claim/claim-utils'
 import { useUser } from '@/hooks/use-user'
 import { AdminModal } from '@/components/console/admin/AdminModal'
-import { TaskConversation } from '@/components/console/staff/my-task/task-conversation'
+import { ClaimConversation } from '@/components/console/staff/my-processing-claim/claim-conversation'
 import { ConversationStatus, type IConversation } from '@/types/chat.types'
-import { Avatar } from '@/components/console/staff/my-task/avatar'
+import { Avatar } from '@/components/common/avatar'
 
 function DetailRow({ label, value }: { label: string; value: string }) {
   return (
@@ -535,7 +535,7 @@ export function InventoryItemDetailView({
                 >
                   {openConv && (
                     <div className="h-[70vh] min-h-[520px] flex flex-col rounded-xl border border-[#ebebeb] overflow-hidden">
-                      <TaskConversation
+                      <ClaimConversation
                         conversationId={openConv.id}
                         partner={openConv.partner}
                         readOnly={openConv.status === ConversationStatus.CLOSED}

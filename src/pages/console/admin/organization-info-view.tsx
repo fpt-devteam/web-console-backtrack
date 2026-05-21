@@ -11,12 +11,12 @@ import {
 } from 'lucide-react'
 import { useRouter, useParams } from '@tanstack/react-router'
 import { useEffect, useMemo, useRef } from 'react'
-import { OrgLogo } from '@/components/common/org-logo'
+import { OrgLogo } from '@/components/common/org/org-logo'
 import {
   isValidOrgMapLocation,
   OrgLocationMap,
-} from '@/components/common/org-location-map'
-import { Spinner } from '@/components/ui/spinner'
+} from '@/components/common/location/location-map'
+import { Spinner } from '@/components/common/core/spinner'
 import { useCurrentOrgId } from '@/contexts/current-org.context'
 import { useOrganization } from '@/hooks/use-org'
 import type { DailySchedule, OrgWeekDay } from '@/types/organization.types'

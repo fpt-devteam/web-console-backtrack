@@ -1,7 +1,7 @@
 import { CheckCircle, Loader2, X } from 'lucide-react'
-import { Avatar } from './avatar'
+import { Avatar } from '../../../common/avatar'
 
-interface TaskResolveDialogProps {
+interface ClaimResolveDialogProps {
   partnerName: string
   avatarUrl?: string
   isPending: boolean
@@ -9,7 +9,7 @@ interface TaskResolveDialogProps {
   onCancel: () => void
 }
 
-export function TaskResolveDialog({ partnerName, avatarUrl, isPending, onConfirm, onCancel }: TaskResolveDialogProps) {
+export function ClaimResolveDialog({ partnerName, avatarUrl, isPending, onConfirm, onCancel }: ClaimResolveDialogProps) {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
       <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md mx-4 p-6">

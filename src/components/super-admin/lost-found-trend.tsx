@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 
-import { ChartAreaInteractive } from '@/components/common/dashboard';
+import { AreaChart } from '@/components/common/dashboard';
 import type { SeriesConfig } from '@/components/common/dashboard';
 import { superAdminService } from '@/services/super-admin.service';
 
@@ -25,7 +25,7 @@ export function LostFoundTrend() {
   const handleRangeChange = useCallback((r: Range) => setMonths(RANGE_MONTHS[r]), []);
 
   return (
-    <ChartAreaInteractive
+    <AreaChart
       title="Lost vs Found Trend"
       data={chartData}
       series={SERIES}
