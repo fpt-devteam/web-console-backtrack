@@ -57,16 +57,16 @@ const NAV_ITEMS = [
     to: '/console/$slug/staff/inventory' as const,
   },
   {
-    key: 'chat-board',
-    name: 'Task Board',
+    key: 'claim-board',
+    name: 'Claim Board',
     icon: KanbanSquare,
-    to: '/console/$slug/staff/chat-board' as const,
+    to: '/console/$slug/staff/claim-board' as const,
   },
   {
-    key: 'my-task',
-    name: 'My Claim',
+    key: 'my-processing-claim',
+    name: 'My Processing Claim',
     icon: MessageCircle,
-    to: '/console/$slug/staff/my-task' as const,
+    to: '/console/$slug/staff/my-processing-claim' as const,
   },
   {
     key: 'history',
@@ -99,8 +99,8 @@ function StaffSidebarInner() {
         !cur.startsWith(`${base}/staff/history`)
       )
     }
-    if (key === 'my-task') return cur === `${base}/staff/my-task`
-    if (key === 'chat-board') return cur.startsWith(`${base}/staff/chat-board`)
+    if (key === 'my-processing-claim') return cur === `${base}/staff/my-processing-claim`
+    if (key === 'claim-board') return cur.startsWith(`${base}/staff/claim-board`)
     if (key === 'history') return cur.startsWith(`${base}/staff/history`)
     return false
   }

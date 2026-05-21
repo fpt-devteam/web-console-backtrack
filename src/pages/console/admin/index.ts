@@ -1,5 +1,5 @@
 export { EmployeePage } from './employee';
-export { AdminChatBoardPage } from './chat-board';
+export { AdminClaimBoardPage } from './claim-board';
 export { PricingPage } from './pricing';
 export { CheckoutPage } from './checkout';
 export { AdminDashboardPage } from './dashboard';

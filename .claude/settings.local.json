@@ -54,7 +54,16 @@
       "Bash(mv /home/nhatthang/Fptu/web-console-backtrack/src/components/console/staff/my-task /home/nhatthang/Fptu/web-console-backtrack/src/components/console/staff/my-claim)",
       "Bash(mv task-assign-dialog.tsx claim-assign-dialog.tsx)",
       "Bash(mv task-conversation.tsx claim-conversation.tsx)",
-      "Bash(mv task-item.tsx claim-item.tsx)"
+      "Bash(mv task-item.tsx claim-item.tsx)",
+      "Bash(mv '/home/nhatthang/Fptu/web-console-backtrack/src/routes/console/$slug/admin/chat-board.tsx' '/home/nhatthang/Fptu/web-console-backtrack/src/routes/console/$slug/admin/claim-board.tsx')",
+      "Bash(mv '/home/nhatthang/Fptu/web-console-backtrack/src/routes/console/$slug/staff/chat-board.tsx' '/home/nhatthang/Fptu/web-console-backtrack/src/routes/console/$slug/staff/claim-board.tsx')",
+      "Bash(sed -i 's/export function StaffChatBoardPage/export function StaffClaimBoardPage/g; s/Task Board/Claim Board/g' /home/nhatthang/Fptu/web-console-backtrack/src/pages/console/staff/claim-board.tsx)",
+      "Bash(sed -i 's/export function AdminChatBoardPage/export function AdminClaimBoardPage/g; s/Chat Board/Claim Board/g' /home/nhatthang/Fptu/web-console-backtrack/src/pages/console/admin/claim-board.tsx)",
+      "Bash(sed -i 's/StaffChatBoardPage/StaffClaimBoardPage/g; s|from '\\\\''./chat-board'\\\\''|from '\\\\''./claim-board'\\\\''|g' /home/nhatthang/Fptu/web-console-backtrack/src/pages/console/staff/index.ts)",
+      "Bash(sed -i 's/AdminChatBoardPage/AdminClaimBoardPage/g; s|from '\\\\''./chat-board'\\\\''|from '\\\\''./claim-board'\\\\''|g' /home/nhatthang/Fptu/web-console-backtrack/src/pages/console/admin/index.ts)",
+      "Bash(sed -i s/StaffChatBoardPage/StaffClaimBoardPage/g '/home/nhatthang/Fptu/web-console-backtrack/src/routes/console/$slug/staff/claim-board.tsx')",
+      "Bash(mv '/home/nhatthang/Fptu/web-console-backtrack/src/routes/console/$slug/staff/my-task.tsx' '/home/nhatthang/Fptu/web-console-backtrack/src/routes/console/$slug/staff/my-processing-claim.tsx')",
+      "Bash(sed -i 's|from '\\\\''./my-task'\\\\''|from '\\\\''./my-processing-claim'\\\\''|g' /home/nhatthang/Fptu/web-console-backtrack/src/pages/console/staff/index.ts)"
     ]
   }
 }

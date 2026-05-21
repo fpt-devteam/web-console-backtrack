@@ -1,7 +1,7 @@
 import { StaffMyClaimPage } from '@/pages/console/staff'
 import { createFileRoute } from '@tanstack/react-router'
 
-export const Route = createFileRoute('/console/$slug/staff/my-task')({
+export const Route = createFileRoute('/console/$slug/staff/my-processing-claim')({
   component: RouteComponent,
 })
 

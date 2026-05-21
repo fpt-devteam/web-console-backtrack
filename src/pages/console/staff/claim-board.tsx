@@ -4,7 +4,7 @@ import { useConversationUpdates } from '@/hooks/use-chat-socket'
 import { useState } from 'react'
 import { Search } from 'lucide-react'
 
-export function StaffChatBoardPage() {
+export function StaffClaimBoardPage() {
   useConversationUpdates()
   const [searchTerm, setSearchTerm] = useState('')
 
@@ -14,7 +14,7 @@ export function StaffChatBoardPage() {
         <div className="px-4 sm:px-6 lg:px-8 pt-6 pb-4 flex-shrink-0">
           <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
             <div>
-              <h1 className="text-2xl font-bold text-ink">Task Board</h1>
+              <h1 className="text-2xl font-bold text-ink">Claim Board</h1>
               <p className="text-sm text-mute mt-1">
                 Drag conversations between columns to manage their status.
               </p>
