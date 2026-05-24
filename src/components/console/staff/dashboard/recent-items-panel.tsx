@@ -23,7 +23,7 @@ const STATUS_LABEL: Record<string, string> = {
 function RecentItemRow({ item, slug }: { item: DashboardInventoryItem; slug: string }) {
   return (
     <Link
-      to="/console/$slug/staff/item/$itemId"
+      to="/console/$slug/staff/inventory/$itemId"
       params={{ slug, itemId: item.id }}
       className="flex items-center gap-3 py-2.5 px-3 rounded-xl hover:bg-[#f7f7f7] transition-colors group"
     >

@@ -90,24 +90,19 @@ export interface IConversation {
   /** Normalised from backend's `conversationId` */
   id: string;
   type: ConversationType;
-  orgId?: string | null;
-  orgName?: string | null;
-  orgSlug?: string | null;
-  orgLogoUrl?: string | null;
-  assignedStaffId?: string | null;
-  /** Pinned inventory item ID for this conversation */
-  supportFormData?: SupportFormData | null;
-  /** The other participant in the conversation */
-  partner?: IConversationPartner | null;
+  orgId: string;
+  orgName: string;
+  orgSlug: string;
+  orgLogoUrl: string;
+  assignedStaff?: IConversationPartner;
+  supportFormData: SupportFormData;
+  partner: IConversationPartner;
   /** Flattened from lastMessage.timestamp for convenience */
   lastMessageAt?: string | null;
-  /** Flattened from lastMessage.content for convenience */
   lastMessageContent?: string | null;
-  /** The full lastMessage object from the backend */
   lastMessage?: IConversationLastMessage | null;
   unreadCount?: number;
-  /** Conversation lifecycle status: queue | in_progress | closed */
-  status?: ConversationStatus;
+  status: ConversationStatus;
   createdAt: string;
   updatedAt: string;
   deletedAt?: string | null;

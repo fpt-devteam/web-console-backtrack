@@ -1,10 +1,9 @@
-import { Layout } from '@/components/console/admin/layout'
 import { useState } from 'react'
 import { useParams } from '@tanstack/react-router'
 import { useInventoryItem } from '@/hooks/use-inventory'
 import { useCurrentOrgId } from '@/contexts/current-org.context'
 import { useOrgReturnReports } from '@/hooks/use-return-report'
-import { InventoryItemDetailView } from '@/components/common/inventory/inventory-item-detail-view'
+import { InventoryItemDetailView } from '@/components/common/inventory/detail/inventory-detail-view'
 
 export function AdminInventoryItemDetailPage() {
   const { slug, itemId } = useParams({ strict: false }) as { slug: string, itemId: string }
@@ -18,8 +17,7 @@ export function AdminInventoryItemDetailPage() {
     returnReports?.items?.find((r) => r.post?.id === item?.id) ?? null
 
   return (
-    <Layout>
-      <InventoryItemDetailView
+    <InventoryItemDetailView
         slug={slug}
         itemId={itemId}
         backTo={{ to: '/console/$slug/admin/inventory', params: { slug } }}
@@ -29,6 +27,5 @@ export function AdminInventoryItemDetailPage() {
         onMainImageIndexChange={setMainImageIndex}
         returnReportForPost={returnReportForPost}
       />
-    </Layout>
   )
 }

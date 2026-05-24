@@ -6,11 +6,11 @@ import { useInventoryItems } from '@/hooks/use-inventory'
 import { useDebouncedValue } from '@/hooks/use-debounce'
 import { Pagination } from '@/components/common/core/pagination'
 import type { InventoryListItem, PostStatus } from '@/services/inventory.service'
-import { InventoryGridCards } from '@/components/common/inventory/inventory-grid-cards'
+import { InventoryGridCards } from '@/components/common/inventory/list/inventory-grid-cards'
 import { Search, X } from 'lucide-react'
 import { useSubcategories } from '@/hooks/use-subcategories'
-import { FilterDateRangeChip, FilterDropdownChip } from '@/components/common/inventory/filter-dropdown-chip'
-import type { ChipOption } from '@/components/common/inventory/filter-dropdown-chip'
+import { FilterDateRangeChip, FilterDropdownChip } from '@/components/common/inventory/list/filter-dropdown-chip'
+import type { ChipOption } from '@/components/common/inventory/list/filter-dropdown-chip'
 
 const ALL_STATUS = 'All' as const
 type StatusFilter = typeof ALL_STATUS | PostStatus
@@ -123,7 +123,7 @@ export function IntakeHistory() {
         emptyText="No intake history found matching your filters."
 
         detailLink={{
-          to: '/console/$slug/staff/item/$itemId',
+          to: '/console/$slug/staff/inventory/$itemId/',
           params: (item: InventoryListItem) => ({ slug, itemId: item.id }),
         }}
       />

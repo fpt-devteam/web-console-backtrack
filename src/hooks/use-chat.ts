@@ -48,10 +48,10 @@ export function useChatAssigned({ isMe }: { isMe: boolean } = { isMe: false }) {
 }
 
 /** Fetch resolved (closed) conversations handled by the authenticated staff member. */
-export function useChatResolved() {
+export function useChatResolved({ isMe }: { isMe: boolean } = { isMe: false }) {
   return useQuery({
     queryKey: chatKeys.resolved(),
-    queryFn: () => chatService.listResolved(),
+    queryFn: () => chatService.listResolved({ isMe }),
     staleTime: 1000 * 30,
     retry: false,
   });

@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react';
 import type { AdminSubscriptionResult } from '@/types/admin-user.types';
-import { Layout } from '@/components/console/admin/layout';
 import { Check, Info, Loader2, Network } from 'lucide-react';
 import { showToast } from '@/lib/toast';
 import { subscriptionService } from '@/services/subscription.service';
@@ -89,8 +88,7 @@ export function PricingPage() {
   };
 
   return (
-    <Layout>
-      <div className="p-4 sm:p-8 w-full">
+    <div className="p-4 sm:p-8 w-full">
         {/* Header */}
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-[#222222] mb-2">Pricing</h1>
@@ -211,6 +209,5 @@ export function PricingPage() {
           </div>
         )}
       </div>
-    </Layout>
   );
 }

@@ -1,6 +1,5 @@
 import { useMemo, useState } from 'react'
 import { CheckCircle, MapPin, Package, Users, Info } from 'lucide-react'
-import { Layout } from '@/components/console/admin/layout'
 import { StatCard } from '@/components/console/admin/dashboard/stat-card'
 import { MonthlyActivityChart } from '@/components/console/admin/dashboard/monthly-activity-chart'
 import { StaffPerformancePanel } from '@/components/console/admin/dashboard/staff-performance-panel'
@@ -145,8 +144,7 @@ export function AdminDashboardMockPage() {
   }, [allInventory, itemsPage])
 
   return (
-    <Layout>
-      <div className="h-full overflow-y-auto p-4 sm:p-6 lg:p-8 space-y-6">
+    <div className="h-full overflow-y-auto p-4 sm:p-6 lg:p-8 space-y-6">
         {/* Greeting */}
         <div>
           <h1 className="text-2xl font-bold text-[#222222]">
@@ -214,7 +212,6 @@ export function AdminDashboardMockPage() {
           />
         </div>
       </div>
-    </Layout>
   )
 }
 

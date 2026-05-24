@@ -8,7 +8,6 @@ import {
   ShieldCheck,
   TriangleAlert,
 } from 'lucide-react';
-import { Layout } from '@/components/console/admin/layout';
 import type { AdminPaymentHistoryItem, AdminSubscriptionResult } from '@/types/admin-user.types';
 import { showToast } from '@/lib/toast';
 import { subscriptionService } from '@/services/subscription.service';
@@ -97,8 +96,8 @@ export function PlanPage() {
   };
 
   return (
-    <Layout>
-      <div className="p-4 sm:p-8 w-full">
+    <>
+    <div className="p-4 sm:p-8 w-full">
         {/* Header */}
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-[#222222] mb-1">Plan Management</h1>
@@ -358,6 +357,6 @@ export function PlanPage() {
           </div>
         </div>
       )}
-    </Layout>
+    </>
   );
 }

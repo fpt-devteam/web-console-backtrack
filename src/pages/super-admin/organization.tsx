@@ -1,4 +1,5 @@
 import { Layout } from '@/components/super-admin/layout';
+import { formatDate } from '@/utils/datetime.util';
 import { useState } from 'react';
 import { useRouter, useSearch } from '@tanstack/react-router';
 import {
@@ -40,7 +41,7 @@ function formatCapacity(current: number, limit: number | null | undefined, plan:
 
 function formatNextBilling(iso: string | null): string {
   if (!iso) return '—';
-  return new Date(iso).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+  return formatDate(iso);
 }
 
 function PlanBadge({ plan }: { plan: string }) {
@@ -54,13 +55,6 @@ function PlanBadge({ plan }: { plan: string }) {
   );
 }
 
-function formatDate(iso: string) {
-  return new Date(iso).toLocaleDateString('en-US', {
-    month: 'short',
-    day: 'numeric',
-    year: 'numeric',
-  });
-}
 
 export function OrganizationPage() {
   const router = useRouter();

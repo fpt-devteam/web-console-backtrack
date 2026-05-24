@@ -30,13 +30,8 @@ import { Route as AuthCreatePasswordRouteImport } from './routes/auth/create-pas
 import { Route as AuthCheckEmailRouteImport } from './routes/auth/check-email'
 import { Route as ConsoleSlugStaffRouteImport } from './routes/console/$slug/staff'
 import { Route as ConsoleSlugAdminRouteImport } from './routes/console/$slug/admin'
-import { Route as ConsoleSlugStaffMyProcessingClaimRouteImport } from './routes/console/$slug/staff/my-processing-claim'
-import { Route as ConsoleSlugStaffInventorySearchRouteImport } from './routes/console/$slug/staff/inventory-search'
-import { Route as ConsoleSlugStaffInventoryAddItemRouteImport } from './routes/console/$slug/staff/inventory-add-item'
-import { Route as ConsoleSlugStaffInventoryRouteImport } from './routes/console/$slug/staff/inventory'
 import { Route as ConsoleSlugStaffHistoryRouteImport } from './routes/console/$slug/staff/history'
 import { Route as ConsoleSlugStaffDashboardRouteImport } from './routes/console/$slug/staff/dashboard'
-import { Route as ConsoleSlugStaffClaimBoardRouteImport } from './routes/console/$slug/staff/claim-board'
 import { Route as ConsoleSlugAdminSettingRouteImport } from './routes/console/$slug/admin/setting'
 import { Route as ConsoleSlugAdminPricingRouteImport } from './routes/console/$slug/admin/pricing'
 import { Route as ConsoleSlugAdminPlanRouteImport } from './routes/console/$slug/admin/plan'
@@ -44,16 +39,22 @@ import { Route as ConsoleSlugAdminInventoryRouteImport } from './routes/console/
 import { Route as ConsoleSlugAdminEmployeeRouteImport } from './routes/console/$slug/admin/employee'
 import { Route as ConsoleSlugAdminEditAccountRouteImport } from './routes/console/$slug/admin/edit-account'
 import { Route as ConsoleSlugAdminDashboardRouteImport } from './routes/console/$slug/admin/dashboard'
-import { Route as ConsoleSlugAdminClaimBoardRouteImport } from './routes/console/$slug/admin/claim-board'
 import { Route as ConsoleSlugAdminCheckoutRouteImport } from './routes/console/$slug/admin/checkout'
 import { Route as ConsoleSlugAccountSecurityRouteImport } from './routes/console/$slug/account/security'
+import { Route as ConsoleSlugStaffInventoryIndexRouteImport } from './routes/console/$slug/staff/inventory/index'
+import { Route as ConsoleSlugStaffClaimsIndexRouteImport } from './routes/console/$slug/staff/claims/index'
 import { Route as ConsoleSlugAdminSettingIndexRouteImport } from './routes/console/$slug/admin/setting/index'
 import { Route as ConsoleSlugAdminInventoryIndexRouteImport } from './routes/console/$slug/admin/inventory/index'
-import { Route as ConsoleSlugStaffItemItemIdRouteImport } from './routes/console/$slug/staff/item/$itemId'
-import { Route as ConsoleSlugStaffItemEditItemIdRouteImport } from './routes/console/$slug/staff/item-edit/$itemId'
+import { Route as ConsoleSlugAdminClaimsIndexRouteImport } from './routes/console/$slug/admin/claims/index'
+import { Route as ConsoleSlugStaffInventorySearchRouteImport } from './routes/console/$slug/staff/inventory/search'
+import { Route as ConsoleSlugStaffInventoryAddRouteImport } from './routes/console/$slug/staff/inventory/add'
+import { Route as ConsoleSlugStaffClaimsClaimIdRouteImport } from './routes/console/$slug/staff/claims/$claimId'
 import { Route as ConsoleSlugAdminSettingOrganizationRouteImport } from './routes/console/$slug/admin/setting/organization'
 import { Route as ConsoleSlugAdminInventoryItemIdRouteImport } from './routes/console/$slug/admin/inventory/$itemId'
+import { Route as ConsoleSlugAdminClaimsClaimIdRouteImport } from './routes/console/$slug/admin/claims/$claimId'
+import { Route as ConsoleSlugStaffInventoryItemIdIndexRouteImport } from './routes/console/$slug/staff/inventory/$itemId/index'
 import { Route as ConsoleSlugAdminSettingOrganizationIndexRouteImport } from './routes/console/$slug/admin/setting/organization/index'
+import { Route as ConsoleSlugStaffInventoryItemIdEditRouteImport } from './routes/console/$slug/staff/inventory/$itemId/edit'
 import { Route as ConsoleSlugAdminSettingOrganizationEditRouteImport } from './routes/console/$slug/admin/setting/organization/edit'
 
 const SuperAdminRoute = SuperAdminRouteImport.update({
@@ -164,30 +165,6 @@ const ConsoleSlugAdminRoute = ConsoleSlugAdminRouteImport.update({
   path: '/admin',
   getParentRoute: () => ConsoleSlugRoute,
 } as any)
-const ConsoleSlugStaffMyProcessingClaimRoute =
-  ConsoleSlugStaffMyProcessingClaimRouteImport.update({
-    id: '/my-processing-claim',
-    path: '/my-processing-claim',
-    getParentRoute: () => ConsoleSlugStaffRoute,
-  } as any)
-const ConsoleSlugStaffInventorySearchRoute =
-  ConsoleSlugStaffInventorySearchRouteImport.update({
-    id: '/inventory-search',
-    path: '/inventory-search',
-    getParentRoute: () => ConsoleSlugStaffRoute,
-  } as any)
-const ConsoleSlugStaffInventoryAddItemRoute =
-  ConsoleSlugStaffInventoryAddItemRouteImport.update({
-    id: '/inventory-add-item',
-    path: '/inventory-add-item',
-    getParentRoute: () => ConsoleSlugStaffRoute,
-  } as any)
-const ConsoleSlugStaffInventoryRoute =
-  ConsoleSlugStaffInventoryRouteImport.update({
-    id: '/inventory',
-    path: '/inventory',
-    getParentRoute: () => ConsoleSlugStaffRoute,
-  } as any)
 const ConsoleSlugStaffHistoryRoute = ConsoleSlugStaffHistoryRouteImport.update({
   id: '/history',
   path: '/history',
@@ -197,12 +174,6 @@ const ConsoleSlugStaffDashboardRoute =
   ConsoleSlugStaffDashboardRouteImport.update({
     id: '/dashboard',
     path: '/dashboard',
-    getParentRoute: () => ConsoleSlugStaffRoute,
-  } as any)
-const ConsoleSlugStaffClaimBoardRoute =
-  ConsoleSlugStaffClaimBoardRouteImport.update({
-    id: '/claim-board',
-    path: '/claim-board',
     getParentRoute: () => ConsoleSlugStaffRoute,
   } as any)
 const ConsoleSlugAdminSettingRoute = ConsoleSlugAdminSettingRouteImport.update({
@@ -244,12 +215,6 @@ const ConsoleSlugAdminDashboardRoute =
     path: '/dashboard',
     getParentRoute: () => ConsoleSlugAdminRoute,
   } as any)
-const ConsoleSlugAdminClaimBoardRoute =
-  ConsoleSlugAdminClaimBoardRouteImport.update({
-    id: '/claim-board',
-    path: '/claim-board',
-    getParentRoute: () => ConsoleSlugAdminRoute,
-  } as any)
 const ConsoleSlugAdminCheckoutRoute =
   ConsoleSlugAdminCheckoutRouteImport.update({
     id: '/checkout',
@@ -261,6 +226,18 @@ const ConsoleSlugAccountSecurityRoute =
     id: '/account/security',
     path: '/account/security',
     getParentRoute: () => ConsoleSlugRoute,
+  } as any)
+const ConsoleSlugStaffInventoryIndexRoute =
+  ConsoleSlugStaffInventoryIndexRouteImport.update({
+    id: '/inventory/',
+    path: '/inventory/',
+    getParentRoute: () => ConsoleSlugStaffRoute,
+  } as any)
+const ConsoleSlugStaffClaimsIndexRoute =
+  ConsoleSlugStaffClaimsIndexRouteImport.update({
+    id: '/claims/',
+    path: '/claims/',
+    getParentRoute: () => ConsoleSlugStaffRoute,
   } as any)
 const ConsoleSlugAdminSettingIndexRoute =
   ConsoleSlugAdminSettingIndexRouteImport.update({
@@ -274,16 +251,28 @@ const ConsoleSlugAdminInventoryIndexRoute =
     path: '/',
     getParentRoute: () => ConsoleSlugAdminInventoryRoute,
   } as any)
-const ConsoleSlugStaffItemItemIdRoute =
-  ConsoleSlugStaffItemItemIdRouteImport.update({
-    id: '/item/$itemId',
-    path: '/item/$itemId',
+const ConsoleSlugAdminClaimsIndexRoute =
+  ConsoleSlugAdminClaimsIndexRouteImport.update({
+    id: '/claims/',
+    path: '/claims/',
+    getParentRoute: () => ConsoleSlugAdminRoute,
+  } as any)
+const ConsoleSlugStaffInventorySearchRoute =
+  ConsoleSlugStaffInventorySearchRouteImport.update({
+    id: '/inventory/search',
+    path: '/inventory/search',
     getParentRoute: () => ConsoleSlugStaffRoute,
   } as any)
-const ConsoleSlugStaffItemEditItemIdRoute =
-  ConsoleSlugStaffItemEditItemIdRouteImport.update({
-    id: '/item-edit/$itemId',
-    path: '/item-edit/$itemId',
+const ConsoleSlugStaffInventoryAddRoute =
+  ConsoleSlugStaffInventoryAddRouteImport.update({
+    id: '/inventory/add',
+    path: '/inventory/add',
+    getParentRoute: () => ConsoleSlugStaffRoute,
+  } as any)
+const ConsoleSlugStaffClaimsClaimIdRoute =
+  ConsoleSlugStaffClaimsClaimIdRouteImport.update({
+    id: '/claims/$claimId',
+    path: '/claims/$claimId',
     getParentRoute: () => ConsoleSlugStaffRoute,
   } as any)
 const ConsoleSlugAdminSettingOrganizationRoute =
@@ -298,11 +287,29 @@ const ConsoleSlugAdminInventoryItemIdRoute =
     path: '/$itemId',
     getParentRoute: () => ConsoleSlugAdminInventoryRoute,
   } as any)
+const ConsoleSlugAdminClaimsClaimIdRoute =
+  ConsoleSlugAdminClaimsClaimIdRouteImport.update({
+    id: '/claims/$claimId',
+    path: '/claims/$claimId',
+    getParentRoute: () => ConsoleSlugAdminRoute,
+  } as any)
+const ConsoleSlugStaffInventoryItemIdIndexRoute =
+  ConsoleSlugStaffInventoryItemIdIndexRouteImport.update({
+    id: '/inventory/$itemId/',
+    path: '/inventory/$itemId/',
+    getParentRoute: () => ConsoleSlugStaffRoute,
+  } as any)
 const ConsoleSlugAdminSettingOrganizationIndexRoute =
   ConsoleSlugAdminSettingOrganizationIndexRouteImport.update({
     id: '/',
     path: '/',
     getParentRoute: () => ConsoleSlugAdminSettingOrganizationRoute,
+  } as any)
+const ConsoleSlugStaffInventoryItemIdEditRoute =
+  ConsoleSlugStaffInventoryItemIdEditRouteImport.update({
+    id: '/inventory/$itemId/edit',
+    path: '/inventory/$itemId/edit',
+    getParentRoute: () => ConsoleSlugStaffRoute,
   } as any)
 const ConsoleSlugAdminSettingOrganizationEditRoute =
   ConsoleSlugAdminSettingOrganizationEditRouteImport.update({
@@ -335,7 +342,6 @@ export interface FileRoutesByFullPath {
   '/console/$slug/staff': typeof ConsoleSlugStaffRouteWithChildren
   '/console/$slug/account/security': typeof ConsoleSlugAccountSecurityRoute
   '/console/$slug/admin/checkout': typeof ConsoleSlugAdminCheckoutRoute
-  '/console/$slug/admin/claim-board': typeof ConsoleSlugAdminClaimBoardRoute
   '/console/$slug/admin/dashboard': typeof ConsoleSlugAdminDashboardRoute
   '/console/$slug/admin/edit-account': typeof ConsoleSlugAdminEditAccountRoute
   '/console/$slug/admin/employee': typeof ConsoleSlugAdminEmployeeRoute
@@ -343,21 +349,23 @@ export interface FileRoutesByFullPath {
   '/console/$slug/admin/plan': typeof ConsoleSlugAdminPlanRoute
   '/console/$slug/admin/pricing': typeof ConsoleSlugAdminPricingRoute
   '/console/$slug/admin/setting': typeof ConsoleSlugAdminSettingRouteWithChildren
-  '/console/$slug/staff/claim-board': typeof ConsoleSlugStaffClaimBoardRoute
   '/console/$slug/staff/dashboard': typeof ConsoleSlugStaffDashboardRoute
   '/console/$slug/staff/history': typeof ConsoleSlugStaffHistoryRoute
-  '/console/$slug/staff/inventory': typeof ConsoleSlugStaffInventoryRoute
-  '/console/$slug/staff/inventory-add-item': typeof ConsoleSlugStaffInventoryAddItemRoute
-  '/console/$slug/staff/inventory-search': typeof ConsoleSlugStaffInventorySearchRoute
-  '/console/$slug/staff/my-processing-claim': typeof ConsoleSlugStaffMyProcessingClaimRoute
+  '/console/$slug/admin/claims/$claimId': typeof ConsoleSlugAdminClaimsClaimIdRoute
   '/console/$slug/admin/inventory/$itemId': typeof ConsoleSlugAdminInventoryItemIdRoute
   '/console/$slug/admin/setting/organization': typeof ConsoleSlugAdminSettingOrganizationRouteWithChildren
-  '/console/$slug/staff/item-edit/$itemId': typeof ConsoleSlugStaffItemEditItemIdRoute
-  '/console/$slug/staff/item/$itemId': typeof ConsoleSlugStaffItemItemIdRoute
+  '/console/$slug/staff/claims/$claimId': typeof ConsoleSlugStaffClaimsClaimIdRoute
+  '/console/$slug/staff/inventory/add': typeof ConsoleSlugStaffInventoryAddRoute
+  '/console/$slug/staff/inventory/search': typeof ConsoleSlugStaffInventorySearchRoute
+  '/console/$slug/admin/claims': typeof ConsoleSlugAdminClaimsIndexRoute
   '/console/$slug/admin/inventory/': typeof ConsoleSlugAdminInventoryIndexRoute
   '/console/$slug/admin/setting/': typeof ConsoleSlugAdminSettingIndexRoute
+  '/console/$slug/staff/claims': typeof ConsoleSlugStaffClaimsIndexRoute
+  '/console/$slug/staff/inventory': typeof ConsoleSlugStaffInventoryIndexRoute
   '/console/$slug/admin/setting/organization/edit': typeof ConsoleSlugAdminSettingOrganizationEditRoute
+  '/console/$slug/staff/inventory/$itemId/edit': typeof ConsoleSlugStaffInventoryItemIdEditRoute
   '/console/$slug/admin/setting/organization/': typeof ConsoleSlugAdminSettingOrganizationIndexRoute
+  '/console/$slug/staff/inventory/$itemId': typeof ConsoleSlugStaffInventoryItemIdIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -383,26 +391,27 @@ export interface FileRoutesByTo {
   '/console/$slug/staff': typeof ConsoleSlugStaffRouteWithChildren
   '/console/$slug/account/security': typeof ConsoleSlugAccountSecurityRoute
   '/console/$slug/admin/checkout': typeof ConsoleSlugAdminCheckoutRoute
-  '/console/$slug/admin/claim-board': typeof ConsoleSlugAdminClaimBoardRoute
   '/console/$slug/admin/dashboard': typeof ConsoleSlugAdminDashboardRoute
   '/console/$slug/admin/edit-account': typeof ConsoleSlugAdminEditAccountRoute
   '/console/$slug/admin/employee': typeof ConsoleSlugAdminEmployeeRoute
   '/console/$slug/admin/plan': typeof ConsoleSlugAdminPlanRoute
   '/console/$slug/admin/pricing': typeof ConsoleSlugAdminPricingRoute
-  '/console/$slug/staff/claim-board': typeof ConsoleSlugStaffClaimBoardRoute
   '/console/$slug/staff/dashboard': typeof ConsoleSlugStaffDashboardRoute
   '/console/$slug/staff/history': typeof ConsoleSlugStaffHistoryRoute
-  '/console/$slug/staff/inventory': typeof ConsoleSlugStaffInventoryRoute
-  '/console/$slug/staff/inventory-add-item': typeof ConsoleSlugStaffInventoryAddItemRoute
-  '/console/$slug/staff/inventory-search': typeof ConsoleSlugStaffInventorySearchRoute
-  '/console/$slug/staff/my-processing-claim': typeof ConsoleSlugStaffMyProcessingClaimRoute
+  '/console/$slug/admin/claims/$claimId': typeof ConsoleSlugAdminClaimsClaimIdRoute
   '/console/$slug/admin/inventory/$itemId': typeof ConsoleSlugAdminInventoryItemIdRoute
-  '/console/$slug/staff/item-edit/$itemId': typeof ConsoleSlugStaffItemEditItemIdRoute
-  '/console/$slug/staff/item/$itemId': typeof ConsoleSlugStaffItemItemIdRoute
+  '/console/$slug/staff/claims/$claimId': typeof ConsoleSlugStaffClaimsClaimIdRoute
+  '/console/$slug/staff/inventory/add': typeof ConsoleSlugStaffInventoryAddRoute
+  '/console/$slug/staff/inventory/search': typeof ConsoleSlugStaffInventorySearchRoute
+  '/console/$slug/admin/claims': typeof ConsoleSlugAdminClaimsIndexRoute
   '/console/$slug/admin/inventory': typeof ConsoleSlugAdminInventoryIndexRoute
   '/console/$slug/admin/setting': typeof ConsoleSlugAdminSettingIndexRoute
+  '/console/$slug/staff/claims': typeof ConsoleSlugStaffClaimsIndexRoute
+  '/console/$slug/staff/inventory': typeof ConsoleSlugStaffInventoryIndexRoute
   '/console/$slug/admin/setting/organization/edit': typeof ConsoleSlugAdminSettingOrganizationEditRoute
+  '/console/$slug/staff/inventory/$itemId/edit': typeof ConsoleSlugStaffInventoryItemIdEditRoute
   '/console/$slug/admin/setting/organization': typeof ConsoleSlugAdminSettingOrganizationIndexRoute
+  '/console/$slug/staff/inventory/$itemId': typeof ConsoleSlugStaffInventoryItemIdIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -429,7 +438,6 @@ export interface FileRoutesById {
   '/console/$slug/staff': typeof ConsoleSlugStaffRouteWithChildren
   '/console/$slug/account/security': typeof ConsoleSlugAccountSecurityRoute
   '/console/$slug/admin/checkout': typeof ConsoleSlugAdminCheckoutRoute
-  '/console/$slug/admin/claim-board': typeof ConsoleSlugAdminClaimBoardRoute
   '/console/$slug/admin/dashboard': typeof ConsoleSlugAdminDashboardRoute
   '/console/$slug/admin/edit-account': typeof ConsoleSlugAdminEditAccountRoute
   '/console/$slug/admin/employee': typeof ConsoleSlugAdminEmployeeRoute
@@ -437,21 +445,23 @@ export interface FileRoutesById {
   '/console/$slug/admin/plan': typeof ConsoleSlugAdminPlanRoute
   '/console/$slug/admin/pricing': typeof ConsoleSlugAdminPricingRoute
   '/console/$slug/admin/setting': typeof ConsoleSlugAdminSettingRouteWithChildren
-  '/console/$slug/staff/claim-board': typeof ConsoleSlugStaffClaimBoardRoute
   '/console/$slug/staff/dashboard': typeof ConsoleSlugStaffDashboardRoute
   '/console/$slug/staff/history': typeof ConsoleSlugStaffHistoryRoute
-  '/console/$slug/staff/inventory': typeof ConsoleSlugStaffInventoryRoute
-  '/console/$slug/staff/inventory-add-item': typeof ConsoleSlugStaffInventoryAddItemRoute
-  '/console/$slug/staff/inventory-search': typeof ConsoleSlugStaffInventorySearchRoute
-  '/console/$slug/staff/my-processing-claim': typeof ConsoleSlugStaffMyProcessingClaimRoute
+  '/console/$slug/admin/claims/$claimId': typeof ConsoleSlugAdminClaimsClaimIdRoute
   '/console/$slug/admin/inventory/$itemId': typeof ConsoleSlugAdminInventoryItemIdRoute
   '/console/$slug/admin/setting/organization': typeof ConsoleSlugAdminSettingOrganizationRouteWithChildren
-  '/console/$slug/staff/item-edit/$itemId': typeof ConsoleSlugStaffItemEditItemIdRoute
-  '/console/$slug/staff/item/$itemId': typeof ConsoleSlugStaffItemItemIdRoute
+  '/console/$slug/staff/claims/$claimId': typeof ConsoleSlugStaffClaimsClaimIdRoute
+  '/console/$slug/staff/inventory/add': typeof ConsoleSlugStaffInventoryAddRoute
+  '/console/$slug/staff/inventory/search': typeof ConsoleSlugStaffInventorySearchRoute
+  '/console/$slug/admin/claims/': typeof ConsoleSlugAdminClaimsIndexRoute
   '/console/$slug/admin/inventory/': typeof ConsoleSlugAdminInventoryIndexRoute
   '/console/$slug/admin/setting/': typeof ConsoleSlugAdminSettingIndexRoute
+  '/console/$slug/staff/claims/': typeof ConsoleSlugStaffClaimsIndexRoute
+  '/console/$slug/staff/inventory/': typeof ConsoleSlugStaffInventoryIndexRoute
   '/console/$slug/admin/setting/organization/edit': typeof ConsoleSlugAdminSettingOrganizationEditRoute
+  '/console/$slug/staff/inventory/$itemId/edit': typeof ConsoleSlugStaffInventoryItemIdEditRoute
   '/console/$slug/admin/setting/organization/': typeof ConsoleSlugAdminSettingOrganizationIndexRoute
+  '/console/$slug/staff/inventory/$itemId/': typeof ConsoleSlugStaffInventoryItemIdIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -479,7 +489,6 @@ export interface FileRouteTypes {
     | '/console/$slug/staff'
     | '/console/$slug/account/security'
     | '/console/$slug/admin/checkout'
-    | '/console/$slug/admin/claim-board'
     | '/console/$slug/admin/dashboard'
     | '/console/$slug/admin/edit-account'
     | '/console/$slug/admin/employee'
@@ -487,21 +496,23 @@ export interface FileRouteTypes {
     | '/console/$slug/admin/plan'
     | '/console/$slug/admin/pricing'
     | '/console/$slug/admin/setting'
-    | '/console/$slug/staff/claim-board'
     | '/console/$slug/staff/dashboard'
     | '/console/$slug/staff/history'
-    | '/console/$slug/staff/inventory'
-    | '/console/$slug/staff/inventory-add-item'
-    | '/console/$slug/staff/inventory-search'
-    | '/console/$slug/staff/my-processing-claim'
+    | '/console/$slug/admin/claims/$claimId'
     | '/console/$slug/admin/inventory/$itemId'
     | '/console/$slug/admin/setting/organization'
-    | '/console/$slug/staff/item-edit/$itemId'
-    | '/console/$slug/staff/item/$itemId'
+    | '/console/$slug/staff/claims/$claimId'
+    | '/console/$slug/staff/inventory/add'
+    | '/console/$slug/staff/inventory/search'
+    | '/console/$slug/admin/claims'
     | '/console/$slug/admin/inventory/'
     | '/console/$slug/admin/setting/'
+    | '/console/$slug/staff/claims'
+    | '/console/$slug/staff/inventory'
     | '/console/$slug/admin/setting/organization/edit'
+    | '/console/$slug/staff/inventory/$itemId/edit'
     | '/console/$slug/admin/setting/organization/'
+    | '/console/$slug/staff/inventory/$itemId'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -527,26 +538,27 @@ export interface FileRouteTypes {
     | '/console/$slug/staff'
     | '/console/$slug/account/security'
     | '/console/$slug/admin/checkout'
-    | '/console/$slug/admin/claim-board'
     | '/console/$slug/admin/dashboard'
     | '/console/$slug/admin/edit-account'
     | '/console/$slug/admin/employee'
     | '/console/$slug/admin/plan'
     | '/console/$slug/admin/pricing'
-    | '/console/$slug/staff/claim-board'
     | '/console/$slug/staff/dashboard'
     | '/console/$slug/staff/history'
-    | '/console/$slug/staff/inventory'
-    | '/console/$slug/staff/inventory-add-item'
-    | '/console/$slug/staff/inventory-search'
-    | '/console/$slug/staff/my-processing-claim'
+    | '/console/$slug/admin/claims/$claimId'
     | '/console/$slug/admin/inventory/$itemId'
-    | '/console/$slug/staff/item-edit/$itemId'
-    | '/console/$slug/staff/item/$itemId'
+    | '/console/$slug/staff/claims/$claimId'
+    | '/console/$slug/staff/inventory/add'
+    | '/console/$slug/staff/inventory/search'
+    | '/console/$slug/admin/claims'
     | '/console/$slug/admin/inventory'
     | '/console/$slug/admin/setting'
+    | '/console/$slug/staff/claims'
+    | '/console/$slug/staff/inventory'
     | '/console/$slug/admin/setting/organization/edit'
+    | '/console/$slug/staff/inventory/$itemId/edit'
     | '/console/$slug/admin/setting/organization'
+    | '/console/$slug/staff/inventory/$itemId'
   id:
     | '__root__'
     | '/'
@@ -572,7 +584,6 @@ export interface FileRouteTypes {
     | '/console/$slug/staff'
     | '/console/$slug/account/security'
     | '/console/$slug/admin/checkout'
-    | '/console/$slug/admin/claim-board'
     | '/console/$slug/admin/dashboard'
     | '/console/$slug/admin/edit-account'
     | '/console/$slug/admin/employee'
@@ -580,21 +591,23 @@ export interface FileRouteTypes {
     | '/console/$slug/admin/plan'
     | '/console/$slug/admin/pricing'
     | '/console/$slug/admin/setting'
-    | '/console/$slug/staff/claim-board'
     | '/console/$slug/staff/dashboard'
     | '/console/$slug/staff/history'
-    | '/console/$slug/staff/inventory'
-    | '/console/$slug/staff/inventory-add-item'
-    | '/console/$slug/staff/inventory-search'
-    | '/console/$slug/staff/my-processing-claim'
+    | '/console/$slug/admin/claims/$claimId'
     | '/console/$slug/admin/inventory/$itemId'
     | '/console/$slug/admin/setting/organization'
-    | '/console/$slug/staff/item-edit/$itemId'
-    | '/console/$slug/staff/item/$itemId'
+    | '/console/$slug/staff/claims/$claimId'
+    | '/console/$slug/staff/inventory/add'
+    | '/console/$slug/staff/inventory/search'
+    | '/console/$slug/admin/claims/'
     | '/console/$slug/admin/inventory/'
     | '/console/$slug/admin/setting/'
+    | '/console/$slug/staff/claims/'
+    | '/console/$slug/staff/inventory/'
     | '/console/$slug/admin/setting/organization/edit'
+    | '/console/$slug/staff/inventory/$itemId/edit'
     | '/console/$slug/admin/setting/organization/'
+    | '/console/$slug/staff/inventory/$itemId/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -762,34 +775,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ConsoleSlugAdminRouteImport
       parentRoute: typeof ConsoleSlugRoute
     }
-    '/console/$slug/staff/my-processing-claim': {
-      id: '/console/$slug/staff/my-processing-claim'
-      path: '/my-processing-claim'
-      fullPath: '/console/$slug/staff/my-processing-claim'
-      preLoaderRoute: typeof ConsoleSlugStaffMyProcessingClaimRouteImport
-      parentRoute: typeof ConsoleSlugStaffRoute
-    }
-    '/console/$slug/staff/inventory-search': {
-      id: '/console/$slug/staff/inventory-search'
-      path: '/inventory-search'
-      fullPath: '/console/$slug/staff/inventory-search'
-      preLoaderRoute: typeof ConsoleSlugStaffInventorySearchRouteImport
-      parentRoute: typeof ConsoleSlugStaffRoute
-    }
-    '/console/$slug/staff/inventory-add-item': {
-      id: '/console/$slug/staff/inventory-add-item'
-      path: '/inventory-add-item'
-      fullPath: '/console/$slug/staff/inventory-add-item'
-      preLoaderRoute: typeof ConsoleSlugStaffInventoryAddItemRouteImport
-      parentRoute: typeof ConsoleSlugStaffRoute
-    }
-    '/console/$slug/staff/inventory': {
-      id: '/console/$slug/staff/inventory'
-      path: '/inventory'
-      fullPath: '/console/$slug/staff/inventory'
-      preLoaderRoute: typeof ConsoleSlugStaffInventoryRouteImport
-      parentRoute: typeof ConsoleSlugStaffRoute
-    }
     '/console/$slug/staff/history': {
       id: '/console/$slug/staff/history'
       path: '/history'
@@ -802,13 +787,6 @@ declare module '@tanstack/react-router' {
       path: '/dashboard'
       fullPath: '/console/$slug/staff/dashboard'
       preLoaderRoute: typeof ConsoleSlugStaffDashboardRouteImport
-      parentRoute: typeof ConsoleSlugStaffRoute
-    }
-    '/console/$slug/staff/claim-board': {
-      id: '/console/$slug/staff/claim-board'
-      path: '/claim-board'
-      fullPath: '/console/$slug/staff/claim-board'
-      preLoaderRoute: typeof ConsoleSlugStaffClaimBoardRouteImport
       parentRoute: typeof ConsoleSlugStaffRoute
     }
     '/console/$slug/admin/setting': {
@@ -860,13 +838,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ConsoleSlugAdminDashboardRouteImport
       parentRoute: typeof ConsoleSlugAdminRoute
     }
-    '/console/$slug/admin/claim-board': {
-      id: '/console/$slug/admin/claim-board'
-      path: '/claim-board'
-      fullPath: '/console/$slug/admin/claim-board'
-      preLoaderRoute: typeof ConsoleSlugAdminClaimBoardRouteImport
-      parentRoute: typeof ConsoleSlugAdminRoute
-    }
     '/console/$slug/admin/checkout': {
       id: '/console/$slug/admin/checkout'
       path: '/checkout'
@@ -880,6 +851,20 @@ declare module '@tanstack/react-router' {
       fullPath: '/console/$slug/account/security'
       preLoaderRoute: typeof ConsoleSlugAccountSecurityRouteImport
       parentRoute: typeof ConsoleSlugRoute
+    }
+    '/console/$slug/staff/inventory/': {
+      id: '/console/$slug/staff/inventory/'
+      path: '/inventory'
+      fullPath: '/console/$slug/staff/inventory'
+      preLoaderRoute: typeof ConsoleSlugStaffInventoryIndexRouteImport
+      parentRoute: typeof ConsoleSlugStaffRoute
+    }
+    '/console/$slug/staff/claims/': {
+      id: '/console/$slug/staff/claims/'
+      path: '/claims'
+      fullPath: '/console/$slug/staff/claims'
+      preLoaderRoute: typeof ConsoleSlugStaffClaimsIndexRouteImport
+      parentRoute: typeof ConsoleSlugStaffRoute
     }
     '/console/$slug/admin/setting/': {
       id: '/console/$slug/admin/setting/'
@@ -895,18 +880,32 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ConsoleSlugAdminInventoryIndexRouteImport
       parentRoute: typeof ConsoleSlugAdminInventoryRoute
     }
-    '/console/$slug/staff/item/$itemId': {
-      id: '/console/$slug/staff/item/$itemId'
-      path: '/item/$itemId'
-      fullPath: '/console/$slug/staff/item/$itemId'
-      preLoaderRoute: typeof ConsoleSlugStaffItemItemIdRouteImport
+    '/console/$slug/admin/claims/': {
+      id: '/console/$slug/admin/claims/'
+      path: '/claims'
+      fullPath: '/console/$slug/admin/claims'
+      preLoaderRoute: typeof ConsoleSlugAdminClaimsIndexRouteImport
+      parentRoute: typeof ConsoleSlugAdminRoute
+    }
+    '/console/$slug/staff/inventory/search': {
+      id: '/console/$slug/staff/inventory/search'
+      path: '/inventory/search'
+      fullPath: '/console/$slug/staff/inventory/search'
+      preLoaderRoute: typeof ConsoleSlugStaffInventorySearchRouteImport
       parentRoute: typeof ConsoleSlugStaffRoute
     }
-    '/console/$slug/staff/item-edit/$itemId': {
-      id: '/console/$slug/staff/item-edit/$itemId'
-      path: '/item-edit/$itemId'
-      fullPath: '/console/$slug/staff/item-edit/$itemId'
-      preLoaderRoute: typeof ConsoleSlugStaffItemEditItemIdRouteImport
+    '/console/$slug/staff/inventory/add': {
+      id: '/console/$slug/staff/inventory/add'
+      path: '/inventory/add'
+      fullPath: '/console/$slug/staff/inventory/add'
+      preLoaderRoute: typeof ConsoleSlugStaffInventoryAddRouteImport
+      parentRoute: typeof ConsoleSlugStaffRoute
+    }
+    '/console/$slug/staff/claims/$claimId': {
+      id: '/console/$slug/staff/claims/$claimId'
+      path: '/claims/$claimId'
+      fullPath: '/console/$slug/staff/claims/$claimId'
+      preLoaderRoute: typeof ConsoleSlugStaffClaimsClaimIdRouteImport
       parentRoute: typeof ConsoleSlugStaffRoute
     }
     '/console/$slug/admin/setting/organization': {
@@ -923,12 +922,33 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ConsoleSlugAdminInventoryItemIdRouteImport
       parentRoute: typeof ConsoleSlugAdminInventoryRoute
     }
+    '/console/$slug/admin/claims/$claimId': {
+      id: '/console/$slug/admin/claims/$claimId'
+      path: '/claims/$claimId'
+      fullPath: '/console/$slug/admin/claims/$claimId'
+      preLoaderRoute: typeof ConsoleSlugAdminClaimsClaimIdRouteImport
+      parentRoute: typeof ConsoleSlugAdminRoute
+    }
+    '/console/$slug/staff/inventory/$itemId/': {
+      id: '/console/$slug/staff/inventory/$itemId/'
+      path: '/inventory/$itemId'
+      fullPath: '/console/$slug/staff/inventory/$itemId'
+      preLoaderRoute: typeof ConsoleSlugStaffInventoryItemIdIndexRouteImport
+      parentRoute: typeof ConsoleSlugStaffRoute
+    }
     '/console/$slug/admin/setting/organization/': {
       id: '/console/$slug/admin/setting/organization/'
       path: '/'
       fullPath: '/console/$slug/admin/setting/organization/'
       preLoaderRoute: typeof ConsoleSlugAdminSettingOrganizationIndexRouteImport
       parentRoute: typeof ConsoleSlugAdminSettingOrganizationRoute
+    }
+    '/console/$slug/staff/inventory/$itemId/edit': {
+      id: '/console/$slug/staff/inventory/$itemId/edit'
+      path: '/inventory/$itemId/edit'
+      fullPath: '/console/$slug/staff/inventory/$itemId/edit'
+      preLoaderRoute: typeof ConsoleSlugStaffInventoryItemIdEditRouteImport
+      parentRoute: typeof ConsoleSlugStaffRoute
     }
     '/console/$slug/admin/setting/organization/edit': {
       id: '/console/$slug/admin/setting/organization/edit'
@@ -1015,7 +1035,6 @@ const ConsoleSlugAdminSettingRouteWithChildren =
 
 interface ConsoleSlugAdminRouteChildren {
   ConsoleSlugAdminCheckoutRoute: typeof ConsoleSlugAdminCheckoutRoute
-  ConsoleSlugAdminClaimBoardRoute: typeof ConsoleSlugAdminClaimBoardRoute
   ConsoleSlugAdminDashboardRoute: typeof ConsoleSlugAdminDashboardRoute
   ConsoleSlugAdminEditAccountRoute: typeof ConsoleSlugAdminEditAccountRoute
   ConsoleSlugAdminEmployeeRoute: typeof ConsoleSlugAdminEmployeeRoute
@@ -1023,11 +1042,12 @@ interface ConsoleSlugAdminRouteChildren {
   ConsoleSlugAdminPlanRoute: typeof ConsoleSlugAdminPlanRoute
   ConsoleSlugAdminPricingRoute: typeof ConsoleSlugAdminPricingRoute
   ConsoleSlugAdminSettingRoute: typeof ConsoleSlugAdminSettingRouteWithChildren
+  ConsoleSlugAdminClaimsClaimIdRoute: typeof ConsoleSlugAdminClaimsClaimIdRoute
+  ConsoleSlugAdminClaimsIndexRoute: typeof ConsoleSlugAdminClaimsIndexRoute
 }
 
 const ConsoleSlugAdminRouteChildren: ConsoleSlugAdminRouteChildren = {
   ConsoleSlugAdminCheckoutRoute: ConsoleSlugAdminCheckoutRoute,
-  ConsoleSlugAdminClaimBoardRoute: ConsoleSlugAdminClaimBoardRoute,
   ConsoleSlugAdminDashboardRoute: ConsoleSlugAdminDashboardRoute,
   ConsoleSlugAdminEditAccountRoute: ConsoleSlugAdminEditAccountRoute,
   ConsoleSlugAdminEmployeeRoute: ConsoleSlugAdminEmployeeRoute,
@@ -1035,34 +1055,37 @@ const ConsoleSlugAdminRouteChildren: ConsoleSlugAdminRouteChildren = {
   ConsoleSlugAdminPlanRoute: ConsoleSlugAdminPlanRoute,
   ConsoleSlugAdminPricingRoute: ConsoleSlugAdminPricingRoute,
   ConsoleSlugAdminSettingRoute: ConsoleSlugAdminSettingRouteWithChildren,
+  ConsoleSlugAdminClaimsClaimIdRoute: ConsoleSlugAdminClaimsClaimIdRoute,
+  ConsoleSlugAdminClaimsIndexRoute: ConsoleSlugAdminClaimsIndexRoute,
 }
 
 const ConsoleSlugAdminRouteWithChildren =
   ConsoleSlugAdminRoute._addFileChildren(ConsoleSlugAdminRouteChildren)
 
 interface ConsoleSlugStaffRouteChildren {
-  ConsoleSlugStaffClaimBoardRoute: typeof ConsoleSlugStaffClaimBoardRoute
   ConsoleSlugStaffDashboardRoute: typeof ConsoleSlugStaffDashboardRoute
   ConsoleSlugStaffHistoryRoute: typeof ConsoleSlugStaffHistoryRoute
-  ConsoleSlugStaffInventoryRoute: typeof ConsoleSlugStaffInventoryRoute
-  ConsoleSlugStaffInventoryAddItemRoute: typeof ConsoleSlugStaffInventoryAddItemRoute
+  ConsoleSlugStaffClaimsClaimIdRoute: typeof ConsoleSlugStaffClaimsClaimIdRoute
+  ConsoleSlugStaffInventoryAddRoute: typeof ConsoleSlugStaffInventoryAddRoute
   ConsoleSlugStaffInventorySearchRoute: typeof ConsoleSlugStaffInventorySearchRoute
-  ConsoleSlugStaffMyProcessingClaimRoute: typeof ConsoleSlugStaffMyProcessingClaimRoute
-  ConsoleSlugStaffItemEditItemIdRoute: typeof ConsoleSlugStaffItemEditItemIdRoute
-  ConsoleSlugStaffItemItemIdRoute: typeof ConsoleSlugStaffItemItemIdRoute
+  ConsoleSlugStaffClaimsIndexRoute: typeof ConsoleSlugStaffClaimsIndexRoute
+  ConsoleSlugStaffInventoryIndexRoute: typeof ConsoleSlugStaffInventoryIndexRoute
+  ConsoleSlugStaffInventoryItemIdEditRoute: typeof ConsoleSlugStaffInventoryItemIdEditRoute
+  ConsoleSlugStaffInventoryItemIdIndexRoute: typeof ConsoleSlugStaffInventoryItemIdIndexRoute
 }
 
 const ConsoleSlugStaffRouteChildren: ConsoleSlugStaffRouteChildren = {
-  ConsoleSlugStaffClaimBoardRoute: ConsoleSlugStaffClaimBoardRoute,
   ConsoleSlugStaffDashboardRoute: ConsoleSlugStaffDashboardRoute,
   ConsoleSlugStaffHistoryRoute: ConsoleSlugStaffHistoryRoute,
-  ConsoleSlugStaffInventoryRoute: ConsoleSlugStaffInventoryRoute,
-  ConsoleSlugStaffInventoryAddItemRoute: ConsoleSlugStaffInventoryAddItemRoute,
+  ConsoleSlugStaffClaimsClaimIdRoute: ConsoleSlugStaffClaimsClaimIdRoute,
+  ConsoleSlugStaffInventoryAddRoute: ConsoleSlugStaffInventoryAddRoute,
   ConsoleSlugStaffInventorySearchRoute: ConsoleSlugStaffInventorySearchRoute,
-  ConsoleSlugStaffMyProcessingClaimRoute:
-    ConsoleSlugStaffMyProcessingClaimRoute,
-  ConsoleSlugStaffItemEditItemIdRoute: ConsoleSlugStaffItemEditItemIdRoute,
-  ConsoleSlugStaffItemItemIdRoute: ConsoleSlugStaffItemItemIdRoute,
+  ConsoleSlugStaffClaimsIndexRoute: ConsoleSlugStaffClaimsIndexRoute,
+  ConsoleSlugStaffInventoryIndexRoute: ConsoleSlugStaffInventoryIndexRoute,
+  ConsoleSlugStaffInventoryItemIdEditRoute:
+    ConsoleSlugStaffInventoryItemIdEditRoute,
+  ConsoleSlugStaffInventoryItemIdIndexRoute:
+    ConsoleSlugStaffInventoryItemIdIndexRoute,
 }
 
 const ConsoleSlugStaffRouteWithChildren =

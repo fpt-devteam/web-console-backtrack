@@ -1,6 +1,7 @@
 import { Outlet, createFileRoute } from '@tanstack/react-router'
 import { requireOrgStaff } from '@/lib/route-guards'
 import { Forbidden } from '@/components/common/errors/forbidden-page'
+import { StaffLayout } from '@/components/console/staff/staff-layout'
 
 export const Route = createFileRoute('/console/$slug/staff')({
   beforeLoad: async ({ context }) => {
@@ -11,6 +12,10 @@ export const Route = createFileRoute('/console/$slug/staff')({
 })
 
 function RouteComponent() {
-  return <Outlet />
+  return (
+    <StaffLayout>
+      <Outlet />
+    </StaffLayout>
+  )
 }
 

@@ -1,4 +1,3 @@
-import { Layout } from '@/components/console/admin/layout';
 import { useState } from 'react';
 import type { FormEvent } from 'react';
 import { useRouter, useParams } from '@tanstack/react-router';
@@ -101,8 +100,7 @@ export function EditAccountPage() {
   };
 
   return (
-    <Layout>
-      <div className="p-8 max-w-6xl mx-auto">
+    <div className="p-8 max-w-6xl mx-auto">
         {/* Header */}
         <div className="mb-8">
           <button
@@ -385,7 +383,6 @@ export function EditAccountPage() {
           </div>
         </form>
       </div>
-    </Layout>
   );
 }
 

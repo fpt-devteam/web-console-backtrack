@@ -11,7 +11,7 @@ export function ConsoleAuthLayout({ children }: { children: ReactNode }) {
     <div className="relative flex min-h-screen">
       <button
         type="button"
-        onClick={() => router.navigate({ to: '/features' })}
+        onClick={() => router.navigate({ to: '/' })}
         aria-label="Back"
         className="absolute top-5 left-5 z-30 flex h-9 w-9 cursor-pointer items-center justify-center rounded-full border border-[#E5E7EB] bg-white shadow-sm transition-colors duration-150 hover:bg-[#F9FAFB] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-400"
       >

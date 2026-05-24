@@ -1,4 +1,3 @@
-import { Layout } from '@/components/console/admin/layout'
 import { Download } from 'lucide-react'
 import { useMemo } from 'react'
 import { Pagination } from '@/components/common/core/pagination'
@@ -8,10 +7,10 @@ import { useInventoryItems } from '@/hooks/use-inventory'
 import { useCurrentOrgId } from '@/contexts/current-org.context'
 import { useOrgMembers } from '@/hooks/use-org'
 import type { InventoryListItem } from '@/services/inventory.service'
-import { useInventoryListState } from '@/components/common/inventory/use-inventory-list-state'
-import { InventoryListFiltersBar } from '@/components/common/inventory/inventory-list-filters-bar'
-import { InventoryGridCards } from '@/components/common/inventory/inventory-grid-cards'
-import { InventoryStatusTabs } from '@/components/common/inventory/inventory-status-tabs'
+import { useInventoryListState } from '@/components/common/inventory/list/use-inventory-list-state'
+import { InventoryListFiltersBar } from '@/components/common/inventory/list/inventory-list-filters-bar'
+import { InventoryGridCards } from '@/components/common/inventory/list/inventory-grid-cards'
+import { InventoryStatusTabs } from '@/components/common/inventory/list/inventory-status-tabs'
 import { useSubcategories } from '@/hooks/use-subcategories'
 
 
@@ -51,8 +50,7 @@ export function AdminInventoryMonitorPage() {
   )
 
   return (
-    <Layout>
-      <div className="p-4 sm:p-6 lg:p-8">
+    <div className="p-4 sm:p-6 lg:p-8">
         <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <h1 className="text-xl font-bold text-black sm:text-2xl">Inventory</h1>
           <Button
@@ -127,6 +125,5 @@ export function AdminInventoryMonitorPage() {
           </div>
         )}
       </div>
-    </Layout>
   )
 }

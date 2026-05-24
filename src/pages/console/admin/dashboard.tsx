@@ -1,6 +1,5 @@
 import { useState } from 'react'
 import { CheckCircle, Package, Users } from 'lucide-react'
-import { Layout } from '@/components/console/admin/layout'
 import { StatCard } from '@/components/console/admin/dashboard/stat-card'
 import { MonthlyActivityChart } from '@/components/console/admin/dashboard/monthly-activity-chart'
 // import { OrgItemStatsPanel } from '@/components/console/admin/dashboard/org-item-stats-panel'
@@ -43,30 +42,27 @@ export function AdminDashboardPage() {
 
   if (!currentOrgId || isSubLoading) {
     return (
-      <Layout>
-        <div className="h-full overflow-y-auto p-4 sm:p-6 lg:p-8 space-y-6">
-          <div className="h-10 w-64 rounded-xl bg-white border border-[#dddddd] animate-pulse" />
-          <div className="h-5 w-80 rounded-xl bg-white border border-[#dddddd] animate-pulse" />
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-            {Array.from({ length: 4 }).map((_, i) => (
-              <div key={i} className="h-28 bg-white rounded-2xl border border-[#dddddd] animate-pulse" />
-            ))}
-          </div>
-          <div className="h-[296px] bg-white rounded-2xl border border-[#dddddd] animate-pulse" />
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-            <div className="h-64 bg-white rounded-2xl border border-[#dddddd] animate-pulse" />
-            <div className="h-64 bg-white rounded-2xl border border-[#dddddd] animate-pulse" />
-          </div>
+      <div className="h-full overflow-y-auto p-4 sm:p-6 lg:p-8 space-y-6">
+        <div className="h-10 w-64 rounded-xl bg-white border border-[#dddddd] animate-pulse" />
+        <div className="h-5 w-80 rounded-xl bg-white border border-[#dddddd] animate-pulse" />
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+          {Array.from({ length: 4 }).map((_, i) => (
+            <div key={i} className="h-28 bg-white rounded-2xl border border-[#dddddd] animate-pulse" />
+          ))}
         </div>
-      </Layout>
+        <div className="h-[296px] bg-white rounded-2xl border border-[#dddddd] animate-pulse" />
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+          <div className="h-64 bg-white rounded-2xl border border-[#dddddd] animate-pulse" />
+          <div className="h-64 bg-white rounded-2xl border border-[#dddddd] animate-pulse" />
+        </div>
+      </div>
     )
   }
 
   const firstName = user?.name ? user.name.split(' ')[0] : 'Admin'
 
   return (
-    <Layout>
-      <div className="h-full overflow-y-auto p-4 sm:p-6 lg:p-8 space-y-6">
+    <div className="h-full overflow-y-auto p-4 sm:p-6 lg:p-8 space-y-6">
 
         {/* Greeting */}
         <div>
@@ -138,6 +134,5 @@ export function AdminDashboardPage() {
         </div>
 
       </div>
-    </Layout>
   )
 }

@@ -1,4 +1,4 @@
-import { Layout } from '@/components/console/admin/layout';
+import { formatDate } from '@/utils/datetime.util';
 import { Search, Filter, Plus, ChevronDown, Edit, Trash2, Mail, Info } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { useNavigate, useSearch } from '@tanstack/react-router';
@@ -12,9 +12,9 @@ import { Spinner } from '@/components/common/core/spinner';
 import { Button } from '@/components/common/core/button';
 import { Input } from '@/components/common/core/input';
 import { Pagination } from '@/components/common/core/pagination';
-import { AdminModal } from '@/components/console/admin/AdminModal';
-import { InviteEmployeeModal } from '@/components/console/admin/InviteEmployeeModal';
-import { EditEmployeeModal } from '@/components/console/admin/EditEmployeeModal';
+import { AdminModal } from '@/components/console/admin/admin-modal';
+import { InviteEmployeeModal } from '@/components/console/admin/invite-employee-modal';
+import { EditEmployeeModal } from '@/components/console/admin/edit-employee-modal';
 import type { OrgMember } from '@/types/organization.types';
 import { isOrgOnFreePlan, useOrgSubscription } from '@/hooks/use-org-subscription'
 
@@ -40,11 +40,7 @@ function FreePlanInviteNotice() {
 
 function formatJoinedAt(iso: string) {
   try {
-    return new Date(iso).toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric',
-    });
+    return formatDate(iso)
   } catch {
     return iso;
   }
@@ -196,17 +192,15 @@ export function EmployeePage() {
 
   if (!orgId && !isLoading) {
     return (
-      <Layout>
-        <div className="p-8 min-h-screen">
-          <p className="text-[#6a6a6a]">No organization found.</p>
-        </div>
-      </Layout>
+      <div className="p-8 min-h-screen">
+        <p className="text-[#6a6a6a]">No organization found.</p>
+      </div>
     );
   }
 
   return (
-    <Layout>
-      <div className="p-8 min-h-screen">
+    <>
+    <div className="p-8 min-h-screen">
         {/* Page header */}
         <div className="flex items-start justify-between mb-8">
           <div>
@@ -506,6 +500,6 @@ export function EmployeePage() {
           onClose={closeModal}
         />
       </AdminModal>
-    </Layout>
+    </>
   );
 }

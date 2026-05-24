@@ -1,4 +1,5 @@
 import { Layout } from '@/components/super-admin/layout';
+import { formatDate } from '@/utils/datetime.util';
 import { Ghost, Users } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useDebouncedValue, SEARCH_DEBOUNCE_MS } from '@/hooks/use-debounce';
@@ -29,9 +30,6 @@ function getStatusStyle(status: AdminUserStatus) {
   }
 }
 
-function formatDate(iso: string) {
-  return new Date(iso).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
-}
 
 export function UsersPage() {
   const router = useRouter();

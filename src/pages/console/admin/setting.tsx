@@ -1,4 +1,3 @@
-import { Layout } from '@/components/console/admin/layout'
 import {
   Camera,
   Clock3,
@@ -391,51 +390,44 @@ export function SettingPage() {
 
   if (!currentOrgId) {
     return (
-      <Layout>
-        <div className="flex min-h-[40vh] items-center justify-center">
-          <Spinner />
-        </div>
-      </Layout>
+      <div className="flex min-h-[40vh] items-center justify-center">
+        <Spinner />
+      </div>
     )
   }
 
   if (isLoading || !formReady) {
     return (
-      <Layout>
-        <div className="flex min-h-[40vh] items-center justify-center">
-          <Spinner />
-        </div>
-      </Layout>
+      <div className="flex min-h-[40vh] items-center justify-center">
+        <Spinner />
+      </div>
     )
   }
 
   if (isError || !org) {
     return (
-      <Layout>
-        <div className="min-h-screen px-3 py-8 sm:px-6">
-          <div className="mx-auto max-w-lg rounded-[14px] border border-[#dddddd] bg-white p-6 text-center">
-            <p className="text-sm font-semibold text-[#222222]">
-              Could not load organization
-            </p>
-            <p className="mt-2 text-sm text-[#6a6a6a]">
-              {error instanceof Error ? error.message : 'Please try again.'}
-            </p>
-            <Button
-              type="button"
-              className="mt-4"
-              onClick={() => void refetch()}
-            >
-              Retry
-            </Button>
-          </div>
+      <div className="min-h-screen px-3 py-8 sm:px-6">
+        <div className="mx-auto max-w-lg rounded-[14px] border border-[#dddddd] bg-white p-6 text-center">
+          <p className="text-sm font-semibold text-[#222222]">
+            Could not load organization
+          </p>
+          <p className="mt-2 text-sm text-[#6a6a6a]">
+            {error instanceof Error ? error.message : 'Please try again.'}
+          </p>
+          <Button
+            type="button"
+            className="mt-4"
+            onClick={() => void refetch()}
+          >
+            Retry
+          </Button>
         </div>
-      </Layout>
+      </div>
     )
   }
 
   return (
-    <Layout>
-      <div className="min-h-screen px-3 py-4 sm:px-6 sm:py-6 lg:px-8 xl:px-10 2xl:px-12">
+    <div className="min-h-screen px-3 py-4 sm:px-6 sm:py-6 lg:px-8 xl:px-10 2xl:px-12">
         <div className="mx-auto ">
           <div className="mb-5 flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between xl:mb-6">
             <h1 className="text-xl font-semibold tracking-tight text-[#222222] sm:text-2xl">
@@ -847,6 +839,5 @@ export function SettingPage() {
           </section>
         </div>
       </div>
-    </Layout>
   )
 }

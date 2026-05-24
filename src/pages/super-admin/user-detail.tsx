@@ -1,4 +1,5 @@
 import { Layout } from '@/components/super-admin/layout';
+import { formatDate } from '@/utils/datetime.util';
 import { useRouter } from '@tanstack/react-router';
 import { Button } from '@/components/common/core/button';
 import { ArrowLeft, Calendar, Phone, Mail } from 'lucide-react';
@@ -56,10 +57,7 @@ export function UserDetailPanel({ userId, onClose, variant = 'drawer' }: UserDet
     router.navigate({ to: '/super-admin/users' });
   };
 
-  const formatDate = (iso: string) =>
-    new Date(iso).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
-
-  const getUserStatusBadgeClass = (status: string) => {
+const getUserStatusBadgeClass = (status: string) => {
     if (status === 'Active') return 'bg-[#e8f9f0] text-[#06c167] border-[#06c167]/20';
     return 'bg-[#f7f7f7] text-[#6a6a6a] border-[#dddddd]';
   };

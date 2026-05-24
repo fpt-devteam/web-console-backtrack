@@ -1,4 +1,3 @@
-import { Layout } from '@/components/console/admin/layout';
 import { Lock, Eye, EyeOff, ShieldCheck, Check } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { auth } from '@/lib/firebase';
@@ -214,8 +213,7 @@ export function SecurityPage() {
     }`;
 
   return (
-    <Layout>
-      <div className="py-5 bg-[#f7f7f7]">
+    <div className="py-5 bg-[#f7f7f7]">
         <div className=" mx-10 space-y-4 xl:space-y-6">
           <div className="mb-3 xl:mb-5">
             <h1 className="text-xl md:text-2xl xl:text-3xl font-bold text-[#222222] mb-2">Security</h1>
@@ -536,7 +534,6 @@ export function SecurityPage() {
 
         </div>
       </div>
-    </Layout>
   );
 }
 

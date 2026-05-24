@@ -10,8 +10,8 @@ import { useSubcategories } from '@/hooks/use-subcategories'
 import { getInventoryDescription, getInventoryTitle, getInventoryDistinctiveMarks } from '@/utils/inventory-view'
 import type { InventoryListItem } from '@/services/inventory.service'
 import { useInventoryItems } from '@/hooks/use-inventory'
-import { InventoryGridCards } from '@/components/common/inventory/inventory-grid-cards'
-import { FilterDateRangeChip } from '@/components/common/inventory/filter-dropdown-chip'
+import { InventoryGridCards } from '@/components/common/inventory/list/inventory-grid-cards'
+import { FilterDateRangeChip } from '@/components/common/inventory/list/filter-dropdown-chip'
 
 const pageSize = 8
 /** Staff return history: BE caps page size; load one batch then filter client-side. */
@@ -161,7 +161,7 @@ export function HandoverHistory() {
         subcategoryNameById={subcategoryNameById}
 
         detailLink={{
-          to: '/console/$slug/staff/item/$itemId',
+          to: '/console/$slug/staff/inventory/$itemId/',
           params: (item) => ({ slug, itemId: item.id }),
         }}
       />

@@ -1,4 +1,5 @@
 import { Layout } from '@/components/super-admin/layout';
+import { formatDate } from '@/utils/datetime.util';
 import { useRouter } from '@tanstack/react-router';
 import { Calendar, ArrowLeft, Phone, Mail } from 'lucide-react';
 import { Button } from '@/components/common/core/button';
@@ -178,19 +179,6 @@ export function OrganizationDetailPanel({
     }
   };
 
-  /**
-   * Formats date to readable string
-   *
-   * @param date - Date to format
-   * @returns Formatted date string (e.g., "Dec 31, 2024")
-   */
-  const formatDate = (date: Date) => {
-    return date.toLocaleDateString('en-US', {
-      month: 'short',
-      day: 'numeric',
-      year: 'numeric',
-    });
-  };
 
   /**
    * Calculates progress percentage

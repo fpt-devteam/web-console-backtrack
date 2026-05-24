@@ -15,19 +15,24 @@ interface RawConversation {
   _id?: string;
   id?: string;
   type?: string;
-  orgId?: string | null;
-  orgName?: string | null;
-  orgSlug?: string | null;
-  orgLogoUrl?: string | null;
-  assignedStaffId?: string | null;
-  supportFormData?: SupportFormData | null;
+  orgId?: string;
+  orgName?: string;
+  orgSlug?: string;
+  orgLogoUrl?: string;
+  assignedStaff?: {
+    id: string;
+    displayName: string | null;
+    email: string | null;
+    avatarUrl: string | null;
+  } | null;
+  supportFormData?: SupportFormData;
   status?: string;
   partner?: {
     id: string;
     displayName: string | null;
     email: string | null;
     avatarUrl: string | null;
-  } | null;
+  };
   lastMessage?: {
     senderId: string | null;
     content: string;
@@ -55,13 +60,13 @@ export function normalizeConv(raw: unknown): IConversation {
   return {
     id: (obj.conversationId ?? obj._id ?? obj.id ?? ''),
     type: obj.type as IConversation['type'],
-    orgId: obj.orgId ?? null,
-    orgName: obj.orgName ?? null,
-    orgSlug: obj.orgSlug ?? null,
-    orgLogoUrl: obj.orgLogoUrl ?? null,
-    assignedStaffId: obj.assignedStaffId ?? null,
-    supportFormData: obj.supportFormData ?? null,
-    partner: obj.partner ?? null,
+    orgId: obj.orgId ?? '',
+    orgName: obj.orgName ?? '',
+    orgSlug: obj.orgSlug ?? '',
+    orgLogoUrl: obj.orgLogoUrl ?? '',
+    assignedStaff: obj.assignedStaff ?? undefined,
+    supportFormData: obj.supportFormData!,
+    partner: obj.partner!,
     lastMessage: obj.lastMessage ?? null,
     lastMessageAt: obj.lastMessage?.timestamp ?? null,
     lastMessageContent: obj.lastMessage?.content ?? null,
@@ -117,7 +122,7 @@ export const chatService = {
    * Requires X-Org-Id header (injected automatically by the Axios interceptor).
    */
   async listQueue(orgId?: string): Promise<Array<IConversation>> {
-    const { data } = await privateClient.get<ApiResponse<unknown>>(
+    const { data } = await privateClient.get<ApiResponse<IConversation>>(
       `${BASE}/conversations/organization/queue`,
       {
         headers: orgId ? { 'X-Org-Id': orgId } : undefined,
@@ -129,7 +134,7 @@ export const chatService = {
 
   /** List conversations currently assigned to the authenticated staff member. */
   async listAssigned({ isMe }: { isMe: boolean }): Promise<Array<IConversation>> {
-    const { data } = await privateClient.get<ApiResponse<unknown>>(
+    const { data } = await privateClient.get<ApiResponse<IConversation>>(
       `${BASE}/conversations/organization/assigned`,
       {
         params: {
@@ -195,9 +200,14 @@ export const chatService = {
   },
 
   /** List resolved conversations assigned to the authenticated staff member. */
-  async listResolved(): Promise<Array<IConversation>> {
+  async listResolved({ isMe }: { isMe: boolean }): Promise<Array<IConversation>> {
     const { data } = await privateClient.get<ApiResponse<unknown>>(
-      `${BASE}/conversations/organization/resolved`
+      `${BASE}/conversations/organization/resolved`,
+      {
+        params: {
+          isMe,
+        }
+      }
     );
     if (!data.success) throw new Error(data.error?.message ?? 'Failed to fetch resolved conversations');
     return toList(data.data).conversations;

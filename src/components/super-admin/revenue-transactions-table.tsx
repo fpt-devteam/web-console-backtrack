@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { formatDate } from '@/utils/datetime.util'
 import { Building2, User } from 'lucide-react'
 import type { RevenueStatus, RevenueTransaction, SubscriberType } from '@/services/revenue.service'
 import { revenueService } from '@/services/revenue.service'
@@ -17,8 +18,6 @@ const STATUS_CLASS: Record<RevenueStatus, string> = {
 const formatCurrency = (amount: number, currency = 'usd') =>
   new Intl.NumberFormat('en-US', { style: 'currency', currency: currency.toUpperCase(), minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(amount)
 
-const formatDate = (date: Date) =>
-  date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
 
 export function RevenueTransactionsTable() {
   const [page, setPage] = useState(1)

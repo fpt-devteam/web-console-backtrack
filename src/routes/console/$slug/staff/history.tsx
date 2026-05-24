@@ -1,4 +1,3 @@
-import { StaffProcessingHistoryPage } from '@/pages/console/staff'
 import { createFileRoute } from '@tanstack/react-router'
 
 export const Route = createFileRoute('/console/$slug/staff/history')({
@@ -6,5 +5,5 @@ export const Route = createFileRoute('/console/$slug/staff/history')({
 })
 
 function RouteComponent() {
-  return <StaffProcessingHistoryPage />
+  return <div></div>
 }
