@@ -64,9 +64,6 @@ export function RecentItemsPanel({ items, slug, totalCount, page, pageSize, onPa
     <div className="bg-white rounded-2xl border border-[#dddddd] p-5 flex flex-col">
       <div className="flex items-center justify-between mb-3">
         <h2 className="text-sm font-semibold text-[#222222]">Recent Items I Logged</h2>
-        <Link to="/console/$slug/staff/history" params={{ slug }} className="text-xs text-[#ff385c] font-medium hover:underline">
-          View all
-        </Link>
       </div>
 
       <div className="flex-1 space-y-0.5 min-h-0">

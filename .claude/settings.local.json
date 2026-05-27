@@ -76,7 +76,9 @@
       "Bash(mv item-detail.tsx inventory-detail.page.tsx)",
       "Bash(mv add-item.tsx add-item.page.tsx)",
       "Bash(mv index.tsx edit-item.page.tsx)",
-      "Bash(mv search-results.tsx inventory-search.page.tsx)"
+      "Bash(mv search-results.tsx inventory-search.page.tsx)",
+      "Bash(sed -n '1,40p' src/utils/datetime.util.ts)",
+      "Bash(sed -n '1,40p' src/components/common/avatar.tsx)"
     ]
   }
 }

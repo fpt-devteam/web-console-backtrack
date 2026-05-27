@@ -62,10 +62,10 @@ const NAV_ITEMS = [
     to: '/console/$slug/staff/claims' as const,
   },
   {
-    key: 'history',
-    name: 'Handling History',
+    key: 'assigned-claim',
+    name: 'Assigned Claim',
     icon: ClipboardList,
-    to: '/console/$slug/staff/history' as const,
+    to: '/console/$slug/staff/assigned-claim' as const,
   },
 ]
 
@@ -86,15 +86,9 @@ function StaffSidebarInner() {
   const isActive = (key: string) => {
     const cur = location.pathname
     if (key === 'dashboard') return cur === `${base}/staff/dashboard` || cur === `${base}/staff`
-    if (key === 'inventory') {
-      return (
-        cur.startsWith(`${base}/staff/inventory`) &&
-        !cur.startsWith(`${base}/staff/history`)
-      )
-    }
-    if (key === 'my-processing-claim') return cur === `${base}/staff/my-processing-claim`
+    if (key === 'inventory') return cur.startsWith(`${base}/staff/inventory`)
     if (key === 'claim-board') return cur.startsWith(`${base}/staff/claims`)
-    if (key === 'history') return cur.startsWith(`${base}/staff/history`)
+    if (key === 'assigned-claim') return cur.startsWith(`${base}/staff/assigned-claim`)
     return false
   }
 
