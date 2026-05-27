@@ -1,5 +1,4 @@
 import { useMemo, useState } from 'react'
-import { useNavigate, useParams } from '@tanstack/react-router'
 import { ClaimBoard } from '@/components/common/claim/claim-board/claim-board'
 import { ClaimBoardHeader } from '@/components/common/claim/claim-board-header/claim-board-header'
 import { ClaimBoardFilter } from '@/components/common/claim/claim-board-filter/claim-board-filter'
@@ -26,14 +25,6 @@ export function AdminClaimsPage() {
   const [boardFilter, setBoardFilter] = useState<ClaimBoardFilterState>(DEFAULT_FILTER)
   const [previewConv, setPreviewConv] = useState<IConversation | null>(null)
   const isMe = boardFilter.assignee === 'mine'
-
-  const navigate = useNavigate()
-  const { slug } = useParams({ strict: false })
-
-  function handleOpenDetail(convId: string) {
-    if (!slug) return
-    navigate({ to: '/console/$slug/admin/claims/$claimId', params: { slug, claimId: convId } })
-  }
 
   const { currentOrgId } = useCurrentOrgId()
   const { data: currentUser } = useCurrentUser()
@@ -64,7 +55,6 @@ export function AdminClaimsPage() {
           <ClaimPreviewDialog
             conv={previewConv}
             onClose={() => setPreviewConv(null)}
-            onOpenDetail={() => handleOpenDetail(previewConv.id)}
           />
         )}
         <ClaimBoardHeader searchTerm={searchTerm} onSearchChange={setSearchTerm} className="border-b border-gray-200" />
