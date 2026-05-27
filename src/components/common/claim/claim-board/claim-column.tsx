@@ -12,6 +12,7 @@ export function ClaimColumn({
   isLoading = false,
   isCardDraggable,
   onOpenConversation,
+  onTakeOn,
 }: ClaimColumnProps) {
   const { setNodeRef, isOver } = useDroppable({ id })
 
@@ -42,16 +43,18 @@ export function ClaimColumn({
           conversations={conversations}
           isCardDraggable={isCardDraggable}
           onOpenConversation={onOpenConversation}
+          onTakeOn={onTakeOn}
         />
       </div>
     </div>
   )
 }
-function ColumnContent({ isLoading, conversations, isCardDraggable, onOpenConversation } : {
+function ColumnContent({ isLoading, conversations, isCardDraggable, onOpenConversation, onTakeOn } : {
   isLoading: boolean
   conversations: IConversation[]
   isCardDraggable?: (conv: IConversation) => boolean
   onOpenConversation?: (conv: IConversation) => void
+  onTakeOn?: (conv: IConversation) => void | Promise<void>
 }) {
   if (isLoading) {
     return Array.from({ length: 3 }).map((_, i) => (
@@ -73,6 +76,7 @@ function ColumnContent({ isLoading, conversations, isCardDraggable, onOpenConver
       conv={conv}
       disabled={!(isCardDraggable?.(conv) ?? false)}
       onOpenConversation={onOpenConversation}
+      onTakeOn={onTakeOn}
     />
   ))
 }

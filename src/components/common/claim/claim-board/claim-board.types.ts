@@ -22,4 +22,5 @@ export interface ClaimColumnProps {
   isLoading?: boolean
   isCardDraggable?: (conv: IConversation) => boolean
   onOpenConversation?: (conv: IConversation) => void
+  onTakeOn?: (conv: IConversation) => void | Promise<void>
 }

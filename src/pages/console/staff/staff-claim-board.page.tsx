@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react'
 import { useNavigate, useParams } from '@tanstack/react-router'
+import toast from 'react-hot-toast'
 import { ClaimBoard } from '@/components/common/claim/claim-board/claim-board'
 import { ClaimBoardHeader } from '@/components/common/claim/claim-board-header/claim-board-header'
 import { ClaimBoardFilter } from '@/components/common/claim/claim-board-filter/claim-board-filter'
@@ -8,6 +9,7 @@ import { filterConversations } from '@/components/common/claim/claim-board/claim
 import { applyBoardFilter } from '@/components/common/claim/claim-board-filter/claim-board-filter.helper'
 import { DEFAULT_FILTER } from '@/components/common/claim/claim-board-filter/claim-board-filter.types'
 import type { ClaimBoardFilterState } from '@/components/common/claim/claim-board-filter/claim-board-filter.types'
+import { ConversationStatus } from '@/types/chat.types'
 import type { IConversation } from '@/types/chat.types'
 import { useConversationUpdates, useSocketChatQueue } from '@/hooks/use-chat-socket'
 import {
@@ -33,6 +35,15 @@ export function StaffClaimBoardPage() {
   function handleOpenDetail(convId: string) {
     if (!slug) return
     navigate({ to: '/console/$slug/staff/claims/$claimId', params: { slug, claimId: convId } })
+  }
+
+  async function handleTakeOn(conv: IConversation) {
+    try {
+      await assignMutation.mutateAsync(conv.id)
+      removeFromQueue(conv.id)
+    } catch {
+      toast.error('Failed to take on conversation')
+    }
   }
 
   const { currentOrgId } = useCurrentOrgId()
@@ -64,7 +75,20 @@ export function StaffClaimBoardPage() {
         <ClaimPreviewDialog
           conv={previewConv}
           onClose={() => setPreviewConv(null)}
-          onOpenDetail={() => handleOpenDetail(previewConv.id)}
+          onTakeIt={
+            previewConv.status === ConversationStatus.QUEUE
+              ? () => {
+                  const conv = previewConv
+                  setPreviewConv(null)
+                  void handleTakeOn(conv)
+                }
+              : undefined
+          }
+          onOpenDetail={
+            previewConv.status === ConversationStatus.QUEUE || currentUser?.id !== previewConv.assignedStaff?.id
+              ? undefined
+              : () => handleOpenDetail(previewConv.id)
+          }
         />
       )}
       <ClaimBoardHeader searchTerm={searchTerm} onSearchChange={setSearchTerm} className='border-b border-gray-200'/>
@@ -91,6 +115,7 @@ export function StaffClaimBoardPage() {
           onResolve={async (convId) => { await resolveMutation.mutateAsync(convId) }}
           onRemoveFromQueue={removeFromQueue}
           onOpenConversation={setPreviewConv}
+          onTakeOn={handleTakeOn}
         />
       </div>
     </div>

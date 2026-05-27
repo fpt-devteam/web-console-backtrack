@@ -10,7 +10,7 @@ interface ClaimAssignDialogProps {
 }
 
 export function ClaimAssignDialog({ conv, isPending, onConfirm, onCancel }: ClaimAssignDialogProps) {
-  const label = conv.partner?.displayName ?? conv.partner?.email ?? conv.id.slice(0, 8)
+  const label = conv.partner.displayName ?? conv.partner.email ?? conv.id.slice(0, 8)
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
       <div className="bg-white rounded-2xl shadow-2xl w-full max-w-sm mx-4 p-6">
@@ -30,7 +30,7 @@ export function ClaimAssignDialog({ conv, isPending, onConfirm, onCancel }: Clai
         </div>
 
         <div className="bg-[#f7f7f7] rounded-xl p-3 mb-5 flex items-center gap-3">
-          <Avatar url={conv.partner?.avatarUrl} name={label} className="w-10 h-10 rounded-full flex-shrink-0" />
+          <Avatar url={conv.partner.avatarUrl} name={label} className="w-10 h-10 rounded-full flex-shrink-0" />
           <div className="min-w-0">
             <p className="text-sm font-medium text-[#222222] truncate">{label}</p>
             {conv.lastMessageContent && (

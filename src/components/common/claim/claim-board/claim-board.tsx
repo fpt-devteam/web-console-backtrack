@@ -34,6 +34,8 @@ interface ClaimBoardProps {
   onResolve: (convId: string) => Promise<void>
   onRemoveFromQueue: (convId: string) => void
   onOpenConversation?: (conv: IConversation) => void
+  /** When provided, queued cards show a "Take on" button. Omit to hide it (e.g. admin views). */
+  onTakeOn?: (conv: IConversation) => void | Promise<void>
 }
 
 export function ClaimBoard({
@@ -50,6 +52,7 @@ export function ClaimBoard({
   onResolve,
   onRemoveFromQueue,
   onOpenConversation,
+  onTakeOn,
 }: ClaimBoardProps) {
   const [board, setBoard] = useState<BoardState>({
     [ConversationStatus.QUEUE]: queueConversations,
@@ -182,6 +185,7 @@ export function ClaimBoard({
               isLoading={isLoading}
               isCardDraggable={isCardDraggable(id, currentUserId)}
               onOpenConversation={onOpenConversation}
+              onTakeOn={onTakeOn}
             />
           ))}
         </div>
