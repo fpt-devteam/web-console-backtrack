@@ -10,11 +10,11 @@ export function ClaimColumn({
   accent,
   conversations = [],
   isLoading = false,
+  isDropDisabled = false,
   isCardDraggable,
   onOpenConversation,
-  onTakeOn,
 }: ClaimColumnProps) {
-  const { setNodeRef, isOver } = useDroppable({ id })
+  const { setNodeRef, isOver } = useDroppable({ id, disabled: isDropDisabled })
 
   return (
     <div className="flex flex-col min-w-md w-lg shrink-0 bg-neutral-100/70 rounded-xl px-2 py-4">
@@ -33,9 +33,11 @@ export function ClaimColumn({
         className={[
           'flex-1 rounded-xl p-2 flex flex-col items-stretch gap-2 min-h-30',
           'transition-colors',
-          isOver
+          isOver && !isDropDisabled
             ? 'bg-primary/5 ring-2 ring-primary/30 ring-dashed'
-            : 'bg-neutral-100/70',
+            : isDropDisabled
+              ? 'bg-neutral-100/30 opacity-50'
+              : 'bg-neutral-100/70',
         ].join(' ')}
       >
         <ColumnContent
@@ -43,18 +45,16 @@ export function ClaimColumn({
           conversations={conversations}
           isCardDraggable={isCardDraggable}
           onOpenConversation={onOpenConversation}
-          onTakeOn={onTakeOn}
         />
       </div>
     </div>
   )
 }
-function ColumnContent({ isLoading, conversations, isCardDraggable, onOpenConversation, onTakeOn } : {
+function ColumnContent({ isLoading, conversations, isCardDraggable, onOpenConversation } : {
   isLoading: boolean
   conversations: IConversation[]
   isCardDraggable?: (conv: IConversation) => boolean
   onOpenConversation?: (conv: IConversation) => void
-  onTakeOn?: (conv: IConversation) => void | Promise<void>
 }) {
   if (isLoading) {
     return Array.from({ length: 3 }).map((_, i) => (
@@ -76,7 +76,6 @@ function ColumnContent({ isLoading, conversations, isCardDraggable, onOpenConver
       conv={conv}
       disabled={!(isCardDraggable?.(conv) ?? false)}
       onOpenConversation={onOpenConversation}
-      onTakeOn={onTakeOn}
     />
   ))
 }

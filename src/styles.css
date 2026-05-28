@@ -143,6 +143,15 @@ code {
     color: var(--ink);
     font-weight: 500;
   }
+  button,
+  [role='button'],
+  [role='tab'],
+  summary,
+  label[for],
+  select,
+  a {
+    cursor: pointer;
+  }
 }
 
 /* Elevation shadow */

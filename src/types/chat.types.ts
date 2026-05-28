@@ -80,6 +80,9 @@ export interface SupportFormData {
   imageUrls: Array<string> | null
   lostLocation: string | null
   eventTime: Date | null
+  contactName?: string | null
+  contactPhone?: string | null
+  contactEmail?: string | null
 }
 
 /**

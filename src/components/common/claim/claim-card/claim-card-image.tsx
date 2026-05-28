@@ -9,6 +9,7 @@ interface ClaimCardImageProps {
   src?: string | null
   alt: string
   category?: string | null
+  subcategoryIcon?: string | null
 }
 
 const CATEGORY_ICON: Record<ItemCategory, string> = {
@@ -18,9 +19,9 @@ const CATEGORY_ICON: Record<ItemCategory, string> = {
   Others:             othersIcon,
 }
 
-function CategoryFallback({ category }: { category?: string | null }) {
+function CategoryFallback({ category, subcategoryIcon }: { category?: string | null; subcategoryIcon?: string | null }) {
   const key = (category ?? 'Others') as ItemCategory
-  const icon = CATEGORY_ICON[key]
+  const icon = subcategoryIcon ?? CATEGORY_ICON[key]
   const { bg } = CATEGORY_COLOR[key] ?? CATEGORY_COLOR.Others
 
   return (
@@ -30,7 +31,7 @@ function CategoryFallback({ category }: { category?: string | null }) {
   )
 }
 
-export function ClaimCardImage({ src, alt, category }: ClaimCardImageProps) {
+export function ClaimCardImage({ src, alt, category, subcategoryIcon }: ClaimCardImageProps) {
   if (src) {
     return (
       <div className="w-20 h-20 rounded-lg border border-hairline shrink-0 overflow-hidden">
@@ -42,5 +43,5 @@ export function ClaimCardImage({ src, alt, category }: ClaimCardImageProps) {
       </div>
     )
   }
-  return <CategoryFallback category={category} />
+  return <CategoryFallback category={category} subcategoryIcon={subcategoryIcon} />
 }

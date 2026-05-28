@@ -153,7 +153,7 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
         if (mounted) setLastSeenEvent(event);
       });
 
-      if (mounted) setIsConnected(s.connected);
+      setIsConnected(s.connected);
     });
 
     return () => {
@@ -167,7 +167,7 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
   // ── Active conversation room management ─────────────────
   const setActiveConversationId = useCallback(
     (id: string | null) => {
-      if (id === activeConversationId) return;
+      if (id === activeConvRef.current) return;
 
       const s = socketRef.current;
 
@@ -190,8 +190,21 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
         s.emit('conversation:read', { conversationId: id });
       }
     },
-    [activeConversationId, queryClient]
+    [queryClient]
   );
+
+  // Re-join the active conversation room whenever the socket (re)connects.
+  // Covers the case where a page set the active conversation before the socket
+  // was ready (direct load / refresh) or the socket dropped and reconnected.
+  useEffect(() => {
+    const s = socketRef.current;
+    const id = activeConvRef.current;
+    if (!s || !isConnected || !id || joinedRoomRef.current === id) return;
+    s.emit('join:conversation', id);
+    joinedRoomRef.current = id;
+    patchConvUnread(queryClient, id, 0);
+    s.emit('conversation:read', { conversationId: id });
+  }, [isConnected, queryClient]);
 
   // ── Context value ───────────────────────────────────────
   const value = useMemo<ChatContextValue>(

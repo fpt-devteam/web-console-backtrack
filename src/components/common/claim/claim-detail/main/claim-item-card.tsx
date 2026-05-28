@@ -3,6 +3,7 @@ import { Button } from '@/components/common/core/button'
 import type { SupportFormData } from '@/types/chat.types'
 import type { ItemCategory } from '@/services/inventory.service'
 import { formatDateTime } from '@/utils/datetime.util'
+import { getSubcategoryIcon } from '@/utils/subcategory-icon'
 import { CATEGORY_COLOR } from '@/components/common/claim/claim.constants'
 import cardIcon from '@/assets/icons/cards/card_icon.png'
 import electronicsIcon from '@/assets/icons/electronics/electronics_icon.png'
@@ -18,10 +19,16 @@ const CATEGORY_ICON: Record<ItemCategory, string> = {
 
 interface ClaimItemCardProps {
   supportFormData: SupportFormData
+  subcategoryCodeById?: Record<string, string>
   onPrintSlip?: () => void
 }
 
-function ItemImage({ src, alt, category }: { src?: string | null; alt: string; category?: string | null }) {
+function ItemImage({ src, alt, category, subcategoryIcon }: {
+  src?: string | null
+  alt: string
+  category?: string | null
+  subcategoryIcon?: string | null
+}) {
   if (src) {
     return (
       <div className="w-28 h-28 rounded-xl border border-hairline shrink-0 overflow-hidden">
@@ -30,7 +37,7 @@ function ItemImage({ src, alt, category }: { src?: string | null; alt: string; c
     )
   }
   const key = (category ?? 'Others') as ItemCategory
-  const icon = CATEGORY_ICON[key]
+  const icon = subcategoryIcon ?? CATEGORY_ICON[key]
   const { bg } = CATEGORY_COLOR[key]
   return (
     <div className={`w-28 h-28 rounded-xl border border-hairline flex items-center justify-center shrink-0 ${bg}`}>
@@ -48,7 +55,7 @@ function DetailField({ label, value }: { label: string; value?: string | null })
   )
 }
 
-export function ClaimItemCard({ supportFormData, onPrintSlip }: ClaimItemCardProps) {
+export function ClaimItemCard({ supportFormData, subcategoryCodeById, onPrintSlip }: ClaimItemCardProps) {
   const images = supportFormData.imageUrls ?? []
   const [primary, ...thumbs] = images
 
@@ -59,8 +66,13 @@ export function ClaimItemCard({ supportFormData, onPrintSlip }: ClaimItemCardPro
     ? formatDateTime(new Date(supportFormData.eventTime).toISOString())
     : '—'
 
+  const subcategoryCode = subcategoryCodeById?.[supportFormData.subCategoryId]
+  const subcategoryIcon = subcategoryCode
+    ? getSubcategoryIcon(supportFormData.category as ItemCategory, subcategoryCode)
+    : null
+
   return (
-    <div className="bg-white rounded-xl border border-hairline">
+    <div className="bg-white border-b border-hairline">
       <div className="flex items-center justify-between px-5 py-3.5 border-b border-hairline">
         <span className="text-xs font-bold tracking-widest text-mute uppercase flex items-center gap-1.5">
           <span className="w-3 h-3 rounded-sm bg-neutral-200" />
@@ -76,9 +88,9 @@ export function ClaimItemCard({ supportFormData, onPrintSlip }: ClaimItemCardPro
 
       <div className="p-5 flex flex-col gap-5">
         <div className="flex gap-3">
-          <ItemImage src={primary} alt={supportFormData.itemName} category={supportFormData.category} />
+          <ItemImage src={primary} alt={supportFormData.itemName} category={supportFormData.category} subcategoryIcon={subcategoryIcon} />
           {thumbs.slice(0, 2).map((url, i) => (
-            <ItemImage key={i} src={url} alt={supportFormData.itemName} category={supportFormData.category} />
+            <ItemImage key={i} src={url} alt={supportFormData.itemName} category={supportFormData.category} subcategoryIcon={subcategoryIcon} />
           ))}
         </div>
 

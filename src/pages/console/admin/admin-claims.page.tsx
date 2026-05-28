@@ -14,7 +14,6 @@ import {
   useChatAssigned,
   useChatResolved,
   useResolveConversation,
-  useReturnToQueue,
 } from '@/hooks/use-chat'
 import { useCurrentOrgId } from '@/contexts/current-org.context'
 import { useCurrentUser } from '@/hooks/use-auth'
@@ -33,7 +32,7 @@ export function AdminClaimsPage() {
   const resolvedQuery  = useChatResolved({ isMe })
 
   const assignMutation  = useAssignConversation()
-  const returnMutation  = useReturnToQueue()
+
   const resolveMutation = useResolveConversation()
 
   const isLoading = isQueueLoading || assignedQuery.isLoading || resolvedQuery.isLoading
@@ -74,11 +73,9 @@ export function AdminClaimsPage() {
             isLoading={isLoading}
             currentUserId={currentUser?.id}
             isAssignPending={assignMutation.isPending}
-            isReturnPending={returnMutation.isPending}
             isResolvePending={resolveMutation.isPending}
-            onAssign={async (convId) => { await assignMutation.mutateAsync(convId) }}
-            onReturn={async (convId) => { await returnMutation.mutateAsync(convId) }}
-            onResolve={async (convId) => { await resolveMutation.mutateAsync(convId) }}
+            onAssign={async (convId: string) => { await assignMutation.mutateAsync(convId) }}
+            onResolve={async (convId: string) => { await resolveMutation.mutateAsync(convId) }}
             onRemoveFromQueue={removeFromQueue}
             onOpenConversation={setPreviewConv}
           />

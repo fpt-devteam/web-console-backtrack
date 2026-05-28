@@ -1,7 +1,9 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useNavigate, useParams } from '@tanstack/react-router'
 import { ConversationStatus, MessageType } from '@/types/chat.types'
 import { useConversation, useResolveConversation, useReturnToQueue, useChatMessages } from '@/hooks/use-chat'
+import { useInventoryItem } from '@/hooks/use-inventory'
+import { useSubcategories } from '@/hooks/use-subcategories'
 import { useConversationUpdates, useIncomingMessages, useMarkSeen, useSendMessage, useTypingIndicator } from '@/hooks/use-chat-socket'
 import { useChatContext } from '@/contexts/chat.context'
 import { auth } from '@/lib/firebase'
@@ -28,13 +30,37 @@ export function StaffClaimDetailPage() {
   const { send } = useSendMessage()
   const { startTyping, stopTyping } = useTypingIndicator()
   const markSeen = useMarkSeen()
-  const { typingUsers } = useChatContext()
+  const { typingUsers, setActiveConversationId } = useChatContext()
 
   useIncomingMessages(claimId ?? '')
+
+  // Join the conversation's socket room so incoming messages and typing
+  // arrive in real time (and leave it on unmount / when switching claims).
+  useEffect(() => {
+    if (!claimId) return
+    setActiveConversationId(claimId)
+    return () => setActiveConversationId(null)
+  }, [claimId, setActiveConversationId])
 
   useEffect(() => {
     if (claimId) markSeen(claimId)
   }, [claimId, markSeen])
+
+  // ── Linked inventory item (for claim ↔ found-item comparison) ─
+  const postId = conv?.supportFormData.postId ?? null
+  const { data: inventoryItem, isLoading: isInventoryLoading } = useInventoryItem(conv?.orgId ?? null, postId)
+  const { data: subcategories } = useSubcategories()
+  const subcategoryNameById = useMemo(() => {
+    const map: Record<string, string> = {}
+    for (const s of subcategories ?? []) map[s.id] = s.name
+    return map
+  }, [subcategories])
+
+  const subcategoryCodeById = useMemo(() => {
+    const map: Record<string, string> = {}
+    for (const s of subcategories ?? []) map[s.id] = s.code
+    return map
+  }, [subcategories])
 
   // ── Mutations ──────────────────────────────────────────────
   const resolveMutation = useResolveConversation()
@@ -101,7 +127,7 @@ export function StaffClaimDetailPage() {
         sidebar={
           <ClaimDetailSidebar
             partner={conv.partner}
-            lastContactAt={conv.lastMessageAt}
+
             createdAt={conv.createdAt}
             assigneeName={conv.assignedStaff?.displayName ?? null}
             assigneeAvatarUrl={conv.assignedStaff?.avatarUrl ?? null}
@@ -110,10 +136,19 @@ export function StaffClaimDetailPage() {
             isResolvePending={resolveMutation.isPending}
             onResolve={!isClosed ? () => setResolveConfirmOpen(true) : undefined}
             onReturnToQueue={!isClosed ? handleReturn : undefined}
+            supportFormData={conv.supportFormData}
           />
         }
         main={
-          <ClaimMainContent supportFormData={conv.supportFormData} />
+          <ClaimMainContent
+            supportFormData={conv.supportFormData}
+            inventoryItem={inventoryItem}
+            isInventoryLoading={isInventoryLoading}
+            subcategoryNameById={subcategoryNameById}
+            subcategoryCodeById={subcategoryCodeById}
+            orgId={conv.orgId}
+            slug={slug}
+          />
         }
         messaging={
           <ClaimConversation

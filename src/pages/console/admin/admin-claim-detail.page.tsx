@@ -1,7 +1,9 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useNavigate, useParams } from '@tanstack/react-router'
 import { ConversationStatus, MessageType } from '@/types/chat.types'
 import { useConversation, useResolveConversation, useReturnToQueue, useChatMessages } from '@/hooks/use-chat'
+import { useInventoryItem } from '@/hooks/use-inventory'
+import { useSubcategories } from '@/hooks/use-subcategories'
 import { useConversationUpdates, useIncomingMessages, useMarkSeen, useSendMessage, useTypingIndicator } from '@/hooks/use-chat-socket'
 import { useChatContext } from '@/contexts/chat.context'
 import { auth } from '@/lib/firebase'
@@ -34,6 +36,20 @@ export function AdminClaimDetailPage() {
   useEffect(() => {
     if (claimId) markSeen(claimId)
   }, [claimId, markSeen])
+
+  const postId = conv?.supportFormData.postId ?? null
+  const { data: inventoryItem, isLoading: isInventoryLoading } = useInventoryItem(conv?.orgId ?? null, postId)
+  const { data: subcategories } = useSubcategories()
+  const subcategoryNameById = useMemo(() => {
+    const map: Record<string, string> = {}
+    for (const s of subcategories ?? []) map[s.id] = s.name
+    return map
+  }, [subcategories])
+  const subcategoryCodeById = useMemo(() => {
+    const map: Record<string, string> = {}
+    for (const s of subcategories ?? []) map[s.id] = s.code
+    return map
+  }, [subcategories])
 
   const resolveMutation = useResolveConversation()
   const returnMutation  = useReturnToQueue()
@@ -98,7 +114,7 @@ export function AdminClaimDetailPage() {
           sidebar={
             <ClaimDetailSidebar
               partner={conv.partner}
-              lastContactAt={conv.lastMessageAt}
+
               createdAt={conv.createdAt}
               assigneeName={conv.assignedStaff?.displayName ?? null}
               assigneeAvatarUrl={conv.assignedStaff?.avatarUrl ?? null}
@@ -107,10 +123,20 @@ export function AdminClaimDetailPage() {
               isResolvePending={resolveMutation.isPending}
               onResolve={!isClosed ? () => setResolveConfirmOpen(true) : undefined}
               onReturnToQueue={!isClosed ? handleReturn : undefined}
+              supportFormData={conv.supportFormData}
             />
           }
           main={
-            <ClaimMainContent supportFormData={conv.supportFormData} />
+            <ClaimMainContent
+              supportFormData={conv.supportFormData}
+              inventoryItem={inventoryItem}
+              isInventoryLoading={isInventoryLoading}
+              subcategoryNameById={subcategoryNameById}
+              subcategoryCodeById={subcategoryCodeById}
+              orgId={conv.orgId}
+              slug={slug}
+              role="admin"
+            />
           }
           messaging={
             <ClaimConversation

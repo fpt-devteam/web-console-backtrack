@@ -116,6 +116,10 @@ export function useIncomingMessages(conversationId: string | null) {
         (old: { pages: Array<{ messages: Array<IMessage> }> } | undefined) => {
           if (!old) return old;
           const [firstPage, ...rest] = old.pages;
+          // Skip if we already have it — the sender receives both
+          // `message:send:support:success` and a `message:new` echo.
+          // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+          if (firstPage?.messages?.some((m) => m.id === msg.id)) return old;
           return {
             ...old,
             pages: [

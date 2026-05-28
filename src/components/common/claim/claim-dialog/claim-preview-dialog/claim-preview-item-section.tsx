@@ -29,7 +29,7 @@ function ItemImage({ src, alt, category, className }: { src?: string; alt: strin
   }
   const key = (category ?? 'Others') as ItemCategory
   const icon = CATEGORY_ICON[key]
-  const { bg } = CATEGORY_COLOR[key] ?? CATEGORY_COLOR.Others
+  const { bg } = CATEGORY_COLOR[key]
   return (
     <div className={`border border-hairline flex items-center justify-center overflow-hidden ${bg} ${className}`}>
       <img src={icon} alt={category ?? 'Others'} className="w-1/2 h-1/2 object-contain scale-[1.3]" />
@@ -57,7 +57,7 @@ export function ClaimPreviewItemSection({ supportFormData, createdAt }: ClaimPre
     : '—'
   const opened = createdAt ? formatDateTime(createdAt) : '—'
 
-  const { bg: catBg, text: catText } = CATEGORY_COLOR[(category ?? 'Others') as ItemCategory] ?? CATEGORY_COLOR.Others
+  const { bg: catBg, text: catText } = CATEGORY_COLOR[(category ?? 'Others') as ItemCategory]
 
   return (
     <div className="flex gap-4 px-5 py-4">

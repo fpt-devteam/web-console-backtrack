@@ -1,25 +1,38 @@
-import { User } from 'lucide-react'
+import { Mail, Phone, User } from 'lucide-react'
 import { Avatar } from '@/components/common/avatar'
-import type { IConversationPartner } from '@/types/chat.types'
-import { formatDateTime } from '@/utils/datetime.util'
+import type { IConversationPartner, SupportFormData } from '@/types/chat.types'
 
 interface CustomerSectionProps {
   partner: IConversationPartner
-  lastContactAt?: string | null
+  supportFormData?: SupportFormData | null
 }
 
-function Field({ label, value }: { label: string; value?: string | null }) {
+function ContactRow({ icon: Icon, label, value, href }: {
+  icon: typeof User
+  label: string
+  value: string
+  href?: string
+}) {
   return (
-    <div className="flex flex-col gap-0.5">
-      <span className="text-xs font-bold tracking-widest text-ink uppercase">{label}</span>
-      <span className="text-xs font-medium text-mute break-all">{value ?? '—'}</span>
+    <div className="flex items-start gap-2 min-w-0">
+      <Icon className="w-3.5 h-3.5 text-mute mt-0.5 shrink-0" />
+      <div className="flex flex-col min-w-0">
+        <span className="text-[10px] font-semibold tracking-widest text-mute uppercase">{label}</span>
+        {href ? (
+          <a href={href} className="text-xs text-primary hover:underline break-words">{value}</a>
+        ) : (
+          <span className="text-xs text-ink break-words">{value}</span>
+        )}
+      </div>
     </div>
   )
 }
 
-export function CustomerSection({ partner, lastContactAt }: CustomerSectionProps) {
+export function CustomerSection({ partner, supportFormData }: CustomerSectionProps) {
   const name = partner.displayName ?? partner.email ?? 'Unknown'
-  const lastContact = lastContactAt ? formatDateTime(lastContactAt) : '—'
+
+  const contactPhone = supportFormData?.contactPhone?.trim()
+  const contactEmail = supportFormData?.contactEmail?.trim()
 
   return (
     <div className="flex flex-col gap-4">
@@ -28,18 +41,17 @@ export function CustomerSection({ partner, lastContactAt }: CustomerSectionProps
         Customer
       </span>
 
-      <div className="flex items-center gap-2.5">
-        <Avatar url={partner.avatarUrl} name={name} className="w-10 h-10 rounded-full text-sm shrink-0" />
-        <div className="min-w-0">
-          <p className="text-sm font-semibold text-ink truncate">{name}</p>
-          {partner.email && (
-            <p className="text-xs text-mute truncate">{partner.email}</p>
-          )}
+      <div className="flex flex-col gap-3.5">
+        <div className="flex items-center gap-3 min-w-0">
+          <Avatar url={partner.avatarUrl} name={name} className="w-10 h-10 rounded-full text-sm shrink-0" />
+          <div className="flex flex-col min-w-0">
+            <span className="text-[10px] font-semibold tracking-widest text-mute uppercase">Name</span>
+            <span className="text-sm text-ink break-words">{name}</span>
+          </div>
         </div>
-      </div>
 
-      <div className="grid grid-cols-1 gap-2.5">
-        <Field label="Last contact" value={lastContact} />
+        {contactPhone && <ContactRow icon={Phone} label="Phone" value={contactPhone} href={`tel:${contactPhone}`} />}
+        {contactEmail && <ContactRow icon={Mail}  label="Email" value={contactEmail} href={`mailto:${contactEmail}`} />}
       </div>
     </div>
   )

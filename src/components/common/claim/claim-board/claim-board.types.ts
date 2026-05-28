@@ -20,7 +20,7 @@ export interface ClaimColumnProps {
   accent: string
   conversations: IConversation[]
   isLoading?: boolean
+  isDropDisabled?: boolean
   isCardDraggable?: (conv: IConversation) => boolean
   onOpenConversation?: (conv: IConversation) => void
-  onTakeOn?: (conv: IConversation) => void | Promise<void>
 }

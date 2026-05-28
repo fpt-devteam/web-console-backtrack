@@ -8,5 +8,5 @@ export const COLUMNS: { id: ConversationStatus; title: string; accent: string }[
 
 export const VALID_TRANSITIONS: Partial<Record<ConversationStatus, ConversationStatus[]>> = {
   [ConversationStatus.QUEUE]:       [ConversationStatus.IN_PROGRESS],
-  [ConversationStatus.IN_PROGRESS]: [ConversationStatus.QUEUE, ConversationStatus.CLOSED],
+  [ConversationStatus.IN_PROGRESS]: [ConversationStatus.CLOSED],
 }

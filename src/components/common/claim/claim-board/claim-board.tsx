@@ -15,7 +15,6 @@ import { ConversationStatus } from '@/types/chat.types'
 import { COLUMNS, VALID_TRANSITIONS } from './claim-board.constants'
 import { findConv, isCardDraggable } from './claim-board.helper'
 import { ClaimAssignDialog } from '../claim-dialog/claim-assign-dialog'
-import { ClaimRequeueDialog } from '../claim-dialog/claim-requeue-dialog'
 import { ClaimResolveDialog } from '../claim-dialog/claim-resolve-dialog'
 import type { BoardState, ColKey } from './claim-board.types'
 import type { IConversation } from '@/types/chat.types'
@@ -27,15 +26,11 @@ interface ClaimBoardProps {
   isLoading: boolean
   currentUserId?: string
   isAssignPending: boolean
-  isReturnPending: boolean
   isResolvePending: boolean
   onAssign: (convId: string) => Promise<void>
-  onReturn: (convId: string) => Promise<void>
   onResolve: (convId: string) => Promise<void>
   onRemoveFromQueue: (convId: string) => void
   onOpenConversation?: (conv: IConversation) => void
-  /** When provided, queued cards show a "Take on" button. Omit to hide it (e.g. admin views). */
-  onTakeOn?: (conv: IConversation) => void | Promise<void>
 }
 
 export function ClaimBoard({
@@ -45,14 +40,11 @@ export function ClaimBoard({
   isLoading,
   currentUserId,
   isAssignPending,
-  isReturnPending,
   isResolvePending,
   onAssign,
-  onReturn,
   onResolve,
   onRemoveFromQueue,
   onOpenConversation,
-  onTakeOn,
 }: ClaimBoardProps) {
   const [board, setBoard] = useState<BoardState>({
     [ConversationStatus.QUEUE]: queueConversations,
@@ -61,7 +53,6 @@ export function ClaimBoard({
   })
   const [draggingConv, setDraggingConv] = useState<IConversation | null>(null)
   const [pendingAssign, setPendingAssign] = useState<IConversation | null>(null)
-  const [pendingReturn, setPendingReturn] = useState<IConversation | null>(null)
   const [pendingResolve, setPendingResolve] = useState<IConversation | null>(null)
 
   useEffect(() => {
@@ -106,10 +97,6 @@ export function ClaimBoard({
       setPendingAssign(conv)
       return
     }
-    if (sourceCol === ConversationStatus.IN_PROGRESS && targetCol === ConversationStatus.QUEUE) {
-      setPendingReturn(conv)
-      return
-    }
     if (sourceCol === ConversationStatus.IN_PROGRESS && targetCol === ConversationStatus.CLOSED) {
       setPendingResolve(conv)
       return
@@ -140,19 +127,6 @@ export function ClaimBoard({
     }
   }
 
-  async function handleReturnConfirm() {
-    if (!pendingReturn) return
-    const conv = pendingReturn
-    setPendingReturn(null)
-    const revert = applyMove(conv, ConversationStatus.IN_PROGRESS, ConversationStatus.QUEUE)
-    try {
-      await onReturn(conv.id)
-    } catch {
-      revert()
-      toast.error('Failed to return conversation to queue')
-    }
-  }
-
   async function handleResolveConfirm() {
     if (!pendingResolve) return
     const conv = pendingResolve
@@ -175,19 +149,23 @@ export function ClaimBoard({
     >
       <div className="h-full overflow-x-auto">
         <div className="flex gap-6 pb-6 min-h-full">
-          {COLUMNS.map(({ id, title, accent }) => (
-            <ClaimColumn
-              key={id}
-              id={id}
-              title={title}
-              accent={accent}
-              conversations={isLoading ? [] : board[id]}
-              isLoading={isLoading}
-              isCardDraggable={isCardDraggable(id, currentUserId)}
-              onOpenConversation={onOpenConversation}
-              onTakeOn={onTakeOn}
-            />
-          ))}
+          {COLUMNS.map(({ id, title, accent }) => {
+            const validTargets = draggingConv ? (VALID_TRANSITIONS[draggingConv.status as ColKey] ?? []) : null
+            const isDropDisabled = validTargets != null && !validTargets.includes(id)
+            return (
+              <ClaimColumn
+                key={id}
+                id={id}
+                title={title}
+                accent={accent}
+                conversations={isLoading ? [] : board[id]}
+                isLoading={isLoading}
+                isDropDisabled={isDropDisabled}
+                isCardDraggable={isCardDraggable(id, currentUserId)}
+                onOpenConversation={onOpenConversation}
+              />
+            )
+          })}
         </div>
       </div>
 
@@ -205,15 +183,6 @@ export function ClaimBoard({
           isPending={isAssignPending}
           onConfirm={handleAssignConfirm}
           onCancel={() => setPendingAssign(null)}
-        />
-      )}
-
-      {pendingReturn && (
-        <ClaimRequeueDialog
-          conv={pendingReturn}
-          isPending={isReturnPending}
-          onConfirm={handleReturnConfirm}
-          onCancel={() => setPendingReturn(null)}
         />
       )}
 

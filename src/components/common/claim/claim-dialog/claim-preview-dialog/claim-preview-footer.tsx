@@ -23,7 +23,7 @@ export function ClaimPreviewFooter({
 
       <div className="flex items-center gap-2">
         {onTakeIt && (
-          <Button variant="outline" size="sm" onClick={onTakeIt} disabled={isTakingOn} className='cursor-pointer'>
+          <Button size="sm" onClick={onTakeIt} disabled={isTakingOn} className='cursor-pointer'>
             <Check className="w-3.5 h-3.5" />
             Take it on
           </Button>

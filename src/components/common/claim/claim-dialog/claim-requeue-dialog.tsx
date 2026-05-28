@@ -24,7 +24,7 @@ export function ClaimRequeueDialog({ conv, isPending, onConfirm, onCancel }: Cla
               <p className="text-xs text-[#929292] mt-0.5">This will unassign you from the conversation</p>
             </div>
           </div>
-          <button onClick={onCancel} className="text-[#929292] hover:text-[#6a6a6a] transition-colors p-1">
+          <button onClick={onCancel} className="cursor-pointer text-[#929292] hover:text-[#6a6a6a] transition-colors p-1">
             <X className="w-4 h-4" />
           </button>
         </div>
@@ -43,14 +43,14 @@ export function ClaimRequeueDialog({ conv, isPending, onConfirm, onCancel }: Cla
           <button
             onClick={onCancel}
             disabled={isPending}
-            className="flex-1 px-4 py-2.5 text-sm font-medium text-[#222222] border border-[#dddddd] rounded-xl hover:bg-[#f7f7f7] transition-colors disabled:opacity-50"
+            className="cursor-pointer flex-1 px-4 py-2.5 text-sm font-medium text-[#222222] border border-[#dddddd] rounded-xl hover:bg-[#f7f7f7] transition-colors disabled:opacity-50"
           >
             Cancel
           </button>
           <button
             onClick={onConfirm}
             disabled={isPending}
-            className="flex-1 px-4 py-2.5 text-sm font-medium text-white bg-[#f59e0b] rounded-xl hover:bg-[#d97706] transition-colors disabled:opacity-50 flex items-center justify-center gap-1.5"
+            className="cursor-pointer flex-1 px-4 py-2.5 text-sm font-medium text-white bg-[#f59e0b] rounded-xl hover:bg-[#d97706] transition-colors disabled:opacity-50 flex items-center justify-center gap-1.5"
           >
             {isPending ? (
               <><Loader2 className="w-4 h-4 animate-spin" /> Returning…</>
