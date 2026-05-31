@@ -1,6 +1,6 @@
 import type { IConversation } from '@/types/chat.types'
 import { Skeleton } from '@/components/common/core/skeleton'
-import { ClaimListCard } from './claim-list-card'
+import { ClaimCard } from '../claim-card/claim-card'
 
 interface ClaimListProps {
   conversations: IConversation[]
@@ -10,7 +10,7 @@ interface ClaimListProps {
   onView: (conv: IConversation) => void
 }
 
-/** A vertical list of claim rows with loading / error / empty states. */
+/** A vertical list of claim cards with loading / error / empty states. */
 export function ClaimList({
   conversations,
   isLoading,
@@ -20,9 +20,9 @@ export function ClaimList({
 }: ClaimListProps) {
   if (isLoading) {
     return (
-      <div className="flex flex-col gap-2">
+      <div className="flex flex-col gap-3">
         {Array.from({ length: 4 }).map((_, i) => (
-          <Skeleton key={i} className="h-28 w-full rounded-xl" />
+          <Skeleton key={i} className="h-40 w-full rounded-xl" />
         ))}
       </div>
     )
@@ -45,9 +45,9 @@ export function ClaimList({
   }
 
   return (
-    <div className="flex flex-col gap-2">
+    <div className="flex flex-col gap-3">
       {conversations.map((conv) => (
-        <ClaimListCard key={conv.id} conv={conv} onView={onView} />
+        <ClaimCard key={conv.id} conv={conv} disabled onOpenConversation={onView} />
       ))}
     </div>
   )

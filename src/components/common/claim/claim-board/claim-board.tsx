@@ -15,6 +15,7 @@ import { ConversationStatus } from '@/types/chat.types'
 import { COLUMNS, VALID_TRANSITIONS } from './claim-board.constants'
 import { findConv, isCardDraggable } from './claim-board.helper'
 import { ClaimAssignDialog } from '../claim-dialog/claim-assign-dialog'
+import { ClaimVerifyDialog } from '../claim-dialog/claim-verify-dialog'
 import { ClaimResolveDialog } from '../claim-dialog/claim-resolve-dialog'
 import type { BoardState, ColKey } from './claim-board.types'
 import type { IConversation } from '@/types/chat.types'
@@ -22,12 +23,15 @@ import type { IConversation } from '@/types/chat.types'
 interface ClaimBoardProps {
   queueConversations: IConversation[]
   assignedConversations: IConversation[]
+  verifiedConversations: IConversation[]
   resolvedConversations: IConversation[]
   isLoading: boolean
   currentUserId?: string
   isAssignPending: boolean
+  isVerifyPending: boolean
   isResolvePending: boolean
   onAssign: (convId: string) => Promise<void>
+  onVerify: (convId: string) => Promise<void>
   onResolve: (convId: string) => Promise<void>
   onRemoveFromQueue: (convId: string) => void
   onOpenConversation?: (conv: IConversation) => void
@@ -36,12 +40,15 @@ interface ClaimBoardProps {
 export function ClaimBoard({
   queueConversations,
   assignedConversations,
+  verifiedConversations,
   resolvedConversations,
   isLoading,
   currentUserId,
   isAssignPending,
+  isVerifyPending,
   isResolvePending,
   onAssign,
+  onVerify,
   onResolve,
   onRemoveFromQueue,
   onOpenConversation,
@@ -49,10 +56,12 @@ export function ClaimBoard({
   const [board, setBoard] = useState<BoardState>({
     [ConversationStatus.QUEUE]: queueConversations,
     [ConversationStatus.IN_PROGRESS]: assignedConversations,
+    [ConversationStatus.VERIFIED]: verifiedConversations,
     [ConversationStatus.CLOSED]: resolvedConversations,
   })
   const [draggingConv, setDraggingConv] = useState<IConversation | null>(null)
   const [pendingAssign, setPendingAssign] = useState<IConversation | null>(null)
+  const [pendingVerify, setPendingVerify] = useState<IConversation | null>(null)
   const [pendingResolve, setPendingResolve] = useState<IConversation | null>(null)
 
   useEffect(() => {
@@ -62,6 +71,10 @@ export function ClaimBoard({
   useEffect(() => {
     setBoard((prev) => ({ ...prev, [ConversationStatus.IN_PROGRESS]: assignedConversations }))
   }, [assignedConversations])
+
+  useEffect(() => {
+    setBoard((prev) => ({ ...prev, [ConversationStatus.VERIFIED]: verifiedConversations }))
+  }, [verifiedConversations])
 
   useEffect(() => {
     setBoard((prev) => ({ ...prev, [ConversationStatus.CLOSED]: resolvedConversations }))
@@ -97,7 +110,11 @@ export function ClaimBoard({
       setPendingAssign(conv)
       return
     }
-    if (sourceCol === ConversationStatus.IN_PROGRESS && targetCol === ConversationStatus.CLOSED) {
+    if (sourceCol === ConversationStatus.IN_PROGRESS && targetCol === ConversationStatus.VERIFIED) {
+      setPendingVerify(conv)
+      return
+    }
+    if (sourceCol === ConversationStatus.VERIFIED && targetCol === ConversationStatus.CLOSED) {
       setPendingResolve(conv)
       return
     }
@@ -127,11 +144,24 @@ export function ClaimBoard({
     }
   }
 
+  async function handleVerifyConfirm() {
+    if (!pendingVerify) return
+    const conv = pendingVerify
+    setPendingVerify(null)
+    const revert = applyMove(conv, ConversationStatus.IN_PROGRESS, ConversationStatus.VERIFIED)
+    try {
+      await onVerify(conv.id)
+    } catch {
+      revert()
+      toast.error('Failed to verify conversation')
+    }
+  }
+
   async function handleResolveConfirm() {
     if (!pendingResolve) return
     const conv = pendingResolve
     setPendingResolve(null)
-    const revert = applyMove(conv, ConversationStatus.IN_PROGRESS, ConversationStatus.CLOSED)
+    const revert = applyMove(conv, ConversationStatus.VERIFIED, ConversationStatus.CLOSED)
     try {
       await onResolve(conv.id)
     } catch {
@@ -148,7 +178,7 @@ export function ClaimBoard({
       onDragEnd={handleDragEnd}
     >
       <div className="h-full overflow-x-auto">
-        <div className="flex justify-around gap-6 pb-6 min-h-full">
+        <div className="flex justify-around pb-6 min-h-full">
           {COLUMNS.map(({ id, title, accent }) => {
             const validTargets = draggingConv ? (VALID_TRANSITIONS[draggingConv.status] ?? []) : null
             const isDropDisabled = validTargets != null && !validTargets.includes(id)
@@ -171,7 +201,7 @@ export function ClaimBoard({
 
       <DragOverlay modifiers={[restrictToWindowEdges]}>
         {draggingConv && (
-          <div className="w-96 shadow-2xl rotate-1">
+          <div className="w-80 shadow-2xl rotate-1">
             <ClaimCard conv={draggingConv} />
           </div>
         )}
@@ -183,6 +213,16 @@ export function ClaimBoard({
           isPending={isAssignPending}
           onConfirm={handleAssignConfirm}
           onCancel={() => setPendingAssign(null)}
+        />
+      )}
+
+      {pendingVerify && (
+        <ClaimVerifyDialog
+          partnerName={pendingVerify.partner.displayName ?? pendingVerify.partner.email ?? pendingVerify.id.slice(0, 8)}
+          avatarUrl={pendingVerify.partner.avatarUrl ?? undefined}
+          isPending={isVerifyPending}
+          onConfirm={handleVerifyConfirm}
+          onCancel={() => setPendingVerify(null)}
         />
       )}
 

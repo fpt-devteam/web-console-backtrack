@@ -10,7 +10,7 @@ interface ClaimCardHeaderProps {
 
 export function ClaimCardHeader({ id, itemName, status }: ClaimCardHeaderProps) {
   return (
-    <div className="flex items-start justify-between gap-2 h-14">
+    <div className="flex items-start justify-between gap-2">
       <div className="flex flex-col min-w-0">
         <span className="text-xs font-mono text-mute leading-none mb-0.5">
           {formatClaimId(id)}

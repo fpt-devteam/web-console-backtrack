@@ -18,30 +18,47 @@ interface Step {
   time?: string | null
 }
 
+/** Ordinal position of each status in the Queue → In Review → Verified → Resolved flow. */
+const STATUS_ORDER: Record<ConversationStatus, number> = {
+  [ConversationStatus.QUEUE]:       0,
+  [ConversationStatus.IN_PROGRESS]: 1,
+  [ConversationStatus.VERIFIED]:    2,
+  [ConversationStatus.CLOSED]:      3,
+}
+
+function stepState(current: number, step: number): StepState {
+  if (current === step) return 'active'
+  return current > step ? 'done' : 'todo'
+}
+
 function buildSteps(
   status: ConversationStatus,
   submittedAt?: string | null,
   firstAssignedAt?: string | null,
   resolvedAt?: string | null,
 ): Step[] {
-  const isQueue      = status === ConversationStatus.QUEUE
-  const isInProgress = status === ConversationStatus.IN_PROGRESS
-  const isClosed     = status === ConversationStatus.CLOSED
+  const current = STATUS_ORDER[status]
 
   return [
     {
       label: 'Submitted',
-      state: isQueue ? 'active' : 'done',
+      // Submitted is complete the moment the claim leaves the queue.
+      state: current === 0 ? 'active' : 'done',
       time: submittedAt ? formatDateTime(submittedAt) : null,
     },
     {
       label: 'In Review',
-      state: isInProgress ? 'active' : isClosed ? 'done' : 'todo',
+      state: stepState(current, 1),
       time: firstAssignedAt ? formatDateTime(firstAssignedAt) : null,
     },
     {
+      label: 'Verified',
+      state: stepState(current, 2),
+      time: null,
+    },
+    {
       label: 'Resolved',
-      state: isClosed ? 'done' : 'todo',
+      state: current === 3 ? 'done' : 'todo',
       time: resolvedAt ? formatDateTime(resolvedAt) : null,
     },
   ]

@@ -9,7 +9,7 @@ export function StaffLayout({ children }: LayoutProps) {
   return (
     <SidebarProvider className="bg-cloud h-svh overflow-hidden">
       <StaffSidebar />
-      <SidebarInset className="bg-white overflow-y-auto scrollbar-auto-hide md:my-2 md:mr-2 md:rounded-xl md:shadow-md">
+      <SidebarInset className="bg-white overflow-y-auto scrollbar-auto-hide m-2 rounded-xl shadow-md">
         {children}
       </SidebarInset>
     </SidebarProvider>

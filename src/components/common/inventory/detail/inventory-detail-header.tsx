@@ -26,7 +26,7 @@ export function InventoryDetailHeader({
   return (
     <>
       {/* Header */}
-      <div className="px-4 py-2 flex gap-4 items-center justify-between border-b border-gray-100 bg-white">
+      <div className="px-2 py-2 flex gap-4 items-center justify-between border-b border-gray-100 bg-white">
         {/* Breadcrumb bar */}
         <div className="flex items-center gap-3 text-md text-ink font-semibold">
             <Link

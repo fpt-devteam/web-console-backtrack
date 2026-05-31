@@ -195,6 +195,14 @@ export const chatService = {
     if (!data.success) throw new Error(data.error?.message ?? 'Failed to return conversation to queue');
   },
 
+  /** Mark a conversation as verified (claimant ownership confirmed). */
+  async verifyConversation(conversationId: string): Promise<void> {
+    const { data } = await privateClient.post<ApiResponse<void>>(
+      `${BASE}/conversations/${conversationId}/verify`
+    );
+    if (!data.success) throw new Error(data.error?.message ?? 'Failed to verify conversation');
+  },
+
   /** Resolve (close) a conversation. */
   async resolveConversation(conversationId: string): Promise<void> {
     const { data } = await privateClient.post<ApiResponse<void>>(

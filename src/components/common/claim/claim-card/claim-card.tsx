@@ -46,29 +46,25 @@ export function ClaimCard({ conv, disabled = false, onOpenConversation }: ClaimC
       onClick={handleCardClick}
       className={getCardClassName(isDragging)}
     >
-      <div className="h-5 flex items-center justify-center">
+      <div className="h-3 flex items-center justify-center">
         {!disabled && (
           <div
             {...listeners}
             {...attributes}
             className="w-full flex items-center justify-center cursor-grab active:cursor-grabbing opacity-0 group-hover:opacity-100 transition-opacity"
           >
-            <GripVertical className="w-4 h-4 text-neutral-300" />
+            <GripVertical className="w-3 h-3 text-neutral-300" />
           </div>
         )}
       </div>
 
-      <div className={`flex gap-3 px-3 pb-3 pt-0 min-h-40`}>
+      <div className={`flex gap-2 px-2 pb-2 pt-0 min-h-30`}>
         <ClaimCardImage src={imageUrl} alt={itemName} category={category} subcategoryIcon={subcategoryIcon} />
 
         <div className="flex-1 min-w-0 flex flex-col justify-between">
           <ClaimCardHeader id={conv.id} itemName={itemName} status={statusKey} />
 
           <ClaimCardPartner name={partnerName} avatarUrl={conv.partner.avatarUrl} />
-
-          <p className="text-xs text-mute truncate">
-            {conv.lastMessageContent ?? 'No messages yet'}
-          </p>
 
           <ClaimCardMeta category={category} lastMessageAt={conv.lastMessageAt} />
         </div>

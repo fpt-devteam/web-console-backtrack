@@ -125,6 +125,18 @@ export function useAssignConversation() {
   });
 }
 
+/** Staff member marks a conversation as verified */
+export function useVerifyConversation() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (conversationId: string) => chatService.verifyConversation(conversationId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: chatKeys.assigned() });
+    },
+  });
+}
+
 /** Staff member resolves (closes) a conversation */
 export function useResolveConversation() {
   const queryClient = useQueryClient();

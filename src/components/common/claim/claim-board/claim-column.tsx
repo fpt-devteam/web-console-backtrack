@@ -17,7 +17,7 @@ export function ClaimColumn({
   const { setNodeRef, isOver } = useDroppable({ id, disabled: isDropDisabled })
 
   return (
-    <div className="flex flex-col min-w-md w-lg shrink-0 bg-neutral-100/70 rounded-xl px-2 py-4">
+    <div className="flex flex-col min-w-xs w-sm shrink-0 bg-neutral-100/70 rounded-xl px-2 py-4">
       {/* Column header */}
       <div className="flex items-center gap-2 mb-3 px-4">
         <span className={`w-3 h-3 rounded-full shrink-0 ${accent}`} />
@@ -31,7 +31,7 @@ export function ClaimColumn({
       <div
         ref={setNodeRef}
         className={[
-          'flex-1 rounded-xl p-2 flex flex-col items-stretch gap-2 min-h-30',
+          'flex-1 rounded-xl p-2 flex flex-col items-stretch gap-4 min-h-30',
           'transition-colors',
           isOver && !isDropDisabled
             ? 'bg-primary/5 ring-2 ring-primary/30 ring-dashed'

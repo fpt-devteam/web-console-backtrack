@@ -11,6 +11,7 @@ export type ColKey = ConversationStatus
 export interface BoardState {
   [ConversationStatus.QUEUE]:       IConversation[]
   [ConversationStatus.IN_PROGRESS]: IConversation[]
+  [ConversationStatus.VERIFIED]:    IConversation[]
   [ConversationStatus.CLOSED]:      IConversation[]
 }
 

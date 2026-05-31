@@ -25,7 +25,8 @@ export function isCardDraggable(
   currentUserId: string | undefined,
 ): (conv: IConversation) => boolean {
   if (colId === ConversationStatus.QUEUE) return () => true
-  if (colId === ConversationStatus.IN_PROGRESS) return (conv) => conv.assignedStaff?.id === currentUserId
+  if (colId === ConversationStatus.IN_PROGRESS || colId === ConversationStatus.VERIFIED)
+    return (conv) => conv.assignedStaff?.id === currentUserId
   return () => false
 }
 

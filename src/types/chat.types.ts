@@ -13,6 +13,7 @@ export enum ConversationType {
 export enum ConversationStatus {
   QUEUE = 'queue',
   IN_PROGRESS = 'in_progress',
+  VERIFIED = 'verified',
   CLOSED = 'closed',
 }
 

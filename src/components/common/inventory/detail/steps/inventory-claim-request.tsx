@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { AdminModal } from '@/components/console/admin/admin-modal'
 import { Avatar } from '@/components/common/avatar'
-import { ClaimList } from '@/components/common/claim/claim-list/claim-list'
+import { ClaimListPanel } from '@/components/common/claim/claim-list/claim-list-panel'
 import { ConversationStatus } from '@/types/chat.types'
 import type { IConversation } from '@/types/chat.types'
 import type { InventoryItem } from '@/services/inventory.service'
@@ -60,7 +60,7 @@ export function InventoryClaimRequest({
       {/* Right — claim requests linked to this item */}
       <div className="space-y-4">
         <SectionTitle title={`Claim requests (${postConvs.length})`} />
-        <ClaimList
+        <ClaimListPanel
           conversations={postConvs}
           isLoading={postQuery.isLoading}
           isError={postQuery.isError}

@@ -104,7 +104,6 @@ export function InventoryItemDetailView({
 
   return (
     <div className="mx-auto h-full w-full overflow-y-auto">
-
       <div className="sticky top-0 z-20 bg-white">
         <InventoryDetailHeader
           backTo={backTo}

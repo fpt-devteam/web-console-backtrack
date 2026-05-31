@@ -22,10 +22,10 @@ const CATEGORY_ICON: Record<ItemCategory, string> = {
 function CategoryFallback({ category, subcategoryIcon }: { category?: string | null; subcategoryIcon?: string | null }) {
   const key = (category ?? 'Others') as ItemCategory
   const icon = subcategoryIcon ?? CATEGORY_ICON[key]
-  const { bg } = CATEGORY_COLOR[key] ?? CATEGORY_COLOR.Others
+  const { bg } = CATEGORY_COLOR[key]
 
   return (
-    <div className={`w-20 h-20 rounded-lg border border-hairline flex items-center justify-center shrink-0 overflow-hidden ${bg}`}>
+    <div className={`w-16 h-16 rounded-lg border border-hairline flex items-center justify-center shrink-0 overflow-hidden ${bg}`}>
       <img src={icon} alt={category ?? 'Others'} className="w-10 h-10 object-contain transition-transform duration-200 scale-[1.3] group-hover:scale-[1.5]" />
     </div>
   )
