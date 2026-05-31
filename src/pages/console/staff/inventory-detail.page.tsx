@@ -42,7 +42,6 @@ export function InventoryDetailPage() {
         onMainImageIndexChange={setMainImageIndex}
         returnReportForPost={returnReportForPost}
         subcategoryNameById={subcategoryNameById}
-        showAddThumbnailButton
         actions={
           item && item.status !== 'Returned' && item.status !== 'Archived' && item.status !== 'Expired' ? (
             <>

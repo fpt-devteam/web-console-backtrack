@@ -9,7 +9,7 @@ interface ClaimBoardHeaderProps {
 
 export function ClaimBoardHeader({ searchTerm, onSearchChange, className }: ClaimBoardHeaderProps) {
   return (
-    <div className={cn("px-4 sm:px-6 lg:px-8 py-6 shrink-0", className)}>
+    <div className={cn("p-4 shrink-0", className)}>
       <div className="flex flex-col gap-3 sm:flex-row sm:justify-between sm:items-center">
         <div>
           <h1 className="text-2xl font-bold text-ink">Claim Board</h1>

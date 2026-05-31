@@ -7,9 +7,9 @@ interface AdminLayoutProps {
 
 export function AdminLayout({ children }: AdminLayoutProps) {
   return (
-    <SidebarProvider>
+    <SidebarProvider className="bg-cloud h-svh overflow-hidden">
       <AdminSidebar />
-      <SidebarInset className="bg-[#f7f7f7] min-h-screen">
+      <SidebarInset className="bg-white overflow-y-auto scrollbar-auto-hide md:my-2 md:rounded-xl md:shadow-md">
         {children}
       </SidebarInset>
     </SidebarProvider>

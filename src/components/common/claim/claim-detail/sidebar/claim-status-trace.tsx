@@ -6,6 +6,7 @@ import { formatDateTime } from '@/utils/datetime.util'
 interface ClaimStatusTraceProps {
   status: ConversationStatus
   submittedAt?: string | null
+  firstAssignedAt?: string | null
   resolvedAt?: string | null
 }
 
@@ -17,7 +18,12 @@ interface Step {
   time?: string | null
 }
 
-function buildSteps(status: ConversationStatus, submittedAt?: string | null, resolvedAt?: string | null): Step[] {
+function buildSteps(
+  status: ConversationStatus,
+  submittedAt?: string | null,
+  firstAssignedAt?: string | null,
+  resolvedAt?: string | null,
+): Step[] {
   const isQueue      = status === ConversationStatus.QUEUE
   const isInProgress = status === ConversationStatus.IN_PROGRESS
   const isClosed     = status === ConversationStatus.CLOSED
@@ -31,18 +37,18 @@ function buildSteps(status: ConversationStatus, submittedAt?: string | null, res
     {
       label: 'In Review',
       state: isInProgress ? 'active' : isClosed ? 'done' : 'todo',
-      time: null,
+      time: firstAssignedAt ? formatDateTime(firstAssignedAt) : null,
     },
     {
       label: 'Resolved',
       state: isClosed ? 'done' : 'todo',
-      time: isClosed && resolvedAt ? formatDateTime(resolvedAt) : null,
+      time: resolvedAt ? formatDateTime(resolvedAt) : null,
     },
   ]
 }
 
-export function ClaimStatusTrace({ status, submittedAt, resolvedAt }: ClaimStatusTraceProps) {
-  const steps = buildSteps(status, submittedAt, resolvedAt)
+export function ClaimStatusTrace({ status, submittedAt, firstAssignedAt, resolvedAt }: ClaimStatusTraceProps) {
+  const steps = buildSteps(status, submittedAt, firstAssignedAt, resolvedAt)
 
   return (
     <div className="flex flex-col gap-3">

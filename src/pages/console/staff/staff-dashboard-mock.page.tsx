@@ -158,7 +158,7 @@ export function StaffDashboardMockPage() {
 
   return (
     <StaffLayout>
-      <div className="h-full overflow-y-auto bg-[#f7f7f7] p-4 sm:p-6 lg:p-8">
+      <div className="h-full p-4 sm:p-6 lg:p-8">
         <div className="space-y-6">
           {/* Header */}
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">

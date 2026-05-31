@@ -43,7 +43,7 @@ export function InventoryPage() {
 
   return (
     <div className="h-full overflow-y-auto flex flex-col">
-      <div className="p-4 sm:p-6 lg:p-8 flex-1 flex flex-col gap-4">
+      <div className="p-4 flex-1 flex flex-col gap-4">
 
         {/* Header */}
         <div className="flex flex-col gap-1">

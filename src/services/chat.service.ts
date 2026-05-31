@@ -39,6 +39,8 @@ interface RawConversation {
     timestamp: string | null;
   } | null;
   unreadCount?: number;
+  firstAssignedAt?: string | null;
+  resolvedAt?: string | null;
   createdAt?: string;
   updatedAt?: string;
   deletedAt?: string | null;
@@ -72,6 +74,8 @@ export function normalizeConv(raw: unknown): IConversation {
     lastMessageContent: obj.lastMessage?.content ?? null,
     unreadCount: obj.unreadCount ?? 0,
     status: obj.status as IConversation['status'],
+    firstAssignedAt: obj.firstAssignedAt ?? null,
+    resolvedAt: obj.resolvedAt ?? null,
     createdAt: (obj.createdAt ?? ''),
     updatedAt: (obj.updatedAt ?? ''),
     deletedAt: obj.deletedAt ?? null,
@@ -217,6 +221,18 @@ export const chatService = {
   async listByPostId(postId: string, orgId?: string): Promise<Array<IConversation>> {
     const { data } = await privateClient.get<ApiResponse<unknown>>(
       `${BASE}/conversations/organization/posts/${postId}`,
+      {
+        headers: orgId ? { 'X-Org-Id': orgId } : undefined,
+      }
+    );
+    if (!data.success) throw new Error(data.error?.message ?? 'Failed to fetch conversations');
+    return toList(data.data).conversations;
+  },
+
+  /** List all conversations whose claim request targets the given subcategory. */
+  async listBySubcategoryId(subcategoryId: string, orgId?: string): Promise<Array<IConversation>> {
+    const { data } = await privateClient.get<ApiResponse<unknown>>(
+      `${BASE}/conversations/organization/subcategories/${subcategoryId}`,
       {
         headers: orgId ? { 'X-Org-Id': orgId } : undefined,
       }

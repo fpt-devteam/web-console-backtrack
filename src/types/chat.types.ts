@@ -106,6 +106,10 @@ export interface IConversation {
   lastMessage?: IConversationLastMessage | null;
   unreadCount?: number;
   status: ConversationStatus;
+  /** When the conversation was first assigned to a staff member (entered "In Review") */
+  firstAssignedAt?: string | null;
+  /** When the conversation was resolved/closed */
+  resolvedAt?: string | null;
   createdAt: string;
   updatedAt: string;
   deletedAt?: string | null;

@@ -148,9 +148,9 @@ export function ClaimBoard({
       onDragEnd={handleDragEnd}
     >
       <div className="h-full overflow-x-auto">
-        <div className="flex gap-6 pb-6 min-h-full">
+        <div className="flex justify-around gap-6 pb-6 min-h-full">
           {COLUMNS.map(({ id, title, accent }) => {
-            const validTargets = draggingConv ? (VALID_TRANSITIONS[draggingConv.status as ColKey] ?? []) : null
+            const validTargets = draggingConv ? (VALID_TRANSITIONS[draggingConv.status] ?? []) : null
             const isDropDisabled = validTargets != null && !validTargets.includes(id)
             return (
               <ClaimColumn

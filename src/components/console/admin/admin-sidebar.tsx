@@ -30,7 +30,6 @@ import {
   SidebarMenuSub,
   SidebarMenuSubButton,
   SidebarMenuSubItem,
-  SidebarRail,
   useSidebar,
 } from '@/components/common/core/sidebar'
 import {
@@ -48,7 +47,7 @@ import {
 } from '@/components/common/core/dropdown-menu'
 
 const MENU_ITEM_CLS =
-  'text-base text-charcoal hover:bg-cloud data-[active=true]:bg-[#fff0f2] data-[active=true]:text-rausch'
+  'text-base text-charcoal hover:bg-neutral-200 data-[active=true]:bg-[#fff0f2] data-[active=true]:text-rausch'
 
 function getInitials(name: string | null | undefined): string {
   if (!name?.trim()) return 'U'
@@ -127,17 +126,17 @@ function AdminSidebarInner() {
               size="lg"
               tooltip={org?.name ?? 'Admin'}
               asChild
-              className="hover:bg-cloud text-ink"
+              className="hover:bg-neutral-200 text-ink"
             >
               <Link to="/console/$slug/admin/dashboard" params={{ slug }}>
                 <OrgLogo
                   logoUrl={org?.logoUrl}
                   alt={org?.name ?? 'Organization'}
-                  className="h-11 w-11 flex-shrink-0"
+                  className="h-6 w-6 flex-shrink-0"
                 />
                 <div className="flex flex-col min-w-0">
                   <span
-                    className="font-semibold text-base text-ink leading-tight"
+                    className="font-semibold text-sm text-ink leading-tight"
                     title={org?.name}
                   >
                     {org?.name ?? 'Admin'}
@@ -210,7 +209,7 @@ function AdminSidebarInner() {
                       <SidebarMenuSubButton
                         asChild
                         isActive={isSettingChildActive('organization')}
-                        className="text-base text-ash hover:bg-cloud hover:text-ink data-[active=true]:bg-[#fff0f2] data-[active=true]:text-rausch"
+                        className="text-base text-ash hover:bg-neutral-200 hover:text-ink data-[active=true]:bg-[#fff0f2] data-[active=true]:text-rausch"
                       >
                         <Link to="/console/$slug/admin/setting/organization" params={{ slug }}>
                           <ChevronRight className="w-3 h-3 opacity-40" />
@@ -222,7 +221,7 @@ function AdminSidebarInner() {
                       <SidebarMenuSubButton
                         asChild
                         isActive={isSettingChildActive('security')}
-                        className="text-base text-ash hover:bg-cloud hover:text-ink data-[active=true]:bg-[#fff0f2] data-[active=true]:text-rausch"
+                        className="text-base text-ash hover:bg-neutral-200 hover:text-ink data-[active=true]:bg-[#fff0f2] data-[active=true]:text-rausch"
                       >
                         <Link to="/console/$slug/account/security" params={{ slug }}>
                           <ChevronRight className="w-3 h-3 opacity-40" />
@@ -247,7 +246,7 @@ function AdminSidebarInner() {
                 <SidebarMenuButton
                   size="lg"
                   tooltip={userDisplayName}
-                  className="text-[#222222] hover:bg-[#f7f7f7] data-[state=open]:bg-[#f7f7f7]"
+                  className="text-ink hover:bg-neutral-200 data-[state=open]:bg-neutral-200"
                 >
                   {user?.avatarUrl ? (
                     <img src={user.avatarUrl} alt={userDisplayName} className="w-8 h-8 rounded-full object-cover flex-shrink-0" />
@@ -301,9 +300,8 @@ function AdminSidebarInner() {
 
 export function AdminSidebar() {
   return (
-    <Sidebar collapsible="icon" className="border-r border-[#dddddd] bg-white">
+    <Sidebar collapsible="icon" className="border-r-0! bg-cloud [&_[data-slot=sidebar-inner]]:bg-cloud">
       <AdminSidebarInner />
-      <SidebarRail />
     </Sidebar>
   )
 }

@@ -15,18 +15,18 @@ export function ClaimDetailHeader({
   onBack
 }: ClaimDetailHeaderProps) {
   return (
-    <div className="flex items-center gap-3 px-4 py-6 border-b border-hairline bg-white shrink-0">
+    <div className="sticky top-0 z-20 flex items-center gap-3 px-4 py-3 border-b border-hairline bg-white shrink-0">
       <button
         onClick={onBack}
-        className="flex items-center gap-1 text-md text-mute hover:text-ink hover:cursor-pointer transition-colors"
+        className="flex items-center gap-1 text-sm text-mute hover:text-ink hover:cursor-pointer transition-colors"
       >
-        <ChevronLeft className="w-5 h-5" />
+        <ChevronLeft className="w-4 h-4" />
         Back to board
       </button>
 
       <span className="text-neutral-200">|</span>
 
-      <div className="flex items-center gap-1 text-md text-mute">
+      <div className="flex items-center gap-1 text-sm text-mute">
         <span>Claims</span>
         <span>/</span>
         <span className="font-mono font-semibold text-ink mt-1">{formatClaimId(claimId)}</span>

@@ -7,9 +7,9 @@ interface LayoutProps {
 
 export function StaffLayout({ children }: LayoutProps) {
   return (
-    <SidebarProvider>
+    <SidebarProvider className="bg-cloud h-svh overflow-hidden">
       <StaffSidebar />
-      <SidebarInset className="min-h-screen">
+      <SidebarInset className="bg-white overflow-y-auto scrollbar-auto-hide md:my-2 md:mr-2 md:rounded-xl md:shadow-md">
         {children}
       </SidebarInset>
     </SidebarProvider>

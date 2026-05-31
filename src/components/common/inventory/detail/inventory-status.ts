@@ -2,7 +2,6 @@ export type InventoryStatus =
   | 'All'
   | 'Active'
   | 'InStorage'
-  | 'ReturnScheduled'
   | 'Returned'
   | 'Archived'
   | 'Expired'
@@ -22,8 +21,6 @@ export function inventoryStatusBadgeClass(s: InventoryStatus) {
       return 'border-[#ff385c] bg-[#fff0f3] text-[#ff385c]'
     case 'InStorage':
       return 'border-[#ff385c] bg-[#fff0f3] text-[#ff385c]'
-    case 'ReturnScheduled':
-      return 'border-[#ff8c00] bg-[#fff3e0] text-[#ff8c00]'
     case 'Returned':
       return 'border-[#a8d5a3] bg-[#e6f4ea] text-[#008a05]'
     case 'Archived':
@@ -43,8 +40,6 @@ export function inventoryStatusLabel(s: InventoryStatus) {
       return 'Active'
     case 'InStorage':
       return 'In Storage'
-    case 'ReturnScheduled':
-      return 'Return Scheduled'
     case 'Returned':
       return 'Returned'
     case 'Archived':

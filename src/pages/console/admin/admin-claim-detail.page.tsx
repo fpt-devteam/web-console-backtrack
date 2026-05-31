@@ -119,7 +119,8 @@ export function AdminClaimDetailPage() {
               assigneeName={conv.assignedStaff?.displayName ?? null}
               assigneeAvatarUrl={conv.assignedStaff?.avatarUrl ?? null}
               status={status}
-              resolvedAt={isClosed ? conv.updatedAt : null}
+              firstAssignedAt={conv.firstAssignedAt}
+              resolvedAt={conv.resolvedAt}
               isResolvePending={resolveMutation.isPending}
               onResolve={!isClosed ? () => setResolveConfirmOpen(true) : undefined}
               onReturnToQueue={!isClosed ? handleReturn : undefined}

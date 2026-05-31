@@ -6,12 +6,13 @@ import { ClaimCardBadge } from '@/components/common/claim/claim-card/claim-card-
 import { formatClaimId } from '@/components/common/claim/claim.utils'
 import { formatDateTime } from '@/utils/datetime.util'
 
-interface AssignedClaimCardProps {
+interface ClaimListCardProps {
   conv: IConversation
   onView: (conv: IConversation) => void
 }
 
-export function AssignedClaimCard({ conv, onView }: AssignedClaimCardProps) {
+/** A horizontal claim row used inside {@link ClaimList}. */
+export function ClaimListCard({ conv, onView }: ClaimListCardProps) {
   const partnerName = conv.partner.displayName ?? conv.partner.email ?? conv.id.slice(0, 8)
   const itemName = conv.supportFormData.itemName
   const imageUrl = conv.supportFormData.imageUrls?.[0] ?? null

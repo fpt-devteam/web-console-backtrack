@@ -99,7 +99,7 @@ export function StaffClaimBoardPage() {
         onChange={setBoardFilter}
       />
 
-      <div className="flex-1 overflow-hidden px-4 sm:px-6 lg:px-8 pb-6 pt-4">
+      <div className="flex-1 overflow-hidden p-4">
         <ClaimBoard
           queueConversations={queueConversations}
           assignedConversations={assignedConversations}

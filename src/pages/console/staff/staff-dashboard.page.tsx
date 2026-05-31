@@ -49,7 +49,7 @@ export function StaffDashboardPage() {
 
   if (!currentOrgId || isSubLoading) {
     return (
-      <div className="h-full overflow-y-auto bg-[#f7f7f7] p-4 sm:p-6 lg:p-8">
+      <div className="h-full p-4 sm:p-6 lg:p-8">
         <div className="space-y-6">
           <div className="h-10 w-64 rounded-xl bg-white border border-[#dddddd] animate-pulse" />
           <div className="h-5 w-80 rounded-xl bg-white border border-[#dddddd] animate-pulse" />
@@ -74,7 +74,7 @@ export function StaffDashboardPage() {
   const firstName = user?.name ? user.name.split(' ')[0] : 'there'
 
   return (
-    <div className="h-full overflow-y-auto bg-[#f7f7f7] p-4 sm:p-6 lg:p-8">
+    <div className="h-full pt-4 px-8">
       <div className="space-y-6">
         {/* Header + quick actions */}
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">

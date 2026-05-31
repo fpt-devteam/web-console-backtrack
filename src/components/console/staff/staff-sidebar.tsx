@@ -21,7 +21,6 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
-  SidebarRail,
 } from '@/components/common/core/sidebar'
 import {
   DropdownMenu,
@@ -40,7 +39,7 @@ function getInitials(name: string | null | undefined): string {
 }
 
 const ITEM_CLS =
-  'text-base text-charcoal hover:bg-cloud data-[active=true]:bg-[#fff0f2] data-[active=true]:text-rausch'
+  'text-base text-charcoal hover:bg-neutral-200 data-[active=true]:bg-[#fff0f2] data-[active=true]:text-rausch'
 
 const NAV_ITEMS = [
   {
@@ -95,23 +94,23 @@ function StaffSidebarInner() {
   return (
     <>
       {/* Header — org logo + name (dashboard-01 SidebarMenu pattern) */}
-      <SidebarHeader className="border-b border-hairline py-4">
-        <SidebarMenu className="px-2">
+      <SidebarHeader className="py-2">
+        <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton
               size="lg"
               tooltip={org?.name ?? 'Staff'}
               asChild
-              className="hover:bg-cloud text-ink"
+              className="hover:bg-neutral-200 text-ink"
             >
               <Link to="/console/$slug/staff/inventory" params={{ slug }}>
                 <OrgLogo
                   logoUrl={org?.logoUrl}
                   alt={org?.name ?? 'Organization'}
-                  className="h-11 w-11 flex-shrink-0"
+                  className="h-8 w-8 flex-shrink-0"
                 />
                 <div className="flex flex-col min-w-0">
-                  <span className="font-semibold text-base text-ink leading-tight" title={org?.name}>
+                  <span className="font-semibold text-md text-ink leading-tight" title={org?.name}>
                     {org?.name ?? 'Staff'}
                   </span>
                 </div>
@@ -122,7 +121,7 @@ function StaffSidebarInner() {
       </SidebarHeader>
 
       {/* Navigation */}
-      <SidebarContent className="py-4">
+      <SidebarContent>
         <SidebarMenu className="px-3 gap-0.5">
           {NAV_ITEMS.map((item) => {
             const Icon = item.icon
@@ -147,7 +146,7 @@ function StaffSidebarInner() {
       </SidebarContent>
 
       {/* Footer — user dropdown (NavUser pattern) */}
-      <SidebarFooter className="border-t border-[#dddddd] py-4">
+      <SidebarFooter>
         <SidebarMenu>
           <SidebarMenuItem>
             <DropdownMenu>
@@ -155,7 +154,7 @@ function StaffSidebarInner() {
                 <SidebarMenuButton
                   size="lg"
                   tooltip={userDisplayName}
-                  className="text-[#222222] hover:bg-[#f7f7f7] data-[state=open]:bg-[#f7f7f7]"
+                  className="text-ink hover:bg-neutral-200 data-[state=open]:bg-neutral-200"
                 >
                   {user?.avatarUrl ? (
                     <img src={user.avatarUrl} alt={userDisplayName} className="w-8 h-8 rounded-full object-cover flex-shrink-0" />
@@ -209,9 +208,8 @@ function StaffSidebarInner() {
 
 export function StaffSidebar() {
   return (
-    <Sidebar collapsible="icon" className="border-r border-[#dddddd] bg-white">
+    <Sidebar collapsible="icon" className="border-r-0! bg-cloud [&_[data-slot=sidebar-inner]]:bg-cloud">
       <StaffSidebarInner />
-      <SidebarRail />
     </Sidebar>
   )
 }

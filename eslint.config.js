@@ -9,6 +9,7 @@ export default [
       '@typescript-eslint/array-type': 'off',
       'import/order': 'off',
       'sort-imports': 'off',
+      'import/consistent-type-specifier-style': 'off',
     },
   },
 ]

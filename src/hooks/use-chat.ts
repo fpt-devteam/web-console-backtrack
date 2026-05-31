@@ -15,6 +15,7 @@ export const chatKeys = {
   assigned: () => [...chatKeys.all, 'assigned'] as const,
   resolved: () => [...chatKeys.all, 'resolved'] as const,
   byPost: (postId: string) => [...chatKeys.all, 'by-post', postId] as const,
+  bySubcategory: (subcategoryId: string) => [...chatKeys.all, 'by-subcategory', subcategoryId] as const,
   conversation: (id: string) => [...chatKeys.all, 'conversation', id] as const,
   messages: (conversationId: string) => [...chatKeys.all, 'messages', conversationId] as const,
 };
@@ -63,6 +64,17 @@ export function useChatConversationsByPostId(postId: string | null, orgId?: stri
     queryKey: [...chatKeys.byPost(postId ?? ''), { orgId }],
     queryFn: () => chatService.listByPostId(postId!, orgId),
     enabled: !!postId,
+    staleTime: 1000 * 30,
+    retry: false,
+  });
+}
+
+/** Fetch conversations whose claim request targets a given subcategory. */
+export function useChatConversationsBySubcategory(subcategoryId: string | null, orgId?: string) {
+  return useQuery({
+    queryKey: [...chatKeys.bySubcategory(subcategoryId ?? ''), { orgId }],
+    queryFn: () => chatService.listBySubcategoryId(subcategoryId!, orgId),
+    enabled: !!subcategoryId,
     staleTime: 1000 * 30,
     retry: false,
   });

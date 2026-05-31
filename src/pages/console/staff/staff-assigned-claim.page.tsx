@@ -6,7 +6,7 @@ import { useConversationUpdates } from '@/hooks/use-chat-socket'
 import { filterConversations } from '@/components/common/claim/claim-board/claim-board.helper'
 import { AssignedClaimTabs } from '@/components/console/staff/assigned-claim/assigned-claim-tabs'
 import { AssignedClaimSearch } from '@/components/console/staff/assigned-claim/assigned-claim-search'
-import { AssignedClaimList } from '@/components/console/staff/assigned-claim/assigned-claim-list'
+import { ClaimList } from '@/components/common/claim/claim-list/claim-list'
 import type { AssignedClaimTab } from '@/components/console/staff/assigned-claim/assigned-claim.types'
 
 export function StaffAssignedClaimPage() {
@@ -69,7 +69,7 @@ export function StaffAssignedClaimPage() {
         </div>
 
         <div className="flex-1 flex flex-col min-h-0">
-          <AssignedClaimList
+          <ClaimList
             conversations={activeConversations}
             isLoading={activeQuery.isLoading}
             isError={activeQuery.isError}

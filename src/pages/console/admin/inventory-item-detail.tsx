@@ -6,21 +6,21 @@ import { useOrgReturnReports } from '@/hooks/use-return-report'
 import { InventoryItemDetailView } from '@/components/common/inventory/detail/inventory-detail-view'
 
 export function AdminInventoryItemDetailPage() {
-  const { slug, itemId } = useParams({ strict: false }) as { slug: string, itemId: string }
+  const { slug, itemId } = useParams({ strict: false })
   const { currentOrgId } = useCurrentOrgId()
   const [mainImageIndex, setMainImageIndex] = useState(0)
 
-  const { data: item, isLoading } = useInventoryItem(currentOrgId, itemId)
+  const { data: item, isLoading } = useInventoryItem(currentOrgId, itemId ?? null)
   const orgIdForHandover = item?.organization?.id ?? currentOrgId
   const { data: returnReports } = useOrgReturnReports(orgIdForHandover, 1, 50)
   const returnReportForPost =
-    returnReports?.items?.find((r) => r.post?.id === item?.id) ?? null
+    returnReports?.items.find((r) => r.post?.id === item?.id) ?? null
 
   return (
     <InventoryItemDetailView
-        slug={slug}
-        itemId={itemId}
-        backTo={{ to: '/console/$slug/admin/inventory', params: { slug } }}
+        slug={slug ?? ''}
+        itemId={itemId ?? ''}
+        backTo={{ to: '/console/$slug/admin/inventory', params: { slug: slug ?? '' } }}
         isLoading={isLoading}
         item={item}
         mainImageIndex={mainImageIndex}

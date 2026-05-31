@@ -8,6 +8,7 @@ import { ClaimStatusTrace } from './claim-status-trace'
 interface ClaimDetailSidebarProps {
   partner: IConversationPartner
   createdAt?: string | null
+  firstAssignedAt?: string | null
   resolvedAt?: string | null
   status: ConversationStatus
   assigneeName?: string | null
@@ -32,7 +33,7 @@ function ClaimInfoField({ label, children }: { label: string; children: React.Re
 }
 
 export function ClaimDetailSidebar({
-  partner, createdAt, resolvedAt, status,
+  partner, createdAt, firstAssignedAt, resolvedAt, status,
   assigneeName, assigneeAvatarUrl,
   isResolvePending, onResolve, onReturnToQueue,
   supportFormData,
@@ -48,7 +49,7 @@ export function ClaimDetailSidebar({
           </ClaimInfoField>
         <SectionDivider />
 
-        <ClaimStatusTrace status={status} submittedAt={createdAt} resolvedAt={resolvedAt} />
+        <ClaimStatusTrace status={status} submittedAt={createdAt} firstAssignedAt={firstAssignedAt} resolvedAt={resolvedAt} />
       </div>
 
       {(onResolve || onReturnToQueue) && (

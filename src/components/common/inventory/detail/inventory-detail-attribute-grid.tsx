@@ -4,7 +4,6 @@ import {
   Hash,
   IdCard,
   Layers3,
-  MapPin,
   Palette,
   Ruler,
   ScanSearch,
@@ -12,7 +11,6 @@ import {
   User,
 } from 'lucide-react'
 import type { InventoryItem } from '@/services/inventory.service'
-import { format } from 'date-fns'
 import QRCode from 'react-qr-code'
 import { useMemo, useRef } from 'react'
 import {
@@ -38,12 +36,6 @@ function formatBoolOrDash(v: boolean | null | undefined): string {
   return '—'
 }
 
-function formatFoundTime24h(iso: string | null | undefined): string {
-  if (!iso) return '—'
-  const d = new Date(iso)
-  if (Number.isNaN(d.getTime())) return '—'
-  return format(d, 'dd/MM/yyyy HH:mm')
-}
 
 function InlineMetaRow({
   icon: Icon,
@@ -75,13 +67,13 @@ function AttributeCard({
   value: string | null | undefined
 }) {
   return (
-    <div className="flex items-start gap-3 py-2">
+    <div className="flex items-start gap-3 py-1">
       <div className="mt-0.5 text-[#a8a8a8]">
         <Icon className="w-4 h-4" />
       </div>
       <div className="min-w-0">
         <div className="text-xs font-semibold text-[#a8a8a8] uppercase tracking-wide">{label}</div>
-        <div className="mt-1 text-sm text-[#222222] break-words">{formatOrDash(value)}</div>
+        <div className="mt-0.5 text-sm text-[#222222] break-words">{formatOrDash(value)}</div>
       </div>
     </div>
   )
@@ -126,37 +118,16 @@ export function InventoryDetailAttributeGrid({
         null
 
   return (
-    <>
-      <div className="space-y-4">
-        <div>
+    <div className="grid grid-cols-2 gap-y-6">
+      <div className="col-span-2">
+        <InlineMetaRow
+          icon={ScanSearch}
+          label={cat === 'Others' ? 'Item identifier' : 'Item name'} value={itemNameValue} />
+      </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-10 gap-y-2">
-            <InlineMetaRow
-              icon={ScanSearch}
-              label={cat === 'Others' ? 'Item identifier' : 'Item name'} value={itemNameValue} />
-            <InlineMetaRow
-              icon={MapPin}
-              label="Storage"
-              value={item.organizationStorageLocation ?? undefined}
-            />
-          </div>
-          <div className="mt-3 grid grid-cols-1 sm:grid-cols-2 gap-x-10 gap-y-2">
-            <InlineMetaRow
-              icon={Calendar}
-              label="Found time"
-              value={formatFoundTime24h(item.eventTime)}
-            />
-            <InlineMetaRow
-              icon={MapPin}
-              label="Found location"
-              value={item.organizationFoundLocation ?? undefined}
-            />
-          </div>
-        </div>
-
-        <div className="h-px bg-[#ebebeb]" />
-
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-10">
+      {/* structured attributes */}
+      <div className="col-span-2">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-10 gap-y-4">
           {cat !== 'Cards' ? <AttributeCard icon={Palette} label="Color" value={color} /> : null}
 
           {cat !== 'Cards' && (cat === 'PersonalBelongings' || brand) ? (
@@ -192,25 +163,24 @@ export function InventoryDetailAttributeGrid({
           {cat === 'Cards' ? (
             <AttributeCard icon={IdCard} label="Issuing authority" value={item.cardDetail?.issuingAuthority} />
           ) : null}
-        </div>
-
-        {getInventoryDistinctiveMarks(item) ? (
-          <div className="pt-2">
-            <div className="text-xs font-semibold text-[#a8a8a8] uppercase tracking-wide">Distinctive marks</div>
-            <div className="mt-2 flex items-start gap-2 text-[#222222]">
-              <Fingerprint className="w-4 h-4 text-[#a8a8a8] shrink-0 mt-0.5" />
-              <span className="text-sm leading-relaxed break-words">{getInventoryDistinctiveMarks(item)}</span>
-            </div>
-          </div>
-        ) : null}
-
-        {cat === 'Cards' ? (
-          <div className="pt-2">
-            <div className="text-xs font-semibold text-[#222222] uppercase tracking-wide">Dates</div>
-            <div className="mt-2 grid grid-cols-1 sm:grid-cols-2 gap-x-10">
+          {cat === 'Cards' ? (
+            <>
               <InlineMetaRow icon={Calendar} label="Date of birth" value={formatInventoryDateOnly(item.cardDetail?.dateOfBirth ?? undefined)} />
               <InlineMetaRow icon={Calendar} label="Issue date" value={formatInventoryDateOnly(item.cardDetail?.issueDate ?? undefined)} />
               <InlineMetaRow icon={Calendar} label="Expiry date" value={formatInventoryDateOnly(item.cardDetail?.expiryDate ?? undefined)} />
+            </>
+          ) : null}
+        </div>
+
+      </div>
+      {/* distinctive marks & additional details */}
+      <div className="col-span-2 space-y-4">
+        {getInventoryDistinctiveMarks(item) ? (
+          <div>
+            <div className="text-xs font-semibold text-[#a8a8a8] uppercase tracking-wide">Distinctive marks</div>
+            <div className="mt-1 flex items-start gap-2 text-[#222222]">
+              <Fingerprint className="w-4 h-4 text-[#a8a8a8] shrink-0 mt-0.5" />
+              <span className="text-sm leading-relaxed wrap-break-word">{getInventoryDistinctiveMarks(item)}</span>
             </div>
           </div>
         ) : null}
@@ -226,9 +196,8 @@ export function InventoryDetailAttributeGrid({
             <p className="mt-1 text-sm text-[#222222] leading-relaxed">{aiDesc}</p>
           </div>
         ) : null}
-
       </div>
-    </>
+    </div>
   )
 }
 
@@ -259,14 +228,10 @@ export function ItemQrCard({ orgSlug, itemId }: { orgSlug: string; itemId: strin
   }
 
   return (
-    <div className="mt-3 flex flex-col items-stretch gap-4 sm:flex-row sm:items-start sm:justify-between">
-      <div className="min-w-0 flex-1">
-        <div className="text-xs text-[#a8a8a8]">Scan to open this item.</div>
-      </div>
-
-      <div className="flex shrink-0 flex-col items-center justify-center gap-2 self-center rounded-[12px] border border-[#dddddd] bg-white p-3 sm:-mt-6 sm:self-start md:-mt-10">
+    <div className="flex flex-col items-center gap-3 text-center">
+      <div className="flex flex-col items-center gap-2 rounded-[12px] border border-[#dddddd] bg-white p-3">
         <div ref={qrWrapRef}>
-          <QRCode value={itemUrl} size={88} />
+          <QRCode value={itemUrl} size={60} />
         </div>
         <button
           type="button"
