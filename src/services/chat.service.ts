@@ -154,9 +154,10 @@ export const chatService = {
 
   // ── Conversation detail ─────────────────────────────────
 
-  async getConversation(conversationId: string): Promise<IConversation> {
+  async getConversation(conversationId: string, orgId?: string): Promise<IConversation> {
     const { data } = await privateClient.get<ApiResponse<unknown>>(
-      `${BASE}/conversations/${conversationId}`
+      `${BASE}/conversations/${conversationId}`,
+      orgId ? { params: { orgId } } : undefined
     );
     if (!data.success) throw new Error(data.error?.message ?? 'Failed to fetch conversation');
     return normalizeConv(data.data);

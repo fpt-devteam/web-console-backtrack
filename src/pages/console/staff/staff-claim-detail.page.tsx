@@ -4,6 +4,7 @@ import toast from 'react-hot-toast'
 import { ConversationStatus, MessageType } from '@/types/chat.types'
 import type { InventoryItem, InventoryListItem } from '@/services/inventory.service'
 import { useConversation, useResolveConversation, useVerifyConversation, useChatMessages } from '@/hooks/use-chat'
+import { useCurrentOrgId } from '@/contexts/current-org.context'
 import { useInventoryItem } from '@/hooks/use-inventory'
 import { useSubcategories } from '@/hooks/use-subcategories'
 import { useConversationUpdates, useIncomingMessages, useMarkSeen, useSendMessage, useTypingIndicator } from '@/hooks/use-chat-socket'
@@ -30,7 +31,8 @@ export function StaffClaimDetailPage() {
   const [selectedItem, setSelectedItem] = useState<InventoryListItem | null>(null)
 
   // ── Conversation data ──────────────────────────────────────
-  const { data: conv, isLoading } = useConversation(claimId ?? null)
+  const { currentOrgId } = useCurrentOrgId()
+  const { data: conv, isLoading } = useConversation(claimId ?? null, currentOrgId ?? undefined)
   const { data: messagesData, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading: messagesLoading } =
     useChatMessages(claimId ?? '')
   const { send } = useSendMessage()

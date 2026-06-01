@@ -93,10 +93,10 @@ export function useChatConversationsBySubcategory(subcategoryId: string | null, 
 
 // ── Single conversation ─────────────────────────────────
 
-export function useConversation(conversationId: string | null) {
+export function useConversation(conversationId: string | null, orgId?: string) {
   return useQuery({
-    queryKey: chatKeys.conversation(conversationId ?? ''),
-    queryFn: () => chatService.getConversation(conversationId!),
+    queryKey: [...chatKeys.conversation(conversationId ?? ''), { orgId }],
+    queryFn: () => chatService.getConversation(conversationId!, orgId),
     enabled: !!conversationId,
     staleTime: 1000 * 60 * 5,
   });

@@ -152,7 +152,7 @@ export function InventoryItemDetailView({
                 )}
 
                 {activeStep === 2 && (
-                  <InventoryReturnedStep returnReportForPost={returnReportForPost} />
+                  <InventoryReturnedStep returnReportForPost={returnReportForPost} orgId={item.organization?.id} />
                 )}
 
                 {activeStep === 3 && (

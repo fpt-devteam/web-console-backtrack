@@ -6,6 +6,7 @@ import { useInventoryItem } from '@/hooks/use-inventory'
 import { useSubcategories } from '@/hooks/use-subcategories'
 import { useConversationUpdates, useIncomingMessages, useMarkSeen, useSendMessage, useTypingIndicator } from '@/hooks/use-chat-socket'
 import { useChatContext } from '@/contexts/chat.context'
+import { useCurrentOrgId } from '@/contexts/current-org.context'
 import { auth } from '@/lib/firebase'
 import { ClaimDetailLayout } from '@/components/common/claim/claim-detail/claim-detail-layout'
 import { ClaimDetailHeader } from '@/components/common/claim/claim-detail/claim-detail-header'
@@ -20,7 +21,8 @@ export function AdminClaimDetailPage() {
   const navigate = useNavigate()
   const { slug, claimId } = useParams({ strict: false })
 
-  const { data: conv, isLoading } = useConversation(claimId ?? null)
+  const { currentOrgId } = useCurrentOrgId()
+  const { data: conv, isLoading } = useConversation(claimId ?? null, currentOrgId ?? undefined)
   const { data: messagesData, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading: messagesLoading } =
     useChatMessages(claimId ?? '')
   const { send } = useSendMessage()

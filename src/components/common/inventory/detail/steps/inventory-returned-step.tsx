@@ -5,8 +5,8 @@ import { formatClaimId } from '@/components/common/claim/claim.utils'
 import { DetailRow, SectionTitle } from '../inventory-detail-primitives'
 import { formatDateTimeOrDash, formatOrDash } from '../inventory-detail-format'
 
-function LinkedClaimRequest({ claimRequestId }: { claimRequestId: string }) {
-  const { data: conv, isLoading } = useConversation(claimRequestId)
+function LinkedClaimRequest({ claimRequestId, orgId }: { claimRequestId: string; orgId?: string | null }) {
+  const { data: conv, isLoading } = useConversation(claimRequestId, orgId ?? undefined)
 
   if (isLoading) {
     return <div className="h-16 rounded-xl bg-gray-50 animate-pulse" />
@@ -32,7 +32,7 @@ function LinkedClaimRequest({ claimRequestId }: { claimRequestId: string }) {
   )
 }
 
-export function InventoryReturnedStep({ returnReportForPost }: { returnReportForPost: any }) {
+export function InventoryReturnedStep({ returnReportForPost, orgId }: { returnReportForPost: any; orgId?: string | null }) {
   const claimRequestId: string | null = returnReportForPost?.claimRequestId ?? null
 
   return (
@@ -40,7 +40,7 @@ export function InventoryReturnedStep({ returnReportForPost }: { returnReportFor
       {claimRequestId && (
         <>
           <SectionTitle title="Linked claim request" />
-          <LinkedClaimRequest claimRequestId={claimRequestId} />
+          <LinkedClaimRequest claimRequestId={claimRequestId} orgId={orgId} />
         </>
       )}
 
