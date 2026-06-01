@@ -13,6 +13,13 @@ import { collectInventoryImageUrls, reorderList, revokeObjectUrls, type Inventor
 import { uploadInventoryImage } from '@/services/storage.service'
 import { isValidEmail, isValidPhone10StartingWith0 } from '@/utils/validators'
 import { chatService } from '@/services/chat.service'
+import { useChatConversationsByPostId } from '@/hooks/use-chat'
+import { ConversationStatus } from '@/types/chat.types'
+import type { IConversation } from '@/types/chat.types'
+import { STATUS_BADGE, STATUS_LABEL } from '@/components/common/claim/claim.constants'
+import { formatClaimId } from '@/components/common/claim/claim.utils'
+import { Avatar } from '@/components/common/avatar'
+import { cn } from '@/lib/utils'
 
 export function HandoverItemModal({
   open,
@@ -38,7 +45,25 @@ export function HandoverItemModal({
   const [recipientNationalId, setRecipientNationalId] = useState('')
   const [recipientInternalId, setRecipientInternalId] = useState('')
   const [recipientPhone, setRecipientPhone] = useState('')
+  const [claimRequestId, setClaimRequestId] = useState<string | null>(null)
   const [submitting, setSubmitting] = useState(false)
+
+  // Verified claim requests linked to this item — staff can attach one to the handover.
+  const claimsQuery = useChatConversationsByPostId(open ? postId : null, orgId ?? undefined)
+  const verifiedClaims = (claimsQuery.data ?? []).filter((c) => c.status === ConversationStatus.VERIFIED)
+
+  // Selecting a verified claim prefills the recipient with the claimant's details.
+  function handleSelectClaim(conv: IConversation) {
+    if (claimRequestId === conv.id) {
+      setClaimRequestId(null)
+      return
+    }
+    setClaimRequestId(conv.id)
+    const form = conv.supportFormData
+    setRecipientFullName(conv.partner.displayName ?? form?.contactName ?? '')
+    setRecipientEmail(conv.partner.email ?? form?.contactEmail ?? '')
+    setRecipientPhone(form?.contactPhone ?? '')
+  }
 
   const MAX_EVIDENCE_PHOTOS = 4
   const [evidencePreviews, setEvidencePreviews] = useState<InventoryPhotoPreview[]>([])
@@ -134,6 +159,7 @@ export function HandoverItemModal({
                   orgId,
                   postId,
                   evidenceImageUrls,
+                  claimRequestId,
                   ownerInfo: {
                     ownerName: recipientFullName.trim() || null,
                     email: recipientEmail.trim() || null,
@@ -163,6 +189,53 @@ export function HandoverItemModal({
           })()
         }}
       >
+        {verifiedClaims.length > 0 && (
+          <div className="space-y-2">
+            <div className="text-sm font-semibold text-[#222222]">LINKED CLAIM REQUEST</div>
+            <p className="text-xs text-[#929292] -mt-1">
+              Attach the verified claim this item is being handed over for. Selecting one fills the recipient details.
+            </p>
+            <div className="flex flex-col gap-2">
+              {verifiedClaims.map((conv) => {
+                const name = conv.partner.displayName ?? conv.partner.email ?? conv.id.slice(0, 8)
+                const selected = claimRequestId === conv.id
+                return (
+                  <button
+                    key={conv.id}
+                    type="button"
+                    onClick={() => handleSelectClaim(conv)}
+                    aria-pressed={selected}
+                    className={cn(
+                      'flex items-center gap-3 rounded-xl border p-2.5 text-left transition-all hover:cursor-pointer',
+                      selected ? 'border-rose-500 ring-2 ring-rose-200' : 'border-[#ebebeb] hover:border-neutral-300',
+                    )}
+                  >
+                    <Avatar url={conv.partner.avatarUrl} name={name} className="w-9 h-9 rounded-full shrink-0" />
+                    <div className="min-w-0 flex-1">
+                      <div className="flex items-center gap-2">
+                        <span className="text-xs font-mono text-[#929292]">{formatClaimId(conv.id)}</span>
+                        <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-semibold ${STATUS_BADGE[conv.status]}`}>
+                          {STATUS_LABEL[conv.status]}
+                        </span>
+                      </div>
+                      <p className="truncate text-sm font-medium text-[#222222]">{name}</p>
+                      <p className="truncate text-xs text-[#929292]">{conv.supportFormData?.itemName}</p>
+                    </div>
+                    <span
+                      className={cn(
+                        'flex h-5 w-5 shrink-0 items-center justify-center rounded-full border-2',
+                        selected ? 'border-rose-500 bg-rose-500' : 'border-neutral-300',
+                      )}
+                    >
+                      {selected && <span className="h-2 w-2 rounded-full bg-white" />}
+                    </span>
+                  </button>
+                )
+              })}
+            </div>
+          </div>
+        )}
+
         <div className="space-y-1">
           <div className="text-sm font-semibold text-[#222222]">
             EVIDENCE PHOTOS <span className="text-[#c13515]">*</span>

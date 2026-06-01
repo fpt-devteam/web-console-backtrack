@@ -10,7 +10,8 @@ interface ClaimListPanelProps {
   isLoading: boolean
   isError?: boolean
   emptyText?: string
-  onView: (conv: IConversation) => void
+  /** Optional — when omitted, cards are non-clickable. */
+  onView?: (conv: IConversation) => void
 }
 
 /** Claim list with a status filter bar and a newest/oldest sort dropdown. */

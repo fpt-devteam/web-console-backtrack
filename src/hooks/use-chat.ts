@@ -13,6 +13,7 @@ export const chatKeys = {
   all: ['chat'] as const,
   queue: () => [...chatKeys.all, 'queue'] as const,
   assigned: () => [...chatKeys.all, 'assigned'] as const,
+  verified: () => [...chatKeys.all, 'verified'] as const,
   resolved: () => [...chatKeys.all, 'resolved'] as const,
   byPost: (postId: string) => [...chatKeys.all, 'by-post', postId] as const,
   bySubcategory: (subcategoryId: string) => [...chatKeys.all, 'by-subcategory', subcategoryId] as const,
@@ -43,6 +44,16 @@ export function useChatAssigned({ isMe }: { isMe: boolean } = { isMe: false }) {
   return useQuery({
     queryKey: chatKeys.assigned(),
     queryFn: () => chatService.listAssigned({ isMe }),
+    staleTime: 1000 * 30,
+    retry: false,
+  });
+}
+
+/** Fetch verified conversations (ownership confirmed, awaiting resolution). */
+export function useChatVerified({ isMe }: { isMe: boolean } = { isMe: false }) {
+  return useQuery({
+    queryKey: chatKeys.verified(),
+    queryFn: () => chatService.listVerified({ isMe }),
     staleTime: 1000 * 30,
     retry: false,
   });
@@ -125,14 +136,20 @@ export function useAssignConversation() {
   });
 }
 
-/** Staff member marks a conversation as verified */
+/**
+ * Staff member marks a conversation as verified.
+ * `postId` attaches the matched inventory item to the claim (unlinked case).
+ */
 export function useVerifyConversation() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (conversationId: string) => chatService.verifyConversation(conversationId),
-    onSuccess: () => {
+    mutationFn: ({ conversationId, postId }: { conversationId: string; postId?: string }) =>
+      chatService.verifyConversation(conversationId, postId),
+    onSuccess: (_data, { conversationId }) => {
       queryClient.invalidateQueries({ queryKey: chatKeys.assigned() });
+      queryClient.invalidateQueries({ queryKey: chatKeys.verified() });
+      queryClient.invalidateQueries({ queryKey: chatKeys.conversation(conversationId) });
     },
   });
 }
@@ -143,9 +160,11 @@ export function useResolveConversation() {
 
   return useMutation({
     mutationFn: (conversationId: string) => chatService.resolveConversation(conversationId),
-    onSuccess: () => {
+    onSuccess: (_data, conversationId) => {
       queryClient.invalidateQueries({ queryKey: chatKeys.assigned() });
+      queryClient.invalidateQueries({ queryKey: chatKeys.verified() });
       queryClient.invalidateQueries({ queryKey: chatKeys.resolved() });
+      queryClient.invalidateQueries({ queryKey: chatKeys.conversation(conversationId) });
     },
   });
 }

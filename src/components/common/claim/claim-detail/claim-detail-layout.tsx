@@ -9,7 +9,7 @@ interface ClaimDetailLayoutProps {
 
 export function ClaimDetailLayout({ header, sidebar, main, messaging }: ClaimDetailLayoutProps) {
   return (
-    <div className="h-full flex flex-col bg-gray-100 overflow-hidden">
+    <div className="h-full flex flex-col overflow-hidden">
       {header}
       <div className="flex-1 flex overflow-hidden">
         <aside className="w-80 shrink-0 border-r border-hairline flex flex-col overflow-hidden">

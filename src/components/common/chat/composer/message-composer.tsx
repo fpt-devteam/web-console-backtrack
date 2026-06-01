@@ -33,13 +33,13 @@ export function MessageComposer({
   }
 
   return (
-    <div className="px-4 py-4 border-t border-[#dddddd]">
+    <div className="px-4 py-3 border-t border-[#dddddd] bg-white">
       <div className="flex items-center gap-2">
         <button className="p-2 text-mute hover:text-ash transition-colors rounded-full hover:bg-cloud">
-          <ImageIcon className="w-6 h-6" />
+          <ImageIcon className="w-5 h-5" />
         </button>
 
-        <div className="flex-1 flex items-center bg-[#e8e8e8] rounded-full px-5 py-3 gap-2">
+        <div className="flex-1 flex items-center bg-gray-200 rounded-full px-5 py-2 gap-2">
           <input
             ref={inputRef}
             type="text"
@@ -48,16 +48,16 @@ export function MessageComposer({
             disabled={disabled}
             onChange={e => { setText(e.target.value); onTypingStart?.() }}
             onKeyDown={handleKeyDown}
-            className="flex-1 bg-transparent text-base text-ink placeholder-mute focus:outline-none disabled:cursor-not-allowed"
+            className="flex-1 bg-transparent text-xs text-ink placeholder-mute focus:outline-none disabled:cursor-not-allowed"
           />
         </div>
 
         <button
           onClick={handleSend}
           disabled={!text.trim() || disabled}
-          className="w-11 h-11 flex items-center justify-center rounded-full bg-rausch text-white hover:bg-rausch-deep transition-colors disabled:opacity-40 disabled:cursor-not-allowed flex-shrink-0"
+          className="w-8 h-8 flex items-center justify-center rounded-full bg-rausch text-white hover:bg-rausch-deep transition-colors disabled:opacity-40 disabled:cursor-not-allowed flex-shrink-0"
         >
-          <Send className="w-5 h-5" />
+          <Send className="w-3 h-3" />
         </button>
       </div>
     </div>

@@ -73,8 +73,8 @@ export function ClaimItemCard({ supportFormData, subcategoryCodeById, onPrintSli
 
   return (
     <div className="bg-white border-b border-hairline">
-      <div className="flex items-center justify-between px-5 py-3.5 border-b border-hairline">
-        <span className="text-xs font-bold tracking-widest text-mute uppercase flex items-center gap-1.5">
+      <div className="flex items-center justify-between px-5 pt-4">
+        <span className="text-sm font-bold tracking-widest text-mute uppercase flex items-center gap-1.5">
           <span className="w-3 h-3 rounded-sm bg-neutral-200" />
           Claim Item
         </span>

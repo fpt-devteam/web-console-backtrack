@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react'
-import { Cpu, Gauge, Layers, MapPin, Package, Printer, Ruler, ScanSearch, Tag } from 'lucide-react'
+import { ArrowUpRight, Cpu, Gauge, Layers, MapPin, Package, Printer, Ruler, ScanSearch, Tag } from 'lucide-react'
 import { Button } from '@/components/common/core/button'
 import { ClaimCardImage } from '@/components/common/claim/claim-card/claim-card-image'
 import { CATEGORY_COLOR } from '@/components/common/claim/claim.constants'
@@ -25,6 +25,8 @@ interface ClaimComparisonViewProps {
   subcategoryNameById?: Record<string, string>
   subcategoryCodeById?: Record<string, string>
   onPrintSlip?: () => void
+  /** When provided, shows a "View in inventory" action that opens the matched item. */
+  onViewItem?: () => void
 }
 
 const GRID_COLS = 'grid-cols-[5.5rem_minmax(0,1fr)_minmax(0,1fr)]'
@@ -79,7 +81,7 @@ function Row({ label, claim, found }: { label: string; claim: ReactNode; found: 
   )
 }
 
-export function ClaimComparisonView({ claim, item, subcategoryNameById, subcategoryCodeById, onPrintSlip }: ClaimComparisonViewProps) {
+export function ClaimComparisonView({ claim, item, subcategoryNameById, subcategoryCodeById, onPrintSlip, onViewItem }: ClaimComparisonViewProps) {
   const lostWhen = claim.eventTime ? formatDateTime(new Date(claim.eventTime).toISOString()) : null
   const foundWhen = formatDateTime(item.eventTime)
   const foundTitle = getInventoryTitle(item, subcategoryNameById)
@@ -117,12 +119,20 @@ export function ClaimComparisonView({ claim, item, subcategoryNameById, subcateg
             </p>
           </div>
         </div>
-        {onPrintSlip && (
-          <Button variant="ghost" size="sm" onClick={onPrintSlip} className="text-mute shrink-0">
-            <Printer className="w-3.5 h-3.5" />
-            Print slip
-          </Button>
-        )}
+        <div className="flex shrink-0 items-center gap-2">
+          {onViewItem && (
+            <Button variant="ghost" size="sm" onClick={onViewItem} className="text-primary shrink-0">
+              <ArrowUpRight className="w-3.5 h-3.5" />
+              View in inventory
+            </Button>
+          )}
+          {onPrintSlip && (
+            <Button variant="ghost" size="sm" onClick={onPrintSlip} className="text-mute shrink-0">
+              <Printer className="w-3.5 h-3.5" />
+              Print slip
+            </Button>
+          )}
+        </div>
       </div>
 
       <div className="flex-1 p-5 pt-0">
@@ -174,7 +184,7 @@ export function ClaimComparisonView({ claim, item, subcategoryNameById, subcateg
               <Package className="w-3.5 h-3.5 text-mute shrink-0" />
               <span className="text-xs font-bold tracking-widest text-ink uppercase">Found item details</span>
             </div>
-            <div className="grid grid-cols-2 sm:grid-cols-3 gap-px bg-hairline">
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-px">
               {extras.map(({ label, value, icon: Icon }) => (
                 <div key={label} className="bg-white px-4 py-3 flex items-start gap-2.5 min-w-0">
                   <Icon className="w-3.5 h-3.5 text-mute mt-0.5 shrink-0" />

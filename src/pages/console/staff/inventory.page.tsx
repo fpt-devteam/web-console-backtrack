@@ -11,7 +11,7 @@ import { useParams } from '@tanstack/react-router'
 import { InventoryCtaButton } from '@/components/common/inventory/detail/inventory-cta-button'
 
 
-const pageSize = 8
+const pageSize = 10
 
 export function InventoryPage() {
   const { slug } = useParams({ strict: false })
@@ -43,7 +43,9 @@ export function InventoryPage() {
 
   return (
     <div className="h-full overflow-y-auto flex flex-col">
-      <div className="p-4 flex-1 flex flex-col gap-4">
+
+      {/* Sticky header — title, status tabs, CTA & filters */}
+      <div className="sticky top-0 z-20 bg-white flex flex-col gap-4 p-4 pb-3">
 
         {/* Header */}
         <div className="flex flex-col gap-1">
@@ -90,7 +92,10 @@ export function InventoryPage() {
             ) : null
           }
         />
+      </div>
 
+      {/* Scrolling body — grid & pagination */}
+      <div className="flex-1 flex flex-col gap-4 p-4 pt-1">
         {/* Grid */}
         <InventoryGridCards
           items={items}
@@ -114,7 +119,6 @@ export function InventoryPage() {
             />
           )}
         </div>
-
       </div>
     </div>
   )

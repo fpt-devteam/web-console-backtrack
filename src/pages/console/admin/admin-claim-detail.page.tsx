@@ -1,7 +1,7 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo } from 'react'
 import { useNavigate, useParams } from '@tanstack/react-router'
 import { ConversationStatus, MessageType } from '@/types/chat.types'
-import { useConversation, useResolveConversation, useReturnToQueue, useChatMessages } from '@/hooks/use-chat'
+import { useConversation, useChatMessages } from '@/hooks/use-chat'
 import { useInventoryItem } from '@/hooks/use-inventory'
 import { useSubcategories } from '@/hooks/use-subcategories'
 import { useConversationUpdates, useIncomingMessages, useMarkSeen, useSendMessage, useTypingIndicator } from '@/hooks/use-chat-socket'
@@ -12,7 +12,6 @@ import { ClaimDetailHeader } from '@/components/common/claim/claim-detail/claim-
 import { ClaimDetailSidebar } from '@/components/common/claim/claim-detail/sidebar/claim-detail-sidebar'
 import { ClaimMainContent } from '@/components/common/claim/claim-detail/main/claim-main-content'
 import { ClaimConversation } from '@/components/common/claim/claim-conversation'
-import { ClaimResolveDialog } from '@/components/common/claim/claim-dialog/claim-resolve-dialog'
 import { Spinner } from '@/components/common/core/spinner'
 
 export function AdminClaimDetailPage() {
@@ -20,8 +19,6 @@ export function AdminClaimDetailPage() {
 
   const navigate = useNavigate()
   const { slug, claimId } = useParams({ strict: false })
-
-  const [resolveConfirmOpen, setResolveConfirmOpen] = useState(false)
 
   const { data: conv, isLoading } = useConversation(claimId ?? null)
   const { data: messagesData, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading: messagesLoading } =
@@ -51,31 +48,14 @@ export function AdminClaimDetailPage() {
     return map
   }, [subcategories])
 
-  const resolveMutation = useResolveConversation()
-  const returnMutation  = useReturnToQueue()
-
   const status      = conv?.status ?? ConversationStatus.QUEUE
   const isClosed    = status === ConversationStatus.CLOSED
-  const partnerName = conv?.partner.displayName || conv?.partner.email || 'Unknown'
   const messages    = messagesData?.pages.flatMap(p => p.messages) ?? []
   const isTyping    = Object.values(typingUsers).some(t => t.conversationId === claimId)
 
   function handleBack() {
     if (!slug) return
     navigate({ to: '/console/$slug/admin/claims', params: { slug } })
-  }
-
-  function handleResolveConfirm() {
-    if (!claimId) return
-    resolveMutation.mutate(claimId, {
-      onSuccess: () => setResolveConfirmOpen(false),
-    })
-  }
-
-  async function handleReturn() {
-    if (!claimId) return
-    await returnMutation.mutateAsync(claimId)
-    handleBack()
   }
 
   function handleSend(text: string) {
@@ -93,16 +73,6 @@ export function AdminClaimDetailPage() {
 
   return (
     <>
-      {resolveConfirmOpen && (
-          <ClaimResolveDialog
-            partnerName={partnerName}
-            avatarUrl={conv.partner.avatarUrl}
-            isPending={resolveMutation.isPending}
-            onConfirm={handleResolveConfirm}
-            onCancel={() => setResolveConfirmOpen(false)}
-          />
-        )}
-
         <ClaimDetailLayout
           header={
             <ClaimDetailHeader
@@ -120,10 +90,8 @@ export function AdminClaimDetailPage() {
               assigneeAvatarUrl={conv.assignedStaff?.avatarUrl ?? null}
               status={status}
               firstAssignedAt={conv.firstAssignedAt}
+              verifiedAt={conv.verifiedAt}
               resolvedAt={conv.resolvedAt}
-              isResolvePending={resolveMutation.isPending}
-              onResolve={!isClosed ? () => setResolveConfirmOpen(true) : undefined}
-              onReturnToQueue={!isClosed ? handleReturn : undefined}
               supportFormData={conv.supportFormData}
             />
           }

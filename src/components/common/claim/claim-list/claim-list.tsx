@@ -7,7 +7,8 @@ interface ClaimListProps {
   isLoading: boolean
   isError?: boolean
   emptyText: string
-  onView: (conv: IConversation) => void
+  /** Optional — when omitted, cards are non-clickable. */
+  onView?: (conv: IConversation) => void
 }
 
 /** A vertical list of claim cards with loading / error / empty states. */

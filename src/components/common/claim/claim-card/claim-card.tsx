@@ -34,8 +34,10 @@ export function ClaimCard({ conv, disabled = false, onOpenConversation }: ClaimC
   const subcategoryCode = subcategories?.find((s) => s.id === conv.supportFormData.subCategoryId)?.code
   const subcategoryIcon = subcategoryCode ? getSubcategoryIcon(category as ItemCategory, subcategoryCode) : null
 
+  const interactive = !!onOpenConversation
+
   function handleCardClick() {
-    if (isDragging) return
+    if (isDragging || !interactive) return
     onOpenConversation?.(conv)
   }
 
@@ -44,7 +46,7 @@ export function ClaimCard({ conv, disabled = false, onOpenConversation }: ClaimC
       ref={setNodeRef}
       style={style}
       onClick={handleCardClick}
-      className={getCardClassName(isDragging)}
+      className={getCardClassName(isDragging, interactive)}
     >
       <div className="h-3 flex items-center justify-center">
         {!disabled && (

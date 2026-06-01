@@ -13,7 +13,7 @@ export enum ConversationType {
 export enum ConversationStatus {
   QUEUE = 'queue',
   IN_PROGRESS = 'in_progress',
-  VERIFIED = 'verified',
+  VERIFIED = 'in_verified',
   CLOSED = 'closed',
 }
 
@@ -109,6 +109,8 @@ export interface IConversation {
   status: ConversationStatus;
   /** When the conversation was first assigned to a staff member (entered "In Review") */
   firstAssignedAt?: string | null;
+  /** When the claim was verified (ownership confirmed) */
+  verifiedAt?: string | null;
   /** When the conversation was resolved/closed */
   resolvedAt?: string | null;
   createdAt: string;

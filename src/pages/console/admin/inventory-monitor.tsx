@@ -14,7 +14,7 @@ import { InventoryStatusTabs } from '@/components/common/inventory/list/inventor
 import { useSubcategories } from '@/hooks/use-subcategories'
 
 
-const pageSize = 8
+const pageSize = 10
 
 export function AdminInventoryMonitorPage() {
   const { slug } = useParams({ strict: false }) as { slug: string }

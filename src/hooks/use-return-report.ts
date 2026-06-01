@@ -5,11 +5,12 @@ import { INVENTORY_KEYS } from '@/hooks/use-inventory'
 export function useCreateOrgReturnReport() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: (args: { orgId: string; postId: string; ownerInfo?: OwnerInfoPayload | null; evidenceImageUrls: string[] }) =>
+    mutationFn: (args: { orgId: string; postId: string; ownerInfo?: OwnerInfoPayload | null; evidenceImageUrls: string[]; claimRequestId?: string | null }) =>
       returnReportService.createOrgReturnReport(args.orgId, {
         postId: args.postId,
         ownerInfo: args.ownerInfo,
         evidenceImageUrls: args.evidenceImageUrls,
+        claimRequestId: args.claimRequestId,
       }),
     onSuccess: (_data, args) => {
       queryClient.invalidateQueries({ queryKey: ['return-reports', 'org', args.orgId] });

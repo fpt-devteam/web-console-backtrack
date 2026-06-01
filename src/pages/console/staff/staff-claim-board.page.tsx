@@ -16,6 +16,7 @@ import {
   useAssignConversation,
   useChatAssigned,
   useChatResolved,
+  useChatVerified,
   useResolveConversation,
   useVerifyConversation,
 } from '@/hooks/use-chat'
@@ -50,28 +51,30 @@ export function StaffClaimBoardPage() {
   const { data: currentUser } = useCurrentUser()
   const { data: queueData, isLoading: isQueueLoading, removeFromQueue } = useSocketChatQueue(currentOrgId ?? undefined)
   const assignedQuery  = useChatAssigned({ isMe })
+  const verifiedQuery  = useChatVerified({ isMe })
   const resolvedQuery  = useChatResolved({ isMe })
 
   const assignMutation  = useAssignConversation()
   const verifyMutation  = useVerifyConversation()
   const resolveMutation = useResolveConversation()
 
-  const isLoading = isQueueLoading || assignedQuery.isLoading || resolvedQuery.isLoading
+  const isLoading = isQueueLoading || assignedQuery.isLoading || verifiedQuery.isLoading || resolvedQuery.isLoading
 
   const rawQueue    = useMemo(() => Array.isArray(queueData) ? queueData : [],              [queueData])
   const rawAssigned = useMemo(() => Array.isArray(assignedQuery.data) ? assignedQuery.data : [], [assignedQuery.data])
+  const rawVerified = useMemo(() => Array.isArray(verifiedQuery.data) ? verifiedQuery.data : [], [verifiedQuery.data])
   const rawResolved = useMemo(() => Array.isArray(resolvedQuery.data) ? resolvedQuery.data : [], [resolvedQuery.data])
 
   const queueConversations    = useMemo(() => applyBoardFilter(filterConversations(rawQueue,    searchTerm), boardFilter, currentUser?.id), [rawQueue,    searchTerm, boardFilter, currentUser?.id])
   const assignedConversations = useMemo(() => applyBoardFilter(filterConversations(rawAssigned, searchTerm), boardFilter, currentUser?.id), [rawAssigned, searchTerm, boardFilter, currentUser?.id])
+  const verifiedConversations = useMemo(() => applyBoardFilter(filterConversations(rawVerified, searchTerm), boardFilter, currentUser?.id), [rawVerified, searchTerm, boardFilter, currentUser?.id])
   const resolvedConversations = useMemo(() => applyBoardFilter(filterConversations(rawResolved, searchTerm), boardFilter, currentUser?.id), [rawResolved, searchTerm, boardFilter, currentUser?.id])
 
-  // The "assigned" list contains both in-review and verified claims; split them per column.
+  // "Assigned" may still include verified claims; keep only in-review ones in that column.
   const inReviewConversations = useMemo(() => assignedConversations.filter((c) => c.status === ConversationStatus.IN_PROGRESS), [assignedConversations])
-  const verifiedConversations = useMemo(() => assignedConversations.filter((c) => c.status === ConversationStatus.VERIFIED),    [assignedConversations])
 
-  const totalCount    = rawQueue.length + rawAssigned.length + rawResolved.length
-  const filteredCount = queueConversations.length + assignedConversations.length + resolvedConversations.length
+  const totalCount    = rawQueue.length + rawAssigned.length + rawVerified.length + rawResolved.length
+  const filteredCount = queueConversations.length + inReviewConversations.length + verifiedConversations.length + resolvedConversations.length
 
   return (
     <div className="h-full flex flex-col overflow-hidden">
@@ -116,7 +119,7 @@ export function StaffClaimBoardPage() {
           isVerifyPending={verifyMutation.isPending}
           isResolvePending={resolveMutation.isPending}
           onAssign={async (convId) => { await assignMutation.mutateAsync(convId) }}
-          onVerify={async (convId) => { await verifyMutation.mutateAsync(convId) }}
+          onVerify={async (convId) => { await verifyMutation.mutateAsync({ conversationId: convId }) }}
           onResolve={async (convId) => { await resolveMutation.mutateAsync(convId) }}
           onRemoveFromQueue={removeFromQueue}
           onOpenConversation={setPreviewConv}

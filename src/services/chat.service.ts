@@ -40,6 +40,7 @@ interface RawConversation {
   } | null;
   unreadCount?: number;
   firstAssignedAt?: string | null;
+  verifiedAt?: string | null;
   resolvedAt?: string | null;
   createdAt?: string;
   updatedAt?: string;
@@ -75,6 +76,7 @@ export function normalizeConv(raw: unknown): IConversation {
     unreadCount: obj.unreadCount ?? 0,
     status: obj.status as IConversation['status'],
     firstAssignedAt: obj.firstAssignedAt ?? null,
+    verifiedAt: obj.verifiedAt ?? null,
     resolvedAt: obj.resolvedAt ?? null,
     createdAt: (obj.createdAt ?? ''),
     updatedAt: (obj.updatedAt ?? ''),
@@ -195,10 +197,15 @@ export const chatService = {
     if (!data.success) throw new Error(data.error?.message ?? 'Failed to return conversation to queue');
   },
 
-  /** Mark a conversation as verified (claimant ownership confirmed). */
-  async verifyConversation(conversationId: string): Promise<void> {
+  /**
+   * Mark a conversation as verified (claimant ownership confirmed).
+   * Pass `postId` to attach/confirm the matched inventory item on the claim
+   * (used for the unlinked case; omit when the claim is already linked).
+   */
+  async verifyConversation(conversationId: string, postId?: string): Promise<void> {
     const { data } = await privateClient.post<ApiResponse<void>>(
-      `${BASE}/conversations/${conversationId}/verify`
+      `${BASE}/conversations/${conversationId}/verify`,
+      postId ? { postId } : undefined
     );
     if (!data.success) throw new Error(data.error?.message ?? 'Failed to verify conversation');
   },
@@ -222,6 +229,20 @@ export const chatService = {
       }
     );
     if (!data.success) throw new Error(data.error?.message ?? 'Failed to fetch resolved conversations');
+    return toList(data.data).conversations;
+  },
+
+  /** List verified conversations for the org (claimant ownership confirmed, not yet resolved). */
+  async listVerified({ isMe }: { isMe: boolean }): Promise<Array<IConversation>> {
+    const { data } = await privateClient.get<ApiResponse<unknown>>(
+      `${BASE}/conversations/organization/verified`,
+      {
+        params: {
+          isMe,
+        }
+      }
+    );
+    if (!data.success) throw new Error(data.error?.message ?? 'Failed to fetch verified conversations');
     return toList(data.data).conversations;
   },
 

@@ -15,7 +15,7 @@ export function ClaimDetailHeader({
   onBack
 }: ClaimDetailHeaderProps) {
   return (
-    <div className="sticky top-0 z-20 flex items-center gap-3 px-4 py-3 border-b border-hairline bg-white shrink-0">
+    <div className="sticky top-0 z-20 flex items-center gap-3 px-4 py-3 border-b border-gray-200 bg-white shrink-0">
       <button
         onClick={onBack}
         className="flex items-center gap-1 text-sm text-mute hover:text-ink hover:cursor-pointer transition-colors"

@@ -20,12 +20,14 @@ export type OrgReturnReportResult = {
   /** Full post payload from BE (`PostResult`); used for history cards. */
   post?: InventoryItem | null;
   evidenceImageUrls?: string[] | null;
+  /** Verified claim request (conversation) this handover fulfils, if any. */
+  claimRequestId?: string | null;
 };
 
 export const returnReportService = {
   async createOrgReturnReport(
     orgId: string,
-    payload: { postId: string; ownerInfo?: OwnerInfoPayload | null; evidenceImageUrls: string[] },
+    payload: { postId: string; ownerInfo?: OwnerInfoPayload | null; evidenceImageUrls: string[]; claimRequestId?: string | null },
   ) {
     const { data } = await privateClient.post<ApiResponse<OrgReturnReportResult>>(
       `/api/core/return-reports/org/${orgId}`,

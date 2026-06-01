@@ -7,6 +7,7 @@ interface ClaimStatusTraceProps {
   status: ConversationStatus
   submittedAt?: string | null
   firstAssignedAt?: string | null
+  verifiedAt?: string | null
   resolvedAt?: string | null
 }
 
@@ -35,6 +36,7 @@ function buildSteps(
   status: ConversationStatus,
   submittedAt?: string | null,
   firstAssignedAt?: string | null,
+  verifiedAt?: string | null,
   resolvedAt?: string | null,
 ): Step[] {
   const current = STATUS_ORDER[status]
@@ -54,7 +56,7 @@ function buildSteps(
     {
       label: 'Verified',
       state: stepState(current, 2),
-      time: null,
+      time: verifiedAt ? formatDateTime(verifiedAt) : null,
     },
     {
       label: 'Resolved',
@@ -64,8 +66,8 @@ function buildSteps(
   ]
 }
 
-export function ClaimStatusTrace({ status, submittedAt, firstAssignedAt, resolvedAt }: ClaimStatusTraceProps) {
-  const steps = buildSteps(status, submittedAt, firstAssignedAt, resolvedAt)
+export function ClaimStatusTrace({ status, submittedAt, firstAssignedAt, verifiedAt, resolvedAt }: ClaimStatusTraceProps) {
+  const steps = buildSteps(status, submittedAt, firstAssignedAt, verifiedAt, resolvedAt)
 
   return (
     <div className="flex flex-col gap-3">
