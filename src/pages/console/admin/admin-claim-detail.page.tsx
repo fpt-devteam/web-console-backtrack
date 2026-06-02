@@ -51,7 +51,7 @@ export function AdminClaimDetailPage() {
   }, [subcategories])
 
   const status      = conv?.status ?? ConversationStatus.QUEUE
-  const isClosed    = status === ConversationStatus.CLOSED
+  const isClosed    = status === ConversationStatus.CLOSED || status === ConversationStatus.REJECTED
   const messages    = messagesData?.pages.flatMap(p => p.messages) ?? []
   const isTyping    = Object.values(typingUsers).some(t => t.conversationId === claimId)
 
@@ -94,6 +94,7 @@ export function AdminClaimDetailPage() {
               firstAssignedAt={conv.firstAssignedAt}
               verifiedAt={conv.verifiedAt}
               resolvedAt={conv.resolvedAt}
+              rejectedAt={conv.rejectedAt}
               supportFormData={conv.supportFormData}
             />
           }

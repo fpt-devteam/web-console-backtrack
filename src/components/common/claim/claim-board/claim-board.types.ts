@@ -6,7 +6,12 @@ export interface StaffInfo {
   avatarUrl?: string | null
 }
 
-export type ColKey = ConversationStatus
+/** The four board columns. Note: the "Closed" column shows both resolved and rejected claims. */
+export type ColKey =
+  | ConversationStatus.QUEUE
+  | ConversationStatus.IN_PROGRESS
+  | ConversationStatus.VERIFIED
+  | ConversationStatus.CLOSED
 
 export interface BoardState {
   [ConversationStatus.QUEUE]:       IConversation[]

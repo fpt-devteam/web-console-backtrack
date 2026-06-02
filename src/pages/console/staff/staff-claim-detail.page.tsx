@@ -3,7 +3,7 @@ import { useNavigate, useParams } from '@tanstack/react-router'
 import toast from 'react-hot-toast'
 import { ConversationStatus, MessageType } from '@/types/chat.types'
 import type { InventoryItem, InventoryListItem } from '@/services/inventory.service'
-import { useConversation, useResolveConversation, useVerifyConversation, useChatMessages } from '@/hooks/use-chat'
+import { useConversation, useRejectConversation, useVerifyConversation, useChatMessages } from '@/hooks/use-chat'
 import { useCurrentOrgId } from '@/contexts/current-org.context'
 import { useInventoryItem } from '@/hooks/use-inventory'
 import { useSubcategories } from '@/hooks/use-subcategories'
@@ -71,12 +71,13 @@ export function StaffClaimDetailPage() {
   }, [subcategories])
 
   // ── Mutations ──────────────────────────────────────────────
-  const resolveMutation = useResolveConversation()
+  const rejectMutation = useRejectConversation()
   const verifyMutation  = useVerifyConversation()
 
   // ── Derived state ──────────────────────────────────────────
   const status      = conv?.status ?? ConversationStatus.QUEUE
-  const isClosed    = status === ConversationStatus.CLOSED
+  // Both "resolved" (closed) and "rejected" are terminal — read-only, no actions.
+  const isClosed    = status === ConversationStatus.CLOSED || status === ConversationStatus.REJECTED
   const partnerName = conv?.partner.displayName || conv?.partner.email || 'Unknown'
   const messages    = messagesData?.pages.flatMap(p => p.messages) ?? []
   const isTyping    = Object.values(typingUsers).some(t => t.conversationId === claimId)
@@ -105,14 +106,14 @@ export function StaffClaimDetailPage() {
     })
   }
 
-  // Reject → confirm, then close the claim as resolved.
-  // The resolve mutation invalidates the assigned/resolved/conversation caches on success.
+  // Reject → confirm, then close the claim as rejected.
+  // The reject mutation invalidates the assigned/verified/resolved/conversation caches on success.
   function handleRejectConfirm() {
     if (!claimId) return
-    resolveMutation.mutate(claimId, {
+    rejectMutation.mutate(claimId, {
       onSuccess: () => {
         setRejectConfirmOpen(false)
-        toast.success('Claim rejected and resolved.')
+        toast.success('Claim rejected.')
       },
       onError: () => toast.error('Failed to reject claim'),
     })
@@ -135,10 +136,11 @@ export function StaffClaimDetailPage() {
   const hasLinkedItem = !!conv.supportFormData.postId
   const comparisonItem: InventoryItem | null = hasLinkedItem ? (inventoryItem ?? null) : selectedItem
   const isVerified = status === ConversationStatus.VERIFIED
-  // Accept/Reject only make sense before the claim is verified or closed.
-  const showActions = !isClosed && !isVerified
-  // Reject is always available while actions show; Accept needs a matching item.
-  const canAccept = showActions && !!comparisonItem
+  // Reject is allowed while the claim is in review or verified (backend: in_progress | in_verified).
+  const canReject = !isClosed && (status === ConversationStatus.IN_PROGRESS || isVerified)
+  // Accept (verify) only makes sense before the claim is verified or closed; it needs a matching item.
+  const showAccept = !isClosed && !isVerified && status === ConversationStatus.IN_PROGRESS
+  const canAccept = showAccept && !!comparisonItem
 
   return (
     <>
@@ -156,7 +158,7 @@ export function StaffClaimDetailPage() {
         <ClaimRejectDialog
           partnerName={partnerName}
           avatarUrl={conv.partner.avatarUrl}
-          isPending={resolveMutation.isPending}
+          isPending={rejectMutation.isPending}
           onConfirm={handleRejectConfirm}
           onCancel={() => setRejectConfirmOpen(false)}
         />
@@ -181,10 +183,11 @@ export function StaffClaimDetailPage() {
             firstAssignedAt={conv.firstAssignedAt}
             verifiedAt={conv.verifiedAt}
             resolvedAt={conv.resolvedAt}
+            rejectedAt={conv.rejectedAt}
             canAccept={canAccept}
-            isActionPending={verifyMutation.isPending || resolveMutation.isPending}
-            onAccept={showActions ? () => setAcceptConfirmOpen(true) : undefined}
-            onReject={showActions ? () => setRejectConfirmOpen(true) : undefined}
+            isActionPending={verifyMutation.isPending || rejectMutation.isPending}
+            onAccept={showAccept ? () => setAcceptConfirmOpen(true) : undefined}
+            onReject={canReject ? () => setRejectConfirmOpen(true) : undefined}
             supportFormData={conv.supportFormData}
           />
         }

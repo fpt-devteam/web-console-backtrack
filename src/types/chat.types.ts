@@ -14,7 +14,10 @@ export enum ConversationStatus {
   QUEUE = 'queue',
   IN_PROGRESS = 'in_progress',
   VERIFIED = 'in_verified',
+  /** Terminal — claim approved & closed (maps to backend "closed"). */
   CLOSED = 'closed',
+  /** Terminal — claim denied (maps to backend "rejected"). */
+  REJECTED = 'rejected',
 }
 
 export enum MessageType {
@@ -113,6 +116,8 @@ export interface IConversation {
   verifiedAt?: string | null;
   /** When the conversation was resolved/closed */
   resolvedAt?: string | null;
+  /** When the claim was rejected (denied) */
+  rejectedAt?: string | null;
   createdAt: string;
   updatedAt: string;
   deletedAt?: string | null;

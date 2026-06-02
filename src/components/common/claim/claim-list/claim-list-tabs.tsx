@@ -13,6 +13,7 @@ const TABS: Array<{ key: ClaimStatusFilter; label: string }> = [
   { key: ConversationStatus.IN_PROGRESS, label: STATUS_LABEL[ConversationStatus.IN_PROGRESS] },
   { key: ConversationStatus.VERIFIED, label: STATUS_LABEL[ConversationStatus.VERIFIED] },
   { key: ConversationStatus.CLOSED, label: STATUS_LABEL[ConversationStatus.CLOSED] },
+  { key: ConversationStatus.REJECTED, label: STATUS_LABEL[ConversationStatus.REJECTED] },
 ]
 
 interface ClaimListTabsProps {

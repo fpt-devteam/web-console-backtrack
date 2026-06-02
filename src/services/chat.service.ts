@@ -42,6 +42,7 @@ interface RawConversation {
   firstAssignedAt?: string | null;
   verifiedAt?: string | null;
   resolvedAt?: string | null;
+  rejectedAt?: string | null;
   createdAt?: string;
   updatedAt?: string;
   deletedAt?: string | null;
@@ -78,6 +79,7 @@ export function normalizeConv(raw: unknown): IConversation {
     firstAssignedAt: obj.firstAssignedAt ?? null,
     verifiedAt: obj.verifiedAt ?? null,
     resolvedAt: obj.resolvedAt ?? null,
+    rejectedAt: obj.rejectedAt ?? null,
     createdAt: (obj.createdAt ?? ''),
     updatedAt: (obj.updatedAt ?? ''),
     deletedAt: obj.deletedAt ?? null,
@@ -219,6 +221,14 @@ export const chatService = {
     if (!data.success) throw new Error(data.error?.message ?? 'Failed to resolve conversation');
   },
 
+  /** Reject (deny & close) a conversation. */
+  async rejectConversation(conversationId: string): Promise<void> {
+    const { data } = await privateClient.post<ApiResponse<void>>(
+      `${BASE}/conversations/${conversationId}/reject`
+    );
+    if (!data.success) throw new Error(data.error?.message ?? 'Failed to reject conversation');
+  },
+
   /** List resolved conversations assigned to the authenticated staff member. */
   async listResolved({ isMe }: { isMe: boolean }): Promise<Array<IConversation>> {
     const { data } = await privateClient.get<ApiResponse<unknown>>(
@@ -230,6 +240,20 @@ export const chatService = {
       }
     );
     if (!data.success) throw new Error(data.error?.message ?? 'Failed to fetch resolved conversations');
+    return toList(data.data).conversations;
+  },
+
+  /** List rejected conversations assigned to the authenticated staff member. */
+  async listRejected({ isMe }: { isMe: boolean }): Promise<Array<IConversation>> {
+    const { data } = await privateClient.get<ApiResponse<unknown>>(
+      `${BASE}/conversations/organization/rejected`,
+      {
+        params: {
+          isMe,
+        }
+      }
+    );
+    if (!data.success) throw new Error(data.error?.message ?? 'Failed to fetch rejected conversations');
     return toList(data.data).conversations;
   },
 

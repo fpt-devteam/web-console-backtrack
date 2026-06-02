@@ -22,11 +22,11 @@ export function filterConversations(
 
 export function isCardDraggable(
   colId: ConversationStatus,
-  currentUserId: string | undefined,
+  _currentUserId: string | undefined,
 ): (conv: IConversation) => boolean {
+  // Only queued claims are draggable (Queue → In Review = "take it on").
+  // In Review / Verified / Closed cards are moved through detail-page actions, not DnD.
   if (colId === ConversationStatus.QUEUE) return () => true
-  if (colId === ConversationStatus.IN_PROGRESS || colId === ConversationStatus.VERIFIED)
-    return (conv) => conv.assignedStaff?.id === currentUserId
   return () => false
 }
 
@@ -34,9 +34,9 @@ export function findConv(
   board: BoardState,
   id: string,
 ): { conv: IConversation; col: ColKey } | null {
-  for (const col of Object.values(ConversationStatus)) {
-    const conv = board[col].find((c) => c.id === id)
-    if (conv) return { conv, col: col as ColKey }
+  for (const col of Object.keys(board) as ColKey[]) {
+    const conv = board[col]?.find((c) => c.id === id)
+    if (conv) return { conv, col }
   }
   return null
 }

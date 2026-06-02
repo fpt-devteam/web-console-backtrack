@@ -11,6 +11,7 @@ interface ClaimDetailSidebarProps {
   firstAssignedAt?: string | null
   verifiedAt?: string | null
   resolvedAt?: string | null
+  rejectedAt?: string | null
   status: ConversationStatus
   assigneeName?: string | null
   assigneeAvatarUrl?: string | null
@@ -32,7 +33,7 @@ function ClaimInfoField({ label, children }: { label: string; children: React.Re
 }
 
 export function ClaimDetailSidebar({
-  partner, createdAt, firstAssignedAt, verifiedAt, resolvedAt, status,
+  partner, createdAt, firstAssignedAt, verifiedAt, resolvedAt, rejectedAt, status,
   assigneeName, assigneeAvatarUrl,
   canAccept, isActionPending, onAccept, onReject,
   supportFormData,
@@ -46,13 +47,13 @@ export function ClaimDetailSidebar({
           <ClaimAssignee name={assigneeName} avatarUrl={assigneeAvatarUrl} />
         </ClaimInfoField>
 
-        <ClaimStatusTrace status={status} submittedAt={createdAt} firstAssignedAt={firstAssignedAt} verifiedAt={verifiedAt} resolvedAt={resolvedAt} />
+        <ClaimStatusTrace status={status} submittedAt={createdAt} firstAssignedAt={firstAssignedAt} verifiedAt={verifiedAt} resolvedAt={resolvedAt} rejectedAt={rejectedAt} />
       </div>
 
       {(onAccept || onReject) && (
         <div className="shrink-0 border-t border-hairline px-4 py-3 flex flex-col gap-2">
           {onAccept && !canAccept && (
-            <p className="text-xs text-mute">Choose a matching item to enable Accept.</p>
+            <p className="text-xs text-mute">Choose a matching item to enable Verify.</p>
           )}
           <div className="flex items-center gap-2">
             {onReject && (
@@ -82,7 +83,7 @@ export function ClaimDetailSidebar({
                 )}
               >
                 {isActionPending ? <Loader2 className="w-4 h-4 animate-spin" /> : <Check className="w-4 h-4" />}
-                Accept
+                Verify
               </button>
             )}
           </div>

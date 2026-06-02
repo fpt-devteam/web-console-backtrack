@@ -32,6 +32,7 @@ export function ClaimListPanel({
       [ConversationStatus.IN_PROGRESS]: 0,
       [ConversationStatus.VERIFIED]: 0,
       [ConversationStatus.CLOSED]: 0,
+      [ConversationStatus.REJECTED]: 0,
     }
     for (const conv of conversations) result[conv.status] += 1
     return result

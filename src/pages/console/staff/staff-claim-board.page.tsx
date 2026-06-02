@@ -15,6 +15,7 @@ import { useConversationUpdates, useSocketChatQueue } from '@/hooks/use-chat-soc
 import {
   useAssignConversation,
   useChatAssigned,
+  useChatRejected,
   useChatResolved,
   useChatVerified,
   useResolveConversation,
@@ -42,6 +43,7 @@ export function StaffClaimBoardPage() {
     try {
       await assignMutation.mutateAsync(conv.id)
       removeFromQueue(conv.id)
+      handleOpenDetail(conv.id)
     } catch {
       toast.error('Failed to take on conversation')
     }
@@ -53,28 +55,33 @@ export function StaffClaimBoardPage() {
   const assignedQuery  = useChatAssigned({ isMe })
   const verifiedQuery  = useChatVerified({ isMe })
   const resolvedQuery  = useChatResolved({ isMe })
+  const rejectedQuery  = useChatRejected({ isMe })
 
   const assignMutation  = useAssignConversation()
   const verifyMutation  = useVerifyConversation()
   const resolveMutation = useResolveConversation()
 
-  const isLoading = isQueueLoading || assignedQuery.isLoading || verifiedQuery.isLoading || resolvedQuery.isLoading
+  const isLoading = isQueueLoading || assignedQuery.isLoading || verifiedQuery.isLoading || resolvedQuery.isLoading || rejectedQuery.isLoading
 
   const rawQueue    = useMemo(() => Array.isArray(queueData) ? queueData : [],              [queueData])
   const rawAssigned = useMemo(() => Array.isArray(assignedQuery.data) ? assignedQuery.data : [], [assignedQuery.data])
   const rawVerified = useMemo(() => Array.isArray(verifiedQuery.data) ? verifiedQuery.data : [], [verifiedQuery.data])
   const rawResolved = useMemo(() => Array.isArray(resolvedQuery.data) ? resolvedQuery.data : [], [resolvedQuery.data])
+  const rawRejected = useMemo(() => Array.isArray(rejectedQuery.data) ? rejectedQuery.data : [], [rejectedQuery.data])
+
+  // The "Closed" column holds both terminal outcomes — resolved and rejected.
+  const rawClosed = useMemo(() => [...rawResolved, ...rawRejected], [rawResolved, rawRejected])
 
   const queueConversations    = useMemo(() => applyBoardFilter(filterConversations(rawQueue,    searchTerm), boardFilter, currentUser?.id), [rawQueue,    searchTerm, boardFilter, currentUser?.id])
   const assignedConversations = useMemo(() => applyBoardFilter(filterConversations(rawAssigned, searchTerm), boardFilter, currentUser?.id), [rawAssigned, searchTerm, boardFilter, currentUser?.id])
   const verifiedConversations = useMemo(() => applyBoardFilter(filterConversations(rawVerified, searchTerm), boardFilter, currentUser?.id), [rawVerified, searchTerm, boardFilter, currentUser?.id])
-  const resolvedConversations = useMemo(() => applyBoardFilter(filterConversations(rawResolved, searchTerm), boardFilter, currentUser?.id), [rawResolved, searchTerm, boardFilter, currentUser?.id])
+  const closedConversations   = useMemo(() => applyBoardFilter(filterConversations(rawClosed,   searchTerm), boardFilter, currentUser?.id), [rawClosed,   searchTerm, boardFilter, currentUser?.id])
 
   // "Assigned" may still include verified claims; keep only in-review ones in that column.
   const inReviewConversations = useMemo(() => assignedConversations.filter((c) => c.status === ConversationStatus.IN_PROGRESS), [assignedConversations])
 
-  const totalCount    = rawQueue.length + rawAssigned.length + rawVerified.length + rawResolved.length
-  const filteredCount = queueConversations.length + inReviewConversations.length + verifiedConversations.length + resolvedConversations.length
+  const totalCount    = rawQueue.length + rawAssigned.length + rawVerified.length + rawClosed.length
+  const filteredCount = queueConversations.length + inReviewConversations.length + verifiedConversations.length + closedConversations.length
 
   return (
     <div className="h-full flex flex-col overflow-hidden">
@@ -112,7 +119,7 @@ export function StaffClaimBoardPage() {
           queueConversations={queueConversations}
           assignedConversations={inReviewConversations}
           verifiedConversations={verifiedConversations}
-          resolvedConversations={resolvedConversations}
+          resolvedConversations={closedConversations}
           isLoading={isLoading}
           currentUserId={currentUser?.id}
           isAssignPending={assignMutation.isPending}

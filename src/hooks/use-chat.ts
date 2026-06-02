@@ -15,6 +15,7 @@ export const chatKeys = {
   assigned: () => [...chatKeys.all, 'assigned'] as const,
   verified: () => [...chatKeys.all, 'verified'] as const,
   resolved: () => [...chatKeys.all, 'resolved'] as const,
+  rejected: () => [...chatKeys.all, 'rejected'] as const,
   byPost: (postId: string) => [...chatKeys.all, 'by-post', postId] as const,
   bySubcategory: (subcategoryId: string) => [...chatKeys.all, 'by-subcategory', subcategoryId] as const,
   conversation: (id: string) => [...chatKeys.all, 'conversation', id] as const,
@@ -64,6 +65,16 @@ export function useChatResolved({ isMe }: { isMe: boolean } = { isMe: false }) {
   return useQuery({
     queryKey: chatKeys.resolved(),
     queryFn: () => chatService.listResolved({ isMe }),
+    staleTime: 1000 * 30,
+    retry: false,
+  });
+}
+
+/** Fetch rejected (denied) conversations handled by the authenticated staff member. */
+export function useChatRejected({ isMe }: { isMe: boolean } = { isMe: false }) {
+  return useQuery({
+    queryKey: chatKeys.rejected(),
+    queryFn: () => chatService.listRejected({ isMe }),
     staleTime: 1000 * 30,
     retry: false,
   });
@@ -164,6 +175,21 @@ export function useResolveConversation() {
       queryClient.invalidateQueries({ queryKey: chatKeys.assigned() });
       queryClient.invalidateQueries({ queryKey: chatKeys.verified() });
       queryClient.invalidateQueries({ queryKey: chatKeys.resolved() });
+      queryClient.invalidateQueries({ queryKey: chatKeys.conversation(conversationId) });
+    },
+  });
+}
+
+/** Staff member rejects (denies & closes) a conversation */
+export function useRejectConversation() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (conversationId: string) => chatService.rejectConversation(conversationId),
+    onSuccess: (_data, conversationId) => {
+      queryClient.invalidateQueries({ queryKey: chatKeys.assigned() });
+      queryClient.invalidateQueries({ queryKey: chatKeys.verified() });
+      queryClient.invalidateQueries({ queryKey: chatKeys.rejected() });
       queryClient.invalidateQueries({ queryKey: chatKeys.conversation(conversationId) });
     },
   });
