@@ -7,6 +7,9 @@ import {
 import type { IConversation } from '@/types/chat.types';
 import { chatService } from '@/services/chat.service';
 
+/** Prefix matching every inventory query (all orgs, lists, and details). */
+const INVENTORY_ROOT_KEY = ['inventory'] as const;
+
 // ── Query key factory ───────────────────────────────────
 
 export const chatKeys = {
@@ -157,10 +160,11 @@ export function useVerifyConversation() {
   return useMutation({
     mutationFn: ({ conversationId, postId }: { conversationId: string; postId?: string }) =>
       chatService.verifyConversation(conversationId, postId),
-    onSuccess: (_data, { conversationId }) => {
-      queryClient.invalidateQueries({ queryKey: chatKeys.assigned() });
-      queryClient.invalidateQueries({ queryKey: chatKeys.verified() });
-      queryClient.invalidateQueries({ queryKey: chatKeys.conversation(conversationId) });
+    onSuccess: () => {
+      // Verifying changes the claim's status and links it to an inventory item,
+      // so refresh every claim list and all inventory data.
+      queryClient.invalidateQueries({ queryKey: chatKeys.all });
+      queryClient.invalidateQueries({ queryKey: INVENTORY_ROOT_KEY });
     },
   });
 }
@@ -171,11 +175,9 @@ export function useResolveConversation() {
 
   return useMutation({
     mutationFn: (conversationId: string) => chatService.resolveConversation(conversationId),
-    onSuccess: (_data, conversationId) => {
-      queryClient.invalidateQueries({ queryKey: chatKeys.assigned() });
-      queryClient.invalidateQueries({ queryKey: chatKeys.verified() });
-      queryClient.invalidateQueries({ queryKey: chatKeys.resolved() });
-      queryClient.invalidateQueries({ queryKey: chatKeys.conversation(conversationId) });
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: chatKeys.all });
+      queryClient.invalidateQueries({ queryKey: INVENTORY_ROOT_KEY });
     },
   });
 }
@@ -186,11 +188,27 @@ export function useRejectConversation() {
 
   return useMutation({
     mutationFn: (conversationId: string) => chatService.rejectConversation(conversationId),
-    onSuccess: (_data, conversationId) => {
-      queryClient.invalidateQueries({ queryKey: chatKeys.assigned() });
-      queryClient.invalidateQueries({ queryKey: chatKeys.verified() });
-      queryClient.invalidateQueries({ queryKey: chatKeys.rejected() });
-      queryClient.invalidateQueries({ queryKey: chatKeys.conversation(conversationId) });
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: chatKeys.all });
+      queryClient.invalidateQueries({ queryKey: INVENTORY_ROOT_KEY });
+    },
+  });
+}
+
+/**
+ * Close all active claims for a post after a handover — resolve the excepted
+ * (verified) claim and reject the rest. Refreshes every claim list and all
+ * inventory data so the board, lists, and item details all reflect the change.
+ */
+export function useClosePostConversations() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({ postId, exceptId }: { postId: string; exceptId?: string | null }) =>
+      chatService.closePostConversations(postId, exceptId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: chatKeys.all });
+      queryClient.invalidateQueries({ queryKey: INVENTORY_ROOT_KEY });
     },
   });
 }

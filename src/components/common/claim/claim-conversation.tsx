@@ -2,6 +2,7 @@ import { Loader2 } from 'lucide-react'
 import { MessageList } from '@/components/common/chat/message/message-list'
 import { MessageComposer } from '@/components/common/chat/composer/message-composer'
 import { TypingIndicator } from '@/components/common/chat/typing/typing-indicator'
+import { CLAIM_QUICK_REPLIES } from './claim-quick-replies'
 import type { IMessage, IConversationPartner } from '@/types/chat.types'
 
 export interface ClaimConversationProps {
@@ -72,6 +73,7 @@ export function ClaimConversation({
             onSend={onSend}
             onTypingStart={onTypingStart}
             onTypingStop={onTypingStop}
+            quickReplies={CLAIM_QUICK_REPLIES}
           />
         )}
       </div>

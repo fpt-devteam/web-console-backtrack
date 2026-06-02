@@ -295,10 +295,15 @@ export const chatService = {
     return toList(data.data).conversations;
   },
 
-  /** Close all queued conversations linked to a post (called after handover). */
-  async closePostConversations(postId: string): Promise<void> {
+  /**
+   * Close all active claims (queued / in-progress / verified) linked to a post,
+   * called after handover. Pass `exceptId` — the verified winning claim — to
+   * resolve that one while rejecting the rest; omit it to close everything.
+   */
+  async closePostConversations(postId: string, exceptId?: string | null): Promise<void> {
     const { data } = await privateClient.post<ApiResponse<void>>(
-      `${BASE}/conversations/organization/posts/${postId}/close`
+      `${BASE}/conversations/organization/posts/${postId}/close`,
+      exceptId ? { exceptId } : undefined
     );
     if (!data.success) throw new Error(data.error?.message ?? 'Failed to close conversations');
   },

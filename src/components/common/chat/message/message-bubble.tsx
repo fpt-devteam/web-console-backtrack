@@ -32,7 +32,7 @@ export function MessageBubble({ type, content, createdAt, isOwn, position, showT
 
   return (
     <div className={`text-sm px-3.5 py-2 ${bubbleClass(isOwn, position)}`}>
-      <p className="leading-relaxed">{content}</p>
+      <p className="leading-relaxed whitespace-pre-wrap break-words">{content}</p>
       {showTimestamp && (
         <p className={`text-[10px] mt-0.5 ${isOwn ? 'text-white/60 text-right' : 'text-[#929292]'}`}>
           {formatTime(createdAt)}

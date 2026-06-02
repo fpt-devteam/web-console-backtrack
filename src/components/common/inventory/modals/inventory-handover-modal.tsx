@@ -12,8 +12,7 @@ import { InventoryPhotosPicker } from '../photos/inventory-photos-picker'
 import { collectInventoryImageUrls, reorderList, revokeObjectUrls, type InventoryPhotoPreview } from '@/utils/inventory-photos'
 import { uploadInventoryImage } from '@/services/storage.service'
 import { isValidEmail, isValidPhone10StartingWith0 } from '@/utils/validators'
-import { chatService } from '@/services/chat.service'
-import { useChatConversationsByPostId } from '@/hooks/use-chat'
+import { useChatConversationsByPostId, useClosePostConversations } from '@/hooks/use-chat'
 import { ConversationStatus } from '@/types/chat.types'
 import type { IConversation } from '@/types/chat.types'
 import { STATUS_BADGE, STATUS_LABEL } from '@/components/common/claim/claim.constants'
@@ -37,6 +36,7 @@ export function HandoverItemModal({
   onSuccess?: () => void
 }) {
   const createReturnReport = useCreateOrgReturnReport()
+  const closeClaims = useClosePostConversations()
   const { data: me } = useUser()
   const { data: org } = useOrganization(orgId)
 
@@ -170,7 +170,9 @@ export function HandoverItemModal({
                 },
                 {
                   onSuccess: () => {
-                    void chatService.closePostConversations(postId).catch(() => {})
+                    // Resolve the selected (verified) claim and reject the rest.
+                    // Invalidates all claim + inventory caches on success.
+                    closeClaims.mutate({ postId, exceptId: claimRequestId })
                     showToast.success('Handover saved')
                     setSubmitting(false)
                     onClose()
