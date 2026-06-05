@@ -45,6 +45,7 @@ export function InventoryListFiltersBar({
   layout = 'twoRows',
   categoryFirst = false,
   showStatusFilter = true,
+  showDateFilter = true,
   showAuthorFilter,
   authorValue,
   onAuthorChange,
@@ -68,6 +69,7 @@ export function InventoryListFiltersBar({
   layout?: 'twoRows' | 'oneRow'
   categoryFirst?: boolean
   showStatusFilter?: boolean
+  showDateFilter?: boolean
   showAuthorFilter?: boolean
   authorValue?: string
   onAuthorChange?: (v: string) => void
@@ -83,14 +85,14 @@ export function InventoryListFiltersBar({
       ...(authorOptions ?? []),
     ]
 
-    const DateRangeChip = (
+    const DateRangeChip = showDateFilter ? (
       <FilterDateRangeChip
         fromDate={fromDate}
         toDate={toDate}
         onFromDateChange={onFromDateChange}
         onToDateChange={onToDateChange}
       />
-    )
+    ) : null
 
     const CategoryChip = (
       <FilterDropdownChip
@@ -190,25 +192,27 @@ export function InventoryListFiltersBar({
       {/* Row 2: date range + status + category + author */}
       <div className="flex flex-col md:flex-row md:items-center gap-3 md:gap-5">
         {/* Date range */}
-        <div className="w-full md:w-1/2 flex items-center gap-2">
-          <input
-            type="date"
-            lang="vi-VN"
-            value={fromDate}
-            onChange={(e) => onFromDateChange(e.target.value)}
-            max={toDate || undefined}
-            className="w-full rounded-lg border border-hairline bg-white px-3 py-1.5 text-sm text-ink focus:outline-none focus:border-ink transition-colors"
-          />
-          <span className="text-mute text-xs shrink-0">to</span>
-          <input
-            type="date"
-            lang="vi-VN"
-            value={toDate}
-            onChange={(e) => onToDateChange(e.target.value)}
-            min={fromDate || undefined}
-            className="w-full rounded-lg border border-hairline bg-white px-3 py-1.5 text-sm text-ink focus:outline-none focus:border-ink transition-colors"
-          />
-        </div>
+        {showDateFilter && (
+          <div className="w-full md:w-1/2 flex items-center gap-2">
+            <input
+              type="date"
+              lang="vi-VN"
+              value={fromDate}
+              onChange={(e) => onFromDateChange(e.target.value)}
+              max={toDate || undefined}
+              className="w-full rounded-lg border border-hairline bg-white px-3 py-1.5 text-sm text-ink focus:outline-none focus:border-ink transition-colors"
+            />
+            <span className="text-mute text-xs shrink-0">to</span>
+            <input
+              type="date"
+              lang="vi-VN"
+              value={toDate}
+              onChange={(e) => onToDateChange(e.target.value)}
+              min={fromDate || undefined}
+              className="w-full rounded-lg border border-hairline bg-white px-3 py-1.5 text-sm text-ink focus:outline-none focus:border-ink transition-colors"
+            />
+          </div>
+        )}
 
         {/* Status filter */}
         {showStatusFilter && (

@@ -84,6 +84,7 @@ export function InventoryPage() {
           layout="oneRow"
           categoryFirst
           showStatusFilter={false}
+          showDateFilter={false}
           showClear={listState.hasActiveFilters}
           onClear={() => listState.clear({ preserveStatus: true })}
           rightSlot={
