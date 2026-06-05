@@ -13,7 +13,7 @@ export interface QuickReply {
 export const CLAIM_QUICK_REPLIES: QuickReply[] = [
   {
     label: 'Chào hỏi',
-    text: 'Chào quý khách, cảm ơn quý khách đã liên hệ. Quý khách vui lòng mô tả chi tiết đặc điểm món đồ (màu sắc, nhãn hiệu, vị trí và thời gian thất lạc) để chúng tôi hỗ trợ tra cứu ạ.',
+    text: 'Chào quý khách, cảm ơn quý khách đã liên hệ. Rất hân hạnh được hỗ trợ quý khách với yêu cầu tìm đồ thất lạc.',
   },
   {
     label: 'Chưa tìm thấy',
@@ -21,11 +21,7 @@ export const CLAIM_QUICK_REPLIES: QuickReply[] = [
   },
   {
     label: 'Đã tìm thấy',
-    text: 'Chúng tôi đã tìm thấy một món đồ có đặc điểm tương tự như quý khách mô tả. Quý khách vui lòng cung cấp thêm thông tin để chúng tôi xác minh quyền sở hữu và sắp xếp thời gian nhận lại ạ.',
-  },
-  {
-    label: 'Yêu cầu xác minh',
-    text: 'Để xác minh quyền sở hữu, quý khách vui lòng cung cấp thêm hình ảnh hoặc đặc điểm nhận dạng riêng của món đồ ạ.',
+    text: 'Chúng tôi đã tìm thấy một món đồ có đặc điểm tương tự như quý khách mô tả. Quý khách có thể đến quầy thông tin để kiểm tra và nhận lại đồ vật của mình. Rất hân hạnh được hỗ trợ quý khách.',
   },
   {
     label: 'Cảm ơn',
