@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import { Search, X, Package } from 'lucide-react'
 import { useInventoryItems } from '@/hooks/use-inventory'
 import { useDebouncedValue, SEARCH_DEBOUNCE_MS } from '@/hooks/use-debounce'
@@ -14,6 +14,8 @@ interface ClaimSimilarInventoryProps {
   subCategoryId: string
   subcategoryNameById?: Record<string, string>
   role?: 'staff' | 'admin'
+  /** Items already reviewed and marked as not-a-match — hidden from the list. */
+  notMatchInventoryIds?: Array<string> | null
 }
 
 export function ClaimSimilarInventory({
@@ -23,6 +25,7 @@ export function ClaimSimilarInventory({
   subCategoryId,
   subcategoryNameById,
   role = 'staff',
+  notMatchInventoryIds,
 }: ClaimSimilarInventoryProps) {
   const [search, setSearch] = useState('')
   const debouncedSearch = useDebouncedValue(search, SEARCH_DEBOUNCE_MS)
@@ -33,7 +36,10 @@ export function ClaimSimilarInventory({
     pageSize: 50,
   })
 
-  const allItems = (data?.items ?? []).filter((item) => item.subcategoryId === subCategoryId)
+  const notMatchSet = useMemo(() => new Set(notMatchInventoryIds ?? []), [notMatchInventoryIds])
+  const allItems = (data?.items ?? []).filter(
+    (item) => item.subcategoryId === subCategoryId && !notMatchSet.has(item.id),
+  )
 
   const items = debouncedSearch.trim()
     ? allItems.filter((item) =>

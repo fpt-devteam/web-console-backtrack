@@ -1,7 +1,6 @@
-import { useState } from 'react'
-import { Check, Clock, Package, Search, Warehouse, X } from 'lucide-react'
+import { useMemo } from 'react'
+import { Check, Clock, Package, Warehouse, X } from 'lucide-react'
 import { useInventoryItems } from '@/hooks/use-inventory'
-import { useDebouncedValue, SEARCH_DEBOUNCE_MS } from '@/hooks/use-debounce'
 import { Skeleton } from '@/components/common/core/skeleton'
 import { getInventorySubcategoryName, getInventoryTitle } from '@/utils/inventory-view'
 import { cn } from '@/lib/utils'
@@ -14,6 +13,12 @@ interface ClaimInventoryPickerProps {
   subcategoryNameById?: Record<string, string>
   selectedId?: string | null
   onSelect: (item: InventoryListItem) => void
+  /** Items already reviewed and marked as not-a-match — hidden from suggestions. */
+  notMatchInventoryIds?: Array<string> | null
+  /** Request marking an item as not-a-match (opens a confirm dialog). */
+  onMarkNotMatch?: (inventoryId: string, itemName: string) => void
+  /** Id currently being marked as not-a-match (shows a pending state on its row). */
+  markingNotMatchId?: string | null
 }
 
 /** Selectable vertical list of in-storage items the staff can match a claim against. */
@@ -24,22 +29,20 @@ export function ClaimInventoryPicker({
   subcategoryNameById,
   selectedId,
   onSelect,
+  notMatchInventoryIds,
+  onMarkNotMatch,
+  markingNotMatchId,
 }: ClaimInventoryPickerProps) {
-  const [search, setSearch] = useState('')
-  const debouncedSearch = useDebouncedValue(search, SEARCH_DEBOUNCE_MS)
-
   const { data, isLoading } = useInventoryItems(orgId, {
     category: category as ItemCategory,
     status: 'InStorage',
     pageSize: 50,
   })
 
-  const allItems = (data?.items ?? []).filter((item) => item.subcategoryId === subCategoryId)
-  const items = debouncedSearch.trim()
-    ? allItems.filter((item) =>
-        getInventoryTitle(item, subcategoryNameById).toLowerCase().includes(debouncedSearch.toLowerCase()),
-      )
-    : allItems
+  const notMatchSet = useMemo(() => new Set(notMatchInventoryIds ?? []), [notMatchInventoryIds])
+  const items = (data?.items ?? []).filter(
+    (item) => item.subcategoryId === subCategoryId && !notMatchSet.has(item.id),
+  )
 
   return (
     <div className="flex h-full flex-col bg-white overflow-hidden">
@@ -49,22 +52,6 @@ export function ClaimInventoryPicker({
         {!isLoading && (
           <span className="text-[10px] font-medium text-mute bg-gray-100 rounded-full px-2 py-0.5">{items.length}</span>
         )}
-
-        <div className="ml-auto flex items-center gap-1.5 rounded-lg border border-hairline bg-gray-50 px-2.5 py-1.5 w-48">
-          <Search className="w-3.5 h-3.5 text-mute shrink-0" />
-          <input
-            type="text"
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            placeholder="Search…"
-            className="flex-1 bg-transparent text-xs text-ink outline-none placeholder:text-mute min-w-0"
-          />
-          {search && (
-            <button onClick={() => setSearch('')} className="text-mute hover:text-ink shrink-0">
-              <X className="w-3 h-3" />
-            </button>
-          )}
-        </div>
       </div>
 
       <div className="flex-1 overflow-y-auto p-3">
@@ -88,6 +75,12 @@ export function ClaimInventoryPicker({
                 item={item}
                 selected={item.id === selectedId}
                 onSelect={() => onSelect(item)}
+                onMarkNotMatch={
+                  onMarkNotMatch
+                    ? () => onMarkNotMatch(item.id, getInventoryTitle(item, subcategoryNameById))
+                    : undefined
+                }
+                isMarkingNotMatch={markingNotMatchId === item.id}
                 subcategoryNameById={subcategoryNameById}
               />
             ))}
@@ -102,11 +95,15 @@ function PickerRow({
   item,
   selected,
   onSelect,
+  onMarkNotMatch,
+  isMarkingNotMatch,
   subcategoryNameById,
 }: {
   item: InventoryListItem
   selected: boolean
   onSelect: () => void
+  onMarkNotMatch?: () => void
+  isMarkingNotMatch?: boolean
   subcategoryNameById?: Record<string, string>
 }) {
   const title = getInventoryTitle(item, subcategoryNameById)
@@ -117,9 +114,16 @@ function PickerRow({
     : '—'
 
   return (
-    <button
-      type="button"
+    <div
+      role="button"
+      tabIndex={0}
       onClick={onSelect}
+      onKeyDown={(e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault()
+          onSelect()
+        }
+      }}
       aria-pressed={selected}
       className={cn(
         'group flex w-full items-center gap-3 rounded-xl border bg-white p-2.5 text-left transition-all hover:cursor-pointer hover:shadow-sm',
@@ -157,14 +161,31 @@ function PickerRow({
         </div>
       </div>
 
-      <span
-        className={cn(
-          'flex h-6 w-6 shrink-0 items-center justify-center rounded-full border transition-colors',
-          selected ? 'border-rose-500 bg-rose-500 text-white' : 'border-neutral-300 text-transparent group-hover:border-neutral-400',
+      <div className="flex shrink-0 items-center gap-1.5">
+        {onMarkNotMatch && (
+          <button
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation()
+              onMarkNotMatch()
+            }}
+            disabled={isMarkingNotMatch}
+            title="Mark as not a match"
+            className="flex items-center gap-1 rounded-lg border border-transparent px-2 py-1 text-xs font-medium text-mute transition-colors hover:border-[#fdd] hover:bg-[#fff0f0] hover:text-danger disabled:opacity-50"
+          >
+            <X className="h-3.5 w-3.5" />
+            {isMarkingNotMatch ? 'Removing…' : 'Not a match'}
+          </button>
         )}
-      >
-        <Check className="h-3.5 w-3.5" strokeWidth={3} />
-      </span>
-    </button>
+        <span
+          className={cn(
+            'flex h-6 w-6 items-center justify-center rounded-full border transition-colors',
+            selected ? 'border-rose-500 bg-rose-500 text-white' : 'border-neutral-300 text-transparent group-hover:border-neutral-400',
+          )}
+        >
+          <Check className="h-3.5 w-3.5" strokeWidth={3} />
+        </span>
+      </div>
+    </div>
   )
 }

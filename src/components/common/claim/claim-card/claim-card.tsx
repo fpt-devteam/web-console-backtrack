@@ -12,6 +12,7 @@ import { useSubcategories } from '@/hooks/use-subcategories'
 import { useMatchingInventoryCount } from '@/hooks/use-inventory'
 import { useCurrentOrgId } from '@/contexts/current-org.context'
 import { getSubcategoryIcon } from '@/utils/subcategory-icon'
+import { ConversationStatus } from '@/types/chat.types'
 import type { ItemCategory } from '@/services/inventory.service'
 
 export function ClaimCard({ conv, disabled = false, onOpenConversation }: ClaimCardProps) {
@@ -37,8 +38,15 @@ export function ClaimCard({ conv, disabled = false, onOpenConversation }: ClaimC
   const subcategoryIcon = subcategoryCode ? getSubcategoryIcon(category as ItemCategory, subcategoryCode) : null
 
   // In-storage items of the same subcategory the staff could match this claim against.
+  // Skip for verified claims — they're already matched to an item.
   const { currentOrgId } = useCurrentOrgId()
-  const matchCount = useMatchingInventoryCount(currentOrgId, category, conv.supportFormData.subCategoryId)
+  const showMatches = statusKey !== ConversationStatus.VERIFIED
+  const matchCount = useMatchingInventoryCount(
+    showMatches ? currentOrgId : null,
+    category,
+    conv.supportFormData.subCategoryId,
+    conv.supportFormData.notMatchInventoryIds,
+  )
 
   const interactive = !!onOpenConversation
 

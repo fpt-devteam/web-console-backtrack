@@ -59,6 +59,7 @@ export function ClaimMainContent({
               subCategoryId={supportFormData.subCategoryId}
               subcategoryNameById={subcategoryNameById}
               role={role}
+              notMatchInventoryIds={supportFormData.notMatchInventoryIds}
             />
           )}
         </>

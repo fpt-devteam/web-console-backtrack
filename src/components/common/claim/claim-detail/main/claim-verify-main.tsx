@@ -1,4 +1,4 @@
-import { Pencil, ScanSearch } from 'lucide-react'
+import { Pencil, ScanSearch, X } from 'lucide-react'
 import { Spinner } from '@/components/common/core/spinner'
 import { getInventoryTitle } from '@/utils/inventory-view'
 import type { SupportFormData } from '@/types/chat.types'
@@ -20,6 +20,10 @@ interface ClaimVerifyMainProps {
   onSelectItem: (item: InventoryListItem | null) => void
   /** Open the linked inventory item's detail page. */
   onViewLinkedItem?: () => void
+  /** Request marking an inventory item as not-a-match for this claim (opens a confirm dialog). */
+  onMarkNotMatch?: (inventoryId: string, itemName: string) => void
+  /** Id currently being marked as not-a-match (shows a pending state). */
+  markingNotMatchId?: string | null
 }
 
 export function ClaimVerifyMain({
@@ -32,6 +36,8 @@ export function ClaimVerifyMain({
   selectedItem,
   onSelectItem,
   onViewLinkedItem,
+  onMarkNotMatch,
+  markingNotMatchId,
 }: ClaimVerifyMainProps) {
   const hasLinkedItem = !!supportFormData.postId
 
@@ -63,14 +69,27 @@ export function ClaimVerifyMain({
                 <span className="font-semibold">{getInventoryTitle(selectedItem, subcategoryNameById)}</span>
               </span>
             </div>
-            <button
-              type="button"
-              onClick={() => onSelectItem(null)}
-              className="flex shrink-0 items-center gap-1 text-sm font-medium text-rose-600 hover:text-rose-700 hover:cursor-pointer"
-            >
-              <Pencil className="h-3.5 w-3.5" />
-              Change
-            </button>
+            <div className="flex shrink-0 items-center gap-3">
+              {onMarkNotMatch && (
+                <button
+                  type="button"
+                  onClick={() => onMarkNotMatch(selectedItem.id, getInventoryTitle(selectedItem, subcategoryNameById))}
+                  disabled={markingNotMatchId === selectedItem.id}
+                  className="flex items-center gap-1 text-sm font-medium text-mute hover:text-danger hover:cursor-pointer disabled:opacity-50"
+                >
+                  <X className="h-3.5 w-3.5" />
+                  Not a match
+                </button>
+              )}
+              <button
+                type="button"
+                onClick={() => onSelectItem(null)}
+                className="flex items-center gap-1 text-sm font-medium text-rose-600 hover:text-rose-700 hover:cursor-pointer"
+              >
+                <Pencil className="h-3.5 w-3.5" />
+                Change
+              </button>
+            </div>
           </div>
           <ClaimComparisonView
             claim={supportFormData}
@@ -94,6 +113,9 @@ export function ClaimVerifyMain({
                 subcategoryNameById={subcategoryNameById}
                 selectedId={null}
                 onSelect={onSelectItem}
+                notMatchInventoryIds={supportFormData.notMatchInventoryIds}
+                onMarkNotMatch={onMarkNotMatch}
+                markingNotMatchId={markingNotMatchId}
               />
             </div>
           )}

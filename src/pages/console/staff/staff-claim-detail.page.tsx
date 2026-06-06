@@ -3,7 +3,7 @@ import { useNavigate, useParams } from '@tanstack/react-router'
 import toast from 'react-hot-toast'
 import { ConversationStatus, MessageType } from '@/types/chat.types'
 import type { InventoryItem, InventoryListItem } from '@/services/inventory.service'
-import { useConversation, useRejectConversation, useVerifyConversation, useChatMessages } from '@/hooks/use-chat'
+import { useConversation, useRejectConversation, useVerifyConversation, useChatMessages, useMarkInventoryNotMatch } from '@/hooks/use-chat'
 import { useCurrentOrgId } from '@/contexts/current-org.context'
 import { useInventoryItem } from '@/hooks/use-inventory'
 import { useSubcategories } from '@/hooks/use-subcategories'
@@ -17,6 +17,7 @@ import { ClaimVerifyMain } from '@/components/common/claim/claim-detail/main/cla
 import { ClaimConversation } from '@/components/common/claim/claim-conversation'
 import { ClaimRejectDialog } from '@/components/common/claim/claim-dialog/claim-reject-dialog'
 import { ClaimVerifyDialog } from '@/components/common/claim/claim-dialog/claim-verify-dialog'
+import { ClaimNotMatchDialog } from '@/components/common/claim/claim-dialog/claim-not-match-dialog'
 import { Spinner } from '@/components/common/core/spinner'
 
 export function StaffClaimDetailPage() {
@@ -29,6 +30,8 @@ export function StaffClaimDetailPage() {
   const [rejectConfirmOpen, setRejectConfirmOpen] = useState(false)
   // Item chosen to verify against when the claim isn't linked to a stored item.
   const [selectedItem, setSelectedItem] = useState<InventoryListItem | null>(null)
+  // Item pending "not a match" confirmation.
+  const [notMatchTarget, setNotMatchTarget] = useState<{ id: string; name: string } | null>(null)
 
   // ── Conversation data ──────────────────────────────────────
   const { currentOrgId } = useCurrentOrgId()
@@ -73,12 +76,13 @@ export function StaffClaimDetailPage() {
   // ── Mutations ──────────────────────────────────────────────
   const rejectMutation = useRejectConversation()
   const verifyMutation  = useVerifyConversation()
+  const notMatchMutation = useMarkInventoryNotMatch()
 
   // ── Derived state ──────────────────────────────────────────
   const status      = conv?.status ?? ConversationStatus.QUEUE
   // Both "resolved" (closed) and "rejected" are terminal — read-only, no actions.
   const isClosed    = status === ConversationStatus.CLOSED || status === ConversationStatus.REJECTED
-  const partnerName = conv?.partner.displayName || conv?.partner.email || 'Unknown'
+  const partnerName = conv?.partner?.displayName || conv?.partner?.email || 'Unknown'
   const messages    = messagesData?.pages.flatMap(p => p.messages) ?? []
   const isTyping    = Object.values(typingUsers).some(t => t.conversationId === claimId)
 
@@ -124,6 +128,28 @@ export function StaffClaimDetailPage() {
     send({ conversationId: claimId, type: MessageType.TEXT, content: text })
   }
 
+  // Staff clicks "Not a match" → open a confirm dialog before committing.
+  function handleMarkNotMatch(inventoryId: string, itemName: string) {
+    setNotMatchTarget({ id: inventoryId, name: itemName })
+  }
+
+  // Confirmed in the dialog → drop the item from this claim's suggestions.
+  function handleNotMatchConfirm() {
+    if (!claimId || !notMatchTarget) return
+    const { id } = notMatchTarget
+    notMatchMutation.mutate(
+      { conversationId: claimId, inventoryId: id },
+      {
+        onSuccess: () => {
+          // If the item being compared was just dismissed, return to the picker.
+          setSelectedItem((cur) => (cur?.id === id ? null : cur))
+          setNotMatchTarget(null)
+        },
+        onError: () => toast.error('Failed to mark item as not a match'),
+      },
+    )
+  }
+
   if (isLoading || !conv) {
     return (
       <div className="h-full flex items-center justify-center text-mute text-sm">
@@ -147,7 +173,7 @@ export function StaffClaimDetailPage() {
       {acceptConfirmOpen && (
         <ClaimVerifyDialog
           partnerName={partnerName}
-          avatarUrl={conv.partner.avatarUrl}
+          avatarUrl={conv.partner?.avatarUrl}
           isPending={verifyMutation.isPending}
           onConfirm={() => comparisonItem && handleAcceptConfirm(comparisonItem)}
           onCancel={() => setAcceptConfirmOpen(false)}
@@ -157,10 +183,19 @@ export function StaffClaimDetailPage() {
       {rejectConfirmOpen && (
         <ClaimRejectDialog
           partnerName={partnerName}
-          avatarUrl={conv.partner.avatarUrl}
+          avatarUrl={conv.partner?.avatarUrl}
           isPending={rejectMutation.isPending}
           onConfirm={handleRejectConfirm}
           onCancel={() => setRejectConfirmOpen(false)}
+        />
+      )}
+
+      {notMatchTarget && (
+        <ClaimNotMatchDialog
+          itemName={notMatchTarget.name}
+          isPending={notMatchMutation.isPending}
+          onConfirm={handleNotMatchConfirm}
+          onCancel={() => setNotMatchTarget(null)}
         />
       )}
 
@@ -202,6 +237,8 @@ export function StaffClaimDetailPage() {
             selectedItem={selectedItem}
             onSelectItem={setSelectedItem}
             onViewLinkedItem={hasLinkedItem && inventoryItem ? handleViewLinkedItem : undefined}
+            onMarkNotMatch={handleMarkNotMatch}
+            markingNotMatchId={notMatchMutation.isPending ? notMatchMutation.variables?.inventoryId ?? null : null}
           />
         }
         messaging={

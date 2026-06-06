@@ -169,6 +169,31 @@ export function useVerifyConversation() {
   });
 }
 
+/**
+ * Staff member marks an inventory item as NOT a match for a claim. The server
+ * appends the id to `supportFormData.notMatchInventoryIds`. We patch the cached
+ * conversation immediately and refresh the claim lists so board/preview match
+ * counts (which exclude not-matched items) update.
+ */
+export function useMarkInventoryNotMatch() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({ conversationId, inventoryId }: { conversationId: string; inventoryId: string }) =>
+      chatService.markInventoryNotMatch(conversationId, inventoryId),
+    onSuccess: (updated, { conversationId }) => {
+      // Only patch supportFormData (which holds notMatchInventoryIds). This endpoint
+      // can return null partner/lastMessage, so merging the whole response would
+      // clobber good cached values and crash partner-dependent UI.
+      queryClient.setQueriesData<IConversation>(
+        { queryKey: chatKeys.conversation(conversationId) },
+        (prev) => (prev ? { ...prev, supportFormData: updated.supportFormData } : prev),
+      );
+      queryClient.invalidateQueries({ queryKey: chatKeys.all });
+    },
+  });
+}
+
 /** Staff member resolves (closes) a conversation */
 export function useResolveConversation() {
   const queryClient = useQueryClient();

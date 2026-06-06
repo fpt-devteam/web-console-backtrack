@@ -30,6 +30,7 @@ export function ClaimPreviewDialog({ conv, onClose, onTakeIt, onOpenDetail }: Cl
     conv.orgId,
     conv.supportFormData.category,
     conv.supportFormData.subCategoryId,
+    conv.supportFormData.notMatchInventoryIds,
   )
 
   return (

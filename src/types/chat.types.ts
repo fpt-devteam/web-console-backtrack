@@ -87,6 +87,8 @@ export interface SupportFormData {
   contactName?: string | null
   contactPhone?: string | null
   contactEmail?: string | null
+  /** Inventory item ids a staff member has reviewed and marked as NOT a match. */
+  notMatchInventoryIds?: Array<string> | null
 }
 
 /**

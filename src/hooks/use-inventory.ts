@@ -23,7 +23,8 @@ export function useInventoryItems(orgId: string | null, params?: GetInventoryPar
 
 /**
  * Count in-storage inventory items that share a claim's subcategory — i.e. the
- * items a staff could match this claim against. Reuses the same query key as the
+ * items a staff could match this claim against. Items already reviewed and marked
+ * as not-a-match (`excludeIds`) are left out. Reuses the same query key as the
  * verify picker (per category + InStorage), so React Query dedupes across all
  * claim cards: at most one request per category for the whole board.
  */
@@ -31,6 +32,7 @@ export function useMatchingInventoryCount(
   orgId: string | null,
   category?: string | null,
   subCategoryId?: string | null,
+  excludeIds?: Array<string> | null,
 ) {
   const enabled = !!orgId && !!category
   const { data } = useInventoryItems(enabled ? orgId : null, {
@@ -39,7 +41,10 @@ export function useMatchingInventoryCount(
     pageSize: 50,
   })
   if (!subCategoryId) return 0
-  return (data?.items ?? []).filter((item) => item.subcategoryId === subCategoryId).length
+  const excluded = new Set(excludeIds ?? [])
+  return (data?.items ?? []).filter(
+    (item) => item.subcategoryId === subCategoryId && !excluded.has(item.id),
+  ).length
 }
 
 export function useInventoryItem(orgId: string | null, id: string | null) {

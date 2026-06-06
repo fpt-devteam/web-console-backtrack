@@ -213,6 +213,20 @@ export const chatService = {
     if (!data.success) throw new Error(data.error?.message ?? 'Failed to verify conversation');
   },
 
+  /**
+   * Mark an inventory item as NOT a match for this claim. Appends the id to the
+   * conversation's `supportFormData.notMatchInventoryIds` (idempotent server-side
+   * via $addToSet). Returns the full updated conversation.
+   */
+  async markInventoryNotMatch(conversationId: string, inventoryId: string): Promise<IConversation> {
+    const { data } = await privateClient.post<ApiResponse<unknown>>(
+      `${BASE}/conversations/${conversationId}/not-match-inventory`,
+      { inventoryId }
+    );
+    if (!data.success) throw new Error(data.error?.message ?? 'Failed to mark item as not a match');
+    return normalizeConv(data.data);
+  },
+
   /** Resolve (close) a conversation. */
   async resolveConversation(conversationId: string): Promise<void> {
     const { data } = await privateClient.post<ApiResponse<void>>(
