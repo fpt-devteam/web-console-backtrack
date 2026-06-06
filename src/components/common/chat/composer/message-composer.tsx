@@ -4,6 +4,8 @@ import { Image as ImageIcon, Send } from 'lucide-react'
 interface QuickReply {
   label: string
   text: string
+  /** Optional group label; chips sharing a section render together under it. */
+  section?: string
 }
 
 interface MessageComposerProps {
@@ -56,21 +58,41 @@ export function MessageComposer({
     if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSend() }
   }
 
+  // Group chips by section, preserving first-seen order. Chips without a
+  // section render first, in an unlabeled row.
+  const quickReplyGroups: { section?: string; replies: QuickReply[] }[] = []
+  for (const qr of quickReplies ?? []) {
+    let group = quickReplyGroups.find((g) => g.section === qr.section)
+    if (!group) { group = { section: qr.section, replies: [] }; quickReplyGroups.push(group) }
+    group.replies.push(qr)
+  }
+
   return (
     <div className="px-4 py-3 border-t border-[#dddddd] bg-white">
-      {quickReplies && quickReplies.length > 0 && (
-        <div className="flex gap-2 overflow-x-auto pb-2 mb-1">
-          {quickReplies.map((qr) => (
-            <button
-              key={qr.label}
-              type="button"
-              onClick={() => handleQuickReply(qr.text)}
-              disabled={disabled}
-              title={qr.text}
-              className="shrink-0 px-3 py-1 rounded-full border border-[#dddddd] text-xs text-ash bg-white hover:bg-cloud hover:border-ink hover:text-ink transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
-            >
-              {qr.label}
-            </button>
+      {quickReplyGroups.length > 0 && (
+        <div className="space-y-1.5 mb-1">
+          {quickReplyGroups.map((group) => (
+            <div key={group.section ?? '__default__'}>
+              {group.section && (
+                <div className="px-0.5 pb-1 text-[10px] font-medium uppercase tracking-wide text-mute">
+                  {group.section}
+                </div>
+              )}
+              <div className="flex gap-2 overflow-x-auto pb-1">
+                {group.replies.map((qr) => (
+                  <button
+                    key={qr.label}
+                    type="button"
+                    onClick={() => handleQuickReply(qr.text)}
+                    disabled={disabled}
+                    title={qr.text}
+                    className="shrink-0 px-3 py-1 rounded-full border border-[#dddddd] text-xs text-ash bg-white hover:bg-cloud hover:border-ink hover:text-ink transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+                  >
+                    {qr.label}
+                  </button>
+                ))}
+              </div>
+            </div>
           ))}
         </div>
       )}

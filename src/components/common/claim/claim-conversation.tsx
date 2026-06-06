@@ -3,6 +3,7 @@ import { MessageList } from '@/components/common/chat/message/message-list'
 import { MessageComposer } from '@/components/common/chat/composer/message-composer'
 import { TypingIndicator } from '@/components/common/chat/typing/typing-indicator'
 import { CLAIM_QUICK_REPLIES } from './claim-quick-replies'
+import { getVerificationQuickReplies } from './claim-verification-questions'
 import type { IMessage, IConversationPartner } from '@/types/chat.types'
 
 export interface ClaimConversationProps {
@@ -15,6 +16,8 @@ export interface ClaimConversationProps {
   isTyping?: boolean
   readOnly?: boolean
   viewOnly?: boolean
+  /** Subcategory `code` of the claimed item; picks the verification questions. */
+  subcategoryCode?: string | null
   onLoadMore: () => void
   onSend: (text: string) => void
   onTypingStart?: () => void
@@ -33,6 +36,7 @@ export function ClaimConversation({
   isTyping = false,
   readOnly = false,
   viewOnly = false,
+  subcategoryCode,
   onLoadMore,
   onSend,
   onTypingStart,
@@ -50,6 +54,13 @@ export function ClaimConversation({
   }
 
   const composerDisabled = readOnly || viewOnly
+
+  // Base replies plus the "Yêu cầu xác minh" section tailored to this claim's
+  // subcategory.
+  const quickReplies = [
+    ...CLAIM_QUICK_REPLIES,
+    ...getVerificationQuickReplies(subcategoryCode),
+  ]
 
   return (
     <div className="flex-1 grid min-h-0" style={GRID_ROWS}>
@@ -73,7 +84,7 @@ export function ClaimConversation({
             onSend={onSend}
             onTypingStart={onTypingStart}
             onTypingStop={onTypingStop}
-            quickReplies={CLAIM_QUICK_REPLIES}
+            quickReplies={quickReplies}
           />
         )}
       </div>

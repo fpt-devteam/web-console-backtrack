@@ -4,6 +4,8 @@ export interface QuickReply {
   label: string
   /** Full message inserted into the composer (staff can still edit before sending). */
   text: string
+  /** Optional group label; chips sharing a section render together under it. */
+  section?: string
 }
 
 /**

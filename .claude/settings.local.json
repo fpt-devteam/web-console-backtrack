@@ -79,7 +79,8 @@
       "Bash(mv search-results.tsx inventory-search.page.tsx)",
       "Bash(sed -n '1,40p' src/utils/datetime.util.ts)",
       "Bash(sed -n '1,40p' src/components/common/avatar.tsx)",
-      "Bash(echo \"exit: $?\")"
+      "Bash(echo \"exit: $?\")",
+      "Bash(sed 's/\\\\.png$//')"
     ]
   }
 }

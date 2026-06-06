@@ -251,6 +251,7 @@ export function StaffClaimDetailPage() {
             isFetchingNextPage={isFetchingNextPage}
             isTyping={isTyping}
             readOnly={isClosed}
+            subcategoryCode={subcategoryCodeById[conv.supportFormData.subCategoryId]}
             onLoadMore={() => fetchNextPage()}
             onSend={handleSend}
             onTypingStart={startTyping}
