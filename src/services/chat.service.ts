@@ -2,6 +2,7 @@ import type { ApiResponse } from '@/types/api-response.type';
 import type {
   ConversationListResponse,
   IConversation,
+  IConversationPartner,
   MessageListResponse,
   SupportFormData,
 } from '@/types/chat.types';
@@ -48,11 +49,36 @@ interface RawConversation {
   deletedAt?: string | null;
 }
 
+/** Fallback claim form used when a payload omits it (e.g. the `queue:new` WS event). */
+const EMPTY_SUPPORT_FORM_DATA: SupportFormData = {
+  postId: '',
+  category: '',
+  subCategoryId: '',
+  itemName: '',
+  color: '',
+  additionalDetails: null,
+  imageUrls: null,
+  lostLocation: null,
+  eventTime: null,
+};
+
+/** Fallback partner used when a payload omits it. */
+const UNKNOWN_PARTNER: IConversationPartner = {
+  id: '',
+  displayName: null,
+  email: null,
+  avatarUrl: null,
+};
+
 /**
  * Normalise the raw backend ConversationResponse into the frontend IConversation.
  * Handles two backend shapes:
  *   1. List responses   → { conversationId, type, partner, lastMessage, … }
  *   2. Single GET/assign → { conversation: { conversationId, … } }
+ *
+ * `supportFormData` and `partner` are typed as required, but some payloads
+ * (notably the realtime `queue:new` event) omit them — fall back to safe empty
+ * values so downstream consumers (claim cards, helpers) never read off `undefined`.
  */
 export function normalizeConv(raw: unknown): IConversation {
   const obj = (
@@ -69,8 +95,8 @@ export function normalizeConv(raw: unknown): IConversation {
     orgSlug: obj.orgSlug ?? '',
     orgLogoUrl: obj.orgLogoUrl ?? '',
     assignedStaff: obj.assignedStaff ?? undefined,
-    supportFormData: obj.supportFormData!,
-    partner: obj.partner!,
+    supportFormData: obj.supportFormData ?? EMPTY_SUPPORT_FORM_DATA,
+    partner: obj.partner ?? UNKNOWN_PARTNER,
     lastMessage: obj.lastMessage ?? null,
     lastMessageAt: obj.lastMessage?.timestamp ?? null,
     lastMessageContent: obj.lastMessage?.content ?? null,

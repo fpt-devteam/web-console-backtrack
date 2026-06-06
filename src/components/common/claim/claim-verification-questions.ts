@@ -379,8 +379,9 @@ const FALLBACK_CODE = 'others'
  */
 export function getVerificationQuickReplies(code?: string | null): QuickReply[] {
   const questions =
-    (code && HANDOVER_VERIFICATION_QUESTIONS[code]) ||
-    HANDOVER_VERIFICATION_QUESTIONS[FALLBACK_CODE]
+    code && code in HANDOVER_VERIFICATION_QUESTIONS
+      ? HANDOVER_VERIFICATION_QUESTIONS[code]
+      : HANDOVER_VERIFICATION_QUESTIONS[FALLBACK_CODE]
   return questions.map((q) => ({
     label: q.label,
     text: q.text,
