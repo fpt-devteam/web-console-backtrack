@@ -20,7 +20,10 @@ const CATEGORY_ICON: Record<ItemCategory, string> = {
 }
 
 function CategoryFallback({ category, subcategoryIcon }: { category?: string | null; subcategoryIcon?: string | null }) {
-  const key = (category ?? 'Others') as ItemCategory
+  // Validate against the map at runtime: an unknown/empty category — e.g. a
+  // realtime `queue:new` claim that arrives without supportFormData — falls back
+  // to 'Others' instead of indexing the map with a missing key.
+  const key: ItemCategory = category && category in CATEGORY_COLOR ? (category as ItemCategory) : 'Others'
   const icon = subcategoryIcon ?? CATEGORY_ICON[key]
   const { bg } = CATEGORY_COLOR[key]
 

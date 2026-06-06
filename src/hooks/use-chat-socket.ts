@@ -8,7 +8,7 @@ import type {
   WSMessageSendSuccess,
   WSSendSupportMessagePayload,
 } from '@/types/chat.types';
-import { normalizeConv, toList } from '@/services/chat.service';
+import { chatService, normalizeConv, toList } from '@/services/chat.service';
 import { useChatContext } from '@/contexts/chat.context';
 import { auth } from '@/lib/firebase';
 import { MessageType } from '@/types/chat.types';
@@ -55,6 +55,9 @@ export function useSocketChatQueue(orgId?: string) {
     }
 
     function handleQueueNew(payload: unknown) {
+      // The `queue:new` payload is partial — it omits supportFormData details
+      // (itemName, images, …). Show the card immediately for responsiveness,
+      // then reconcile with the complete, correctly-ordered queue from REST.
       const conversation = normalizeConv(payload);
       setData((prev) => {
         if (prev.some((c) => c.id === conversation.id)) return prev;
@@ -65,6 +68,16 @@ export function useSocketChatQueue(orgId?: string) {
         if (old.some((c) => c.id === conversation.id)) return old;
         return [conversation, ...old];
       });
+
+      void chatService
+        .listQueue(orgId)
+        .then((conversations) => {
+          setData(conversations);
+          queryClient.setQueryData(chatKeys.queue(), conversations);
+        })
+        .catch((err) => {
+          console.error('[useSocketChatQueue] failed to refresh queue after queue:new', err);
+        });
     }
 
     console.log('[useSocketChatQueue] emitting join:org:queue', { orgId });
