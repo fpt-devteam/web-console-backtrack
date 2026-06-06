@@ -9,6 +9,8 @@ import { ClaimCardPartner } from './claim-card-partner'
 import { ClaimCardMeta } from './claim-card-meta'
 import { ClaimAssignee } from '@/components/common/claim/claim-assignee'
 import { useSubcategories } from '@/hooks/use-subcategories'
+import { useMatchingInventoryCount } from '@/hooks/use-inventory'
+import { useCurrentOrgId } from '@/contexts/current-org.context'
 import { getSubcategoryIcon } from '@/utils/subcategory-icon'
 import type { ItemCategory } from '@/services/inventory.service'
 
@@ -33,6 +35,10 @@ export function ClaimCard({ conv, disabled = false, onOpenConversation }: ClaimC
   const { data: subcategories } = useSubcategories()
   const subcategoryCode = subcategories?.find((s) => s.id === conv.supportFormData.subCategoryId)?.code
   const subcategoryIcon = subcategoryCode ? getSubcategoryIcon(category as ItemCategory, subcategoryCode) : null
+
+  // In-storage items of the same subcategory the staff could match this claim against.
+  const { currentOrgId } = useCurrentOrgId()
+  const matchCount = useMatchingInventoryCount(currentOrgId, category, conv.supportFormData.subCategoryId)
 
   const interactive = !!onOpenConversation
 
@@ -68,7 +74,7 @@ export function ClaimCard({ conv, disabled = false, onOpenConversation }: ClaimC
 
           <ClaimCardPartner name={partnerName} avatarUrl={conv.partner.avatarUrl} />
 
-          <ClaimCardMeta category={category} lastMessageAt={conv.lastMessageAt} />
+          <ClaimCardMeta category={category} lastMessageAt={conv.lastMessageAt} matchCount={matchCount} />
         </div>
       </div>
 

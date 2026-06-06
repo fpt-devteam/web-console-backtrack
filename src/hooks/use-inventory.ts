@@ -3,6 +3,7 @@ import {
   inventoryService,
   type CreateInventoryPayload,
   type GetInventoryParams,
+  type ItemCategory,
   type UpdateInventoryPayload,
 } from '@/services/inventory.service'
 
@@ -18,6 +19,27 @@ export function useInventoryItems(orgId: string | null, params?: GetInventoryPar
     queryFn: () => inventoryService.search(orgId!, params),
     enabled: !!orgId,
   })
+}
+
+/**
+ * Count in-storage inventory items that share a claim's subcategory — i.e. the
+ * items a staff could match this claim against. Reuses the same query key as the
+ * verify picker (per category + InStorage), so React Query dedupes across all
+ * claim cards: at most one request per category for the whole board.
+ */
+export function useMatchingInventoryCount(
+  orgId: string | null,
+  category?: string | null,
+  subCategoryId?: string | null,
+) {
+  const enabled = !!orgId && !!category
+  const { data } = useInventoryItems(enabled ? orgId : null, {
+    category: (category ?? undefined) as ItemCategory | undefined,
+    status: 'InStorage',
+    pageSize: 50,
+  })
+  if (!subCategoryId) return 0
+  return (data?.items ?? []).filter((item) => item.subcategoryId === subCategoryId).length
 }
 
 export function useInventoryItem(orgId: string | null, id: string | null) {

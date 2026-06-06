@@ -2,6 +2,7 @@ import cardIcon from '@/assets/icons/cards/card_icon.png'
 import electronicsIcon from '@/assets/icons/electronics/electronics_icon.png'
 import othersIcon from '@/assets/icons/others/others_icon.png'
 import personalBelongingIcon from '@/assets/icons/personal_belongings/personal_belonging_icon.png'
+import { Package } from 'lucide-react'
 import { formatDateTime } from '@/utils/datetime.util'
 import type { SupportFormData } from '@/types/chat.types'
 import type { ItemCategory } from '@/services/inventory.service'
@@ -10,6 +11,8 @@ import { CATEGORY_COLOR } from '@/components/common/claim/claim-card/claim-card.
 interface ClaimPreviewItemSectionProps {
   supportFormData?: SupportFormData | null
   createdAt?: string | null
+  /** In-storage items of the same subcategory this claim could be matched against. */
+  matchCount?: number
 }
 
 const CATEGORY_ICON: Record<ItemCategory, string> = {
@@ -46,7 +49,7 @@ function MetaRow({ label, value }: { label: string; value: string }) {
   )
 }
 
-export function ClaimPreviewItemSection({ supportFormData, createdAt }: ClaimPreviewItemSectionProps) {
+export function ClaimPreviewItemSection({ supportFormData, createdAt, matchCount = 0 }: ClaimPreviewItemSectionProps) {
   const imageUrls = supportFormData?.imageUrls ?? []
   const [primary, ...thumbs] = imageUrls
   const itemName  = supportFormData?.itemName ?? 'Unknown item'
@@ -90,6 +93,15 @@ export function ClaimPreviewItemSection({ supportFormData, createdAt }: ClaimPre
             {category && (
               <span className={`px-2 py-0.5 text-xs rounded-md font-medium ${catBg} ${catText}`}>
                 {category}
+              </span>
+            )}
+            {matchCount > 0 && (
+              <span
+                title={`${matchCount} item${matchCount > 1 ? 's' : ''} in storage match this claim`}
+                className="inline-flex items-center gap-1 rounded-full bg-rose-50 px-2 py-0.5 text-xs font-medium text-rose-600"
+              >
+                <Package className="h-3 w-3" />
+                {matchCount} match{matchCount > 1 ? 'es' : ''}
               </span>
             )}
           </div>

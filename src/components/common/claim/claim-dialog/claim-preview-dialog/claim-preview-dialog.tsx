@@ -7,7 +7,7 @@ import { ClaimPreviewCustomerSection } from './claim-preview-customer-section'
 import { ClaimPreviewMessageSection } from './claim-preview-message-section'
 import { ClaimPreviewFooter } from './claim-preview-footer'
 import { Spinner } from '@/components/common/core/spinner'
-import { useInventoryItem } from '@/hooks/use-inventory'
+import { useInventoryItem, useMatchingInventoryCount } from '@/hooks/use-inventory'
 import { useSubcategories } from '@/hooks/use-subcategories'
 
 export function ClaimPreviewDialog({ conv, onClose, onTakeIt, onOpenDetail }: ClaimPreviewDialogProps) {
@@ -24,6 +24,13 @@ export function ClaimPreviewDialog({ conv, onClose, onTakeIt, onOpenDetail }: Cl
     for (const s of subcategories ?? []) map[s.id] = s.name
     return map
   }, [subcategories])
+
+  // In-storage items of the same subcategory the staff could match this claim against.
+  const matchCount = useMatchingInventoryCount(
+    conv.orgId,
+    conv.supportFormData.category,
+    conv.supportFormData.subCategoryId,
+  )
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4" onClick={onClose}>
@@ -49,7 +56,11 @@ export function ClaimPreviewDialog({ conv, onClose, onTakeIt, onOpenDetail }: Cl
             />
           ) : (
             // No linked item → focus on the customer's claim.
-            <ClaimPreviewItemSection supportFormData={conv.supportFormData} createdAt={conv.createdAt} />
+            <ClaimPreviewItemSection
+              supportFormData={conv.supportFormData}
+              createdAt={conv.createdAt}
+              matchCount={matchCount}
+            />
           )}
 
           <ClaimPreviewCustomerSection
