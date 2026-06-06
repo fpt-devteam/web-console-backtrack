@@ -20,16 +20,20 @@ export function MessageList({
   isFetchingNextPage,
   onLoadMore,
 }: MessageListProps) {
-  const bottomRef = useRef<HTMLDivElement>(null)
+  const containerRef = useRef<HTMLDivElement>(null)
 
+  // Scroll the list's own container (not scrollIntoView, which would also scroll
+  // ancestor/window and shift the whole claim layout when a message arrives).
   useEffect(() => {
-    bottomRef.current?.scrollIntoView({ behavior: 'smooth' })
+    const el = containerRef.current
+    if (!el) return
+    el.scrollTo({ top: el.scrollHeight, behavior: 'smooth' })
   }, [messages.length])
 
   const groups = buildGroups([...messages].reverse())
 
   return (
-    <div className="overflow-y-auto py-4 px-4 space-y-1 bg-white">
+    <div ref={containerRef} className="min-h-0 overflow-y-auto py-4 px-4 space-y-1 bg-white">
       {hasNextPage && (
         <div className="text-center py-2">
           <button
@@ -54,8 +58,6 @@ export function MessageList({
           partner={partner}
         />
       ))}
-
-      <div ref={bottomRef} />
     </div>
   )
 }

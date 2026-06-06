@@ -15,7 +15,7 @@ export function ClaimDetailLayout({ header, sidebar, main, messaging }: ClaimDet
         <aside className="w-80 shrink-0 border-r border-hairline flex flex-col overflow-hidden">
           {sidebar}
         </aside>
-        <main className="flex-1 overflow-y-aut flex flex-col">
+        <main className="flex-1 overflow-y-auto flex flex-col">
           {main}
         </main>
         <aside className="w-100 shrink-0 border-l border-hairline flex flex-col overflow-hidden">
